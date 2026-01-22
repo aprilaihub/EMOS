@@ -10,32 +10,6 @@
 
 A modern open-source and community-based web-based platform for electronics materials science research and analysis, featuring an intuitive interface for materials exploration, AI-powered analysis, and integrated computational tools for electronic device design pipelines.
 
-## 🚀 Features
-
-### Materials Exploration
-- **Material Search**: Search and explore materials from comprehensive databases using various criteria
-- **Material Generation**: Generate new material compositions using AI-powered algorithms and predictive models
-- **Database Extractor**: Extract and analyze specific material properties and data from integrated databases
-- **Material Characterization**: Advanced materials analysis and characterization tools for comprehensive evaluation
-- **DFT Calculation**: Density Functional Theory calculations for electronic structure analysis
-- **Crystallographic Analysis**: Crystal structure analysis and symmetry determination tools
-- **Quantum Mechanics**: Quantum mechanical calculations for electronic and optical properties
-- **Tensor Analysis**: Tensor calculus and analysis for material property tensors
-
-### Electronics Applications
-- **Device Synthesizability**: Evaluate feasibility and methods for synthesizing electronic devices from selected materials
-- **Interface Calculation**: Calculate and analyze interfaces between different materials in electronic applications
-- **Property Prediction**: Electronic property prediction and optimization for semiconductor applications
-- **Band Structure**: Band structure calculations and electronic transport property analysis
-- **Thermal Management**: Thermal management analysis for electronic device performance optimization
-- **Reliability Assessment**: Reliability assessment and failure analysis for electronic materials
-- **Process Integration**: Process integration workflows for electronic device manufacturing
-- **Advanced Characterization**: Advanced characterization techniques for electronic materials evaluation
-
-### AI Assistant
-- **LLM Integration**: Built-in AI assistant for materials science queries
-- **Interactive Chat**: Real-time assistance with materials research
-- **Knowledge Base**: Access to comprehensive materials science information
 
 ## 🛠️ Technology Stack
 
@@ -52,12 +26,54 @@ EMOS/
 ├── index.html                    # Main application interface
 ├── script.js                     # Core JavaScript functionality & dynamic loading
 ├── styles.css                    # Application styling
-├── README.md                     # Project documentation
-├── images/                       # Graphics and logos
-└── Features/                     # Modular feature implementations
-    ├── BaseFeature.js           # Foundation class for all features
-    ├── Materials_Exploration/    # 8 materials science features
-    └── Electronics_Application/  # 8 electronics-focused features
+├── requirements.txt              # Python dependencies
+│
+├── Features/                     # Feature implementations (extend BaseFeature)
+│   ├── BaseFeature.py           # Base class for Python features
+│   ├── BaseFeature.js           # Base class for JS features
+│   ├── FeatureFactory.py        # Feature loader and manager
+│   ├── Materials_Exploration/   # Materials science features
+│   │   ├── MaterialSearch/
+│   │   ├── DftCalculation/
+│   │   └── ...
+│   └── Electronics_Application/ # Electronics-focused features
+│       ├── PropertyPrediction/
+│       ├── BandStructure/
+│       └── ...
+│
+├── Information_Units/           # Data sources & computational tools
+│   ├── Databases/               # Material property databases
+│   │   ├── BaseDatabase.py
+│   │   ├── DatabaseFactory.py
+│   │   ├── Materialsproject/
+│   │   ├── Jarvis/
+│   │   └── ...
+│   ├── Generators/              # Material generation tools
+│   │   ├── BaseGenerator.py
+│   │   ├── GeneratorFactory.py
+│   │   ├── Imatgen/
+│   │   ├── Matgan/
+│   │   └── ...
+│   └── Predictors/              # Property prediction models
+│       ├── BasePredictor.py
+│       ├── PredictorFactory.py
+│       ├── M3gnet/
+│       ├── Deepmd/
+│       └── ...
+│
+├── backend/                     # Flask backend server
+│   └── app.py                   # Flask application & API routes
+│
+├── docs/                        # Documentation (Sphinx)
+│   ├── conf.py
+│   ├── index.rst
+│   └── _build/                  # Generated HTML documentation
+│
+├── metadata/                    # Metadata & utilities
+│   ├── core_metadata.json
+│   └── core_utilities.py
+│
+└── images/                      # Graphics, logos, team photos
 ```
 
 ## 🎯 Getting Started
@@ -76,7 +92,7 @@ EMOS/
 
 2. **Install Python dependencies** (for backend features)
    ```bash
-   pip install flask flask-cors numpy scipy matplotlib pandas
+   python -m pip install -r requirements.txt
    ```
 
 ## 🏃‍♂️ Running the Application
@@ -194,106 +210,6 @@ The EMOS interface is divided into two main panels:
 3. **Configure Inputs**: Set parameters for your analysis or calculation
 4. **Process**: Execute the selected feature with your parameters
 5. **Review Results**: Analyze outputs and export data as needed
-
-### AI Assistant
-
-- Click "LLM for EMOS" to open the chat interface
-- Ask questions about materials science, properties, or applications
-- Get contextual help and guidance for using EMOS features
-
-## 🎨 Interface Features
-
-- **Responsive Design**: Adapts to different screen sizes
-- **Modern Aesthetics**: Glassmorphism effects and smooth animations
-- **Interactive Elements**: Hover effects and visual feedback
-- **Progress Tracking**: Real-time processing status indicators
-- **Modal Views**: Focused interfaces for specific tasks
-
-## 🔧 Development
-
-### Architecture Overview
-
-EMOS uses a modular architecture with dynamic feature loading:
-
-- **BaseFeature Class**: Foundation class providing common functionality for all features
-- **Feature Inheritance**: Each feature extends BaseFeature with specialized implementations
-- **Dynamic Loading**: Features are loaded on-demand using ES6 modules
-- **Consistent Interface**: All features provide standardized input/output interfaces
-
-### Feature Development
-
-Each feature is a self-contained module with:
-
-```javascript
-class YourFeature extends BaseFeature {
-    constructor() {
-        super(id, 'Feature Name', 'Description');
-    }
-    
-    createInputsHTML() {
-        // Custom input interface
-    }
-    
-    createOutputsHTML() {
-        // Custom output interface  
-    }
-    
-    async processFeature() {
-        // Feature-specific logic
-    }
-    
-    updateOutputs(results) {
-        // Update UI with results
-    }
-}
-```
-
-### File Organization
-- `index.html`: Main HTML structure with dynamic content areas
-- `script.js`: Application logic, feature loading, and AI responses
-- `styles.css`: Complete styling including responsive design and animations
-- `Features/BaseFeature.js`: Base class with common utilities
-- `Features/*/`: Individual feature implementations
-
-### Key JavaScript Functions
-- `loadFeatureModule()`: Dynamically loads and initializes features
-- `showFeatureView()`: Displays feature-specific interface
-- `showLLMView()`: Opens AI assistant chat
-- `createGenericFeatureView()`: Fallback UI for error handling
-
-### Styling Architecture
-- CSS Grid and Flexbox for layout
-- CSS custom properties for theming
-- Modular component styles
-- Responsive breakpoints
-
-## 🤝 Contributing
-
-We welcome contributions to EMOS! Here's how you can help:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes**: Implement your feature or fix
-4. **Commit changes**: `git commit -m 'Add amazing feature'`
-5. **Push to branch**: `git push origin feature/amazing-feature`
-6. **Open a Pull Request**: Describe your changes and their benefits
-
-### Development Guidelines
-- Follow existing code style and structure
-- Extend BaseFeature class for new features
-- Use descriptive names (max 3 words) for features
-- Implement error handling and fallback mechanisms
-- Test functionality across different browsers
-- Ensure responsive design compatibility
-- Document new features or changes
-
-### Adding New Features
-
-1. **Create Feature Directory**: `Features/Category/Feature_Name/`
-2. **Implement Feature Class**: Extend BaseFeature with custom methods
-3. **Update Mappings**: Add to `featureClasses` and `featureFiles` in script.js
-4. **Add UI Button**: Include in index.html with proper data attributes
-5. **Test Integration**: Verify loading and functionality
 
 ## 📝 License
 
