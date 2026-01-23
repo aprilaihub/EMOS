@@ -86,6 +86,11 @@ def generate_metadata_from_core(core_metadata_path="core_metadata.json", output_
     Returns:
         dict: The expanded metadata dictionary
     """
+    import os
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    core_metadata_path = os.path.join(script_dir, core_metadata_path)
+    output_path = os.path.join(script_dir, output_path)
+    
     with open(core_metadata_path, 'r') as f:
         core = json.load(f)
     
