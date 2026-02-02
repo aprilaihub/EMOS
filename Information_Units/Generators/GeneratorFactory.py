@@ -15,7 +15,7 @@ generator_factory = {
     "molgan": MolganGenerator,
     "conddfcvae": ConddfcvaeGenerator,
     "mygen1": Mygen1Generator,
-    "mygen2": Mygen2Generator
+    "mygen2": Mygen2Generator,
 }
 
 generator_registry = {}

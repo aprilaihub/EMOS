@@ -15,7 +15,7 @@ predictor_factory = {
     "synthnn": SynthnnPredictor,
     "esen": EsenPredictor,
     "mypred1": Mypred1Predictor,
-    "mypred2": Mypred2Predictor
+    "mypred2": Mypred2Predictor,
 }
 
 predictor_registry = {}

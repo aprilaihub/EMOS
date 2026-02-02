@@ -15,7 +15,7 @@ database_factory = {
     "materialsproject": MaterialsprojectDatabase,
     "alexandria": AlexandriaDatabase,
     "nomad": NomadDatabase,
-    "jarvis": JarvisDatabase
+    "jarvis": JarvisDatabase,
 }
 
 database_registry = {}
