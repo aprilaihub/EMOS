@@ -187,7 +187,7 @@ class {class_name}({base_class}):
         return None
 """
     
-    def create_templates(self, change_info):
+    def create_information_unit_templates(self, change_info):
         """Create template files for new Information Unit"""
         metadata = change_info['metadata']
         unit_type = change_info['type']
@@ -217,7 +217,7 @@ class {class_name}({base_class}):
         
         return metadata
 
-    def build_ui_labels(self, unit_type):
+    def build_information_unit_ui_labels(self, unit_type):
         """Render checkbox label rows for the given unit type using metadata.json"""
         indent = " " * 28
         labels = []
@@ -228,7 +228,7 @@ class {class_name}({base_class}):
             labels.append(f"{indent}<label><input type=\"checkbox\" ui-type=\"{singular}\" value=\"{value}\"> {label}</label>")
         return "\n".join(labels)
 
-    def update_ui_lists(self):
+    def update_information_unit_ui_lists(self):
         """Rewrite index.html checkbox lists from metadata so UI matches backend"""
         index_path = self.project_root / "index.html"
         if not index_path.exists():
@@ -244,7 +244,7 @@ class {class_name}({base_class}):
 
         for unit_type, dom_id in replacements:
             pattern = rf'(<div class="radio-group" id="{dom_id}">\n)(.*?)(\n\s*</div>)'
-            new_labels = self.build_ui_labels(unit_type)
+            new_labels = self.build_information_unit_ui_labels(unit_type)
             content, count = re.subn(pattern, rf"\1{new_labels}\3", content, flags=re.S)
             if count == 0:
                 print(f"  ⚠ Could not update {dom_id} in index.html; please verify markup")
@@ -252,7 +252,7 @@ class {class_name}({base_class}):
         index_path.write_text(content)
         print("  ✓ Updated UI checkboxes in index.html")
     
-    def update_factory_add(self, metadata, unit_type):
+    def update_information_unit_factory_add(self, metadata, unit_type):
         """Add entry to Factory.py file"""
         folder_map = {
             'databases': ('Databases', 'DatabaseFactory.py'),
@@ -301,7 +301,7 @@ class {class_name}({base_class}):
         
         print(f"  ✓ Updated {factory_file.name}")
     
-    def update_factory_remove(self, change_info):
+    def update_information_unit_factory_remove(self, change_info):
         """Remove entry from Factory.py file"""
         unit_type = change_info['type']
         component_name = change_info['name']
@@ -337,7 +337,7 @@ class {class_name}({base_class}):
         
         print(f"  ✓ Updated {factory_file.name}")
     
-    def remove_folder(self, change_info):
+    def remove_information_unit_folder(self, change_info):
         """Remove an Information Unit folder"""
         folder_path = self.project_root / change_info['path']
         
@@ -373,7 +373,7 @@ class {class_name}({base_class}):
             print("✓ No differences found!")
             print("  Metadata and filesystem are in sync.")
             print("\nSyncing UI checkboxes from metadata...")
-            self.update_ui_lists()
+            self.update_information_unit_ui_lists()
             print("\nPress Enter to exit...")
             input()
             return
@@ -423,9 +423,9 @@ class {class_name}({base_class}):
             
             if confirm in ['yes', 'y']:
                 print("\n🔨 Creating templates...\n")
-                metadata = self.create_templates(change_info)
-                self.update_factory_add(metadata, change_info['type'])
-                self.update_ui_lists()
+                metadata = self.create_information_unit_templates(change_info)
+                self.update_information_unit_factory_add(metadata, change_info['type'])
+                self.update_information_unit_ui_lists()
                 print("\n✓ Addition completed successfully!")
             else:
                 print("\n✗ Addition cancelled.")
@@ -444,9 +444,9 @@ class {class_name}({base_class}):
             
             if confirm in ['yes', 'y']:
                 print("\n🔨 Removing...\n")
-                self.remove_folder(change_info)
-                self.update_factory_remove(change_info)
-                self.update_ui_lists()
+                self.remove_information_unit_folder(change_info)
+                self.update_information_unit_factory_remove(change_info)
+                self.update_information_unit_ui_lists()
                 print("\n✓ Removal completed successfully!")
             else:
                 print("\n✗ Removal cancelled.")
