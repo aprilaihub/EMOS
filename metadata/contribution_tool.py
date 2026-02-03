@@ -25,41 +25,53 @@ class ContributionTool:
             self.metadata = json.load(f)
         
     def get_metadata_folders(self):
-        """Extract all folder paths from metadata"""
+        """Extract all folder paths from metadata (information units and features)"""
         folders = {
-            'databases': [],
-            'generators': [],
-            'predictors': []
+            'information_units': {
+                'databases': [],
+                'generators': [],
+                'predictors': []
+            },
+            'features': {}
         }
         
+        # Information Units
         for db in self.metadata['information_units']['databases']:
-            folders['databases'].append({
+            folders['information_units']['databases'].append({
                 'path': db['folder_path'],
                 'metadata': db
             })
             
         for gen in self.metadata['information_units']['generators']:
-            folders['generators'].append({
+            folders['information_units']['generators'].append({
                 'path': gen['folder_path'],
                 'metadata': gen
             })
             
         for pred in self.metadata['information_units']['predictors']:
-            folders['predictors'].append({
+            folders['information_units']['predictors'].append({
                 'path': pred['folder_path'],
                 'metadata': pred
             })
+        
+        # Features
+        feature_folders = self.get_feature_metadata_folders()
+        folders['features'] = feature_folders
             
         return folders
     
     def get_actual_folders(self):
-        """Scan filesystem for actual Information Unit folders"""
+        """Scan filesystem for actual Information Unit and Feature folders"""
         folders = {
-            'databases': [],
-            'generators': [],
-            'predictors': []
+            'information_units': {
+                'databases': [],
+                'generators': [],
+                'predictors': []
+            },
+            'features': {}
         }
         
+        # Information Units
         base_paths = {
             'databases': self.project_root / "Information_Units" / "Databases",
             'generators': self.project_root / "Information_Units" / "Generators",
@@ -71,24 +83,30 @@ class ContributionTool:
                 for item in base_path.iterdir():
                     if item.is_dir() and not item.name.startswith('_'):
                         rel_path = str(item.relative_to(self.project_root))
-                        folders[unit_type].append(rel_path)
+                        folders['information_units'][unit_type].append(rel_path)
+        
+        # Features
+        feature_folders = self.get_feature_actual_folders()
+        folders['features'] = feature_folders
         
         return folders
     
     def compare_folders(self, metadata_folders, actual_folders):
-        """Compare metadata vs actual folders and identify changes"""
+        """Compare metadata vs actual folders and identify changes for both information units and features"""
         additions = []
         removals = []
         
+        # Information Units comparison
         for unit_type in ['databases', 'generators', 'predictors']:
-            meta_paths = set([f['path'] for f in metadata_folders[unit_type]])
-            actual_paths = set(actual_folders[unit_type])
+            meta_paths = set([f['path'] for f in metadata_folders['information_units'][unit_type]])
+            actual_paths = set(actual_folders['information_units'][unit_type])
             
             # Find additions (in metadata but not in filesystem)
-            for folder_info in metadata_folders[unit_type]:
+            for folder_info in metadata_folders['information_units'][unit_type]:
                 if folder_info['path'] not in actual_paths:
                     additions.append({
-                        'type': unit_type,
+                        'type': 'information_unit',
+                        'unit_type': unit_type,
                         'path': folder_info['path'],
                         'metadata': folder_info['metadata']
                     })
@@ -98,10 +116,19 @@ class ContributionTool:
                 if path not in meta_paths:
                     folder_name = path.split('/')[-1]
                     removals.append({
-                        'type': unit_type,
+                        'type': 'information_unit',
+                        'unit_type': unit_type,
                         'path': path,
                         'name': folder_name
                     })
+        
+        # Features comparison
+        feature_additions, feature_removals = self.compare_feature_folders(
+            metadata_folders['features'], 
+            actual_folders['features']
+        )
+        additions.extend(feature_additions)
+        removals.extend(feature_removals)
         
         return additions, removals
     
@@ -348,6 +375,524 @@ class {class_name}({base_class}):
         else:
             print(f"  ⚠ Directory not found: {change_info['path']}")
     
+    # ============================================================================
+    # FEATURE CONTRIBUTION METHODS
+    # ============================================================================
+    
+    def _generate_inputs_extraction(self, inputs):
+        """Generate extract_inputs method body from metadata inputs"""
+        if not inputs:
+            return "            'feature_input': input_data.get('featureInput', ''),"
+        
+        lines = []
+        for inp in inputs:
+            param_name = inp.get('name', '')
+            display_name = inp.get('display_name', param_name)
+            default = inp.get('default', '')
+            
+            # Convert to camelCase from display name
+            camel_case = ''.join(word.capitalize() if i > 0 else word.lower() 
+                                for i, word in enumerate(display_name.split()))
+            
+            lines.append(f"            '{param_name}': input_data.get('{camel_case}', '{default}'),")
+        
+        return '\n'.join(lines) if lines else "            'feature_input': input_data.get('featureInput', ''),"
+    
+    def _generate_outputs_formatting(self, outputs):
+        """Generate format_outputs method body from metadata outputs"""
+        if not outputs:
+            return "            'feature_output': 'placeholder output value',"
+        
+        lines = []
+        for out in outputs:
+            output_name = out.get('name', '')
+            output_type = out.get('type', 'text')
+            lines.append(f"            '{output_name}': 'placeholder {output_type} value',")
+        
+        return '\n'.join(lines) if lines else "            'feature_output': 'placeholder output value',"
+    
+    def _generate_js_inputs_html(self, inputs, class_name):
+        """Generate JavaScript input HTML creation calls"""
+        if not inputs:
+            return "                ${this.createTextInput(`input_${this.featureId}`, 'Feature Input', 'Enter value')}"
+        
+        lines = []
+        for inp in inputs:
+            param_name = inp.get('name', '')
+            display_name = inp.get('display_name', param_name)
+            input_type = inp.get('type', 'text')
+            placeholder = inp.get('placeholder', f'Enter {display_name}')
+            
+            if input_type == 'text':
+                lines.append(f"                ${{this.createTextInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{placeholder}')}}")
+            elif input_type == 'number':
+                min_val = inp.get('min', '0')
+                max_val = inp.get('max', '100')
+                step = inp.get('step', '1')
+                lines.append(f"                ${{this.createNumberInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{min_val}', '{max_val}', '{step}')}}")
+            elif input_type == 'select':
+                options = inp.get('options', [])
+                options_list = ', '.join([f"{{{{value: '{o.get('value')}', text: '{o.get('text')}'}}}} " for o in options])
+                lines.append(f"                ${{this.createSelectInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', [{options_list}])}}")
+            elif input_type == 'checkbox':
+                lines.append(f"                ${{this.createCheckboxInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', true)}}")
+            elif input_type == 'file':
+                accept = inp.get('accept', '*')
+                lines.append(f"                ${{this.createFileInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{accept}')}}")
+        
+        return '\n'.join(lines) if lines else "                ${this.createTextInput(`input_${this.featureId}`, 'Feature Input', 'Enter value')}"
+    
+    def _generate_js_outputs_html(self, outputs, class_name):
+        """Generate JavaScript output display HTML"""
+        if not outputs:
+            return "                <div class=\"output-item\">\n                    <strong>Output:</strong> <span id=\"output_${this.featureId}\">Pending...</span>\n                </div>"
+        
+        lines = []
+        for out in outputs:
+            output_name = out.get('name', '')
+            display_name = out.get('display_name', output_name)
+            lines.append(f"                <div class=\"output-item\">\n                    <strong>{display_name}:</strong> <span id=\"{output_name}_${{this.featureId}}\">Pending...</span>\n                </div>")
+        
+        return '\n'.join(lines) if lines else "                <div class=\"output-item\">\n                    <strong>Output:</strong> <span id=\"output_${this.featureId}\">Pending...</span>\n                </div>"
+    
+    def _generate_js_outputs_placeholder(self, outputs):
+        """Generate placeholder return values for JavaScript processFeature()"""
+        if not outputs:
+            return "            'output': 'placeholder value',"
+        
+        lines = []
+        for out in outputs:
+            output_name = out.get('name', '')
+            display_name = out.get('display_name', output_name)
+            lines.append(f"            {output_name}: '{display_name} - placeholder',")
+        
+        return '\n'.join(lines) if lines else "            'output': 'placeholder value',"
+    
+    def get_feature_metadata_folders(self):
+        """Extract all feature paths from metadata"""
+        folders = {
+            'materials_exploration': [],
+            'electronics_application': []
+        }
+        
+        features = self.metadata.get('features', {})
+        
+        for category, feature_list in features.items():
+            if category == 'materials_exploration':
+                category_key = 'materials_exploration'
+            elif category == 'electronics_application':
+                category_key = 'electronics_application'
+            else:
+                continue
+            
+            # feature_list is now an array of feature objects
+            for feature_meta in feature_list:
+                path = feature_meta.get('folder_path')
+                if path:
+                    folders[category_key].append({
+                        'path': path,
+                        'metadata': {
+                            'display_name': feature_meta.get('display_name'),
+                            'description': feature_meta.get('description'),
+                            'name': feature_meta.get('name'),
+                            'id': feature_meta.get('id'),
+                            'class_name': feature_meta.get('class_name'),
+                            'file_name': feature_meta.get('file_name'),
+                            'js_file': feature_meta.get('js_file_name'),
+                            'category': category_key,
+                            'folder_path': path,
+                            'inputs': feature_meta.get('inputs', []),
+                            'outputs': feature_meta.get('outputs', [])
+                        }
+                    })
+        
+        return folders
+    
+    def get_feature_actual_folders(self):
+        """Scan filesystem for actual feature folders"""
+        folders = {
+            'materials_exploration': [],
+            'electronics_application': []
+        }
+        
+        base_paths = {
+            'materials_exploration': self.project_root / "Features" / "Materials_Exploration",
+            'electronics_application': self.project_root / "Features" / "Electronics_Application"
+        }
+        
+        for category, base_path in base_paths.items():
+            if base_path.exists():
+                for item in base_path.iterdir():
+                    if item.is_dir() and not item.name.startswith('_'):
+                        rel_path = str(item.relative_to(self.project_root))
+                        folders[category].append(rel_path)
+        
+        return folders
+    
+    def compare_feature_folders(self, metadata_folders, actual_folders):
+        """Compare metadata vs actual feature folders and identify changes"""
+        additions = []
+        removals = []
+        
+        for category in ['materials_exploration', 'electronics_application']:
+            meta_paths = set([f['path'] for f in metadata_folders[category]])
+            actual_paths = set(actual_folders[category])
+            
+            # Find additions (in metadata but not in filesystem)
+            for folder_info in metadata_folders[category]:
+                if folder_info['path'] not in actual_paths:
+                    additions.append({
+                        'type': 'feature',
+                        'category': category,
+                        'path': folder_info['path'],
+                        'metadata': folder_info['metadata']
+                    })
+            
+            # Find removals (in filesystem but not in metadata)
+            for path in actual_paths:
+                if path not in meta_paths:
+                    folder_name = path.split('/')[-1]
+                    removals.append({
+                        'type': 'feature',
+                        'category': category,
+                        'path': path,
+                        'name': folder_name
+                    })
+        
+        return additions, removals
+    
+    def create_feature_readme(self, metadata):
+        """Generate README.md content for features"""
+        inputs_section = ""
+        if 'inputs' in metadata:
+            inputs_section = "\n## Input Parameters\n\n"
+            for inp in metadata['inputs']:
+                inputs_section += f"- **{inp.get('display_name', inp.get('name'))}**: {inp.get('description', 'Parameter description')}\n"
+        
+        outputs_section = ""
+        if 'outputs' in metadata:
+            outputs_section = "\n## Output Parameters\n\n"
+            for out in metadata['outputs']:
+                outputs_section += f"- **{out.get('display_name', out.get('name'))}**: {out.get('description', 'Output description')}\n"
+        
+        return f"""# {metadata['display_name']}
+
+{metadata['description']}
+
+## Overview
+
+This feature provides {metadata['display_name'].lower()} functionality within the EMOS platform.
+
+## Key Methods
+
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
+
+{inputs_section}{outputs_section}
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.
+"""
+    
+    def create_feature_python_class(self, metadata, category):
+        """Generate Python feature class file content following BaseFeature pattern"""
+        class_name = metadata['class_name']
+        feature_name = metadata['display_name']
+        description = metadata['description']
+        
+        inputs = metadata.get('inputs', [])
+        outputs = metadata.get('outputs', [])
+        
+        inputs_extraction = self._generate_inputs_extraction(inputs)
+        outputs_formatting = self._generate_outputs_formatting(outputs)
+        
+        return f"""from Features.BaseFeature import BaseFeature
+from Information_Units.Generators.GeneratorFactory import generator_factory
+from Information_Units.Databases.DatabaseFactory import database_factory
+from Information_Units.Predictors.PredictorFactory import predictor_factory
+
+
+class {class_name}(BaseFeature):
+    def __init__(self, logger=None):
+        super().__init__("{feature_name}", logger)
+    
+    def info(self):
+        return "{feature_name}: {description}"
+    
+    def extract_inputs(self, input_data):
+        return {{
+{inputs_extraction}
+        }}
+    
+    def process_feature(self, inputs):
+        if self.logger:
+            self.logger.log('Initializing {feature_name}...', 'info')
+        
+        # Process information units (databases, generators, predictors)
+        self._process_information_units(inputs)
+        
+        if self.logger:
+            self.logger.log('{feature_name} processing completed', 'info')
+        
+        return {{
+            'status': 'completed',
+            'message': '{feature_name} feature executed successfully'
+        }}
+    
+    def format_outputs(self, results):
+        return {{
+{outputs_formatting}
+        }}
+    
+    def _process_information_units(self, inputs):
+        \"\"\"Process active databases, generators, and predictors with proper logging\"\"\"
+        # Process databases
+        active_databases = inputs.get('active_databases', [])
+        if not active_databases:
+            if self.logger:
+                self.logger.log('No active databases found.', 'warning')
+        else:
+            if self.logger:
+                database_names = ', '.join(db["name"] for db in active_databases)
+                self.logger.log(f'Active databases ({{len(active_databases)}}): {{database_names}}', 'info')
+            
+            for dtbs in active_databases:
+                db_key = dtbs['value']
+                if db_key in database_factory:
+                    db_instance = database_factory[db_key](db_key, self.logger)
+                    if self.logger:
+                        self.logger.log(db_instance.info(), 'info')
+                    retrieve_inputs = {{'search_criteria': inputs.get('search_criteria', '')}}
+                    try:
+                        db_instance.retrieve(retrieve_inputs)
+                    except Exception as e:
+                        if self.logger:
+                            self.logger.log(f'Database {{db_key}} retrieve() error: {{str(e)}}', 'warning')
+        
+        # Process generators
+        active_generators = inputs.get('active_generators', [])
+        if not active_generators:
+            if self.logger:
+                self.logger.log('No active generators found.', 'warning')
+        else:
+            if self.logger:
+                generator_names = ', '.join(gen["name"] for gen in active_generators)
+                self.logger.log(f'Active generators ({{len(active_generators)}}): {{generator_names}}', 'info')
+            
+            for gnrtr in active_generators:
+                gen_key = gnrtr['value']
+                if gen_key in generator_factory:
+                    gen_instance = generator_factory[gen_key](gen_key, self.logger)
+                    if self.logger:
+                        self.logger.log(gen_instance.info(), 'info')
+                    generate_inputs = {{'target_properties': inputs.get('target_properties', '')}}
+                    try:
+                        gen_instance.generate(generate_inputs)
+                    except Exception as e:
+                        if self.logger:
+                            self.logger.log(f'Generator {{gen_key}} generate() error: {{str(e)}}', 'warning')
+        
+        # Process predictors
+        active_predictors = inputs.get('active_predictors', [])
+        if not active_predictors:
+            if self.logger:
+                self.logger.log('No active predictors found.', 'warning')
+        else:
+            if self.logger:
+                predictor_names = ', '.join(pred["name"] for pred in active_predictors)
+                self.logger.log(f'Active predictors ({{len(active_predictors)}}): {{predictor_names}}', 'info')
+            
+            for prdctr in active_predictors:
+                pred_key = prdctr['value']
+                if pred_key in predictor_factory:
+                    pred_instance = predictor_factory[pred_key](pred_key, self.logger)
+                    if self.logger:
+                        self.logger.log(pred_instance.info(), 'info')
+                    predict_inputs = {{'material_property': inputs.get('material_property', '')}}
+                    try:
+                        pred_instance.predict(predict_inputs)
+                    except Exception as e:
+                        if self.logger:
+                            self.logger.log(f'Predictor {{pred_key}} predict() error: {{str(e)}}', 'warning')
+"""
+    
+    def create_feature_javascript_file(self, metadata, category):
+        """Generate JavaScript feature class file content following BaseFeature pattern"""
+        class_name = metadata['class_name'].replace('Feature', '')
+        feature_name = metadata['display_name']
+        description = metadata['description']
+        
+        inputs = metadata.get('inputs', [])
+        outputs = metadata.get('outputs', [])
+        
+        inputs_html = self._generate_js_inputs_html(inputs, class_name)
+        outputs_html = self._generate_js_outputs_html(outputs, class_name)
+        outputs_placeholder = self._generate_js_outputs_placeholder(outputs)
+        
+        return f"""// {feature_name} Feature
+class {class_name}Feature extends BaseFeature {{
+    constructor() {{
+        super(1, '{feature_name}', '{description}');
+    }}
+
+    createInputsHTML() {{
+        return `
+            <p>Configure input parameters for {feature_name}</p>
+            <div class="input-controls">
+{inputs_html}
+            </div>
+        `;
+    }}
+
+    createOutputsHTML() {{
+        return `
+            <p>{feature_name} results and outputs</p>
+            <div class="output-display" id="outputDisplay_${{this.featureId}}">
+{outputs_html}
+            </div>
+        `;
+    }}
+
+    async processFeature() {{
+        // Placeholder processing logic for {feature_name}
+        return {{
+{outputs_placeholder}
+        }};
+    }}
+}}
+"""
+    
+    def create_feature_templates(self, change_info):
+        """Create template files for new Feature"""
+        metadata = change_info['metadata']
+        category = change_info['category']
+        folder_path = self.project_root / change_info['path']
+        
+        # Create directory
+        folder_path.mkdir(parents=True, exist_ok=True)
+        print(f"  ✓ Created directory: {change_info['path']}")
+        
+        # Create README.md
+        readme_path = folder_path / "README.md"
+        with open(readme_path, 'w') as f:
+            f.write(self.create_feature_readme(metadata))
+        print(f"  ✓ Created README.md")
+        
+        # Create __init__.py
+        init_path = folder_path / "__init__.py"
+        with open(init_path, 'w') as f:
+            f.write(self.create_init_file())
+        print(f"  ✓ Created __init__.py")
+        
+        # Create Python class file
+        python_file_path = folder_path / metadata['file_name']
+        with open(python_file_path, 'w') as f:
+            f.write(self.create_feature_python_class(metadata, category))
+        print(f"  ✓ Created {metadata['file_name']}")
+        
+        # Create JavaScript file
+        js_file_path = folder_path / metadata['js_file']
+        with open(js_file_path, 'w') as f:
+            f.write(self.create_feature_javascript_file(metadata, category))
+        print(f"  ✓ Created {metadata['js_file']}")
+        
+        return metadata
+    
+    def update_feature_factory_add(self, metadata, category):
+        """Add entry to Feature FeatureFactory.py file"""
+        category_folder = 'Materials_Exploration' if category == 'materials_exploration' else 'Electronics_Application'
+        factory_file = self.project_root / "Features" / category_folder / "FeatureFactory.py"
+        
+        if not factory_file.exists():
+            print(f"  ⚠ Factory file not found: {factory_file}")
+            return
+        
+        with open(factory_file, 'r') as f:
+            content = f.read()
+        
+        # Prepare import and factory entry
+        component_folder = metadata['name']
+        class_name = metadata['class_name']
+        feature_id = metadata['id']
+        
+        import_line = f"from Features.{category_folder}.{component_folder}.{class_name} import {class_name}\n"
+        factory_entry = f'    "{feature_id}": {class_name},\n'
+        
+        # Find where to insert import (after last import)
+        lines = content.split('\n')
+        last_import_idx = 0
+        for i, line in enumerate(lines):
+            if line.startswith('from Features'):
+                last_import_idx = i
+        
+        # Insert import
+        lines.insert(last_import_idx + 1, import_line.rstrip())
+        
+        # Find factory dict and insert entry (before closing brace)
+        for i, line in enumerate(lines):
+            if 'feature_factory' in line and '{' in line:
+                # Find closing brace
+                for j in range(i, len(lines)):
+                    if lines[j].strip() == '}':
+                        lines.insert(j, factory_entry.rstrip())
+                        break
+                break
+        
+        # Write back
+        with open(factory_file, 'w') as f:
+            f.write('\n'.join(lines))
+        
+        print(f"  ✓ Updated {factory_file.name}")
+    
+    def update_feature_factory_remove(self, change_info):
+        """Remove entry from Feature FeatureFactory.py file"""
+        category = change_info['category']
+        component_name = change_info['name']
+        
+        category_folder = 'Materials_Exploration' if category == 'materials_exploration' else 'Electronics_Application'
+        factory_file = self.project_root / "Features" / category_folder / "FeatureFactory.py"
+        
+        if not factory_file.exists():
+            print(f"  ⚠ Factory file not found: {factory_file}")
+            return
+        
+        with open(factory_file, 'r') as f:
+            lines = f.readlines()
+        
+        # Remove import line and factory entry
+        new_lines = []
+        for line in lines:
+            # Skip import line containing the folder name
+            if f".{component_name}." in line and line.strip().startswith('from'):
+                continue
+            # Skip factory entry containing the folder name
+            if f'{component_name}' in line and ':' in line and line.strip().startswith('"'):
+                continue
+            new_lines.append(line)
+        
+        # Write back
+        with open(factory_file, 'w') as f:
+            f.writelines(new_lines)
+        
+        print(f"  ✓ Updated {factory_file.name}")
+    
+    def remove_feature_folder(self, change_info):
+        """Remove a Feature folder"""
+        folder_path = self.project_root / change_info['path']
+        
+        if folder_path.exists():
+            import shutil
+            shutil.rmtree(folder_path)
+            print(f"  ✓ Removed directory: {change_info['path']}")
+        else:
+            print(f"  ⚠ Directory not found: {change_info['path']}")
+    
     def run(self):
         """Main execution flow"""
         print("\n" + "="*60)
@@ -395,61 +940,109 @@ class {class_name}({base_class}):
             print("\n⚠ Please update metadata.json to include only one change.")
             sys.exit(1)
         
-        # Check if it's a feature change
-        if 'Features/' in change_info['path']:
-            print("✗ WARNING: Feature updates not implemented yet!\n")
-            print(f"Detected change in: {change_info['path']}")
-            print("\nThis tool currently only supports Information Units:")
-            print("  - Databases")
-            print("  - Generators")
-            print("  - Predictors")
-            sys.exit(1)
-        
         # Handle single valid change
         if change_type == 'addition':
-            print("📦 ADDITION detected:\n")
-            print(f"  Type: {change_info['type'].capitalize()[:-1]}")
-            print(f"  Path: {change_info['path']}")
-            print(f"  Name: {change_info['metadata']['display_name']}")
-            print(f"  Description: {change_info['metadata']['description']}")
+            # Information Unit Addition
+            if change_info['type'] == 'information_unit':
+                unit_type = change_info['unit_type']
+                print("📦 ADDITION detected (Information Unit):\n")
+                print(f"  Type: {unit_type.capitalize()[:-1]}")
+                print(f"  Path: {change_info['path']}")
+                print(f"  Name: {change_info['metadata']['display_name']}")
+                print(f"  Description: {change_info['metadata']['description']}")
+                
+                print("\nThis will create:")
+                print(f"  - {change_info['path']}/README.md")
+                print(f"  - {change_info['path']}/__init__.py")
+                print(f"  - {change_info['path']}/{change_info['metadata']['file_name']}")
+                print(f"  - Update {unit_type.capitalize()[:-1]}Factory.py")
+                
+                confirm = input("\nProceed with addition? (yes/no): ").strip().lower()
+                
+                if confirm in ['yes', 'y']:
+                    print("\n🔨 Creating templates...\n")
+                    metadata = self.create_information_unit_templates(change_info)
+                    self.update_information_unit_factory_add(metadata, unit_type)
+                    self.update_information_unit_ui_lists()
+                    print("\n✓ Addition completed successfully!")
+                else:
+                    print("\n✗ Addition cancelled.")
             
-            print("\nThis will create:")
-            print(f"  - {change_info['path']}/README.md")
-            print(f"  - {change_info['path']}/__init__.py")
-            print(f"  - {change_info['path']}/{change_info['metadata']['file_name']}")
-            print(f"  - Update {change_info['type'].capitalize()[:-1]}Factory.py")
-            
-            confirm = input("\nProceed with addition? (yes/no): ").strip().lower()
-            
-            if confirm in ['yes', 'y']:
-                print("\n🔨 Creating templates...\n")
-                metadata = self.create_information_unit_templates(change_info)
-                self.update_information_unit_factory_add(metadata, change_info['type'])
-                self.update_information_unit_ui_lists()
-                print("\n✓ Addition completed successfully!")
-            else:
-                print("\n✗ Addition cancelled.")
+            # Feature Addition
+            elif change_info['type'] == 'feature':
+                category = change_info['category']
+                category_display = 'Materials Exploration' if category == 'materials_exploration' else 'Electronics Application'
+                
+                print("📦 ADDITION detected (Feature):\n")
+                print(f"  Category: {category_display}")
+                print(f"  Path: {change_info['path']}")
+                print(f"  Name: {change_info['metadata']['display_name']}")
+                print(f"  Description: {change_info['metadata']['description']}")
+                
+                print("\nThis will create:")
+                print(f"  - {change_info['path']}/README.md")
+                print(f"  - {change_info['path']}/__init__.py")
+                print(f"  - {change_info['path']}/{change_info['metadata']['file_name']}")
+                print(f"  - {change_info['path']}/{change_info['metadata']['js_file']}")
+                print(f"  - Update FeatureFactory.py")
+                
+                confirm = input("\nProceed with addition? (yes/no): ").strip().lower()
+                
+                if confirm in ['yes', 'y']:
+                    print("\n🔨 Creating templates...\n")
+                    metadata = self.create_feature_templates(change_info)
+                    self.update_feature_factory_add(metadata, category)
+                    print("\n✓ Addition completed successfully!")
+                else:
+                    print("\n✗ Addition cancelled.")
         
         elif change_type == 'removal':
-            print("🗑️  REMOVAL detected:\n")
-            print(f"  Type: {change_info['type'].capitalize()[:-1]}")
-            print(f"  Path: {change_info['path']}")
-            print(f"  Name: {change_info['name']}")
+            # Information Unit Removal
+            if change_info['type'] == 'information_unit':
+                unit_type = change_info['unit_type']
+                print("🗑️  REMOVAL detected (Information Unit):\n")
+                print(f"  Type: {unit_type.capitalize()[:-1]}")
+                print(f"  Path: {change_info['path']}")
+                print(f"  Name: {change_info['name']}")
+                
+                print("\nThis will:")
+                print(f"  - Delete {change_info['path']}/")
+                print(f"  - Update {unit_type.capitalize()[:-1]}Factory.py")
+                
+                confirm = input("\n⚠ Proceed with removal? (yes/no): ").strip().lower()
+                
+                if confirm in ['yes', 'y']:
+                    print("\n🔨 Removing...\n")
+                    self.remove_information_unit_folder(change_info)
+                    self.update_information_unit_factory_remove(change_info)
+                    self.update_information_unit_ui_lists()
+                    print("\n✓ Removal completed successfully!")
+                else:
+                    print("\n✗ Removal cancelled.")
             
-            print("\nThis will:")
-            print(f"  - Delete {change_info['path']}/")
-            print(f"  - Update {change_info['type'].capitalize()[:-1]}Factory.py")
-            
-            confirm = input("\n⚠ Proceed with removal? (yes/no): ").strip().lower()
-            
-            if confirm in ['yes', 'y']:
-                print("\n🔨 Removing...\n")
-                self.remove_information_unit_folder(change_info)
-                self.update_information_unit_factory_remove(change_info)
-                self.update_information_unit_ui_lists()
-                print("\n✓ Removal completed successfully!")
-            else:
-                print("\n✗ Removal cancelled.")
+            # Feature Removal
+            elif change_info['type'] == 'feature':
+                category = change_info['category']
+                category_display = 'Materials Exploration' if category == 'materials_exploration' else 'Electronics Application'
+                
+                print("🗑️  REMOVAL detected (Feature):\n")
+                print(f"  Category: {category_display}")
+                print(f"  Path: {change_info['path']}")
+                print(f"  Name: {change_info['name']}")
+                
+                print("\nThis will:")
+                print(f"  - Delete {change_info['path']}/")
+                print(f"  - Update FeatureFactory.py")
+                
+                confirm = input("\n⚠ Proceed with removal? (yes/no): ").strip().lower()
+                
+                if confirm in ['yes', 'y']:
+                    print("\n🔨 Removing...\n")
+                    self.remove_feature_folder(change_info)
+                    self.update_feature_factory_remove(change_info)
+                    print("\n✓ Removal completed successfully!")
+                else:
+                    print("\n✗ Removal cancelled.")
 
 
 if __name__ == "__main__":
