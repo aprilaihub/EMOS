@@ -806,8 +806,7 @@ class {class_name}Feature extends BaseFeature {{
     
     def update_feature_factory_add(self, metadata, category):
         """Add entry to Feature FeatureFactory.py file"""
-        category_folder = 'Materials_Exploration' if category == 'materials_exploration' else 'Electronics_Application'
-        factory_file = self.project_root / "Features" / category_folder / "FeatureFactory.py"
+        factory_file = self.project_root / "Features" / "FeatureFactory.py"
         
         if not factory_file.exists():
             print(f"  ⚠ Factory file not found: {factory_file}")
@@ -819,9 +818,10 @@ class {class_name}Feature extends BaseFeature {{
         # Prepare import and factory entry
         component_folder = metadata['name']
         class_name = metadata['class_name']
-        feature_id = metadata['id']
-        
-        import_line = f"from Features.{category_folder}.{component_folder}.{class_name} import {class_name}\n"
+        feature_id = str(metadata['id'])
+
+        module_path = metadata['folder_path'].replace('/', '.')
+        import_line = f"from {module_path}.{class_name} import {class_name}\n"
         factory_entry = f'    "{feature_id}": {class_name},\n'
         
         # Find where to insert import (after last import)
@@ -852,11 +852,9 @@ class {class_name}Feature extends BaseFeature {{
     
     def update_feature_factory_remove(self, change_info):
         """Remove entry from Feature FeatureFactory.py file"""
-        category = change_info['category']
         component_name = change_info['name']
-        
-        category_folder = 'Materials_Exploration' if category == 'materials_exploration' else 'Electronics_Application'
-        factory_file = self.project_root / "Features" / category_folder / "FeatureFactory.py"
+        class_name = f"{component_name}Feature"
+        factory_file = self.project_root / "Features" / "FeatureFactory.py"
         
         if not factory_file.exists():
             print(f"  ⚠ Factory file not found: {factory_file}")
@@ -868,11 +866,11 @@ class {class_name}Feature extends BaseFeature {{
         # Remove import line and factory entry
         new_lines = []
         for line in lines:
-            # Skip import line containing the folder name
-            if f".{component_name}." in line and line.strip().startswith('from'):
+            # Skip import line containing the class name
+            if line.strip().startswith('from') and f"{class_name} import {class_name}" in line:
                 continue
-            # Skip factory entry containing the folder name
-            if f'{component_name}' in line and ':' in line and line.strip().startswith('"'):
+            # Skip factory entry containing the class name
+            if f": {class_name}," in line and line.strip().startswith('"'):
                 continue
             new_lines.append(line)
         
