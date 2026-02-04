@@ -1,7 +1,7 @@
 // Material Characterization Feature
 class MaterialCharacterizationFeature extends BaseFeature {
-    constructor() {
-        super(4, 'Material Characterization', 'Advanced materials analysis and characterization tools for comprehensive evaluation');
+    constructor(featureId) {
+        super(featureId, 'Material Characterization', 'Advanced materials analysis and characterization tools for comprehensive evaluation');
     }
 
     createInputsHTML() {

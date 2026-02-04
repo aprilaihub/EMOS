@@ -1,7 +1,7 @@
 // Tensor Analysis Feature
 class TensorAnalysisFeature extends BaseFeature {
-    constructor() {
-        super(8, 'Tensor Analysis', 'Comprehensive analysis tools for understanding material structure-property relationships');
+    constructor(featureId) {
+        super(featureId, 'Tensor Analysis', 'Comprehensive analysis tools for understanding material structure-property relationships');
     }
 
     createInputsHTML() {

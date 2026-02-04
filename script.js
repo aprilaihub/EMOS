@@ -138,7 +138,7 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             const FeatureClass = window[featureClasses[featureId]];
             console.log(`Feature class found:`, FeatureClass);
             
-            currentFeatureInstance = new FeatureClass();
+            currentFeatureInstance = new FeatureClass(featureId);
             window.features[featureId] = currentFeatureInstance;
             
             // Replace the feature view content with the specific feature's interface

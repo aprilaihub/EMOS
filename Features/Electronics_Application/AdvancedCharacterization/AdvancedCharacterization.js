@@ -1,7 +1,7 @@
 // Advanced Characterization Feature
 class AdvancedCharacterizationFeature extends BaseFeature {
-    constructor() {
-        super(16, 'Advanced Characterization', 'Advanced characterization techniques for electronic materials evaluation');
+    constructor(featureId) {
+        super(featureId, 'Advanced Characterization', 'Advanced characterization techniques for electronic materials evaluation');
     }
 
     createInputsHTML() {

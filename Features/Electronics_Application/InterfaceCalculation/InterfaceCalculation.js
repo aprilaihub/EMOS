@@ -1,7 +1,7 @@
 // Interface Calculation Feature
 class InterfaceCalculationFeature extends BaseFeature {
-    constructor() {
-        super(10, 'Interface Calculation', 'Calculate and analyze interfaces between different materials in electronic applications');
+    constructor(featureId) {
+        super(featureId, 'Interface Calculation', 'Calculate and analyze interfaces between different materials in electronic applications');
     }
 
     createInputsHTML() {

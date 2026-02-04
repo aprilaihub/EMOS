@@ -1,7 +1,7 @@
 // DFT Calculation Feature
 class DftCalculationFeature extends BaseFeature {
-    constructor() {
-        super(5, 'DFT Calculation', 'Materials optimization workflows for enhanced performance characteristics');
+    constructor(featureId) {
+        super(featureId, 'DFT Calculation', 'Materials optimization workflows for enhanced performance characteristics');
     }
 
     createInputsHTML() {

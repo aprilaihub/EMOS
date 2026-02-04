@@ -1,7 +1,7 @@
 // Process Integration Feature
 class ProcessIntegrationFeature extends BaseFeature {
-    constructor() {
-        super(15, 'Process Integration', 'Process integration workflows for electronic device manufacturing');
+    constructor(featureId) {
+        super(featureId, 'Process Integration', 'Process integration workflows for electronic device manufacturing');
     }
 
     createInputsHTML() {

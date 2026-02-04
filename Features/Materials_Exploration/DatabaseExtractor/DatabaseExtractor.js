@@ -1,7 +1,7 @@
 // Database Extractor Feature
 class DatabaseExtractorFeature extends BaseFeature {
-    constructor() {
-        super(3, 'Database Extractor', 'Extract and analyze specific material properties and data from integrated databases');
+    constructor(featureId) {
+        super(featureId, 'Database Extractor', 'Extract and analyze specific material properties and data from integrated databases');
     }
 
     createInputsHTML() {

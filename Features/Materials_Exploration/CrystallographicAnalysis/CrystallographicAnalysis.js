@@ -1,7 +1,7 @@
 // Crystallographic Analysis Feature
 class CrystallographicAnalysisFeature extends BaseFeature {
-    constructor() {
-        super(6, 'Crystallographic Analysis', 'Simulation and modeling tools for predicting material behavior under various conditions');
+    constructor(featureId) {
+        super(featureId, 'Crystallographic Analysis', 'Simulation and modeling tools for predicting material behavior under various conditions');
     }
 
     createInputsHTML() {

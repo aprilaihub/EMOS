@@ -1,7 +1,7 @@
 // Property Prediction Feature
 class PropertyPredictionFeature extends BaseFeature {
-    constructor() {
-        super(11, 'Property Prediction', 'Electronic property prediction and optimization for semiconductor applications');
+    constructor(featureId) {
+        super(featureId, 'Property Prediction', 'Electronic property prediction and optimization for semiconductor applications');
     }
 
     createInputsHTML() {
