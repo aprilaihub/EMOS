@@ -993,6 +993,39 @@ class {class_name}Feature extends BaseFeature {{
         
         return ''.join(lines) + "\n"
     
+    def update_feature_factory_ids(self):
+        """Rebuild feature_factory dictionary IDs from metadata.json to match current state"""
+        factory_file = self.project_root / "Features" / "FeatureFactory.py"
+        
+        if not factory_file.exists():
+            print("  ⚠ FeatureFactory.py not found; skipping factory ID update")
+            return
+        
+        with open(factory_file, 'r') as f:
+            content = f.read()
+        
+        # Build new factory dictionary from metadata
+        factory_entries = []
+        indent = "    "
+        
+        # Combine both categories in order
+        for category in ['materials_exploration', 'electronics_application']:
+            features = self.metadata.get('features', {}).get(category, [])
+            for feature in features:
+                feature_id = str(feature.get('id'))
+                class_name = feature.get('class_name')
+                factory_entries.append(f'{indent}"{feature_id}": {class_name},')
+        
+        new_factory_dict = "\n".join(factory_entries)
+        
+        # Replace the feature_factory dictionary
+        pattern = r'(feature_factory = \{)(.*?)(\n\})'
+        replacement = rf'\1\n{new_factory_dict}\n\3'
+        content = re.sub(pattern, replacement, content, flags=re.S)
+        
+        factory_file.write_text(content)
+        print("  ✓ Updated feature_factory IDs in FeatureFactory.py")
+    
     def update_all_feature_ui(self):
         """Update all UI components for features (buttons and scripts)"""
         print("\n  Updating UI components...")
@@ -1148,6 +1181,7 @@ class {class_name}Feature extends BaseFeature {{
                     print("\n🔨 Removing...\n")
                     self.remove_feature_folder(change_info)
                     self.update_feature_factory_remove(change_info)
+                    self.update_feature_factory_ids()
                     self.update_all_feature_ui()
                     print("\n✓ Removal completed successfully!")
                 else:
