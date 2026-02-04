@@ -59,6 +59,6 @@ def get_feature_info(feature_id):
         return None
     
     feature_class = feature_factory[feature_id]
-    # Create temporary instance to get info
-    temp_feature = feature_class()
+    # Create temporary instance to get info (logger=None is default)
+    temp_feature = feature_class(logger=None)
     return temp_feature.info()
