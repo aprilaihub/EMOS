@@ -943,7 +943,7 @@ window.{class_name}Feature = {class_name}Feature;
             button = f'<button class="feature-btn" data-feature="{feature_id}" data-feature-name="{name}" data-feature-desc="{desc}">{name}</button>'
             buttons.append(button)
         
-        return indent + indent.join(buttons)
+        return indent + indent.join(buttons) + "\n" + " " * 28
     
     def update_feature_ui_scripts(self):
         """Update feature mappings in script.js based on metadata.json"""
