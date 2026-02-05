@@ -737,8 +737,8 @@ class {class_name}(BaseFeature):
         
         return f"""// {feature_name} Feature
 class {class_name}Feature extends BaseFeature {{
-    constructor() {{
-        super(1, '{feature_name}', '{description}');
+    constructor(featureId) {{
+        super(featureId, '{feature_name}', '{description}');
     }}
 
     createInputsHTML() {{
@@ -766,6 +766,8 @@ class {class_name}Feature extends BaseFeature {{
         }};
     }}
 }}
+
+window.{class_name}Feature = {class_name}Feature;
 """
     
     def create_feature_templates(self, change_info):
