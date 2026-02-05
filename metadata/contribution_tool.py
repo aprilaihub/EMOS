@@ -381,8 +381,17 @@ class {class_name}({base_class}):
     
     def _generate_inputs_extraction(self, inputs):
         """Generate extract_inputs method body from metadata inputs"""
+        base_lines = [
+            "            'feature_input': input_data.get('featureInput', ''),",
+            "            'active_databases': input_data.get('active_databases', []),",
+            "            'active_generators': input_data.get('active_generators', []),",
+            "            'active_predictors': input_data.get('active_predictors', []),",
+            "            'search_criteria': input_data.get('search_criteria', ''),",
+            "            'target_properties': input_data.get('target_properties', ''),",
+            "            'material_property': input_data.get('material_property', ''),",
+        ]
         if not inputs:
-            return "            'feature_input': input_data.get('featureInput', ''),"
+            return "\n".join(base_lines)
         
         lines = []
         for inp in inputs:
@@ -395,8 +404,9 @@ class {class_name}({base_class}):
                                 for i, word in enumerate(display_name.split()))
             
             lines.append(f"            '{param_name}': input_data.get('{camel_case}', '{default}'),")
-        
-        return '\n'.join(lines) if lines else "            'feature_input': input_data.get('featureInput', ''),"
+
+        lines.extend(base_lines)
+        return '\n'.join(lines) if lines else "\n".join(base_lines)
     
     def _generate_outputs_formatting(self, outputs):
         """Generate format_outputs method body from metadata outputs"""
