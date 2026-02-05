@@ -1132,6 +1132,7 @@ class {class_name}Feature extends BaseFeature {{
                     print("\n🔨 Creating templates...\n")
                     metadata = self.create_feature_templates(change_info)
                     self.update_feature_factory_add(metadata, category)
+                    self.update_feature_factory_ids()
                     self.update_all_feature_ui()
                     print("\n✓ Addition completed successfully!")
                 else:
