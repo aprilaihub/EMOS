@@ -58,7 +58,8 @@ def generate_feature_metadata(display_name, category, description, core_meta=Non
         try:
             feature_id = category_features.index(display_name) + 1
             if category == "electronics_application":
-                feature_id += 8  # Electronics features start from ID 9
+                materials_count = len(core_meta["features"].get("materials_exploration", []))
+                feature_id += materials_count
         except ValueError:
             pass
     
