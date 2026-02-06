@@ -27,7 +27,7 @@ const featureClasses = {
     13: 'ThermalManagementFeature',
     14: 'ReliabilityAssessmentFeature',
     15: 'ProcessIntegrationFeature',
-    16: 'AdvancedCharacterizationFeature'
+    16: 'AdvancedCharacterizationFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
@@ -47,7 +47,7 @@ const featureFiles = {
     13: './Features/Electronics_Application/ThermalManagement/ThermalManagement.js',
     14: './Features/Electronics_Application/ReliabilityAssessment/ReliabilityAssessment.js',
     15: './Features/Electronics_Application/ProcessIntegration/ProcessIntegration.js',
-    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js'
+    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
 };
 
 // Global feature instances storage
