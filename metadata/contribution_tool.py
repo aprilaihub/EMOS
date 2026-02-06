@@ -1020,13 +1020,18 @@ window.{class_name}Feature = {class_name}Feature;
         factory_entries = []
         indent = "    "
         
-        # Combine both categories in order
+        # Collect all features first
+        all_features = []
         for category in ['materials_exploration', 'electronics_application']:
             features = self.metadata.get('features', {}).get(category, [])
-            for feature in features:
-                feature_id = str(feature.get('id'))
-                class_name = feature.get('class_name')
-                factory_entries.append(f'{indent}"{feature_id}": {class_name},')
+            all_features.extend(features)
+        
+        # Iterate with enumeration to handle last entry
+        for i, feature in enumerate(all_features):
+            feature_id = str(feature.get('id'))
+            class_name = feature.get('class_name')
+            comma = '' if i == len(all_features) - 1 else ','
+            factory_entries.append(f'{indent}"{feature_id}": {class_name}{comma}')
         
         new_factory_dict = "\n".join(factory_entries)
         

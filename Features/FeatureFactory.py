@@ -35,7 +35,7 @@ feature_factory = {
     "13": ThermalManagementFeature,
     "14": ReliabilityAssessmentFeature,
     "15": ProcessIntegrationFeature,
-    "16": AdvancedCharacterizationFeature,
+    "16": AdvancedCharacterizationFeature
 }
 
 
