@@ -434,21 +434,21 @@ class {class_name}({base_class}):
             placeholder = inp.get('placeholder', f'Enter {display_name}')
             
             if input_type == 'text':
-                lines.append(f"                ${{this.createTextInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{placeholder}')}}")
+                lines.append(f"                ${{this.createTextInput(`{param_name}_${{this.featureId}}`, '{display_name}', '{placeholder}')}}")
             elif input_type == 'number':
                 min_val = inp.get('min', '0')
                 max_val = inp.get('max', '100')
                 step = inp.get('step', '1')
-                lines.append(f"                ${{this.createNumberInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{min_val}', '{max_val}', '{step}')}}")
+                lines.append(f"                ${{this.createNumberInput(`{param_name}_${{this.featureId}}`, '{display_name}', '{min_val}', '{max_val}', '{step}')}}")
             elif input_type == 'select':
                 options = inp.get('options', [])
-                options_list = ', '.join([f"{{{{value: '{o.get('value')}', text: '{o.get('text')}'}}}} " for o in options])
-                lines.append(f"                ${{this.createSelectInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', [{options_list}])}}")
+                options_list = ', '.join([f"{{value: '{o.get('value')}', text: '{o.get('text')}'}}" for o in options])
+                lines.append(f"                ${{this.createSelectInput(`{param_name}_${{this.featureId}}`, '{display_name}', [{options_list}])}}")
             elif input_type == 'checkbox':
-                lines.append(f"                ${{this.createCheckboxInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', true)}}")
+                lines.append(f"                ${{this.createCheckboxInput(`{param_name}_${{this.featureId}}`, '{display_name}', true)}}")
             elif input_type == 'file':
                 accept = inp.get('accept', '*')
-                lines.append(f"                ${{this.createFileInput(`{param_name}_${{{{this.featureId}}}}`, '{display_name}', '{accept}')}}")
+                lines.append(f"                ${{this.createFileInput(`{param_name}_${{this.featureId}}`, '{display_name}', '{accept}')}}")
         
         return '\n'.join(lines) if lines else "                ${this.createTextInput(`input_${this.featureId}`, 'Feature Input', 'Enter value')}"
     
