@@ -478,6 +478,35 @@ class {class_name}({base_class}):
         
         return '\n'.join(lines) if lines else "            'output': 'placeholder value',"
     
+    def _generate_js_updateOutputs(self, outputs):
+        """Generate updateOutputs method for JavaScript feature class"""
+        if not outputs:
+            return ""  # Use default BaseFeature implementation
+        
+        lines = []
+        lines.append("    updateOutputs(results = null) {")
+        lines.append("        const finalResults = results || this.results;")
+        lines.append("        ")
+        lines.append("        if (finalResults.error) {")
+        
+        # Use first output field for error display
+        first_output = outputs[0].get('name', 'output')
+        lines.append(f"            document.getElementById(`{first_output}_${{this.featureId}}`).textContent = `Error: ${{finalResults.error}}`;")
+        lines.append("            return;")
+        lines.append("        }")
+        lines.append("        ")
+        
+        # Generate update for each output field
+        for out in outputs:
+            output_name = out.get('name', '')
+            lines.append(f"        if (finalResults.{output_name}) {{")
+            lines.append(f"            document.getElementById(`{output_name}_${{this.featureId}}`).textContent = finalResults.{output_name};")
+            lines.append("        }")
+        
+        lines.append("    }")
+        
+        return '\n'.join(lines)
+    
     def get_feature_metadata_folders(self):
         """Extract all feature paths from metadata"""
         folders = {
@@ -744,6 +773,10 @@ class {class_name}(BaseFeature):
         inputs_html = self._generate_js_inputs_html(inputs, class_name)
         outputs_html = self._generate_js_outputs_html(outputs, class_name)
         outputs_placeholder = self._generate_js_outputs_placeholder(outputs)
+        updateOutputs_method = self._generate_js_updateOutputs(outputs)
+        
+        # Build the class with optional updateOutputs method
+        updateOutputs_section = f"\n\n{updateOutputs_method}" if updateOutputs_method else ""
         
         return f"""// {feature_name} Feature
 class {class_name}Feature extends BaseFeature {{
@@ -774,7 +807,7 @@ class {class_name}Feature extends BaseFeature {{
         return {{
 {outputs_placeholder}
         }};
-    }}
+    }}{updateOutputs_section}
 }}
 
 window.{class_name}Feature = {class_name}Feature;
