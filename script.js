@@ -13,7 +13,7 @@ const chatMessages = document.getElementById('chatMessages');
 // Feature class mapping for dynamic loading
 const featureClasses = {
     1: 'MaterialSearchFeature',
-    2: 'MaterialGenerationFeature', 
+    2: 'MaterialGenerationFeature',
     3: 'DatabaseExtractorFeature',
     4: 'MaterialCharacterizationFeature',
     5: 'DftCalculationFeature',
