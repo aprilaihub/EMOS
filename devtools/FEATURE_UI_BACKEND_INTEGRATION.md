@@ -52,7 +52,7 @@ Add new feature entry to the appropriate category:
 
 ### Step 2: Run Contribution Tool
 ```bash
-python metadata/contribution_tool.py
+python devtools/contribution_tool.py
 ```
 
 ### Step 3: Tool Actions (Automatic)
@@ -406,7 +406,7 @@ Delete the feature entry from the appropriate category array.
 
 ### Step 2: Run Contribution Tool
 ```bash
-python metadata/contribution_tool.py
+python devtools/contribution_tool.py
 ```
 
 ### Step 3: Tool Actions (Automatic)

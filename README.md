@@ -69,7 +69,7 @@ EMOS/
 │   ├── index.rst
 │   └── _build/                  # Generated HTML documentation
 │
-├── metadata/                    # Metadata & utilities
+├── devtools/                   # Development tools & contribution utilities
 │   ├── core_metadata.json
 │   └── core_utilities.py
 │

@@ -16,7 +16,7 @@ from pathlib import Path
 class ContributionTool:
     def __init__(self, project_root):
         self.project_root = Path(project_root)
-        self.metadata_path = self.project_root / "metadata" / "metadata.json"
+        self.metadata_path = self.project_root / "devtools" / "metadata.json"
         self.metadata = None
         
     def load_metadata(self):

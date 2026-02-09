@@ -8,7 +8,7 @@
 
 **1. Edit the source metadata**
 ```bash
-nano metadata/core_metadata.json
+nano devtools/core_metadata.json
 ```
 
 Add your component under the appropriate section:
