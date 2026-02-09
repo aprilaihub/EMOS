@@ -217,7 +217,7 @@ class {class_name}({base_class}):
     def create_information_unit_templates(self, change_info):
         """Create template files for new Information Unit"""
         metadata = change_info['metadata']
-        unit_type = change_info['type']
+        unit_type = change_info['unit_type']
         folder_path = self.project_root / change_info['path']
         
         # Create directory
@@ -330,7 +330,7 @@ class {class_name}({base_class}):
     
     def update_information_unit_factory_remove(self, change_info):
         """Remove entry from Factory.py file"""
-        unit_type = change_info['type']
+        unit_type = change_info['unit_type']
         component_name = change_info['name']
         
         folder_map = {
