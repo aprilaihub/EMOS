@@ -346,75 +346,130 @@
         "js_file_name": "MaterialGeneration.js",
         "inputs": [
           {
-            "name": "targetProperties",
-            "display_name": "Target Properties",
-            "type": "text",
-            "required": true,
-            "default": "",
-            "placeholder": "e.g., High conductivity, Low thermal expansion",
-            "description": "Desired material properties for generation"
-          },
-          {
-            "name": "elementConstraints",
-            "display_name": "Element Constraints",
-            "type": "text",
-            "required": false,
-            "default": "",
-            "placeholder": "e.g., No rare earth elements",
-            "description": "Constraints on chemical elements to use"
-          },
-          {
-            "name": "generationMethod",
-            "display_name": "Generation Method",
+            "name": "targetProperty",
+            "display_name": "Target Property",
             "type": "select",
             "required": true,
             "options": [
               {
-                "value": "neural",
-                "text": "Neural Network"
+                "value": "high_strength",
+                "text": "High Mechanical Strength"
               },
               {
-                "value": "genetic",
-                "text": "Genetic Algorithm"
+                "value": "thermal_conductivity",
+                "text": "High Thermal Conductivity"
               },
               {
-                "value": "bayesian",
-                "text": "Bayesian Optimization"
+                "value": "electrical_insulator",
+                "text": "Electrical Insulator"
+              },
+              {
+                "value": "semiconductor",
+                "text": "Semiconductor"
+              },
+              {
+                "value": "superconductor",
+                "text": "Superconductor"
               }
             ],
-            "default": "neural",
-            "description": "Method for generating new materials"
+            "default": "high_strength",
+            "description": "Target property for material generation"
           },
           {
-            "name": "numCandidates",
-            "display_name": "Number of Candidates",
+            "name": "baseElements",
+            "display_name": "Base Element Group",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "metals",
+                "text": "Metals (Fe, Al, Ti, etc.)"
+              },
+              {
+                "value": "ceramics",
+                "text": "Ceramics (Si, O, N, etc.)"
+              },
+              {
+                "value": "polymers",
+                "text": "Polymers (C, H, O, etc.)"
+              },
+              {
+                "value": "composites",
+                "text": "Composite Materials"
+              }
+            ],
+            "default": "metals",
+            "description": "Base element group for generation"
+          },
+          {
+            "name": "numCompositions",
+            "display_name": "Number of Compositions",
             "type": "number",
-            "required": false,
+            "required": true,
             "min": 1,
             "max": 100,
             "step": 1,
             "default": 10,
-            "description": "Number of material candidates to generate"
+            "description": "Number of material compositions to generate"
+          },
+          {
+            "name": "targetValue",
+            "display_name": "Target Property Value",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 1000,
+            "step": 0.1,
+            "default": 0,
+            "description": "Target property value"
+          },
+          {
+            "name": "includeRareElements",
+            "display_name": "Include Rare Earth Elements",
+            "type": "checkbox",
+            "required": false,
+            "default": false,
+            "description": "Include rare earth elements in generation"
+          },
+          {
+            "name": "optimizeForCost",
+            "display_name": "Optimize for Cost-Effectiveness",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Optimize for cost-effectiveness"
           }
         ],
         "outputs": [
           {
-            "name": "generatedMaterials",
-            "display_name": "Generated Materials",
-            "type": "table",
-            "description": "List of generated material candidates"
+            "name": "generatedCount",
+            "display_name": "Generated Compositions",
+            "type": "text",
+            "description": "Number of compositions generated"
           },
           {
-            "name": "confidenceScores",
-            "display_name": "Confidence Scores",
+            "name": "bestCandidate",
+            "display_name": "Best Candidate",
             "type": "text",
-            "description": "Confidence scores for generated materials"
+            "description": "Best material candidate"
           },
           {
-            "name": "synthesisRoute",
-            "display_name": "Synthesis Route",
+            "name": "predictedPerformance",
+            "display_name": "Predicted Performance",
             "type": "text",
-            "description": "Suggested synthesis pathway for best candidate"
+            "description": "Performance prediction"
+          },
+          {
+            "name": "synthesisDifficulty",
+            "display_name": "Synthesis Difficulty",
+            "type": "text",
+            "description": "Difficulty level for synthesis"
+          },
+          {
+            "name": "exportData",
+            "display_name": "Export Data",
+            "type": "link",
+            "description": "Export generated compositions"
           }
         ]
       },
@@ -426,7 +481,132 @@
         "folder_path": "Features/Materials_Exploration/DatabaseExtractor",
         "class_name": "DatabaseExtractorFeature",
         "file_name": "DatabaseExtractorFeature.py",
-        "js_file_name": "DatabaseExtractor.js"
+        "js_file_name": "DatabaseExtractor.js",
+        "inputs": [
+          {
+            "name": "databaseSource",
+            "display_name": "Database Source",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "all",
+                "text": "All Databases"
+              },
+              {
+                "value": "materialsproject",
+                "text": "Materials Project"
+              },
+              {
+                "value": "oqmd",
+                "text": "OQMD"
+              },
+              {
+                "value": "aflow",
+                "text": "AFLOW"
+              },
+              {
+                "value": "crystallography",
+                "text": "Crystallography DB"
+              }
+            ],
+            "default": "all",
+            "description": "Database source for extraction"
+          },
+          {
+            "name": "extractionType",
+            "display_name": "Extraction Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "properties",
+                "text": "Material Properties"
+              },
+              {
+                "value": "structures",
+                "text": "Crystal Structures"
+              },
+              {
+                "value": "thermodynamics",
+                "text": "Thermodynamic Data"
+              },
+              {
+                "value": "experimental",
+                "text": "Experimental Data"
+              }
+            ],
+            "default": "properties",
+            "description": "Type of data to extract"
+          },
+          {
+            "name": "filterCriteria",
+            "display_name": "Filter Criteria",
+            "type": "text",
+            "required": false,
+            "placeholder": "e.g., space_group=225, bandgap>1.0",
+            "description": "Filter criteria for extraction"
+          },
+          {
+            "name": "maxEntries",
+            "display_name": "Maximum Entries",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 10000,
+            "step": 1,
+            "default": 1000,
+            "description": "Maximum number of entries to extract"
+          },
+          {
+            "name": "configFile",
+            "display_name": "Configuration File",
+            "type": "file",
+            "required": false,
+            "accept": ".json,.yaml",
+            "description": "Optional configuration file"
+          },
+          {
+            "name": "includeMetadata",
+            "display_name": "Include Metadata",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Include metadata in extraction"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "recordsExtracted",
+            "display_name": "Records Extracted",
+            "type": "text",
+            "description": "Number of records extracted"
+          },
+          {
+            "name": "dataSize",
+            "display_name": "Data Size",
+            "type": "text",
+            "description": "Total size of extracted data"
+          },
+          {
+            "name": "fileFormat",
+            "display_name": "File Format",
+            "type": "text",
+            "description": "Format of extracted data"
+          },
+          {
+            "name": "processingTime",
+            "display_name": "Processing Time",
+            "type": "text",
+            "description": "Time taken for extraction"
+          },
+          {
+            "name": "downloadPackage",
+            "display_name": "Download Package",
+            "type": "link",
+            "description": "Download extracted data package"
+          }
+        ]
       },
       {
         "id": 4,
@@ -436,7 +616,78 @@
         "folder_path": "Features/Materials_Exploration/MaterialCharacterization",
         "class_name": "MaterialCharacterizationFeature",
         "file_name": "MaterialCharacterizationFeature.py",
-        "js_file_name": "MaterialCharacterization.js"
+        "js_file_name": "MaterialCharacterization.js",
+        "inputs": [
+          {
+            "name": "materialFormula",
+            "display_name": "Material Formula",
+            "type": "text",
+            "required": true,
+            "placeholder": "e.g., Al2O3, SiC",
+            "description": "Material formula for characterization"
+          },
+          {
+            "name": "analysisType",
+            "display_name": "Analysis Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "basic",
+                "text": "Basic Analysis"
+              },
+              {
+                "value": "advanced",
+                "text": "Advanced Analysis"
+              },
+              {
+                "value": "comprehensive",
+                "text": "Comprehensive Analysis"
+              }
+            ],
+            "default": "basic",
+            "description": "Type of analysis to perform"
+          },
+          {
+            "name": "threshold",
+            "display_name": "Threshold Value",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 100,
+            "step": 0.1,
+            "default": 50,
+            "description": "Threshold value for analysis"
+          },
+          {
+            "name": "exportResults",
+            "display_name": "Export Results",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Export analysis results"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "analysisStatus",
+            "display_name": "Analysis Status",
+            "type": "text",
+            "description": "Status of the analysis"
+          },
+          {
+            "name": "materialProperties",
+            "display_name": "Material Properties",
+            "type": "text",
+            "description": "Calculated material properties"
+          },
+          {
+            "name": "reportGeneration",
+            "display_name": "Report Generation",
+            "type": "text",
+            "description": "Report generation status"
+          }
+        ]
       },
       {
         "id": 5,
@@ -446,7 +697,78 @@
         "folder_path": "Features/Materials_Exploration/DftCalculation",
         "class_name": "DftCalculationFeature",
         "file_name": "DftCalculationFeature.py",
-        "js_file_name": "DftCalculation.js"
+        "js_file_name": "DftCalculation.js",
+        "inputs": [
+          {
+            "name": "optimizationTarget",
+            "display_name": "Optimization Target",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "performance",
+                "text": "Performance"
+              },
+              {
+                "value": "cost",
+                "text": "Cost"
+              },
+              {
+                "value": "efficiency",
+                "text": "Efficiency"
+              }
+            ],
+            "default": "performance",
+            "description": "Optimization target for DFT calculation"
+          },
+          {
+            "name": "iterations",
+            "display_name": "Iterations",
+            "type": "number",
+            "required": false,
+            "min": 10,
+            "max": 1000,
+            "step": 10,
+            "default": 100,
+            "description": "Number of optimization iterations"
+          },
+          {
+            "name": "configFile",
+            "display_name": "Configuration File",
+            "type": "file",
+            "required": false,
+            "accept": ".json,.xml",
+            "description": "Configuration file for DFT"
+          },
+          {
+            "name": "verboseOutput",
+            "display_name": "Verbose Output",
+            "type": "checkbox",
+            "required": false,
+            "default": false,
+            "description": "Enable verbose output"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "convergenceStatus",
+            "display_name": "Convergence Status",
+            "type": "text",
+            "description": "Convergence status of optimization"
+          },
+          {
+            "name": "performanceImprovement",
+            "display_name": "Performance Improvement",
+            "type": "text",
+            "description": "Performance improvement achieved"
+          },
+          {
+            "name": "configurationStatus",
+            "display_name": "Configuration",
+            "type": "text",
+            "description": "Final configuration status"
+          }
+        ]
       },
       {
         "id": 6,
@@ -456,7 +778,78 @@
         "folder_path": "Features/Materials_Exploration/CrystallographicAnalysis",
         "class_name": "CrystallographicAnalysisFeature",
         "file_name": "CrystallographicAnalysisFeature.py",
-        "js_file_name": "CrystallographicAnalysis.js"
+        "js_file_name": "CrystallographicAnalysis.js",
+        "inputs": [
+          {
+            "name": "inputData",
+            "display_name": "Input Data",
+            "type": "text",
+            "required": true,
+            "placeholder": "Enter data or formula",
+            "description": "Input data or material formula"
+          },
+          {
+            "name": "modelType",
+            "display_name": "Model Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "linear",
+                "text": "Linear Model"
+              },
+              {
+                "value": "nonlinear",
+                "text": "Non-linear Model"
+              },
+              {
+                "value": "ml",
+                "text": "Machine Learning"
+              }
+            ],
+            "default": "linear",
+            "description": "Type of analysis model"
+          },
+          {
+            "name": "accuracy",
+            "display_name": "Required Accuracy (%)",
+            "type": "number",
+            "required": false,
+            "min": 50,
+            "max": 99,
+            "step": 1,
+            "default": 90,
+            "description": "Required accuracy level"
+          },
+          {
+            "name": "realTimeUpdate",
+            "display_name": "Real-time Updates",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Enable real-time updates"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "simulationStatus",
+            "display_name": "Simulation Status",
+            "type": "text",
+            "description": "Status of simulation"
+          },
+          {
+            "name": "modelValidation",
+            "display_name": "Model Validation",
+            "type": "text",
+            "description": "Model validation results"
+          },
+          {
+            "name": "predictions",
+            "display_name": "Predictions",
+            "type": "text",
+            "description": "Structural predictions"
+          }
+        ]
       },
       {
         "id": 7,
@@ -466,7 +859,78 @@
         "folder_path": "Features/Materials_Exploration/QuantumMechanics",
         "class_name": "QuantumMechanicsFeature",
         "file_name": "QuantumMechanicsFeature.py",
-        "js_file_name": "QuantumMechanics.js"
+        "js_file_name": "QuantumMechanics.js",
+        "inputs": [
+          {
+            "name": "computationMethod",
+            "display_name": "Computation Method",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "quantum",
+                "text": "Quantum Mechanical"
+              },
+              {
+                "value": "classical",
+                "text": "Classical Methods"
+              },
+              {
+                "value": "hybrid",
+                "text": "Hybrid Approach"
+              }
+            ],
+            "default": "quantum",
+            "description": "Computation method to use"
+          },
+          {
+            "name": "precision",
+            "display_name": "Precision Level",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 10,
+            "step": 1,
+            "default": 5,
+            "description": "Precision level for computation"
+          },
+          {
+            "name": "boundary",
+            "display_name": "Boundary Conditions",
+            "type": "text",
+            "required": false,
+            "placeholder": "Specify conditions",
+            "description": "Boundary conditions for calculation"
+          },
+          {
+            "name": "parallelProcessing",
+            "display_name": "Parallel Processing",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Enable parallel processing"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "computationStatus",
+            "display_name": "Computation Status",
+            "type": "text",
+            "description": "Status of computation"
+          },
+          {
+            "name": "discoveryPotential",
+            "display_name": "Discovery Potential",
+            "type": "text",
+            "description": "Discovery potential of results"
+          },
+          {
+            "name": "databaseExport",
+            "display_name": "Database Export",
+            "type": "text",
+            "description": "Database export status"
+          }
+        ]
       },
       {
         "id": 8,
@@ -476,7 +940,78 @@
         "folder_path": "Features/Materials_Exploration/TensorAnalysis",
         "class_name": "TensorAnalysisFeature",
         "file_name": "TensorAnalysisFeature.py",
-        "js_file_name": "TensorAnalysis.js"
+        "js_file_name": "TensorAnalysis.js",
+        "inputs": [
+          {
+            "name": "sampleId",
+            "display_name": "Sample ID",
+            "type": "text",
+            "required": true,
+            "placeholder": "Enter sample identifier",
+            "description": "Sample identifier"
+          },
+          {
+            "name": "characterizationType",
+            "display_name": "Characterization Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "structural",
+                "text": "Structural Analysis"
+              },
+              {
+                "value": "compositional",
+                "text": "Compositional Analysis"
+              },
+              {
+                "value": "property",
+                "text": "Property Analysis"
+              }
+            ],
+            "default": "structural",
+            "description": "Type of characterization"
+          },
+          {
+            "name": "resolution",
+            "display_name": "Resolution (nm)",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 1,
+            "description": "Resolution for analysis"
+          },
+          {
+            "name": "sampleData",
+            "display_name": "Sample Data File",
+            "type": "file",
+            "required": false,
+            "accept": ".dat,.csv",
+            "description": "Sample data file for analysis"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "analysisComplete",
+            "display_name": "Analysis Status",
+            "type": "text",
+            "description": "Analysis completion status"
+          },
+          {
+            "name": "correlationValue",
+            "display_name": "Structure-Property Correlation",
+            "type": "text",
+            "description": "Structure-property correlation value"
+          },
+          {
+            "name": "visualizationData",
+            "display_name": "Visualization Data",
+            "type": "text",
+            "description": "Visualization data availability"
+          }
+        ]
       }
     ],
     "electronics_application": [
@@ -488,7 +1023,142 @@
         "folder_path": "Features/Electronics_Application/DeviceSynthesizability",
         "class_name": "DeviceSynthesizabilityFeature",
         "file_name": "DeviceSynthesizabilityFeature.py",
-        "js_file_name": "DeviceSynthesizability.js"
+        "js_file_name": "DeviceSynthesizability.js",
+        "inputs": [
+          {
+            "name": "deviceType",
+            "display_name": "Device Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "transistor",
+                "text": "Transistor"
+              },
+              {
+                "value": "diode",
+                "text": "Diode"
+              },
+              {
+                "value": "solar_cell",
+                "text": "Solar Cell"
+              },
+              {
+                "value": "led",
+                "text": "LED"
+              },
+              {
+                "value": "sensor",
+                "text": "Sensor"
+              }
+            ],
+            "default": "transistor",
+            "description": "Type of device to synthesize"
+          },
+          {
+            "name": "materialComposition",
+            "display_name": "Material Composition",
+            "type": "text",
+            "required": true,
+            "placeholder": "e.g., GaAs, SiC, InGaN",
+            "description": "Material composition"
+          },
+          {
+            "name": "substrateType",
+            "display_name": "Substrate Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "silicon",
+                "text": "Silicon"
+              },
+              {
+                "value": "sapphire",
+                "text": "Sapphire"
+              },
+              {
+                "value": "sic",
+                "text": "Silicon Carbide"
+              },
+              {
+                "value": "gan",
+                "text": "Gallium Nitride"
+              }
+            ],
+            "default": "silicon",
+            "description": "Substrate type"
+          },
+          {
+            "name": "operatingTemp",
+            "display_name": "Operating Temperature (\u00b0C)",
+            "type": "number",
+            "required": false,
+            "min": -50,
+            "max": 500,
+            "step": 1,
+            "default": 25,
+            "description": "Operating temperature"
+          },
+          {
+            "name": "fabricationMethod",
+            "display_name": "Preferred Fabrication Method",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "mocvd",
+                "text": "MOCVD"
+              },
+              {
+                "value": "mbe",
+                "text": "MBE"
+              },
+              {
+                "value": "sputtering",
+                "text": "Sputtering"
+              },
+              {
+                "value": "cvd",
+                "text": "CVD"
+              }
+            ],
+            "default": "mocvd",
+            "description": "Fabrication method"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "feasibility",
+            "display_name": "Synthesis Feasibility",
+            "type": "text",
+            "description": "Feasibility score and level"
+          },
+          {
+            "name": "recommendedProcess",
+            "display_name": "Recommended Process",
+            "type": "text",
+            "description": "Recommended synthesis process"
+          },
+          {
+            "name": "estimatedCost",
+            "display_name": "Estimated Cost",
+            "type": "text",
+            "description": "Cost estimation"
+          },
+          {
+            "name": "processTemp",
+            "display_name": "Processing Temperature",
+            "type": "text",
+            "description": "Recommended processing temperature"
+          },
+          {
+            "name": "yieldPrediction",
+            "display_name": "Yield Prediction",
+            "type": "text",
+            "description": "Predicted manufacturing yield"
+          }
+        ]
       },
       {
         "id": 10,
@@ -498,7 +1168,136 @@
         "folder_path": "Features/Electronics_Application/InterfaceCalculation",
         "class_name": "InterfaceCalculationFeature",
         "file_name": "InterfaceCalculationFeature.py",
-        "js_file_name": "InterfaceCalculation.js"
+        "js_file_name": "InterfaceCalculation.js",
+        "inputs": [
+          {
+            "name": "material1",
+            "display_name": "Material 1",
+            "type": "text",
+            "required": true,
+            "placeholder": "e.g., Si, GaAs, AlN",
+            "description": "First material in interface"
+          },
+          {
+            "name": "material2",
+            "display_name": "Material 2",
+            "type": "text",
+            "required": true,
+            "placeholder": "e.g., SiO2, Al2O3, HfO2",
+            "description": "Second material in interface"
+          },
+          {
+            "name": "interfaceType",
+            "display_name": "Interface Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "coherent",
+                "text": "Coherent Interface"
+              },
+              {
+                "value": "semicoherent",
+                "text": "Semi-coherent Interface"
+              },
+              {
+                "value": "incoherent",
+                "text": "Incoherent Interface"
+              },
+              {
+                "value": "grain_boundary",
+                "text": "Grain Boundary"
+              }
+            ],
+            "default": "coherent",
+            "description": "Type of interface"
+          },
+          {
+            "name": "calculationMethod",
+            "display_name": "Calculation Method",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "dft",
+                "text": "DFT (First Principles)"
+              },
+              {
+                "value": "classical_md",
+                "text": "Classical Molecular Dynamics"
+              },
+              {
+                "value": "tight_binding",
+                "text": "Tight Binding"
+              },
+              {
+                "value": "empirical",
+                "text": "Empirical Models"
+              }
+            ],
+            "default": "dft",
+            "description": "Calculation method"
+          },
+          {
+            "name": "supercellSize",
+            "display_name": "Supercell Size (atoms)",
+            "type": "number",
+            "required": false,
+            "min": 50,
+            "max": 1000,
+            "step": 10,
+            "default": 200,
+            "description": "Supercell size"
+          },
+          {
+            "name": "includeStrain",
+            "display_name": "Include Strain Effects",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Include strain effects"
+          },
+          {
+            "name": "calculateBandOffset",
+            "display_name": "Calculate Band Offset",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Calculate band offset"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "interfaceEnergy",
+            "display_name": "Interface Energy",
+            "type": "text",
+            "description": "Interface energy"
+          },
+          {
+            "name": "bandOffset",
+            "display_name": "Band Offset",
+            "type": "text",
+            "description": "Band offset value"
+          },
+          {
+            "name": "latticeMismatch",
+            "display_name": "Lattice Mismatch",
+            "type": "text",
+            "description": "Lattice mismatch percentage"
+          },
+          {
+            "name": "interfaceStates",
+            "display_name": "Interface States",
+            "type": "text",
+            "description": "Density of interface states"
+          },
+          {
+            "name": "chargeTransfer",
+            "display_name": "Charge Transfer",
+            "type": "text",
+            "description": "Charge transfer at interface"
+          }
+        ]
       },
       {
         "id": 11,
@@ -508,7 +1307,78 @@
         "folder_path": "Features/Electronics_Application/PropertyPrediction",
         "class_name": "PropertyPredictionFeature",
         "file_name": "PropertyPredictionFeature.py",
-        "js_file_name": "PropertyPrediction.js"
+        "js_file_name": "PropertyPrediction.js",
+        "inputs": [
+          {
+            "name": "materialSystem",
+            "display_name": "Material System",
+            "type": "text",
+            "required": true,
+            "placeholder": "e.g., III-V, II-VI",
+            "description": "Material system for prediction"
+          },
+          {
+            "name": "propertyPrediction",
+            "display_name": "Property to Predict",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "bandgap",
+                "text": "Band Gap"
+              },
+              {
+                "value": "mobility",
+                "text": "Carrier Mobility"
+              },
+              {
+                "value": "conductivity",
+                "text": "Electrical Conductivity"
+              }
+            ],
+            "default": "bandgap",
+            "description": "Property to predict"
+          },
+          {
+            "name": "temperature",
+            "display_name": "Temperature (K)",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 1000,
+            "step": 1,
+            "default": 300,
+            "description": "Temperature for prediction"
+          },
+          {
+            "name": "includeDefects",
+            "display_name": "Include Defects",
+            "type": "checkbox",
+            "required": false,
+            "default": false,
+            "description": "Include defect effects"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "predictionStatus",
+            "display_name": "Prediction Status",
+            "type": "text",
+            "description": "Status of prediction"
+          },
+          {
+            "name": "bandGap",
+            "display_name": "Band Gap",
+            "type": "text",
+            "description": "Predicted band gap"
+          },
+          {
+            "name": "carrierMobility",
+            "display_name": "Carrier Mobility",
+            "type": "text",
+            "description": "Predicted carrier mobility"
+          }
+        ]
       },
       {
         "id": 12,
@@ -518,7 +1388,78 @@
         "folder_path": "Features/Electronics_Application/BandStructure",
         "class_name": "BandStructureFeature",
         "file_name": "BandStructureFeature.py",
-        "js_file_name": "BandStructure.js"
+        "js_file_name": "BandStructure.js",
+        "inputs": [
+          {
+            "name": "bandCalculationType",
+            "display_name": "Band Calculation Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "dft",
+                "text": "DFT Calculation"
+              },
+              {
+                "value": "gw",
+                "text": "GW Approximation"
+              },
+              {
+                "value": "hybrid",
+                "text": "Hybrid Functional"
+              }
+            ],
+            "default": "dft",
+            "description": "Type of band calculation"
+          },
+          {
+            "name": "kPoints",
+            "display_name": "K-Points Density",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 20,
+            "step": 1,
+            "default": 10,
+            "description": "K-points density"
+          },
+          {
+            "name": "latticeParams",
+            "display_name": "Lattice Parameters",
+            "type": "text",
+            "required": false,
+            "placeholder": "a, b, c values",
+            "description": "Lattice parameters"
+          },
+          {
+            "name": "spinOrbit",
+            "display_name": "Include Spin-Orbit Coupling",
+            "type": "checkbox",
+            "required": false,
+            "default": false,
+            "description": "Include spin-orbit coupling"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "bandStructureStatus",
+            "display_name": "Band Structure",
+            "type": "text",
+            "description": "Band structure calculation status"
+          },
+          {
+            "name": "transportProperties",
+            "display_name": "Transport Properties",
+            "type": "text",
+            "description": "Calculated transport properties"
+          },
+          {
+            "name": "dosAnalysis",
+            "display_name": "DOS Analysis",
+            "type": "text",
+            "description": "Density of states analysis"
+          }
+        ]
       },
       {
         "id": 13,
@@ -528,7 +1469,81 @@
         "folder_path": "Features/Electronics_Application/ThermalManagement",
         "class_name": "ThermalManagementFeature",
         "file_name": "ThermalManagementFeature.py",
-        "js_file_name": "ThermalManagement.js"
+        "js_file_name": "ThermalManagement.js",
+        "inputs": [
+          {
+            "name": "thermalProperty",
+            "display_name": "Thermal Property",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "conductivity",
+                "text": "Thermal Conductivity"
+              },
+              {
+                "value": "expansion",
+                "text": "Thermal Expansion"
+              },
+              {
+                "value": "capacity",
+                "text": "Heat Capacity"
+              }
+            ],
+            "default": "conductivity",
+            "description": "Thermal property to analyze"
+          },
+          {
+            "name": "operatingPower",
+            "display_name": "Operating Power (W)",
+            "type": "number",
+            "required": true,
+            "min": 0.1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 100,
+            "description": "Operating power"
+          },
+          {
+            "name": "ambientTemp",
+            "display_name": "Ambient Temperature (\u00b0C)",
+            "type": "number",
+            "required": false,
+            "min": -50,
+            "max": 200,
+            "step": 1,
+            "default": 25,
+            "description": "Ambient temperature"
+          },
+          {
+            "name": "includeConvection",
+            "display_name": "Include Convection",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Include convection effects"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "optimizationStatus",
+            "display_name": "Optimization Status",
+            "type": "text",
+            "description": "Thermal optimization status"
+          },
+          {
+            "name": "maxTemperature",
+            "display_name": "Maximum Temperature",
+            "type": "text",
+            "description": "Maximum temperature reached"
+          },
+          {
+            "name": "coolingSolution",
+            "display_name": "Cooling Solution",
+            "type": "text",
+            "description": "Recommended cooling solution"
+          }
+        ]
       },
       {
         "id": 14,
@@ -538,7 +1553,81 @@
         "folder_path": "Features/Electronics_Application/ReliabilityAssessment",
         "class_name": "ReliabilityAssessmentFeature",
         "file_name": "ReliabilityAssessmentFeature.py",
-        "js_file_name": "ReliabilityAssessment.js"
+        "js_file_name": "ReliabilityAssessment.js",
+        "inputs": [
+          {
+            "name": "reliabilityTest",
+            "display_name": "Reliability Test",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "thermal_cycling",
+                "text": "Thermal Cycling"
+              },
+              {
+                "value": "humidity",
+                "text": "Humidity Test"
+              },
+              {
+                "value": "voltage_stress",
+                "text": "Voltage Stress"
+              }
+            ],
+            "default": "thermal_cycling",
+            "description": "Type of reliability test"
+          },
+          {
+            "name": "testDuration",
+            "display_name": "Test Duration (hours)",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 10000,
+            "step": 1,
+            "default": 1000,
+            "description": "Test duration"
+          },
+          {
+            "name": "failureCriteria",
+            "display_name": "Failure Criteria (%)",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 50,
+            "step": 1,
+            "default": 10,
+            "description": "Failure criteria"
+          },
+          {
+            "name": "acceleratedTest",
+            "display_name": "Accelerated Testing",
+            "type": "checkbox",
+            "required": false,
+            "default": false,
+            "description": "Enable accelerated testing"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "assessmentStatus",
+            "display_name": "Assessment Status",
+            "type": "text",
+            "description": "Assessment completion status"
+          },
+          {
+            "name": "mttfValue",
+            "display_name": "MTTF (Mean Time to Failure)",
+            "type": "text",
+            "description": "Mean time to failure"
+          },
+          {
+            "name": "failureAnalysis",
+            "display_name": "Failure Analysis",
+            "type": "text",
+            "description": "Failure analysis results"
+          }
+        ]
       },
       {
         "id": 15,
@@ -548,7 +1637,82 @@
         "folder_path": "Features/Electronics_Application/ProcessIntegration",
         "class_name": "ProcessIntegrationFeature",
         "file_name": "ProcessIntegrationFeature.py",
-        "js_file_name": "ProcessIntegration.js"
+        "js_file_name": "ProcessIntegration.js",
+        "inputs": [
+          {
+            "name": "processStep",
+            "display_name": "Process Step",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "deposition",
+                "text": "Deposition"
+              },
+              {
+                "value": "etching",
+                "text": "Etching"
+              },
+              {
+                "value": "annealing",
+                "text": "Annealing"
+              },
+              {
+                "value": "doping",
+                "text": "Doping"
+              }
+            ],
+            "default": "deposition",
+            "description": "Process step"
+          },
+          {
+            "name": "processTemp",
+            "display_name": "Process Temperature (\u00b0C)",
+            "type": "number",
+            "required": false,
+            "min": 20,
+            "max": 1200,
+            "step": 10,
+            "default": 600,
+            "description": "Process temperature"
+          },
+          {
+            "name": "gasFlow",
+            "display_name": "Gas Flow Rates",
+            "type": "text",
+            "required": false,
+            "placeholder": "sccm values",
+            "description": "Gas flow rates"
+          },
+          {
+            "name": "inSituMonitoring",
+            "display_name": "In-situ Monitoring",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Enable in-situ monitoring"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "integrationStatus",
+            "display_name": "Integration Status",
+            "type": "text",
+            "description": "Process integration status"
+          },
+          {
+            "name": "yieldPrediction",
+            "display_name": "Yield Prediction",
+            "type": "text",
+            "description": "Predicted manufacturing yield"
+          },
+          {
+            "name": "recipeParameters",
+            "display_name": "Recipe Parameters",
+            "type": "text",
+            "description": "Process recipe parameters"
+          }
+        ]
       },
       {
         "id": 16,
@@ -584,7 +1748,7 @@
               }
             ],
             "default": "xrd",
-            "description": "Advanced characterization technique to use"
+            "description": "Characterization technique to use"
           },
           {
             "name": "scanRange",
