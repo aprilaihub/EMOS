@@ -70,7 +70,7 @@ EMOS/
 │   └── _build/                  # Generated HTML documentation
 │
 ├── devtools/                   # Development tools & contribution utilities
-│   ├── core_metadata.json
+│   ├── ui_data.json
 │   └── core_utilities.py
 │
 └── images/                      # Graphics, logos, team photos

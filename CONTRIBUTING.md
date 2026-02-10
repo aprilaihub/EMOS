@@ -6,7 +6,7 @@ The EMOS devtools automate UI generation and backend integration, allowing devel
 
 EMOS uses a metadata-driven architecture. All contributions follow this workflow:
 
-1. **Edit** `devtools/core_metadata.json` (ONE change only)
+1. **Edit** `devtools/ui_data.json` (ONE change only)
 2. **Generate** full metadata: `python devtools/make_metadata.py`
 3. **Create templates**: `python devtools/contribution_tool.py`
 4. **Implement** your code in the generated files
@@ -19,7 +19,7 @@ Information units are the building blocks: **Databases**, **Generators**, and **
 
 ### Example: Adding a Database
 
-**1. Edit core metadata** (`devtools/core_metadata.json`):
+**1. Edit core metadata** (`devtools/ui_data.json`):
 
 ```json
 {
@@ -93,7 +93,7 @@ Features are user-facing functionality that combines information units.
 
 **2. (Optional) Define custom inputs/outputs:**
 
-Available input types are defined in `devtools/core_metadata.json` under `ui_input_types`. See `feature_inputs_outputs` for examples.
+Available input types are defined in `devtools/ui_data.json` under `ui_input_types`. See `feature_inputs_outputs` for examples.
 
 ```json
 {
@@ -161,7 +161,7 @@ Edit `YourFeature.js` for custom UI behavior if needed.
 
 ## Removing Components
 
-**1. Delete the entry from `core_metadata.json`**
+**1. Delete the entry from `ui_data.json`**
 
 **2. Regenerate and run tool:**
 
@@ -188,8 +188,8 @@ The tool automatically:
 
 ❌ **DON'T:**
 - Add multiple components at once
-- Edit `metadata.json` directly (always use `core_metadata.json`)
-- Skip running `make_metadata.py` after editing core metadata
+- Edit `metadata.json` directly (always use `ui_data.json`)
+- Skip running `make_metadata.py` after editing UI data
 
 ## File Organization
 
