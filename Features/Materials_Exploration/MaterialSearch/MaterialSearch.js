@@ -1,7 +1,7 @@
 // Material Search Feature
 class MaterialSearchFeature extends BaseFeature {
-    constructor() {
-        super(1, 'Material Search', 'Search and explore materials from comprehensive databases using various criteria');
+    constructor(featureId) {
+        super(featureId, 'Material Search', 'Search and explore materials from comprehensive databases using various criteria');
     }
 
     createInputsHTML() {

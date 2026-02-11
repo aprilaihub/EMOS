@@ -1,7 +1,7 @@
 // Material Generation Feature
 class MaterialGenerationFeature extends BaseFeature {
-    constructor() {
-        super(2, 'Material Generation', 'Generate new material compositions using AI-powered algorithms and predictive models');
+    constructor(featureId) {
+        super(featureId, 'Material Generation', 'Generate new material compositions using AI-powered algorithms and predictive models');
     }
 
     createInputsHTML() {

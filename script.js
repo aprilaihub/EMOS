@@ -13,7 +13,7 @@ const chatMessages = document.getElementById('chatMessages');
 // Feature class mapping for dynamic loading
 const featureClasses = {
     1: 'MaterialSearchFeature',
-    2: 'MaterialGenerationFeature', 
+    2: 'MaterialGenerationFeature',
     3: 'DatabaseExtractorFeature',
     4: 'MaterialCharacterizationFeature',
     5: 'DftCalculationFeature',
@@ -27,7 +27,7 @@ const featureClasses = {
     13: 'ThermalManagementFeature',
     14: 'ReliabilityAssessmentFeature',
     15: 'ProcessIntegrationFeature',
-    16: 'AdvancedCharacterizationFeature'
+    16: 'AdvancedCharacterizationFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
@@ -47,7 +47,7 @@ const featureFiles = {
     13: './Features/Electronics_Application/ThermalManagement/ThermalManagement.js',
     14: './Features/Electronics_Application/ReliabilityAssessment/ReliabilityAssessment.js',
     15: './Features/Electronics_Application/ProcessIntegration/ProcessIntegration.js',
-    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js'
+    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
 };
 
 // Global feature instances storage
@@ -138,7 +138,7 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             const FeatureClass = window[featureClasses[featureId]];
             console.log(`Feature class found:`, FeatureClass);
             
-            currentFeatureInstance = new FeatureClass();
+            currentFeatureInstance = new FeatureClass(featureId);
             window.features[featureId] = currentFeatureInstance;
             
             // Replace the feature view content with the specific feature's interface

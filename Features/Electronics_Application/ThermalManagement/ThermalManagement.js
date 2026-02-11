@@ -1,7 +1,7 @@
 // Thermal Management Feature
 class ThermalManagementFeature extends BaseFeature {
-    constructor() {
-        super(13, 'Thermal Management', 'Thermal management analysis for electronic device performance optimization');
+    constructor(featureId) {
+        super(featureId, 'Thermal Management', 'Thermal management analysis for electronic device performance optimization');
     }
 
     createInputsHTML() {

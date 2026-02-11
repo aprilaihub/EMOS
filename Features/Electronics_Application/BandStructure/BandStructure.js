@@ -1,7 +1,7 @@
 // Band Structure Feature
 class BandStructureFeature extends BaseFeature {
-    constructor() {
-        super(12, 'Band Structure', 'Band structure calculations and electronic transport property analysis');
+    constructor(featureId) {
+        super(featureId, 'Band Structure', 'Band structure calculations and electronic transport property analysis');
     }
 
     createInputsHTML() {

@@ -1,7 +1,7 @@
 // Quantum Mechanics Feature
 class QuantumMechanicsFeature extends BaseFeature {
-    constructor() {
-        super(7, 'Quantum Mechanics', 'Advanced computational methods for materials discovery and design');
+    constructor(featureId) {
+        super(featureId, 'Quantum Mechanics', 'Advanced computational methods for materials discovery and design');
     }
 
     createInputsHTML() {

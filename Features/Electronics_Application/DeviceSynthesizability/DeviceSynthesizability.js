@@ -1,7 +1,7 @@
 // Device Synthesizability Feature
 class DeviceSynthesizabilityFeature extends BaseFeature {
-    constructor() {
-        super(9, 'Device Synthesizability', 'Evaluate the feasibility and methods for synthesizing electronic devices from selected materials');
+    constructor(featureId) {
+        super(featureId, 'Device Synthesizability', 'Evaluate the feasibility and methods for synthesizing electronic devices from selected materials');
     }
 
     createInputsHTML() {

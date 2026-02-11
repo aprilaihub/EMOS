@@ -69,8 +69,8 @@ EMOS/
 │   ├── index.rst
 │   └── _build/                  # Generated HTML documentation
 │
-├── metadata/                    # Metadata & utilities
-│   ├── core_metadata.json
+├── devtools/                   # Development tools & contribution utilities
+│   ├── ui_data.json
 │   └── core_utilities.py
 │
 └── images/                      # Graphics, logos, team photos

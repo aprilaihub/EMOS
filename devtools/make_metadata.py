@@ -1,6 +1,6 @@
 """
 EMOS Core Utilities
-Converts core_metadata.json to full metadata.json
+Converts ui_data.json to full metadata.json
 
 Display names are the source of truth - everything else is derived automatically.
 """
@@ -58,7 +58,8 @@ def generate_feature_metadata(display_name, category, description, core_meta=Non
         try:
             feature_id = category_features.index(display_name) + 1
             if category == "electronics_application":
-                feature_id += 8  # Electronics features start from ID 9
+                materials_count = len(core_meta["features"].get("materials_exploration", []))
+                feature_id += materials_count
         except ValueError:
             pass
     
@@ -75,12 +76,12 @@ def generate_feature_metadata(display_name, category, description, core_meta=Non
         "js_file_name": f"{folder_name}.js"
     }
 
-def generate_metadata_from_core(core_metadata_path="core_metadata.json", output_path="metadata.json"):
+def generate_metadata_from_core(core_metadata_path="ui_data.json", output_path="metadata.json"):
     """
-    Main function: Convert core_metadata.json to full metadata.json
+    Main function: Convert ui_data.json to full metadata.json
     
     Args:
-        core_metadata_path: Path to the core metadata file
+        core_metadata_path: Path to the UI data file
         output_path: Path where the full metadata will be saved
     
     Returns:
