@@ -20,7 +20,6 @@ EMOS is an open-source platform for electronics materials science research. Acce
 
 ### Installation
 
-**Option 1: Automated Setup (Recommended)**
 ```bash
 git clone https://github.com/aprilaihub/EMOS.git
 cd EMOS
@@ -33,16 +32,7 @@ Then activate the virtual environment:
 - macOS/Linux: `source emos_env/bin/activate`
 - Windows: `emos_env\Scripts\activate.bat`
 
-**Option 2: Manual Setup**
-```bash
-git clone https://github.com/aprilaihub/EMOS.git
-cd EMOS
-python -m venv emos_env
-source emos_env/bin/activate  # macOS/Linux
-pip install -r requirements.txt
-```
-
-See [setup/README.md](setup/README.md) for more details.
+The setup script automatically installs all libraries from `requirements.txt`. See [setup/README.md](setup/README.md) for more details or manual setup instructions.
 
 ### Run Locally
 
