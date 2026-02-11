@@ -10,6 +10,7 @@ import json
 import sys
 from pathlib import Path
 
+from make_metadata import generate_metadata_from_core
 from utils.comparison_methods import ComparisonMethods
 from utils.information_unit_methods import InformationUnitMethods
 from utils.feature_methods import FeatureMethods
@@ -37,6 +38,11 @@ class ContributionTool(
         print("\n" + "="*60)
         print("EMOS Contribution Tool")
         print("="*60 + "\n")
+        
+        # Regenerate metadata from ui_data.json
+        print("Syncing metadata from ui_data.json...")
+        generate_metadata_from_core()
+        print("✓ Metadata updated\n")
         
         # Load metadata
         print("Loading metadata.json...")
