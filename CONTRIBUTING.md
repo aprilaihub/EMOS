@@ -1,15 +1,14 @@
 # Contributing to EMOS
 
-The EMOS devtools automate UI generation and backend integration, allowing developers to contribute new features and information units using only Python. You define your component in metadata, implement your algorithm, and the tooling handles the rest—no frontend knowledge required.
+The EMOS devtools automate UI generation and backend integration. Define your component in `devtools/ui_data.json`, run the contribution tool, and it generates functional templates. Then implement your Python-based algorithms—no frontend knowledge required.
 
 ## Quick Start
 
-EMOS uses a metadata-driven architecture. All contributions follow this workflow:
+All contributions follow this workflow:
 
 1. **Edit** `devtools/ui_data.json` (ONE change only)
-2. **Generate** full metadata: `python devtools/make_metadata.py`
-3. **Create templates**: `python devtools/contribution_tool.py`
-4. **Implement** your code in the generated files
+2. **Run**: `python devtools/contribution_tool.py`
+3. **Implement** your code in the generated files
 
 > ⚠️ **Important**: Make only ONE change at a time (add/remove one component per commit)
 
@@ -32,13 +31,7 @@ Information units are the building blocks: **Databases**, **Generators**, and **
 }
 ```
 
-**2. Generate metadata:**
-
-```bash
-python devtools/make_metadata.py
-```
-
-**3. Run contribution tool:**
+**2. Run contribution tool:**
 
 ```bash
 python devtools/contribution_tool.py
@@ -120,10 +113,9 @@ Available input types are defined in `devtools/ui_data.json` under `ui_input_typ
 }
 ```
 
-**3. Generate and create templates:**
+**3. Run contribution tool:**
 
 ```bash
-python devtools/make_metadata.py
 python devtools/contribution_tool.py
 ```
 
@@ -163,10 +155,9 @@ Edit `YourFeature.js` for custom UI behavior if needed.
 
 **1. Delete the entry from `ui_data.json`**
 
-**2. Regenerate and run tool:**
+**2. Run contribution tool:**
 
 ```bash
-python devtools/make_metadata.py
 python devtools/contribution_tool.py
 # Type 'yes' to confirm removal
 ```
@@ -189,7 +180,6 @@ The tool automatically:
 ❌ **DON'T:**
 - Add multiple components at once
 - Edit `metadata.json` directly (always use `ui_data.json`)
-- Skip running `make_metadata.py` after editing UI data
 
 ## File Organization
 
@@ -216,6 +206,23 @@ python backend/app.py
 # 3. Test your component
 # 4. Verify outputs are correct
 ```
+
+## Submitting Your Contribution
+
+Once your implementation is tested and working:
+
+1. **Commit your changes:**
+   ```bash
+   git add .
+   git commit -m "Add [ComponentName] component"
+   ```
+
+2. **Raise a Pull Request** with:
+   - Clear description of what the component does
+   - Any dependencies or setup needed
+   - Reference to related issues (if applicable)
+
+We review PRs regularly and will provide feedback if needed.
 
 ## Need Help?
 
