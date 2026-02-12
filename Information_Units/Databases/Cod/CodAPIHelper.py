@@ -3,6 +3,7 @@
 import os
 import re
 import tempfile
+import time
 import requests
 from pymatgen.core import Structure, Lattice, Composition
 
@@ -23,65 +24,83 @@ class CodAPIHelper:
 
     def fetch_from_api(self, query: str, limit: int) -> list:
         """
-        Fetch structures from COD OPTIMADE API.
+        Fetch structures from COD OPTIMADE API with pagination support.
 
         Args:
             query: Element or formula to search for
-            limit: Maximum number of results
+            limit: Maximum number of results to fetch
 
         Returns:
             list: Raw structure data from OPTIMADE API
         """
-        try:
-            # Build OPTIMADE filter query
-            optimade_filter = self.build_filter(query)
+        all_results = []
+        page_limit = 10  # COD's max per request
+        page_offset = 0
 
-            # Make API request
-            params = {
-                'page_limit': limit,
-                'response_fields': (
-                    'lattice_vectors,'
-                    'cartesian_site_positions,'
-                    'fractional_site_positions,'
-                    'species_at_sites,'
-                    'species,'
-                    'chemical_formula_reduced'
+        try:
+            while len(all_results) < limit:
+                # Build OPTIMADE filter query
+                optimade_filter = self.build_filter(query)
+
+                # Make API request with pagination
+                params = {
+                    'page_limit': page_limit,
+                    'page_offset': page_offset,
+                    'response_fields': (
+                        'lattice_vectors,'
+                        'cartesian_site_positions,'
+                        'fractional_site_positions,'
+                        'species_at_sites,'
+                        'species,'
+                        'chemical_formula_reduced'
+                    )
+                }
+                if optimade_filter:
+                    params['filter'] = optimade_filter
+
+                if self.logger:
+                    self.logger.log(f"API Request (offset={page_offset}): {self.base_url}structures with params {params}")
+
+                response = requests.get(
+                    f"{self.base_url}structures",
+                    params=params,
+                    headers={"Accept": "application/json"},
+                    timeout=30
                 )
-            }
-            if optimade_filter:
-                params['filter'] = optimade_filter
+                response.raise_for_status()
+
+                # Parse JSON response
+                data = response.json()
+
+                if 'data' in data and len(data['data']) > 0:
+                    page_results = data['data']
+                    if self.logger:
+                        self.logger.log(f"Retrieved {len(page_results)} structures (page offset: {page_offset})")
+                    all_results.extend(page_results)
+                    page_offset += page_limit
+
+                    # Add delay to avoid rate limiting
+                    time.sleep(1.0)
+                else:
+                    # No more data available
+                    if self.logger:
+                        self.logger.log("No more structures available")
+                    break
 
             if self.logger:
-                self.logger.log(f"API Request: {self.base_url}structures with params {params}")
+                self.logger.log(f"Total retrieved: {len(all_results)} structures")
 
-            response = requests.get(
-                f"{self.base_url}structures",
-                params=params,
-                headers={"Accept": "application/json"},
-                timeout=30
-            )
-            response.raise_for_status()
-
-            # Parse JSON response
-            data = response.json()
-
-            if 'data' in data:
-                if self.logger:
-                    self.logger.log(f"Retrieved {len(data['data'])} structures from API")
-                return data['data']
-            else:
-                if self.logger:
-                    self.logger.log("No 'data' field in API response")
-                return []
+            # Trim to exact limit
+            return all_results[:limit]
 
         except requests.exceptions.RequestException as e:
             if self.logger:
                 self.logger.log(f"API request failed: {str(e)}")
-            return []
+            return all_results
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error fetching from API: {str(e)}")
-            return []
+            return all_results
 
     def build_filter(self, query: str) -> str:
         """
