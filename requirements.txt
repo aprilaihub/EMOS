@@ -9,3 +9,6 @@ myst-parser==2.0.0
 
 # Optional: Useful for development and deployment
 requests==2.31.0
+
+# Materials Data
+pymatgen>=2024.6.0
