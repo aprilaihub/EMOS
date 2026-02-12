@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Simple test for AFLOWLIB database"""
+"""Simple test for COD database"""
 
-from Information_Units.Databases.Aflowlib.AflowlibDatabase import AflowlibDatabase
+from Information_Units.Databases.Cod.CodDatabase import CodDatabase
 
 
 class SimpleLogger:
@@ -11,7 +11,7 @@ class SimpleLogger:
 
 # Test
 logger = SimpleLogger()
-db = AflowlibDatabase(logger=logger)
+db = CodDatabase(logger=logger)
 
 print(f"Database: {db.info()}")
 print()
