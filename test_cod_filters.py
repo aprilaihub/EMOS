@@ -112,6 +112,34 @@ for f in result:
     print(f"  - {f}")
 print()
 
+# Test 8: Using standard property name 'year' (maps to COD: _cod_year)
+print("=" * 80)
+print("Test 8: Query 'Si' with publication year range (standard name maps to _cod_year in COD) (limit: 5)")
+print("=" * 80)
+result = db.retrieve({
+    'query': 'Si',
+    'limit': 5,
+    'year': [2010, 2020]
+})
+print(f"Result: {len(result)} files")
+for f in result:
+    print(f"  - {f}")
+print()
+
+# Test 9: Using standard property name 'z_value' (maps to COD: _cod_z)
+print("=" * 80)
+print("Test 9: Query 'Fe' with z_value=4 (standard name maps to _cod_z in COD) (limit: 5)")
+print("=" * 80)
+result = db.retrieve({
+    'query': 'Fe',
+    'limit': 5,
+    'z_value': 4
+})
+print(f"Result: {len(result)} files")
+for f in result:
+    print(f"  - {f}")
+print()
+
 print("=" * 80)
 print("Testing complete!")
 print("=" * 80)
