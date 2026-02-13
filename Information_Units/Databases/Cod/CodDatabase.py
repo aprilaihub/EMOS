@@ -23,19 +23,32 @@ class CodDatabase(BaseDatabase):
             inputs (dict): Query parameters
                 - query: Material query (e.g., 'Fe', 'Al2O3')
                 - limit: Max number of results (default: 10)
+                - nelements: int or [min, max] - number of unique elements
+                - natoms: int or [min, max] - atoms in unit cell
+                - volume: [min, max] - unit cell volume range
+                - spacegroup_number: int - space group number (1-230)
+                - spacegroup_symbol: str - Hermann-Mauguin symbol
 
         Returns:
             list: Paths to saved CIF files
         """
         try:
             query = inputs.get('query', '')
+            # Default limit of 10 is the page size limit provided by the COD OPTIMADE API
             limit = inputs.get('limit', 10)
 
+            # Extract optional filters from the same inputs dict
+            filters = {}
+            for filter_key in ['nelements', 'natoms', 'volume', 'spacegroup_number', 'spacegroup_symbol']:
+                if filter_key in inputs:
+                    filters[filter_key] = inputs[filter_key]
+
             if self.logger:
-                self.logger.log(f"Retrieving from COD via OPTIMADE: {query} (limit: {limit})")
+                filter_str = f" with filters {filters}" if filters else ""
+                self.logger.log(f"Retrieving from COD via OPTIMADE: {query} (limit: {limit}){filter_str}")
 
             # Fetch data from OPTIMADE API
-            structures_data = self.api_helper.fetch_from_api(query, limit)
+            structures_data = self.api_helper.fetch_from_api(query, limit, filters)
 
             if not structures_data:
                 if self.logger:

@@ -22,13 +22,19 @@ class CodAPIHelper:
         self.base_url = base_url
         self.logger = logger
 
-    def fetch_from_api(self, query: str, limit: int) -> list:
+    def fetch_from_api(self, query: str, limit: int, filters: dict = None) -> list:
         """
         Fetch structures from COD OPTIMADE API with pagination support.
 
         Args:
             query: Element or formula to search for
             limit: Maximum number of results to fetch
+            filters: Optional dict with structure property filters:
+                - nelements: int or [min, max] - number of unique elements
+                - natoms: int or [min, max] - atoms in unit cell
+                - volume: [min, max] - unit cell volume range
+                - spacegroup_number: int - space group number (1-230)
+                - spacegroup_symbol: str - Hermann-Mauguin symbol
 
         Returns:
             list: Raw structure data from OPTIMADE API
@@ -36,11 +42,12 @@ class CodAPIHelper:
         all_results = []
         page_limit = 10  # COD's max per request
         page_offset = 0
+        filters = filters or {}
 
         try:
             while len(all_results) < limit:
                 # Build OPTIMADE filter query
-                optimade_filter = self.build_filter(query)
+                optimade_filter = self.build_filter(query, filters)
 
                 # Make API request with pagination
                 params = {
@@ -52,7 +59,12 @@ class CodAPIHelper:
                         'fractional_site_positions,'
                         'species_at_sites,'
                         'species,'
-                        'chemical_formula_reduced'
+                        'chemical_formula_reduced,'
+                        'nelements,'
+                        'natoms,'
+                        'volume,'
+                        'spacegroup_number,'
+                        'spacegroup_symbol'
                     )
                 }
                 if optimade_filter:
@@ -102,7 +114,36 @@ class CodAPIHelper:
                 self.logger.log(f"Error fetching from API: {str(e)}")
             return all_results
 
-    def build_filter(self, query: str) -> str:
+    def build_filter(self, query: str, filters: dict = None) -> str:
+        """
+        Build OPTIMADE filter combining composition and structure filters.
+
+        Args:
+            query: Element or formula to search for
+            filters: Optional dict with structure property filters
+
+        Returns:
+            str: OPTIMADE filter string or None if no filter needed
+        """
+        filters = filters or {}
+        filter_parts = []
+
+        # Build composition filter
+        comp_filter = self._build_composition_filter(query)
+        if comp_filter:
+            filter_parts.append(comp_filter)
+
+        # Build structure property filters
+        struct_filters = self._build_structure_filters(filters)
+        if struct_filters:
+            filter_parts.extend(struct_filters)
+
+        # Combine all filters with AND
+        if filter_parts:
+            return " AND ".join(filter_parts)
+        return None
+
+    def _build_composition_filter(self, query: str) -> str:
         """
         Build OPTIMADE filter for element or formula queries.
 
@@ -122,12 +163,58 @@ class CodAPIHelper:
             if elements:
                 if len(elements) == 1:
                     return f'elements HAS "{elements[0]}"'
-                return " AND ".join([f'elements HAS "{el}"' for el in elements])
+                return "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
         except Exception:
             pass
 
         # Fallback: treat the query as a raw element symbol
         return f'elements HAS "{query}"'
+
+    def _build_structure_filters(self, filters: dict) -> list:
+        """
+        Build OPTIMADE filters for structure properties.
+
+        Args:
+            filters: Dict with filter keys and values
+
+        Returns:
+            list: List of OPTIMADE filter strings
+        """
+        filter_parts = []
+
+        # nelements filter
+        if 'nelements' in filters:
+            nelements = filters['nelements']
+            if isinstance(nelements, list):
+                filter_parts.append(f"nelements >= {nelements[0]} AND nelements <= {nelements[1]}")
+            else:
+                filter_parts.append(f"nelements = {nelements}")
+
+        # natoms filter
+        if 'natoms' in filters:
+            natoms = filters['natoms']
+            if isinstance(natoms, list):
+                filter_parts.append(f"natoms >= {natoms[0]} AND natoms <= {natoms[1]}")
+            else:
+                filter_parts.append(f"natoms = {natoms}")
+
+        # volume filter (expects [min, max] range)
+        if 'volume' in filters:
+            volume = filters['volume']
+            if isinstance(volume, (list, tuple)) and len(volume) == 2:
+                filter_parts.append(f"volume >= {volume[0]} AND volume <= {volume[1]}")
+
+        # spacegroup_number filter
+        if 'spacegroup_number' in filters:
+            sg = filters['spacegroup_number']
+            filter_parts.append(f"spacegroup_number = {sg}")
+
+        # spacegroup_symbol filter
+        if 'spacegroup_symbol' in filters:
+            sg_symbol = filters['spacegroup_symbol']
+            filter_parts.append(f'spacegroup_symbol = "{sg_symbol}"')
+
+        return filter_parts
 
     def convert_to_structure(self, optimade_entry: dict) -> Structure:
         """
@@ -262,7 +349,7 @@ class CodAPIHelper:
         try:
             # Get formula for filename
             attrs = entry.get('attributes', {})
-            formula = attrs.get('chemical_formula_reduced', f'structure_{index}')
+            formula = attrs.get('chemical_formula_reduced') or f'structure_{index}'
             formula = formula.replace(' ', '_')
 
             # Save CIF
