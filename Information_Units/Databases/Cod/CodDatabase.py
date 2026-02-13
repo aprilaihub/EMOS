@@ -20,14 +20,19 @@ class CodDatabase(BaseDatabase):
         Retrieve materials from COD using OPTIMADE API and save as CIF files.
 
         Args:
-            inputs (dict): Query parameters
+            inputs (dict): Query parameters with standard property names
                 - query: Material query (e.g., 'Fe', 'Al2O3')
                 - limit: Max number of results (default: 10)
-                - nelements: int or [min, max] - number of unique elements
-                - natoms: int or [min, max] - atoms in unit cell
-                - volume: [min, max] - unit cell volume range
-                - spacegroup_number: int - space group number (1-230)
-                - spacegroup_symbol: str - Hermann-Mauguin symbol
+                - Additional keys are treated as standard property filters
+                  
+                Example:
+                  db.retrieve({
+                      'query': 'Fe',
+                      'limit': 5,
+                      'natoms': [1, 10],
+                      'volume': [20, 100],
+                      'spacegroup_number': 225
+                  })
 
         Returns:
             list: Paths to saved CIF files
@@ -37,11 +42,9 @@ class CodDatabase(BaseDatabase):
             # Default limit of 10 is the page size limit provided by the COD OPTIMADE API
             limit = inputs.get('limit', 10)
 
-            # Extract optional filters from the same inputs dict
-            filters = {}
-            for filter_key in ['nelements', 'natoms', 'volume', 'spacegroup_number', 'spacegroup_symbol']:
-                if filter_key in inputs:
-                    filters[filter_key] = inputs[filter_key]
+            # Extract filters: all keys except 'query' and 'limit'
+            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:
                 filter_str = f" with filters {filters}" if filters else ""

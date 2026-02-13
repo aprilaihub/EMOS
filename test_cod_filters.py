@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test script for COD database with advanced filters"""
+"""Test script for COD database with property mapping"""
 
 from Information_Units.Databases.Cod.CodDatabase import CodDatabase
 
@@ -26,9 +26,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 2: Composition with nelements filter
+# Test 2: Using standard property name 'nelements' (maps to COD: nelements)
 print("=" * 80)
-print("Test 2: Query 'Al2O3' with nelements=2 (limit: 5)")
+print("Test 2: Query 'Al2O3' with nelements=2 (standard name maps to COD) (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Al2O3',
@@ -40,9 +40,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 3: Composition with natoms filter
+# Test 3: Using standard property name 'natoms' with range (maps to COD: natoms)
 print("=" * 80)
-print("Test 3: Query 'Si' with natoms range [1, 8] (limit: 5)")
+print("Test 3: Query 'Si' with natoms range [1, 8] (standard name maps to COD) (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Si',
@@ -54,9 +54,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 4: Composition with volume filter
+# Test 4: Using standard property name 'volume' (maps to COD: volume)
 print("=" * 80)
-print("Test 4: Query 'Fe' with volume range [20, 100] (limit: 5)")
+print("Test 4: Query 'Fe' with volume range [20, 100] (standard name maps to COD) (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Fe',
@@ -68,9 +68,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 5: Composition with spacegroup_number filter
+# Test 5: Using standard property name 'spacegroup_number' (maps to COD: spacegroup_number)
 print("=" * 80)
-print("Test 5: Query 'Fe' with spacegroup_number=229 (Im-3m, cubic) (limit: 5)")
+print("Test 5: Query 'Fe' with spacegroup_number=229 (standard name maps to COD) (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Fe',
@@ -82,9 +82,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 6: Multiple filters combined
+# Test 6: Multiple standard property filters combined
 print("=" * 80)
-print("Test 6: Query 'Al' with multiple filters (nelements=1, natoms=[1,4], volume=[10,50]) (limit: 5)")
+print("Test 6: Multiple filters using standard names (all mapped to COD) (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Al',
@@ -92,6 +92,20 @@ result = db.retrieve({
     'nelements': 1,
     'natoms': [1, 4],
     'volume': [10, 50]
+})
+print(f"Result: {len(result)} files")
+for f in result:
+    print(f"  - {f}")
+print()
+
+# Test 7: Using standard property name 'lattice_a' (maps to COD: _cod_a)
+print("=" * 80)
+print("Test 7: Query 'Al' with lattice_a range (standard name maps to _cod_a in COD) (limit: 5)")
+print("=" * 80)
+result = db.retrieve({
+    'query': 'Al',
+    'limit': 5,
+    'lattice_a': [3.0, 4.0]
 })
 print(f"Result: {len(result)} files")
 for f in result:

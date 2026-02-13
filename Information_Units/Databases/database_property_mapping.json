@@ -12,11 +12,12 @@
       "type": "integer",
       "description": "Total number of atoms in unit cell",
       "category": "structural",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "natoms"
+        "name": "natoms",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "nelements": {
@@ -35,11 +36,12 @@
       "description": "Unit cell volume",
       "units": "cubic_angstrom",
       "category": "structural",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "volume"
+        "name": "volume",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "elements": {
@@ -58,11 +60,12 @@
       "description": "Lattice parameter a",
       "units": "angstrom",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_a"
+        "name": "_cod_a",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "lattice_b": {
@@ -70,11 +73,12 @@
       "description": "Lattice parameter b",
       "units": "angstrom",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_b"
+        "name": "_cod_b",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "lattice_c": {
@@ -82,11 +86,12 @@
       "description": "Lattice parameter c",
       "units": "angstrom",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_c"
+        "name": "_cod_c",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "lattice_alpha": {
@@ -94,11 +99,12 @@
       "description": "Lattice angle alpha",
       "units": "degrees",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_alpha"
+        "name": "_cod_alpha",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "lattice_beta": {
@@ -106,11 +112,12 @@
       "description": "Lattice angle beta",
       "units": "degrees",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_beta"
+        "name": "_cod_beta",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "lattice_gamma": {
@@ -118,77 +125,84 @@
       "description": "Lattice angle gamma",
       "units": "degrees",
       "category": "lattice_parameters",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_gamma"
+        "name": "_cod_gamma",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "spacegroup_number": {
       "type": "integer",
       "description": "International space group number (1-230)",
       "category": "symmetry",
-      "queryable": true,
+      "queryable": false,
       "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "spacegroup_number"
+        "name": "spacegroup_number",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "spacegroup_symbol": {
       "type": "string",
       "description": "Hermann-Mauguin space group symbol",
       "category": "symmetry",
-      "queryable": true,
+      "queryable": false,
       "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "spacegroup_symbol"
+        "name": "spacegroup_symbol",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "z_value": {
       "type": "integer",
       "description": "Number of formula units per unit cell (Z)",
       "category": "symmetry",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_z"
+        "name": "_cod_z",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "r_observed": {
       "type": "float",
       "description": "R-factor for observed reflections",
       "category": "quality_metrics",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_robs"
+        "name": "_cod_robs",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "r_all": {
       "type": "float",
       "description": "R-factor for all reflections",
       "category": "quality_metrics",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_rall"
+        "name": "_cod_rall",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "gof_all": {
       "type": "float",
       "description": "Goodness of fit for all reflections",
       "category": "quality_metrics",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_gofall"
+        "name": "_cod_gofall",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "chemical_formula_reduced": {
@@ -239,11 +253,12 @@
       "type": "integer",
       "description": "Publication year",
       "category": "publication",
-      "queryable": true,
-      "range_support": true,
+      "queryable": false,
+      "range_support": false,
       "cod": {
         "is_available": true,
-        "name": "_cod_year"
+        "name": "_cod_year",
+        "note": "Available as response field but not queryable in COD OPTIMADE"
       }
     },
     "doi": {

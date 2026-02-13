@@ -2,6 +2,7 @@
 
 import os
 import re
+import json
 import tempfile
 import time
 import requests
@@ -21,6 +22,69 @@ class CodAPIHelper:
         """
         self.base_url = base_url
         self.logger = logger
+        self.property_mapping = self._load_property_mapping()
+
+    def _load_property_mapping(self) -> dict:
+        """
+        Load property mapping from database_property_mapping.json.
+        
+        Returns:
+            dict: Mapping with structure {prop_name: {name: cod_name, queryable: bool, ...}}
+        """
+        try:
+            mapping_file = os.path.join(
+                os.path.dirname(__file__),
+                '..',
+                'database_property_mapping.json'
+            )
+            with open(mapping_file, 'r') as f:
+                data = json.load(f)
+            
+            # Create mapping with full property details
+            mapping = {}
+            for prop_name, prop_details in data.get('properties', {}).items():
+                cod_info = prop_details.get('cod', {})
+                if cod_info.get('is_available'):
+                    mapping[prop_name] = {
+                        'name': cod_info.get('name'),
+                        'queryable': prop_details.get('queryable', False),
+                        'range_support': prop_details.get('range_support', False),
+                    }
+            
+            if self.logger:
+                self.logger.log(f"Loaded property mapping with {len(mapping)} properties")
+            
+            return mapping
+        except Exception as e:
+            if self.logger:
+                self.logger.log(f"Warning: Could not load property mapping: {str(e)}")
+            return {}
+
+    def map_properties(self, standard_properties: dict) -> dict:
+        """
+        Map standard property names to COD property names.
+        Only maps properties that are marked as queryable.
+        
+        Args:
+            standard_properties: Dict with standard property names as keys
+            
+        Returns:
+            dict: Dict with COD property names as keys (non-queryable properties excluded)
+        """
+        mapped = {}
+        for standard_name, value in standard_properties.items():
+            if standard_name in self.property_mapping:
+                prop_info = self.property_mapping[standard_name]
+                if prop_info.get('queryable'):
+                    cod_name = prop_info['name']
+                    mapped[cod_name] = value
+                else:
+                    if self.logger:
+                        self.logger.log(f"Property '{standard_name}' is not queryable in COD OPTIMADE, skipping")
+            else:
+                if self.logger:
+                    self.logger.log(f"Warning: Property '{standard_name}' not in mapping, skipping")
+        return mapped
 
     def fetch_from_api(self, query: str, limit: int, filters: dict = None) -> list:
         """
@@ -173,46 +237,40 @@ class CodAPIHelper:
     def _build_structure_filters(self, filters: dict) -> list:
         """
         Build OPTIMADE filters for structure properties.
+        Only builds filters for properties marked as queryable in the mapping.
 
         Args:
-            filters: Dict with filter keys and values
+            filters: Dict with filter keys and values (typically after mapping)
 
         Returns:
             list: List of OPTIMADE filter strings
         """
         filter_parts = []
 
-        # nelements filter
-        if 'nelements' in filters:
-            nelements = filters['nelements']
-            if isinstance(nelements, list):
-                filter_parts.append(f"nelements >= {nelements[0]} AND nelements <= {nelements[1]}")
+        # Only process properties that are queryable according to mapping
+        for prop_name, value in filters.items():
+            # Check if this property is mapped and queryable
+            is_queryable = False
+            for std_name, prop_info in self.property_mapping.items():
+                if prop_info['name'] == prop_name and prop_info.get('queryable'):
+                    is_queryable = True
+                    break
+            
+            if not is_queryable:
+                if self.logger:
+                    self.logger.log(f"Property '{prop_name}' is not queryable, skipping from filter")
+                continue
+
+            # Build filter based on value type
+            if isinstance(value, list) and len(value) == 2:
+                # Range query [min, max]
+                filter_parts.append(f"{prop_name} >= {value[0]} AND {prop_name} <= {value[1]}")
+            elif isinstance(value, str):
+                # String value
+                filter_parts.append(f'{prop_name} = "{value}"')
             else:
-                filter_parts.append(f"nelements = {nelements}")
-
-        # natoms filter
-        if 'natoms' in filters:
-            natoms = filters['natoms']
-            if isinstance(natoms, list):
-                filter_parts.append(f"natoms >= {natoms[0]} AND natoms <= {natoms[1]}")
-            else:
-                filter_parts.append(f"natoms = {natoms}")
-
-        # volume filter (expects [min, max] range)
-        if 'volume' in filters:
-            volume = filters['volume']
-            if isinstance(volume, (list, tuple)) and len(volume) == 2:
-                filter_parts.append(f"volume >= {volume[0]} AND volume <= {volume[1]}")
-
-        # spacegroup_number filter
-        if 'spacegroup_number' in filters:
-            sg = filters['spacegroup_number']
-            filter_parts.append(f"spacegroup_number = {sg}")
-
-        # spacegroup_symbol filter
-        if 'spacegroup_symbol' in filters:
-            sg_symbol = filters['spacegroup_symbol']
-            filter_parts.append(f'spacegroup_symbol = "{sg_symbol}"')
+                # Numeric value
+                filter_parts.append(f"{prop_name} = {value}")
 
         return filter_parts
 
