@@ -40,15 +40,15 @@ class CodAPIHelper:
             with open(mapping_file, 'r') as f:
                 data = json.load(f)
             
-            # Create mapping with full property details
+            # Create mapping with full property details from COD block
             mapping = {}
             for prop_name, prop_details in data.get('properties', {}).items():
                 cod_info = prop_details.get('cod', {})
                 if cod_info.get('is_available'):
                     mapping[prop_name] = {
                         'name': cod_info.get('name'),
-                        'queryable': prop_details.get('queryable', False),
-                        'range_support': prop_details.get('range_support', False),
+                        'queryable': cod_info.get('queryable', False),
+                        'range_support': cod_info.get('range_support', False),
                     }
             
             if self.logger:
