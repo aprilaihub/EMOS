@@ -1,0 +1,269 @@
+{
+  "description": "Standard property mappings for COD database. Maps standard filter names to COD-specific property names.",
+  "version": "1.1",
+  "database": "cod",
+  "database_info": {
+    "name": "Crystallography Open Database",
+    "type": "OPTIMADE",
+    "url": "https://www.crystallography.net/cod/optimade/v1/"
+  },
+  "properties": {
+    "natoms": {
+      "type": "integer",
+      "description": "Total number of atoms in unit cell",
+      "category": "structural",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "natoms"
+      }
+    },
+    "nelements": {
+      "type": "integer",
+      "description": "Number of unique chemical elements",
+      "category": "structural",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "nelements"
+      }
+    },
+    "volume": {
+      "type": "float",
+      "description": "Unit cell volume",
+      "units": "cubic_angstrom",
+      "category": "structural",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "volume"
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "List of unique chemical elements present",
+      "category": "structural",
+      "queryable": true,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "elements"
+      }
+    },
+    "lattice_a": {
+      "type": "float",
+      "description": "Lattice parameter a",
+      "units": "angstrom",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_a"
+      }
+    },
+    "lattice_b": {
+      "type": "float",
+      "description": "Lattice parameter b",
+      "units": "angstrom",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_b"
+      }
+    },
+    "lattice_c": {
+      "type": "float",
+      "description": "Lattice parameter c",
+      "units": "angstrom",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_c"
+      }
+    },
+    "lattice_alpha": {
+      "type": "float",
+      "description": "Lattice angle alpha",
+      "units": "degrees",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_alpha"
+      }
+    },
+    "lattice_beta": {
+      "type": "float",
+      "description": "Lattice angle beta",
+      "units": "degrees",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_beta"
+      }
+    },
+    "lattice_gamma": {
+      "type": "float",
+      "description": "Lattice angle gamma",
+      "units": "degrees",
+      "category": "lattice_parameters",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_gamma"
+      }
+    },
+    "spacegroup_number": {
+      "type": "integer",
+      "description": "International space group number (1-230)",
+      "category": "symmetry",
+      "queryable": true,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "spacegroup_number"
+      }
+    },
+    "spacegroup_symbol": {
+      "type": "string",
+      "description": "Hermann-Mauguin space group symbol",
+      "category": "symmetry",
+      "queryable": true,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "spacegroup_symbol"
+      }
+    },
+    "z_value": {
+      "type": "integer",
+      "description": "Number of formula units per unit cell (Z)",
+      "category": "symmetry",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_z"
+      }
+    },
+    "r_observed": {
+      "type": "float",
+      "description": "R-factor for observed reflections",
+      "category": "quality_metrics",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_robs"
+      }
+    },
+    "r_all": {
+      "type": "float",
+      "description": "R-factor for all reflections",
+      "category": "quality_metrics",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_rall"
+      }
+    },
+    "gof_all": {
+      "type": "float",
+      "description": "Goodness of fit for all reflections",
+      "category": "quality_metrics",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_gofall"
+      }
+    },
+    "chemical_formula_reduced": {
+      "type": "string",
+      "description": "Reduced chemical formula",
+      "category": "chemical_composition",
+      "queryable": false,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "chemical_formula_reduced"
+      }
+    },
+    "authors": {
+      "type": "string",
+      "description": "Publication authors",
+      "category": "publication",
+      "queryable": false,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_authors"
+      }
+    },
+    "title": {
+      "type": "string",
+      "description": "Publication title",
+      "category": "publication",
+      "queryable": false,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_title"
+      }
+    },
+    "journal": {
+      "type": "string",
+      "description": "Journal name",
+      "category": "publication",
+      "queryable": false,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_journal"
+      }
+    },
+    "year": {
+      "type": "integer",
+      "description": "Publication year",
+      "category": "publication",
+      "queryable": true,
+      "range_support": true,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_year"
+      }
+    },
+    "doi": {
+      "type": "string",
+      "description": "Digital Object Identifier",
+      "category": "publication",
+      "queryable": false,
+      "range_support": false,
+      "cod": {
+        "is_available": true,
+        "name": "_cod_doi"
+      }
+    }
+  },
+  "filter_categories": {
+    "structural": "Basic structural properties (atoms, elements, volume)",
+    "lattice_parameters": "Unit cell lattice parameters and vectors",
+    "symmetry": "Space group and symmetry information",
+    "chemical_composition": "Chemical formula and naming",
+    "quality_metrics": "R-factors and goodness of fit values",
+    "publication": "Citation and publication metadata"
+  }
+}
