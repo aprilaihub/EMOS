@@ -3,16 +3,48 @@
   "version": "1.0",
   "supported_databases": ["cod"],
   "properties": {
-    "natoms": {
-      "type": "integer",
-      "description": "Total number of atoms in unit cell",
+    
+    "chemical_formula_descriptive": {
+      "type": "string",
+      "description": "Descriptive chemical formula",
+      "category": "chemical_composition",
+      "cod": {
+        "is_available": true,
+        "name": "chemical_formula_descriptive",
+        "queryable": true
+      }
+    },
+    
+    "elements": {
+      "type": "array",
+      "description": "List of unique chemical elements present",
       "category": "structural",
       "cod": {
         "is_available": true,
-        "name": "natoms",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
+        "name": "elements",
+        "queryable": true
+      }
+    },
+    
+    "id": {
+      "type": "string",
+      "description": "Unique structure ID",
+      "category": "identifier",
+      "cod": {
+        "is_available": true,
+        "name": "id",
+        "queryable": true
+      }
+    },
+    
+    "last_modified": {
+      "type": "string",
+      "description": "Last modification timestamp",
+      "category": "metadata",
+      "cod": {
+        "is_available": true,
+        "name": "last_modified",
+        "queryable": true
       }
     },
     "nelements": {
@@ -22,258 +54,30 @@
       "cod": {
         "is_available": true,
         "name": "nelements",
-        "queryable": true,
-        "range_support": false
+        "queryable": true
       }
     },
-    "volume": {
-      "type": "float",
-      "description": "Unit cell volume",
-      "units": "cubic_angstrom",
+    "nperiodic_dimensions": {
+      "type": "integer",
+      "description": "Number of periodic dimensions",
       "category": "structural",
       "cod": {
         "is_available": true,
-        "name": "volume",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
+        "name": "nperiodic_dimensions",
+        "queryable": true
       }
     },
-    "elements": {
-      "type": "array",
-      "description": "List of unique chemical elements present",
-      "category": "structural",
-      "cod": {
-        "is_available": true,
-        "name": "elements",
-        "queryable": true,
-        "range_support": false
-      }
-    },
-    "lattice_a": {
-      "type": "float",
-      "description": "Lattice parameter a",
-      "units": "angstrom",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_a",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "lattice_b": {
-      "type": "float",
-      "description": "Lattice parameter b",
-      "units": "angstrom",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_b",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "lattice_c": {
-      "type": "float",
-      "description": "Lattice parameter c",
-      "units": "angstrom",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_c",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "lattice_alpha": {
-      "type": "float",
-      "description": "Lattice angle alpha",
-      "units": "degrees",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_alpha",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "lattice_beta": {
-      "type": "float",
-      "description": "Lattice angle beta",
-      "units": "degrees",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_beta",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "lattice_gamma": {
-      "type": "float",
-      "description": "Lattice angle gamma",
-      "units": "degrees",
-      "category": "lattice_parameters",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_gamma",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "spacegroup_number": {
-      "type": "integer",
-      "description": "International space group number (1-230)",
-      "category": "symmetry",
-      "cod": {
-        "is_available": true,
-        "name": "spacegroup_number",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "spacegroup_symbol": {
+    
+    
+    "type": {
       "type": "string",
-      "description": "Hermann-Mauguin space group symbol",
-      "category": "symmetry",
+      "description": "Entry type (always 'structures')",
+      "category": "metadata",
       "cod": {
         "is_available": true,
-        "name": "spacegroup_symbol",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "z_value": {
-      "type": "integer",
-      "description": "Number of formula units per unit cell (Z)",
-      "category": "symmetry",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_z",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "r_observed": {
-      "type": "float",
-      "description": "R-factor for observed reflections",
-      "category": "quality_metrics",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_robs",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "r_all": {
-      "type": "float",
-      "description": "R-factor for all reflections",
-      "category": "quality_metrics",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_rall",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "gof_all": {
-      "type": "float",
-      "description": "Goodness of fit for all reflections",
-      "category": "quality_metrics",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_gofall",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "chemical_formula_reduced": {
-      "type": "string",
-      "description": "Reduced chemical formula",
-      "category": "chemical_composition",
-      "cod": {
-        "is_available": true,
-        "name": "chemical_formula_reduced",
-        "queryable": false,
-        "range_support": false
-      }
-    },
-    "authors": {
-      "type": "string",
-      "description": "Publication authors",
-      "category": "publication",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_authors",
-        "queryable": false,
-        "range_support": false
-      }
-    },
-    "title": {
-      "type": "string",
-      "description": "Publication title",
-      "category": "publication",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_title",
-        "queryable": false,
-        "range_support": false
-      }
-    },
-    "journal": {
-      "type": "string",
-      "description": "Journal name",
-      "category": "publication",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_journal",
-        "queryable": false,
-        "range_support": false
-      }
-    },
-    "year": {
-      "type": "integer",
-      "description": "Publication year",
-      "category": "publication",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_year",
-        "queryable": false,
-        "range_support": false,
-        "note": "Available as response field but not queryable in COD OPTIMADE"
-      }
-    },
-    "doi": {
-      "type": "string",
-      "description": "Digital Object Identifier",
-      "category": "publication",
-      "cod": {
-        "is_available": true,
-        "name": "_cod_doi",
-        "queryable": false,
-        "range_support": false
+        "name": "type",
+        "queryable": true
       }
     }
-  },
-  "filter_categories": {
-    "structural": "Basic structural properties (atoms, elements, volume)",
-    "lattice_parameters": "Unit cell lattice parameters and vectors",
-    "symmetry": "Space group and symmetry information",
-    "chemical_composition": "Chemical formula and naming",
-    "quality_metrics": "R-factors and goodness of fit values",
-    "publication": "Citation and publication metadata"
   }
 }

@@ -16,7 +16,6 @@ db = CodDatabase(logger=logger)
 print(f"Database: {db.info()}")
 print()
 
-# Test 1: Simple composition query
 print("=" * 80)
 print("Test 1: Query 'Fe' (limit: 5)")
 print("=" * 80)
@@ -26,9 +25,9 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 2: Using standard property name 'nelements' (maps to COD: nelements)
+# Test 2: Query with nelements
 print("=" * 80)
-print("Test 2: Query 'Al2O3' with nelements=2 (standard name maps to COD) (limit: 5)")
+print("Test 2: Query 'Al2O3' with nelements=2 (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Al2O3',
@@ -40,100 +39,43 @@ for f in result:
     print(f"  - {f}")
 print()
 
-# Test 3: Using standard property name 'natoms' with range (maps to COD: natoms)
-print("=" * 80)
-print("Test 3: Query 'Si' with natoms range [1, 8] (standard name maps to COD) (limit: 5)")
-print("=" * 80)
-result = db.retrieve({
-    'query': 'Si',
-    'limit': 5,
-    'natoms': [1, 8]
-})
-print(f"Result: {len(result)} files")
-for f in result:
-    print(f"  - {f}")
-print()
+# Test 3: Query with nsites
 
-# Test 4: Using standard property name 'volume' (maps to COD: volume)
+# Test 3: Query with nperiodic_dimensions
 print("=" * 80)
-print("Test 4: Query 'Fe' with volume range [20, 100] (standard name maps to COD) (limit: 5)")
+print("Test 3: Query 'Fe' with nperiodic_dimensions=3 (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Fe',
     'limit': 5,
-    'volume': [20, 100]
+    'nperiodic_dimensions': 3
 })
 print(f"Result: {len(result)} files")
 for f in result:
     print(f"  - {f}")
 print()
 
-# Test 5: Using standard property name 'spacegroup_number' (maps to COD: spacegroup_number)
+# Test 4: Query for element Fe using 'query' parameter
 print("=" * 80)
-print("Test 5: Query 'Fe' with spacegroup_number=229 (standard name maps to COD) (limit: 5)")
+print("Test 4: Query for element 'Fe' (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
     'query': 'Fe',
-    'limit': 5,
-    'spacegroup_number': 229
+    'limit': 5
 })
 print(f"Result: {len(result)} files")
 for f in result:
     print(f"  - {f}")
 print()
 
-# Test 6: Multiple standard property filters combined
+# Test 5: Query with chemical_formula_descriptive
 print("=" * 80)
-print("Test 6: Multiple filters using standard names (all mapped to COD) (limit: 5)")
-print("=" * 80)
-result = db.retrieve({
-    'query': 'Al',
-    'limit': 5,
-    'nelements': 1,
-    'natoms': [1, 4],
-    'volume': [10, 50]
-})
-print(f"Result: {len(result)} files")
-for f in result:
-    print(f"  - {f}")
-print()
-
-# Test 7: Using standard property name 'lattice_a' (maps to COD: _cod_a)
-print("=" * 80)
-print("Test 7: Query 'Al' with lattice_a range (standard name maps to _cod_a in COD) (limit: 5)")
+print("Test 5: Query with chemical_formula_descriptive='Al2O3' (limit: 5)")
 print("=" * 80)
 result = db.retrieve({
-    'query': 'Al',
+    'query': '',
     'limit': 5,
-    'lattice_a': [3.0, 4.0]
-})
-print(f"Result: {len(result)} files")
-for f in result:
-    print(f"  - {f}")
-print()
-
-# Test 8: Using standard property name 'year' (maps to COD: _cod_year)
-print("=" * 80)
-print("Test 8: Query 'Si' with publication year range (standard name maps to _cod_year in COD) (limit: 5)")
-print("=" * 80)
-result = db.retrieve({
-    'query': 'Si',
-    'limit': 5,
-    'year': [2010, 2020]
-})
-print(f"Result: {len(result)} files")
-for f in result:
-    print(f"  - {f}")
-print()
-
-# Test 9: Using standard property name 'z_value' (maps to COD: _cod_z)
-print("=" * 80)
-print("Test 9: Query 'Fe' with z_value=4 (standard name maps to _cod_z in COD) (limit: 5)")
-print("=" * 80)
-result = db.retrieve({
-    'query': 'Fe',
-    'limit': 5,
-    'z_value': 4
+    'chemical_formula_descriptive': 'Al2O3'
 })
 print(f"Result: {len(result)} files")
 for f in result:
