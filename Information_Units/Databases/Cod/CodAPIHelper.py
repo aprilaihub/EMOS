@@ -26,16 +26,17 @@ class CodAPIHelper:
 
     def _load_property_mapping(self) -> dict:
         """
-        Load property mapping from database_property_mapping.json.
+        Load property mapping from property_mappings.json.
         
         Returns:
-            dict: Mapping with structure {prop_name: {name: cod_name, queryable: bool, ...}}
+            dict: Mapping with structure {prop_name: {name: cod_name, ...}} for retrievable properties
         """
         try:
             mapping_file = os.path.join(
                 os.path.dirname(__file__),
                 '..',
-                'database_property_mapping.json'
+                '..',
+                'property_mappings.json'
             )
             with open(mapping_file, 'r') as f:
                 data = json.load(f)
@@ -44,10 +45,10 @@ class CodAPIHelper:
             mapping = {}
             for prop_name, prop_details in data.get('properties', {}).items():
                 cod_info = prop_details.get('cod', {})
-                if cod_info.get('is_available'):
+                if cod_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': cod_info.get('name'),
-                        'queryable': cod_info.get('queryable', False),
+                        'retrievable': True,
                         'range_support': cod_info.get('range_support', False),
                     }
             
@@ -63,24 +64,24 @@ class CodAPIHelper:
     def map_properties(self, standard_properties: dict) -> dict:
         """
         Map standard property names to COD property names.
-        Only maps properties that are marked as queryable.
+        Only maps properties that are marked as retrievable.
         
         Args:
             standard_properties: Dict with standard property names as keys
             
         Returns:
-            dict: Dict with COD property names as keys (non-queryable properties excluded)
+            dict: Dict with COD property names as keys (non-retrievable properties excluded)
         """
         mapped = {}
         for standard_name, value in standard_properties.items():
             if standard_name in self.property_mapping:
                 prop_info = self.property_mapping[standard_name]
-                if prop_info.get('queryable'):
+                if prop_info.get('retrievable'):
                     cod_name = prop_info['name']
                     mapped[cod_name] = value
                 else:
                     if self.logger:
-                        self.logger.log(f"Property '{standard_name}' is not queryable in COD OPTIMADE, skipping")
+                        self.logger.log(f"Property '{standard_name}' is not retrievable in COD OPTIMADE, skipping")
             else:
                 if self.logger:
                     self.logger.log(f"Warning: Property '{standard_name}' not in mapping, skipping")
@@ -237,7 +238,7 @@ class CodAPIHelper:
     def _build_structure_filters(self, filters: dict) -> list:
         """
         Build OPTIMADE filters for structure properties.
-        Only builds filters for properties marked as queryable in the mapping.
+        Only builds filters for properties marked as retrievable in the mapping.
 
         Args:
             filters: Dict with filter keys and values (typically after mapping)
@@ -247,18 +248,18 @@ class CodAPIHelper:
         """
         filter_parts = []
 
-        # Only process properties that are queryable according to mapping
+        # Only process properties that are retrievable according to mapping
         for prop_name, value in filters.items():
-            # Check if this property is mapped and queryable
-            is_queryable = False
+            # Check if this property is mapped and retrievable
+            is_retrievable = False
             for std_name, prop_info in self.property_mapping.items():
-                if prop_info['name'] == prop_name and prop_info.get('queryable'):
-                    is_queryable = True
+                if prop_info['name'] == prop_name and prop_info.get('retrievable'):
+                    is_retrievable = True
                     break
             
-            if not is_queryable:
+            if not is_retrievable:
                 if self.logger:
-                    self.logger.log(f"Property '{prop_name}' is not queryable, skipping from filter")
+                    self.logger.log(f"Property '{prop_name}' is not retrievable, skipping from filter")
                 continue
 
             # Build filter based on value type

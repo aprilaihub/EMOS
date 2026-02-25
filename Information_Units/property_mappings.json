@@ -1,50 +1,41 @@
 {
-  "description": "Standard property mappings for all databases. Maps universal property names to database-specific property names and capabilities.",
+  "description": "Standard property mappings for databases, generators, and predictors. Maps universal property names to source-specific property names and capabilities.",
   "version": "1.0",
-  "supported_databases": ["cod"],
   "properties": {
-    
     "chemical_formula_descriptive": {
       "type": "string",
       "description": "Descriptive chemical formula",
       "category": "chemical_composition",
       "cod": {
-        "is_available": true,
         "name": "chemical_formula_descriptive",
-        "queryable": true
+        "retrievable": true
       }
     },
-    
     "elements": {
       "type": "array",
       "description": "List of unique chemical elements present",
       "category": "structural",
       "cod": {
-        "is_available": true,
         "name": "elements",
-        "queryable": true
+        "retrievable": true
       }
     },
-    
     "id": {
       "type": "string",
       "description": "Unique structure ID",
       "category": "identifier",
       "cod": {
-        "is_available": true,
         "name": "id",
-        "queryable": true
+        "retrievable": true
       }
     },
-    
     "last_modified": {
       "type": "string",
       "description": "Last modification timestamp",
       "category": "metadata",
       "cod": {
-        "is_available": true,
         "name": "last_modified",
-        "queryable": true
+        "retrievable": true
       }
     },
     "nelements": {
@@ -52,9 +43,8 @@
       "description": "Number of unique chemical elements",
       "category": "structural",
       "cod": {
-        "is_available": true,
         "name": "nelements",
-        "queryable": true
+        "retrievable": true
       }
     },
     "nperiodic_dimensions": {
@@ -62,21 +52,17 @@
       "description": "Number of periodic dimensions",
       "category": "structural",
       "cod": {
-        "is_available": true,
         "name": "nperiodic_dimensions",
-        "queryable": true
+        "retrievable": true
       }
     },
-    
-    
     "type": {
       "type": "string",
       "description": "Entry type (always 'structures')",
       "category": "metadata",
       "cod": {
-        "is_available": true,
         "name": "type",
-        "queryable": true
+        "retrievable": true
       }
     }
   }
