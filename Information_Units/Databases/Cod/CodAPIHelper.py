@@ -110,6 +110,9 @@ class CodAPIHelper:
         filters = filters or {}
 
         try:
+            if not self.is_host_reachable():
+                return []
+
             while len(all_results) < limit:
                 # Build OPTIMADE filter query
                 optimade_filter = self.build_filter(query, filters)
@@ -178,6 +181,26 @@ class CodAPIHelper:
             if self.logger:
                 self.logger.log(f"Error fetching from API: {str(e)}")
             return all_results
+
+    def is_host_reachable(self) -> bool:
+        """
+        Check whether the COD OPTIMADE host is reachable.
+
+        Returns:
+            bool: True if reachable, False otherwise
+        """
+        try:
+            response = requests.get(
+                self.base_url,
+                headers={"Accept": "application/json"},
+                timeout=5
+            )
+            # Any HTTP response indicates the host is reachable.
+            return True
+        except requests.exceptions.RequestException as e:
+            if self.logger:
+                self.logger.log(f"COD host unreachable: {str(e)}")
+            return False
 
     def build_filter(self, query: str, filters: dict = None) -> str:
         """
