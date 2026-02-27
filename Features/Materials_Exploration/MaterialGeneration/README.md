@@ -1,21 +1,40 @@
-# Material Generation Feature
+# Material Generation
+
+Generate new material compositions using AI-powered algorithms and predictive models
 
 ## Overview
 
-Generate novel materials with desired properties using machine learning and generative models (GAN-based, VAE-based, diffusion models).
+This feature provides material generation functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `generator` (string): Generator model to use (e.g., 'matgan', 'mattergen', 'cdvae')
-- `composition` (string): Target chemical composition or 'unconstrained'
-- `num_materials` (int): Number of structures to generate
-- `property_constraints` (dict): Target property ranges (e.g., {'bandgap': (1.0, 3.0)})
-- `seed` (int): Random seed for reproducibility (optional)
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `structures` (list): Generated material structures
-- `structure_files` (list): CIF files for generated materials
-- `validity_scores` (list): Structural validity/stability scores
-- `properties` (list): Predicted properties of generated materials
-- `generation_metadata` (dict): Generation parameters and statistics
+## Input Parameters
+
+- **Target Property**: Target property for material generation
+- **Base Element Group**: Base element group for generation
+- **Number of Compositions**: Number of material compositions to generate
+- **Target Property Value**: Target property value
+- **Include Rare Earth Elements**: Include rare earth elements in generation
+- **Optimize for Cost-Effectiveness**: Optimize for cost-effectiveness
+
+## Output Parameters
+
+- **Generated Compositions**: Number of compositions generated
+- **Best Candidate**: Best material candidate
+- **Predicted Performance**: Performance prediction
+- **Synthesis Difficulty**: Difficulty level for synthesis
+- **Export Data**: Export generated compositions
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.
