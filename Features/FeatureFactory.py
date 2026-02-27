@@ -1,5 +1,4 @@
 # Import all feature classes
-from Features.Materials_Exploration.MaterialSearch.MaterialSearchFeature import MaterialSearchFeature
 from Features.Materials_Exploration.MaterialGeneration.MaterialGenerationFeature import MaterialGenerationFeature
 from Features.Materials_Exploration.DatabaseExtractor.DatabaseExtractorFeature import DatabaseExtractorFeature
 from Features.Materials_Exploration.MaterialCharacterization.MaterialCharacterizationFeature import MaterialCharacterizationFeature
@@ -16,6 +15,7 @@ from Features.Electronics_Application.ThermalManagement.ThermalManagementFeature
 from Features.Electronics_Application.ReliabilityAssessment.ReliabilityAssessmentFeature import ReliabilityAssessmentFeature
 from Features.Electronics_Application.ProcessIntegration.ProcessIntegrationFeature import ProcessIntegrationFeature
 from Features.Electronics_Application.AdvancedCharacterization.AdvancedCharacterizationFeature import AdvancedCharacterizationFeature
+from Features.Materials_Exploration.MaterialSearch.MaterialSearchFeature import MaterialSearchFeature
 
 
 # Feature registry - simple mapping like Information Units

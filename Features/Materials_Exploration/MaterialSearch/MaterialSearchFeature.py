@@ -9,43 +9,46 @@ class MaterialSearchFeature(BaseFeature):
         super().__init__("Material Search", logger)
     
     def info(self):
-        return "Material Search: Search and filter materials based on specific criteria and properties"
+        return "Material Search: Search and explore materials from comprehensive databases using various criteria"
     
     def extract_inputs(self, input_data):
         return {
-            'search_criteria': input_data.get('searchCriteria', 'bandgap > 2.0'),
-            'material_class': input_data.get('materialClass', 'semiconductor'),
-            'property_range': input_data.get('propertyRange', '1-5'),
-            'max_results': input_data.get('maxResults', '50'),
+            'materialName': input_data.get('materialName/formula', ''),
+            'propertyType': input_data.get('propertyType', ''),
+            'minValue': input_data.get('minimumValue', '0'),
+            'maxValue': input_data.get('maximumValue', '0'),
+            'includeComposites': input_data.get('includeCompositeMaterials', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing material search...', 'info')
+            self.logger.log('Initializing Material Search...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Material search process - python', 'info')
+            self.logger.log('Material Search processing completed', 'info')
         
         return {
-            'found_materials': f"Found {inputs['max_results']} materials matching criteria",
-            'search_criteria': inputs['search_criteria'],
-            'material_class': inputs['material_class']
+            'status': 'completed',
+            'message': 'Material Search feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'materialsCount': '42 materials found - python',
-            'topMatch': 'Silicon Carbide (SiC) - python',
-            'propertyRange': '2.5 - 45.2 GPa - python',
-            'downloadLink': 'search_results.csv (Ready) - python'
+            'materialsCount': 'placeholder text value',
+            'topMatch': 'placeholder text value',
+            'propertyRange': 'placeholder text value',
+            'downloadLink': 'placeholder link value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -62,12 +65,6 @@ class MaterialSearchFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'search_criteria': inputs['search_criteria']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -85,12 +82,6 @@ class MaterialSearchFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'target_class': inputs['material_class']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -108,9 +99,3 @@ class MaterialSearchFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'material_class': inputs['material_class']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

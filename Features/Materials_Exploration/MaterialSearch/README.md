@@ -1,19 +1,38 @@
-# Material Search Feature
+# Material Search
+
+Search and explore materials from comprehensive databases using various criteria
 
 ## Overview
 
-Search through material databases using various criteria including composition, structure type, and property ranges to discover materials with desired properties.
+This feature provides material search functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `composition` (string): Chemical composition (e.g., 'FeO2')
-- `max_energy` (float): Maximum formation energy threshold
-- `crystal_system` (string): Crystal structure type (e.g., 'cubic', 'hexagonal')
-- `property_min` / `property_max` (dict): Property value ranges
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `materials` (list): Found materials with their metadata
-- `structure_files` (list): CIF or structure files for matching materials
-- `properties` (dict): Computed/retrieved properties for each material
-- `count` (int): Total number of materials found
+## Input Parameters
+
+- **Material Name/Formula**: Material name or chemical formula for search
+- **Property Type**: Type of material property to search by
+- **Minimum Value**: Minimum property value for filtering
+- **Maximum Value**: Maximum property value for filtering
+- **Include Composite Materials**: Include composite materials in search results
+
+## Output Parameters
+
+- **Materials Found**: Number of materials found matching search criteria
+- **Top Match**: Best matching material from search results
+- **Property Range**: Range of property values in search results
+- **Download**: Download link for complete search results
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.
