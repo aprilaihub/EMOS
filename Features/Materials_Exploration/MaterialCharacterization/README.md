@@ -1,19 +1,36 @@
-# Material Characterization Feature
+# Material Characterization
+
+Advanced materials analysis and characterization tools for comprehensive evaluation
 
 ## Overview
 
-Comprehensively characterize material properties through integrated analysis of electronic, optical, mechanical, and thermal properties.
+This feature provides material characterization functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Input material structure
-- `property_types` (list): Properties to characterize ('electronic', 'optical', 'mechanical', 'thermal')
-- `calculation_level` (string): Computation depth ('fast', 'standard', 'accurate')
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `electronic_properties` (dict): Bandgap, effective mass, carrier mobility, conductivity
-- `optical_properties` (dict): Refractive index, absorption coefficient, dielectric constant
-- `mechanical_properties` (dict): Elastic moduli, hardness, bulk modulus, shear modulus
-- `thermal_properties` (dict): Thermal conductivity, heat capacity, thermal expansion
-- `summary_report` (dict): Consolidated property summary
+## Input Parameters
+
+- **Material Formula**: Material formula for characterization
+- **Analysis Type**: Type of analysis to perform
+- **Threshold Value**: Threshold value for analysis
+- **Export Results**: Export analysis results
+
+## Output Parameters
+
+- **Analysis Status**: Status of the analysis
+- **Material Properties**: Calculated material properties
+- **Report Generation**: Report generation status
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

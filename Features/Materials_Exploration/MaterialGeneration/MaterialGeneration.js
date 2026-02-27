@@ -6,24 +6,13 @@ class MaterialGenerationFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure AI material generation parameters</p>
+            <p>Configure input parameters for Material Generation</p>
             <div class="input-controls">
-                ${this.createSelectInput(`targetProperty_${this.featureId}`, 'Target Property', [
-                    { value: 'high_strength', text: 'High Mechanical Strength' },
-                    { value: 'thermal_conductivity', text: 'High Thermal Conductivity' },
-                    { value: 'electrical_insulator', text: 'Electrical Insulator' },
-                    { value: 'semiconductor', text: 'Semiconductor' },
-                    { value: 'superconductor', text: 'Superconductor' }
-                ])}
-                ${this.createSelectInput(`baseElements_${this.featureId}`, 'Base Element Group', [
-                    { value: 'metals', text: 'Metals (Fe, Al, Ti, etc.)' },
-                    { value: 'ceramics', text: 'Ceramics (Si, O, N, etc.)' },
-                    { value: 'polymers', text: 'Polymers (C, H, O, etc.)' },
-                    { value: 'composites', text: 'Composite Materials' }
-                ])}
-                ${this.createNumberInput(`numCompositions_${this.featureId}`, 'Number of Compositions', '1', '100', '1', true)}
+                ${this.createSelectInput(`targetProperty_${this.featureId}`, 'Target Property', [{value: 'high_strength', text: 'High Mechanical Strength'}, {value: 'thermal_conductivity', text: 'High Thermal Conductivity'}, {value: 'electrical_insulator', text: 'Electrical Insulator'}, {value: 'semiconductor', text: 'Semiconductor'}, {value: 'superconductor', text: 'Superconductor'}])}
+                ${this.createSelectInput(`baseElements_${this.featureId}`, 'Base Element Group', [{value: 'metals', text: 'Metals (Fe, Al, Ti, etc.)'}, {value: 'ceramics', text: 'Ceramics (Si, O, N, etc.)'}, {value: 'polymers', text: 'Polymers (C, H, O, etc.)'}, {value: 'composites', text: 'Composite Materials'}])}
+                ${this.createNumberInput(`numCompositions_${this.featureId}`, 'Number of Compositions', '1', '100', '1')}
                 ${this.createNumberInput(`targetValue_${this.featureId}`, 'Target Property Value', '0', '1000', '0.1')}
-                ${this.createCheckboxInput(`includeRareElements_${this.featureId}`, 'Include Rare Earth Elements', false)}
+                ${this.createCheckboxInput(`includeRareElements_${this.featureId}`, 'Include Rare Earth Elements', true)}
                 ${this.createCheckboxInput(`optimizeForCost_${this.featureId}`, 'Optimize for Cost-Effectiveness', true)}
             </div>
         `;
@@ -31,7 +20,7 @@ class MaterialGenerationFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>AI-generated material compositions and predictions</p>
+            <p>Material Generation results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Generated Compositions:</strong> <span id="generatedCount_${this.featureId}">Pending...</span>
@@ -53,23 +42,39 @@ class MaterialGenerationFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for material generation
+        // Placeholder processing logic for Material Generation
         return {
-            generatedCount: '15 compositions generated',
-            bestCandidate: 'Ti3Al2C (MAX Phase)',
-            predictedPerformance: '8.5 GPa (92% of target)',
-            synthesisDifficulty: 'Medium',
-            exportData: 'compositions.json (Ready)'
+            generatedCount: 'Generated Compositions - placeholder',
+            bestCandidate: 'Best Candidate - placeholder',
+            predictedPerformance: 'Predicted Performance - placeholder',
+            synthesisDifficulty: 'Synthesis Difficulty - placeholder',
+            exportData: 'Export Data - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
-        document.getElementById(`generatedCount_${this.featureId}`).textContent = finalResults.generatedCount;
-        document.getElementById(`bestCandidate_${this.featureId}`).textContent = finalResults.bestCandidate;
-        document.getElementById(`predictedPerformance_${this.featureId}`).textContent = finalResults.predictedPerformance;
-        document.getElementById(`synthesisDifficulty_${this.featureId}`).textContent = finalResults.synthesisDifficulty;
-        document.getElementById(`exportData_${this.featureId}`).innerHTML = `<a href="#" style="color: #4CAF50;">${finalResults.exportData}</a>`;
+        
+        if (finalResults.error) {
+            document.getElementById(`generatedCount_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.generatedCount) {
+            document.getElementById(`generatedCount_${this.featureId}`).textContent = finalResults.generatedCount;
+        }
+        if (finalResults.bestCandidate) {
+            document.getElementById(`bestCandidate_${this.featureId}`).textContent = finalResults.bestCandidate;
+        }
+        if (finalResults.predictedPerformance) {
+            document.getElementById(`predictedPerformance_${this.featureId}`).textContent = finalResults.predictedPerformance;
+        }
+        if (finalResults.synthesisDifficulty) {
+            document.getElementById(`synthesisDifficulty_${this.featureId}`).textContent = finalResults.synthesisDifficulty;
+        }
+        if (finalResults.exportData) {
+            document.getElementById(`exportData_${this.featureId}`).textContent = finalResults.exportData;
+        }
     }
 }
 

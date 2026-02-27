@@ -6,14 +6,9 @@ class ProcessIntegrationFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Process Integration</p>
             <div class="input-controls">
-                ${this.createSelectInput(`processStep_${this.featureId}`, 'Process Step', [
-                    { value: 'deposition', text: 'Deposition' },
-                    { value: 'etching', text: 'Etching' },
-                    { value: 'annealing', text: 'Annealing' },
-                    { value: 'doping', text: 'Doping' }
-                ])}
+                ${this.createSelectInput(`processStep_${this.featureId}`, 'Process Step', [{value: 'deposition', text: 'Deposition'}, {value: 'etching', text: 'Etching'}, {value: 'annealing', text: 'Annealing'}, {value: 'doping', text: 'Doping'}])}
                 ${this.createNumberInput(`processTemp_${this.featureId}`, 'Process Temperature (°C)', '20', '1200', '10')}
                 ${this.createTextInput(`gasFlow_${this.featureId}`, 'Gas Flow Rates', 'sccm values')}
                 ${this.createCheckboxInput(`inSituMonitoring_${this.featureId}`, 'In-situ Monitoring', true)}
@@ -23,7 +18,7 @@ class ProcessIntegrationFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Process integration results and optimization status</p>
+            <p>Process Integration results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Integration Status:</strong> <span id="integrationStatus_${this.featureId}">Pending...</span>
@@ -39,20 +34,31 @@ class ProcessIntegrationFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for process integration
+        // Placeholder processing logic for Process Integration
         return {
-            integrationStatus: 'Process integration optimized',
-            yieldPrediction: 'Yield prediction: 82.3%',
-            recipeParameters: 'Recipe parameters saved'
+            integrationStatus: 'Integration Status - placeholder',
+            yieldPrediction: 'Yield Prediction - placeholder',
+            recipeParameters: 'Recipe Parameters - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`integrationStatus_${this.featureId}`).textContent = finalResults.integrationStatus;
-        document.getElementById(`yieldPrediction_${this.featureId}`).textContent = finalResults.yieldPrediction;
-        document.getElementById(`recipeParameters_${this.featureId}`).textContent = finalResults.recipeParameters;
+        if (finalResults.error) {
+            document.getElementById(`integrationStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.integrationStatus) {
+            document.getElementById(`integrationStatus_${this.featureId}`).textContent = finalResults.integrationStatus;
+        }
+        if (finalResults.yieldPrediction) {
+            document.getElementById(`yieldPrediction_${this.featureId}`).textContent = finalResults.yieldPrediction;
+        }
+        if (finalResults.recipeParameters) {
+            document.getElementById(`recipeParameters_${this.featureId}`).textContent = finalResults.recipeParameters;
+        }
     }
 }
 

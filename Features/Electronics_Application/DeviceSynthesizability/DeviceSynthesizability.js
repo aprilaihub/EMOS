@@ -6,36 +6,20 @@ class DeviceSynthesizabilityFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure device synthesis evaluation parameters</p>
+            <p>Configure input parameters for Device Synthesizability</p>
             <div class="input-controls">
-                ${this.createSelectInput(`deviceType_${this.featureId}`, 'Device Type', [
-                    { value: 'transistor', text: 'Transistor' },
-                    { value: 'diode', text: 'Diode' },
-                    { value: 'solar_cell', text: 'Solar Cell' },
-                    { value: 'led', text: 'LED' },
-                    { value: 'sensor', text: 'Sensor' }
-                ])}
+                ${this.createSelectInput(`deviceType_${this.featureId}`, 'Device Type', [{value: 'transistor', text: 'Transistor'}, {value: 'diode', text: 'Diode'}, {value: 'solar_cell', text: 'Solar Cell'}, {value: 'led', text: 'LED'}, {value: 'sensor', text: 'Sensor'}])}
                 ${this.createTextInput(`materialComposition_${this.featureId}`, 'Material Composition', 'e.g., GaAs, SiC, InGaN')}
-                ${this.createSelectInput(`substrateType_${this.featureId}`, 'Substrate Type', [
-                    { value: 'silicon', text: 'Silicon' },
-                    { value: 'sapphire', text: 'Sapphire' },
-                    { value: 'sic', text: 'Silicon Carbide' },
-                    { value: 'gan', text: 'Gallium Nitride' }
-                ])}
+                ${this.createSelectInput(`substrateType_${this.featureId}`, 'Substrate Type', [{value: 'silicon', text: 'Silicon'}, {value: 'sapphire', text: 'Sapphire'}, {value: 'sic', text: 'Silicon Carbide'}, {value: 'gan', text: 'Gallium Nitride'}])}
                 ${this.createNumberInput(`operatingTemp_${this.featureId}`, 'Operating Temperature (°C)', '-50', '500', '1')}
-                ${this.createSelectInput(`fabricationMethod_${this.featureId}`, 'Preferred Fabrication Method', [
-                    { value: 'mocvd', text: 'MOCVD' },
-                    { value: 'mbe', text: 'MBE' },
-                    { value: 'sputtering', text: 'Sputtering' },
-                    { value: 'cvd', text: 'CVD' }
-                ])}
+                ${this.createSelectInput(`fabricationMethod_${this.featureId}`, 'Preferred Fabrication Method', [{value: 'mocvd', text: 'MOCVD'}, {value: 'mbe', text: 'MBE'}, {value: 'sputtering', text: 'Sputtering'}, {value: 'cvd', text: 'CVD'}])}
             </div>
         `;
     }
 
     createOutputsHTML() {
         return `
-            <p>Device synthesis feasibility analysis</p>
+            <p>Device Synthesizability results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Synthesis Feasibility:</strong> <span id="feasibility_${this.featureId}">Pending...</span>
@@ -57,24 +41,39 @@ class DeviceSynthesizabilityFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for device synthesizability
+        // Placeholder processing logic for Device Synthesizability
         return {
-            feasibility: '78% (High)',
-            recommendedProcess: 'MOCVD with 3-step annealing',
-            estimatedCost: '$245/wafer',
-            processTemp: '650°C',
-            yieldPrediction: '85%'
+            feasibility: 'Synthesis Feasibility - placeholder',
+            recommendedProcess: 'Recommended Process - placeholder',
+            estimatedCost: 'Estimated Cost - placeholder',
+            processTemp: 'Processing Temperature - placeholder',
+            yieldPrediction: 'Yield Prediction - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`feasibility_${this.featureId}`).textContent = finalResults.feasibility;
-        document.getElementById(`recommendedProcess_${this.featureId}`).textContent = finalResults.recommendedProcess;
-        document.getElementById(`estimatedCost_${this.featureId}`).textContent = finalResults.estimatedCost;
-        document.getElementById(`processTemp_${this.featureId}`).textContent = finalResults.processTemp;
-        document.getElementById(`yieldPrediction_${this.featureId}`).textContent = finalResults.yieldPrediction;
+        if (finalResults.error) {
+            document.getElementById(`feasibility_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.feasibility) {
+            document.getElementById(`feasibility_${this.featureId}`).textContent = finalResults.feasibility;
+        }
+        if (finalResults.recommendedProcess) {
+            document.getElementById(`recommendedProcess_${this.featureId}`).textContent = finalResults.recommendedProcess;
+        }
+        if (finalResults.estimatedCost) {
+            document.getElementById(`estimatedCost_${this.featureId}`).textContent = finalResults.estimatedCost;
+        }
+        if (finalResults.processTemp) {
+            document.getElementById(`processTemp_${this.featureId}`).textContent = finalResults.processTemp;
+        }
+        if (finalResults.yieldPrediction) {
+            document.getElementById(`yieldPrediction_${this.featureId}`).textContent = finalResults.yieldPrediction;
+        }
     }
 }
 

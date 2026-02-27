@@ -1,22 +1,36 @@
-# Band Structure Feature
+# Band Structure
+
+Band structure calculations and electronic transport property analysis
 
 ## Overview
 
-Calculate and analyze electronic band structures of materials, including density of states and band gap analysis for semiconductor and device design.
+This feature provides band structure functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Input material structure
-- `calculation_type` (string): Band structure type ('standard', 'hseg', 'uniform', 'hybrid')
-- `num_k_points` (int): Number of k-points along path
-- `dos_smearing` (float): DOS broadening parameter (eV)
-- `fermi_level` (float): Fermi level reference (optional)
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `band_structure` (dict): K-points, eigenvalues, and band data
-- `density_of_states` (dict): DOS energies and values
-- `bandgap` (dict): Bandgap value, type (direct/indirect), and locations
-- `effective_mass` (dict): Electron and hole effective masses
-- `band_edges` (dict): Valence and conduction band edge positions
-- `k_points` (array): K-point coordinates and path
+## Input Parameters
+
+- **Band Calculation Type**: Type of band calculation
+- **K-Points Density**: K-points density
+- **Lattice Parameters**: Lattice parameters
+- **Include Spin-Orbit Coupling**: Include spin-orbit coupling
+
+## Output Parameters
+
+- **Band Structure**: Band structure calculation status
+- **Transport Properties**: Calculated transport properties
+- **DOS Analysis**: Density of states analysis
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

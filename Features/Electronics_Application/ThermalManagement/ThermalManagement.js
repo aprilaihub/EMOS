@@ -6,13 +6,9 @@ class ThermalManagementFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Thermal Management</p>
             <div class="input-controls">
-                ${this.createSelectInput(`thermalProperty_${this.featureId}`, 'Thermal Property', [
-                    { value: 'conductivity', text: 'Thermal Conductivity' },
-                    { value: 'expansion', text: 'Thermal Expansion' },
-                    { value: 'capacity', text: 'Heat Capacity' }
-                ])}
+                ${this.createSelectInput(`thermalProperty_${this.featureId}`, 'Thermal Property', [{value: 'conductivity', text: 'Thermal Conductivity'}, {value: 'expansion', text: 'Thermal Expansion'}, {value: 'capacity', text: 'Heat Capacity'}])}
                 ${this.createNumberInput(`operatingPower_${this.featureId}`, 'Operating Power (W)', '0.1', '1000', '0.1')}
                 ${this.createNumberInput(`ambientTemp_${this.featureId}`, 'Ambient Temperature (°C)', '-50', '200', '1')}
                 ${this.createCheckboxInput(`includeConvection_${this.featureId}`, 'Include Convection', true)}
@@ -22,7 +18,7 @@ class ThermalManagementFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Thermal management analysis results and optimization</p>
+            <p>Thermal Management results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Optimization Status:</strong> <span id="optimizationStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class ThermalManagementFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for thermal management
+        // Placeholder processing logic for Thermal Management
         return {
-            optimizationStatus: 'Thermal management optimized',
-            maxTemperature: '73.5°C',
-            coolingSolution: 'Cooling solution recommended'
+            optimizationStatus: 'Optimization Status - placeholder',
+            maxTemperature: 'Maximum Temperature - placeholder',
+            coolingSolution: 'Cooling Solution - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`optimizationStatus_${this.featureId}`).textContent = finalResults.optimizationStatus;
-        document.getElementById(`maxTemperature_${this.featureId}`).textContent = finalResults.maxTemperature;
-        document.getElementById(`coolingSolution_${this.featureId}`).textContent = finalResults.coolingSolution;
+        if (finalResults.error) {
+            document.getElementById(`optimizationStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.optimizationStatus) {
+            document.getElementById(`optimizationStatus_${this.featureId}`).textContent = finalResults.optimizationStatus;
+        }
+        if (finalResults.maxTemperature) {
+            document.getElementById(`maxTemperature_${this.featureId}`).textContent = finalResults.maxTemperature;
+        }
+        if (finalResults.coolingSolution) {
+            document.getElementById(`coolingSolution_${this.featureId}`).textContent = finalResults.coolingSolution;
+        }
     }
 }
 

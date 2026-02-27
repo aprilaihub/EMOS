@@ -6,51 +6,47 @@ from Information_Units.Predictors.PredictorFactory import predictor_factory
 
 class CrystallographicAnalysisFeature(BaseFeature):
     def __init__(self, logger=None):
-        super().__init__('Crystallographic Analysis', logger)
+        super().__init__("Crystallographic Analysis", logger)
     
     def info(self):
-        return f"Feature: {self.feature_name} - Crystal structure analysis and symmetry determination"
+        return "Crystallographic Analysis: Simulation and modeling tools for predicting material behavior under various conditions"
     
     def extract_inputs(self, input_data):
-        """Extract and validate input parameters"""
         return {
-            'structure_file': input_data.get('structureFile', 'structure.cif'),
-            'symmetry_tolerance': input_data.get('symmetryTolerance', '0.01'),
-            'analysis_type': input_data.get('analysisType', 'full'),
-            'space_group': input_data.get('spaceGroup', 'auto'),
+            'inputData': input_data.get('inputData', ''),
+            'modelType': input_data.get('modelType', 'linear'),
+            'accuracy': input_data.get('requiredAccuracy(%)', '90'),
+            'realTimeUpdate': input_data.get('real-timeUpdates', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
-        """Perform the core crystallographic analysis logic"""
         if self.logger:
-            self.logger.log('Initializing crystallographic analysis...', 'info')
+            self.logger.log('Initializing Crystallographic Analysis...', 'info')
         
-        # Process Information Units
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Crystallographic analysis process - python', 'info')
+            self.logger.log('Crystallographic Analysis processing completed', 'info')
         
         return {
-            'analysis_status': 'Crystallographic analysis completed',
-            'space_group': 'P63/mmc (No. 194)',
-            'lattice_parameters': 'a=3.185 Å, c=5.186 Å',
-            'symmetry_elements': '24 symmetry operations'
+            'status': 'completed',
+            'message': 'Crystallographic Analysis feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'analysisStatus': 'Crystallographic analysis completed - python',
-            'spaceGroup': 'P63/mmc (No. 194) - python',
-            'latticeParameters': 'a=3.185 Å, c=5.186 Å - python',
-            'symmetryElements': '24 symmetry operations - python'
+            'simulationStatus': 'placeholder text value',
+            'modelValidation': 'placeholder text value',
+            'predictions': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -67,12 +63,6 @@ class CrystallographicAnalysisFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'structure_file': inputs['structure_file']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -90,12 +80,6 @@ class CrystallographicAnalysisFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'crystal_system': inputs['analysis_type']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -113,9 +97,3 @@ class CrystallographicAnalysisFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'space_group': inputs['space_group']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

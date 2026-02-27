@@ -8,9 +8,6 @@ def generate_inputs_extraction(inputs):
         "            'active_databases': input_data.get('active_databases', []),",
         "            'active_generators': input_data.get('active_generators', []),",
         "            'active_predictors': input_data.get('active_predictors', []),",
-        "            'search_criteria': input_data.get('search_criteria', ''),",
-        "            'target_properties': input_data.get('target_properties', ''),",
-        "            'material_property': input_data.get('material_property', ''),",
     ]
     
     if not inputs:
@@ -255,12 +252,6 @@ class {class_name}(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {{'search_criteria': inputs.get('search_criteria', '')}}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {{db_key}} retrieve() error: {{str(e)}}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -278,12 +269,6 @@ class {class_name}(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {{'target_properties': inputs.get('target_properties', '')}}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {{gen_key}} generate() error: {{str(e)}}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -301,12 +286,6 @@ class {class_name}(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {{'material_property': inputs.get('material_property', '')}}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {{pred_key}} predict() error: {{str(e)}}', 'warning')
 """
     
     return template.format(

@@ -6,23 +6,19 @@ class DftCalculationFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for DFT Calculation</p>
             <div class="input-controls">
-                ${this.createSelectInput(`optimizationTarget_${this.featureId}`, 'Optimization Target', [
-                    { value: 'performance', text: 'Performance' },
-                    { value: 'cost', text: 'Cost' },
-                    { value: 'efficiency', text: 'Efficiency' }
-                ])}
+                ${this.createSelectInput(`optimizationTarget_${this.featureId}`, 'Optimization Target', [{value: 'performance', text: 'Performance'}, {value: 'cost', text: 'Cost'}, {value: 'efficiency', text: 'Efficiency'}])}
                 ${this.createNumberInput(`iterations_${this.featureId}`, 'Iterations', '10', '1000', '10')}
                 ${this.createFileInput(`configFile_${this.featureId}`, 'Configuration File', '.json,.xml')}
-                ${this.createCheckboxInput(`verboseOutput_${this.featureId}`, 'Verbose Output', false)}
+                ${this.createCheckboxInput(`verboseOutput_${this.featureId}`, 'Verbose Output', true)}
             </div>
         `;
     }
 
     createOutputsHTML() {
         return `
-            <p>DFT calculation results and optimization status</p>
+            <p>DFT Calculation results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Convergence Status:</strong> <span id="convergenceStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class DftCalculationFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for DFT calculation
+        // Placeholder processing logic for DFT Calculation
         return {
-            convergenceStatus: 'Optimization converged in 67 iterations',
-            performanceImprovement: 'Performance improved by 18.5%',
-            configurationStatus: 'Configuration saved'
+            convergenceStatus: 'Convergence Status - placeholder',
+            performanceImprovement: 'Performance Improvement - placeholder',
+            configurationStatus: 'Configuration - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`convergenceStatus_${this.featureId}`).textContent = finalResults.convergenceStatus;
-        document.getElementById(`performanceImprovement_${this.featureId}`).textContent = finalResults.performanceImprovement;
-        document.getElementById(`configurationStatus_${this.featureId}`).textContent = finalResults.configurationStatus;
+        if (finalResults.error) {
+            document.getElementById(`convergenceStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.convergenceStatus) {
+            document.getElementById(`convergenceStatus_${this.featureId}`).textContent = finalResults.convergenceStatus;
+        }
+        if (finalResults.performanceImprovement) {
+            document.getElementById(`performanceImprovement_${this.featureId}`).textContent = finalResults.performanceImprovement;
+        }
+        if (finalResults.configurationStatus) {
+            document.getElementById(`configurationStatus_${this.featureId}`).textContent = finalResults.configurationStatus;
+        }
     }
 }
 

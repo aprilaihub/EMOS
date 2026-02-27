@@ -1,21 +1,36 @@
-# Crystallographic Analysis Feature
+# Crystallographic Analysis
+
+Simulation and modeling tools for predicting material behavior under various conditions
 
 ## Overview
 
-Analyze crystal structures including symmetry determination, lattice parameters, phase identification, and structure comparison.
+This feature provides crystallographic analysis functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object or file): Input crystal structure (CIF, POSCAR, etc.)
-- `tolerance` (float): Symmetry detection tolerance (Angstrom)
-- `analysis_type` (string): Type of analysis ('symmetry', 'lattice', 'phase', 'comparison')
-- `comparison_structure` (Structure object): Second structure for comparison (if applicable)
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `space_group` (string): Space group symbol and number
-- `lattice_parameters` (dict): Lattice constants (a, b, c, alpha, beta, gamma)
-- `wyckoff_positions` (list): Atomic Wyckoff positions
-- `point_group` (string): Point group symmetry
-- `structure_comparison` (dict): Similarity metrics between structures (if comparison)
-- `phase_identification` (string): Identified material phase
+## Input Parameters
+
+- **Input Data**: Input data or material formula
+- **Model Type**: Type of analysis model
+- **Required Accuracy (%)**: Required accuracy level
+- **Real-time Updates**: Enable real-time updates
+
+## Output Parameters
+
+- **Simulation Status**: Status of simulation
+- **Model Validation**: Model validation results
+- **Predictions**: Structural predictions
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

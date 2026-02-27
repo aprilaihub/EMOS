@@ -6,16 +6,10 @@ class MaterialSearchFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure search parameters for material database exploration</p>
+            <p>Configure input parameters for Material Search</p>
             <div class="input-controls">
                 ${this.createTextInput(`materialName_${this.featureId}`, 'Material Name/Formula', 'e.g., Al2O3, Silicon, etc.')}
-                ${this.createSelectInput(`propertyType_${this.featureId}`, 'Property Type', [
-                    { value: '', text: 'Select Property' },
-                    { value: 'mechanical', text: 'Mechanical Properties' },
-                    { value: 'thermal', text: 'Thermal Properties' },
-                    { value: 'electrical', text: 'Electrical Properties' },
-                    { value: 'optical', text: 'Optical Properties' }
-                ])}
+                ${this.createSelectInput(`propertyType_${this.featureId}`, 'Property Type', [{value: '', text: 'Select Property'}, {value: 'mechanical', text: 'Mechanical Properties'}, {value: 'thermal', text: 'Thermal Properties'}, {value: 'electrical', text: 'Electrical Properties'}, {value: 'optical', text: 'Optical Properties'}])}
                 ${this.createNumberInput(`minValue_${this.featureId}`, 'Minimum Value', '0', '10000', '0.1')}
                 ${this.createNumberInput(`maxValue_${this.featureId}`, 'Maximum Value', '0', '10000', '0.1')}
                 ${this.createCheckboxInput(`includeComposites_${this.featureId}`, 'Include Composite Materials', true)}
@@ -25,7 +19,7 @@ class MaterialSearchFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Search results for material database query</p>
+            <p>Material Search results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Materials Found:</strong> <span id="materialsCount_${this.featureId}">Pending...</span>
@@ -44,22 +38,35 @@ class MaterialSearchFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for material search
+        // Placeholder processing logic for Material Search
         return {
-            materialsCount: '42 materials found',
-            topMatch: 'Silicon Carbide (SiC)',
-            propertyRange: '2.5 - 45.2 GPa',
-            downloadLink: 'search_results.csv (Ready)'
+            materialsCount: 'Materials Found - placeholder',
+            topMatch: 'Top Match - placeholder',
+            propertyRange: 'Property Range - placeholder',
+            downloadLink: 'Download - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`materialsCount_${this.featureId}`).textContent = finalResults.materialsCount;
-        document.getElementById(`topMatch_${this.featureId}`).textContent = finalResults.topMatch;
-        document.getElementById(`propertyRange_${this.featureId}`).textContent = finalResults.propertyRange;
-        document.getElementById(`downloadLink_${this.featureId}`).innerHTML = `<a href="#" style="color: #4CAF50;">${finalResults.downloadLink}</a>`;
+        if (finalResults.error) {
+            document.getElementById(`materialsCount_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.materialsCount) {
+            document.getElementById(`materialsCount_${this.featureId}`).textContent = finalResults.materialsCount;
+        }
+        if (finalResults.topMatch) {
+            document.getElementById(`topMatch_${this.featureId}`).textContent = finalResults.topMatch;
+        }
+        if (finalResults.propertyRange) {
+            document.getElementById(`propertyRange_${this.featureId}`).textContent = finalResults.propertyRange;
+        }
+        if (finalResults.downloadLink) {
+            document.getElementById(`downloadLink_${this.featureId}`).textContent = finalResults.downloadLink;
+        }
     }
 }
 

@@ -1,20 +1,36 @@
-# Property Prediction Feature
+# Property Prediction
+
+Electronic property prediction and optimization for semiconductor applications
 
 ## Overview
 
-Predict material properties using machine learning models without expensive calculations. Supports electronic, optical, mechanical, and thermal property predictions.
+This feature provides property prediction functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Input material structure
-- `predictor` (string): ML model to use ('m3gnet', 'esen', 'synthnn', 'mattersim', 'deepmd')
-- `properties` (list): Properties to predict ('bandgap', 'elastic_modulus', 'thermal_conductivity', 'carrier_mobility')
-- `include_uncertainty` (bool): Include prediction uncertainty estimates
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `predictions` (dict): Predicted property values
-- `uncertainty` (dict): Uncertainty/confidence for each prediction
-- `interpretation` (dict): Feature importance and property breakdown
-- `success` (bool): Prediction success status
-- `model_info` (dict): Information about ML model used
+## Input Parameters
+
+- **Material System**: Material system for prediction
+- **Property to Predict**: Property to predict
+- **Temperature (K)**: Temperature for prediction
+- **Include Defects**: Include defect effects
+
+## Output Parameters
+
+- **Prediction Status**: Status of prediction
+- **Band Gap**: Predicted band gap
+- **Carrier Mobility**: Predicted carrier mobility
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

@@ -1,16 +1,16 @@
-# Aflowlib Database
+# AFLOWLIB
 
-Interface to AFLOWLIB database for high-throughput materials discovery.
+AFLOW Library - comprehensive materials database with computational data
 
 ## Overview
 
-Access comprehensive materials data from AFLOWLIB including structures, properties, and computational results.
+This module provides integration with AFLOWLIB.
 
 ## Key Methods
 
-- `info()`: Returns description and capabilities of AFLOWLIB database
-- `retrieve(params)`: Retrieves materials data based on input parameters
+- `info()`: Returns description and capabilities
+- `retrieve(params)` / `generate(params)` / `predict(params)`: Main functionality
 
-## API Documentation
+## Usage
 
-For more details, see [BaseDatabase.py](../BaseDatabase.py)
+See the base class documentation for detailed usage instructions.

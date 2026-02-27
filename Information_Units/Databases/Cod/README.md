@@ -1,10 +1,10 @@
 # Cod Database
 
-Interface to COD (Crystallography Open Database).
+Interface to COD (Crystallography Open Database) via OPTIMADE.
 
 ## Overview
 
-Access crystallographic structures from the open-access COD repository.
+Access crystallographic structures from the open-access COD repository and save them as CIF files.
 
 ## Key Methods
 

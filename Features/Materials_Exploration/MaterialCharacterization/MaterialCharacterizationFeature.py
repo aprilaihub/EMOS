@@ -6,50 +6,47 @@ from Information_Units.Predictors.PredictorFactory import predictor_factory
 
 class MaterialCharacterizationFeature(BaseFeature):
     def __init__(self, logger=None):
-        super().__init__('Material Characterization', logger)
+        super().__init__("Material Characterization", logger)
     
     def info(self):
-        return f"Feature: {self.feature_name} - Advanced material property characterization and analysis"
+        return "Material Characterization: Advanced materials analysis and characterization tools for comprehensive evaluation"
     
     def extract_inputs(self, input_data):
-        """Extract and validate input parameters"""
         return {
-            'material_id': input_data.get('materialId', 'MP-123'),
-            'characterization_method': input_data.get('characterizationMethod', 'XRD'),
-            'temperature': input_data.get('temperature', '298'),
-            'pressure': input_data.get('pressure', '1'),
+            'materialFormula': input_data.get('materialFormula', ''),
+            'analysisType': input_data.get('analysisType', 'basic'),
+            'threshold': input_data.get('thresholdValue', '50'),
+            'exportResults': input_data.get('exportResults', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
-        """Perform the core material characterization logic"""
         if self.logger:
-            self.logger.log('Initializing material characterization...', 'info')
+            self.logger.log('Initializing Material Characterization...', 'info')
         
-        # Process Information Units
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Material characterization process - python', 'info')
+            self.logger.log('Material Characterization processing completed', 'info')
         
         return {
-            'characterization_results': f"Characterized {inputs['material_id']} using {inputs['characterization_method']}",
-            'conditions': f"T={inputs['temperature']}K, P={inputs['pressure']}atm",
-            'method': inputs['characterization_method']
+            'status': 'completed',
+            'message': 'Material Characterization feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'characterizationStatus': 'Material characterization completed - python',
-            'physicalProperties': 'Density: 4.23 g/cm³, Hardness: 7.2 GPa - python',
-            'opticalProperties': 'Band gap: 3.2 eV, Refractive index: 2.47 - python',
-            'reportGenerated': 'Comprehensive analysis report ready - python'
+            'analysisStatus': 'placeholder text value',
+            'materialProperties': 'placeholder text value',
+            'reportGeneration': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -66,12 +63,6 @@ class MaterialCharacterizationFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'material_id': inputs['material_id']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -89,12 +80,6 @@ class MaterialCharacterizationFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'material_type': inputs['material_id']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -112,9 +97,3 @@ class MaterialCharacterizationFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'material_id': inputs['material_id']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

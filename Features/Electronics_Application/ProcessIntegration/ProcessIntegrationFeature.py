@@ -9,42 +9,44 @@ class ProcessIntegrationFeature(BaseFeature):
         super().__init__("Process Integration", logger)
     
     def info(self):
-        return "Process Integration: Integrate and optimize manufacturing processes"
+        return "Process Integration: Process integration workflows for electronic device manufacturing"
     
     def extract_inputs(self, input_data):
         return {
-            'process_sequence': input_data.get('processSequence', 'deposition-lithography-etch'),
-            'integration_challenges': input_data.get('integrationChallenges', 'thermal_budget'),
-            'target_yield': input_data.get('targetYield', '95%'),
-            'process_nodes': input_data.get('processNodes', '7nm'),
+            'processStep': input_data.get('processStep', 'deposition'),
+            'processTemp': input_data.get('processTemperature(°c)', '600'),
+            'gasFlow': input_data.get('gasFlowRates', ''),
+            'inSituMonitoring': input_data.get('in-situMonitoring', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing process integration analysis...', 'info')
+            self.logger.log('Initializing Process Integration...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Process integration process - python', 'info')
+            self.logger.log('Process Integration processing completed', 'info')
         
         return {
-            'integration_results': f"Process integration for {inputs['process_nodes']} node",
-            'yield_prediction': f"Predicted yield: {inputs['target_yield']}",
-            'process_flow': inputs['process_sequence']
+            'status': 'completed',
+            'message': 'Process Integration feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'integrationStatus': 'Process integration optimized - python',
-            'yieldPrediction': 'Yield prediction: 82.3% - python',
-            'recipeParameters': 'Recipe parameters saved - python'
+            'integrationStatus': 'placeholder text value',
+            'yieldPrediction': 'placeholder text value',
+            'recipeParameters': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -61,12 +63,6 @@ class ProcessIntegrationFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'process_node': inputs['process_nodes']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -84,12 +80,6 @@ class ProcessIntegrationFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'sequence': inputs['process_sequence']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -107,9 +97,3 @@ class ProcessIntegrationFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'yield_target': inputs['target_yield']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

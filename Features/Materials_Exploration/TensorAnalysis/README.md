@@ -1,22 +1,36 @@
-# Tensor Analysis Feature
+# Tensor Analysis
+
+Comprehensive analysis tools for understanding material structure-property relationships
 
 ## Overview
 
-Analyze and manipulate material properties using tensor mathematics, including stress-strain analysis, elastic properties, and higher-order property tensors.
+This feature provides tensor analysis functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `tensor_type` (string): Type of tensor ('elastic', 'stress', 'strain', 'thermal', 'piezoelectric', 'magnetic')
-- `tensor_data` (array): Tensor components (3x3, 6x6, or higher order)
-- `operation` (string): Tensor operation ('diagonalize', 'rotate', 'contract', 'invert')
-- `rotation_matrix` (array): Rotation matrix for tensor rotation (if applicable)
-- `crystal_system` (string): Crystal symmetry for tensor reduction
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `eigenvalues` (array): Tensor eigenvalues
-- `eigenvectors` (array): Tensor eigenvectors
-- `rotated_tensor` (array): Rotated tensor components
-- `invariants` (dict): Tensor invariants (trace, determinant, etc.)
-- `principal_values` (array): Principal tensor values
-- `symmetry_reduced_tensor` (array): Reduced tensor respecting symmetry
+## Input Parameters
+
+- **Sample ID**: Sample identifier
+- **Characterization Type**: Type of characterization
+- **Resolution (nm)**: Resolution for analysis
+- **Sample Data File**: Sample data file for analysis
+
+## Output Parameters
+
+- **Analysis Status**: Analysis completion status
+- **Structure-Property Correlation**: Structure-property correlation value
+- **Visualization Data**: Visualization data availability
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

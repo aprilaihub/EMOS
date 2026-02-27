@@ -1,0 +1,69 @@
+{
+  "description": "Standard property mappings for databases, generators, and predictors. Maps universal property names to source-specific property names and capabilities.",
+  "version": "1.0",
+  "properties": {
+    "chemical_formula_descriptive": {
+      "type": "string",
+      "description": "Descriptive chemical formula",
+      "category": "chemical_composition",
+      "cod": {
+        "name": "chemical_formula_descriptive",
+        "retrievable": true
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "List of unique chemical elements present",
+      "category": "structural",
+      "cod": {
+        "name": "elements",
+        "retrievable": true
+      }
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique structure ID",
+      "category": "identifier",
+      "cod": {
+        "name": "id",
+        "retrievable": true
+      }
+    },
+    "last_modified": {
+      "type": "string",
+      "description": "Last modification timestamp",
+      "category": "metadata",
+      "cod": {
+        "name": "last_modified",
+        "retrievable": true
+      }
+    },
+    "nelements": {
+      "type": "integer",
+      "description": "Number of unique chemical elements",
+      "category": "structural",
+      "cod": {
+        "name": "nelements",
+        "retrievable": true
+      }
+    },
+    "nperiodic_dimensions": {
+      "type": "integer",
+      "description": "Number of periodic dimensions",
+      "category": "structural",
+      "cod": {
+        "name": "nperiodic_dimensions",
+        "retrievable": true
+      }
+    },
+    "type": {
+      "type": "string",
+      "description": "Entry type (always 'structures')",
+      "category": "metadata",
+      "cod": {
+        "name": "type",
+        "retrievable": true
+      }
+    }
+  }
+}

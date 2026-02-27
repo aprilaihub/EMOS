@@ -1,1 +1,22 @@
-*.pyc
+*.pyc__pycache__/
+*.py[cod]
+
+# Virtual Environments
+emos_env/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+.tmp
+temp/

@@ -9,43 +9,44 @@ class QuantumMechanicsFeature(BaseFeature):
         super().__init__("Quantum Mechanics", logger)
     
     def info(self):
-        return "Quantum Mechanics: Perform quantum mechanical calculations and simulations"
+        return "Quantum Mechanics: Advanced computational methods for materials discovery and design"
     
     def extract_inputs(self, input_data):
         return {
-            'calculation_type': input_data.get('calculationType', 'ground_state'),
-            'basis_set': input_data.get('basisSet', '6-31G'),
-            'theory_level': input_data.get('theoryLevel', 'HF'),
-            'convergence_criteria': input_data.get('convergenceCriteria', '1e-8'),
+            'computationMethod': input_data.get('computationMethod', 'quantum'),
+            'precision': input_data.get('precisionLevel', '5'),
+            'boundary': input_data.get('boundaryConditions', ''),
+            'parallelProcessing': input_data.get('parallelProcessing', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing quantum mechanics calculation...', 'info')
+            self.logger.log('Initializing Quantum Mechanics...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Quantum mechanics process - python', 'info')
+            self.logger.log('Quantum Mechanics processing completed', 'info')
         
         return {
-            'calculation_results': f"{inputs['calculation_type']} calculation using {inputs['theory_level']}",
-            'basis_set': inputs['basis_set'],
-            'convergence': inputs['convergence_criteria']
+            'status': 'completed',
+            'message': 'Quantum Mechanics feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'computationStatus': 'Computational analysis finished - python',
-            'discoveryPotential': 'Discovery potential: High - python',
-            'databaseExport': 'Results exported to database - python'
+            'computationStatus': 'placeholder text value',
+            'discoveryPotential': 'placeholder text value',
+            'databaseExport': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -62,12 +63,6 @@ class QuantumMechanicsFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'theory_level': inputs['theory_level']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -85,12 +80,6 @@ class QuantumMechanicsFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'calculation_type': inputs['calculation_type']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -108,9 +97,3 @@ class QuantumMechanicsFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'basis_set': inputs['basis_set']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')
