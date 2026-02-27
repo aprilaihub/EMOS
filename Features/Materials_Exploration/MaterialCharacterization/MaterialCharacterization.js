@@ -6,14 +6,10 @@ class MaterialCharacterizationFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Material Characterization</p>
             <div class="input-controls">
                 ${this.createTextInput(`materialFormula_${this.featureId}`, 'Material Formula', 'e.g., Al2O3, SiC')}
-                ${this.createSelectInput(`analysisType_${this.featureId}`, 'Analysis Type', [
-                    { value: 'basic', text: 'Basic Analysis' },
-                    { value: 'advanced', text: 'Advanced Analysis' },
-                    { value: 'comprehensive', text: 'Comprehensive Analysis' }
-                ])}
+                ${this.createSelectInput(`analysisType_${this.featureId}`, 'Analysis Type', [{value: 'basic', text: 'Basic Analysis'}, {value: 'advanced', text: 'Advanced Analysis'}, {value: 'comprehensive', text: 'Comprehensive Analysis'}])}
                 ${this.createNumberInput(`threshold_${this.featureId}`, 'Threshold Value', '0', '100', '0.1')}
                 ${this.createCheckboxInput(`exportResults_${this.featureId}`, 'Export Results', true)}
             </div>
@@ -22,7 +18,7 @@ class MaterialCharacterizationFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Material characterization analysis results</p>
+            <p>Material Characterization results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Analysis Status:</strong> <span id="analysisStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class MaterialCharacterizationFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for material characterization
+        // Placeholder processing logic for Material Characterization
         return {
-            analysisStatus: 'Analysis completed - 94.8% accuracy',
-            materialProperties: 'Material properties calculated',
-            reportGeneration: 'Report generated successfully'
+            analysisStatus: 'Analysis Status - placeholder',
+            materialProperties: 'Material Properties - placeholder',
+            reportGeneration: 'Report Generation - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`analysisStatus_${this.featureId}`).textContent = finalResults.analysisStatus;
-        document.getElementById(`materialProperties_${this.featureId}`).textContent = finalResults.materialProperties;
-        document.getElementById(`reportGeneration_${this.featureId}`).textContent = finalResults.reportGeneration;
+        if (finalResults.error) {
+            document.getElementById(`analysisStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.analysisStatus) {
+            document.getElementById(`analysisStatus_${this.featureId}`).textContent = finalResults.analysisStatus;
+        }
+        if (finalResults.materialProperties) {
+            document.getElementById(`materialProperties_${this.featureId}`).textContent = finalResults.materialProperties;
+        }
+        if (finalResults.reportGeneration) {
+            document.getElementById(`reportGeneration_${this.featureId}`).textContent = finalResults.reportGeneration;
+        }
     }
 }
 

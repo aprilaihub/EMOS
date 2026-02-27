@@ -6,13 +6,9 @@ class QuantumMechanicsFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Quantum Mechanics</p>
             <div class="input-controls">
-                ${this.createSelectInput(`computationMethod_${this.featureId}`, 'Computation Method', [
-                    { value: 'quantum', text: 'Quantum Mechanical' },
-                    { value: 'classical', text: 'Classical Methods' },
-                    { value: 'hybrid', text: 'Hybrid Approach' }
-                ])}
+                ${this.createSelectInput(`computationMethod_${this.featureId}`, 'Computation Method', [{value: 'quantum', text: 'Quantum Mechanical'}, {value: 'classical', text: 'Classical Methods'}, {value: 'hybrid', text: 'Hybrid Approach'}])}
                 ${this.createNumberInput(`precision_${this.featureId}`, 'Precision Level', '1', '10', '1')}
                 ${this.createTextInput(`boundary_${this.featureId}`, 'Boundary Conditions', 'Specify conditions')}
                 ${this.createCheckboxInput(`parallelProcessing_${this.featureId}`, 'Parallel Processing', true)}
@@ -22,7 +18,7 @@ class QuantumMechanicsFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Quantum mechanics computation results and analysis</p>
+            <p>Quantum Mechanics results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Computation Status:</strong> <span id="computationStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class QuantumMechanicsFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for quantum mechanics
+        // Placeholder processing logic for Quantum Mechanics
         return {
-            computationStatus: 'Computational analysis finished',
-            discoveryPotential: 'Discovery potential: High',
-            databaseExport: 'Results exported to database'
+            computationStatus: 'Computation Status - placeholder',
+            discoveryPotential: 'Discovery Potential - placeholder',
+            databaseExport: 'Database Export - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`computationStatus_${this.featureId}`).textContent = finalResults.computationStatus;
-        document.getElementById(`discoveryPotential_${this.featureId}`).textContent = finalResults.discoveryPotential;
-        document.getElementById(`databaseExport_${this.featureId}`).textContent = finalResults.databaseExport;
+        if (finalResults.error) {
+            document.getElementById(`computationStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.computationStatus) {
+            document.getElementById(`computationStatus_${this.featureId}`).textContent = finalResults.computationStatus;
+        }
+        if (finalResults.discoveryPotential) {
+            document.getElementById(`discoveryPotential_${this.featureId}`).textContent = finalResults.discoveryPotential;
+        }
+        if (finalResults.databaseExport) {
+            document.getElementById(`databaseExport_${this.featureId}`).textContent = finalResults.databaseExport;
+        }
     }
 }
 

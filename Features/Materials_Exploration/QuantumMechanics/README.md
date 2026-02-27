@@ -1,21 +1,36 @@
-# Quantum Mechanics Feature
+# Quantum Mechanics
+
+Advanced computational methods for materials discovery and design
 
 ## Overview
 
-Perform quantum mechanical calculations including molecular orbital calculations, electronic structure theory, and quantum dynamics simulations.
+This feature provides quantum mechanics functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Input atomic structure
-- `method` (string): Quantum chemistry method ('HF', 'B3LYP', 'PBE', 'CCSD', 'MP2')
-- `basis_set` (string): Basis set specification (e.g., '6-31G*', 'def2-TZVP')
-- `calculation_type` (string): Calculation type ('geometry_opt', 'single_point', 'frequency')
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `orbital_energies` (array): Molecular orbital energies
-- `wavefunctions` (dict): Wavefunction data
-- `electronic_energy` (float): Total electronic energy
-- `orbital_density` (array): Electron density on grid
-- `mulliken_charges` (array): Atomic partial charges
-- `dipole_moment` (float): Molecular dipole moment
+## Input Parameters
+
+- **Computation Method**: Computation method to use
+- **Precision Level**: Precision level for computation
+- **Boundary Conditions**: Boundary conditions for calculation
+- **Parallel Processing**: Enable parallel processing
+
+## Output Parameters
+
+- **Computation Status**: Status of computation
+- **Discovery Potential**: Discovery potential of results
+- **Database Export**: Database export status
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

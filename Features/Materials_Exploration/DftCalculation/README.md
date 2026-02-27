@@ -1,22 +1,36 @@
-# DFT Calculation Feature
+# DFT Calculation
+
+Materials optimization workflows for enhanced performance characteristics
 
 ## Overview
 
-Perform Density Functional Theory (DFT) calculations on material structures, including geometry optimization, electronic structure, band structure, and density of states calculations.
+This feature provides dft calculation functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Input atomic structure (CIF, POSCAR, etc.)
-- `functional` (string): DFT functional (e.g., 'PBE', 'LDA', 'HSE06')
-- `cutoff_energy` (float): Plane wave cutoff energy (eV)
-- `calculation_type` (string): Type of calculation ('optimize', 'static', 'bandstructure', 'dos')
-- `k_points` (list): K-point mesh or path
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `energy` (float): Total electronic energy (eV)
-- `forces` (array): Atomic forces
-- `structure_optimized` (Structure object): Relaxed structure
-- `band_structure` (dict): Band eigenvalues and k-points
-- `density_of_states` (dict): DOS data
-- `stress_tensor` (array): Stress tensor
+## Input Parameters
+
+- **Optimization Target**: Optimization target for DFT calculation
+- **Iterations**: Number of optimization iterations
+- **Configuration File**: Configuration file for DFT
+- **Verbose Output**: Enable verbose output
+
+## Output Parameters
+
+- **Convergence Status**: Convergence status of optimization
+- **Performance Improvement**: Performance improvement achieved
+- **Configuration**: Final configuration status
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

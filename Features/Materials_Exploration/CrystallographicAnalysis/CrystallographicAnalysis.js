@@ -6,14 +6,10 @@ class CrystallographicAnalysisFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Crystallographic Analysis</p>
             <div class="input-controls">
                 ${this.createTextInput(`inputData_${this.featureId}`, 'Input Data', 'Enter data or formula')}
-                ${this.createSelectInput(`modelType_${this.featureId}`, 'Model Type', [
-                    { value: 'linear', text: 'Linear Model' },
-                    { value: 'nonlinear', text: 'Non-linear Model' },
-                    { value: 'ml', text: 'Machine Learning' }
-                ])}
+                ${this.createSelectInput(`modelType_${this.featureId}`, 'Model Type', [{value: 'linear', text: 'Linear Model'}, {value: 'nonlinear', text: 'Non-linear Model'}, {value: 'ml', text: 'Machine Learning'}])}
                 ${this.createNumberInput(`accuracy_${this.featureId}`, 'Required Accuracy (%)', '50', '99', '1')}
                 ${this.createCheckboxInput(`realTimeUpdate_${this.featureId}`, 'Real-time Updates', true)}
             </div>
@@ -22,7 +18,7 @@ class CrystallographicAnalysisFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Crystallographic analysis results and structural predictions</p>
+            <p>Crystallographic Analysis results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Simulation Status:</strong> <span id="simulationStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class CrystallographicAnalysisFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for crystallographic analysis
+        // Placeholder processing logic for Crystallographic Analysis
         return {
-            simulationStatus: 'Simulation completed successfully',
-            modelValidation: 'Model validation: 91.3% accuracy',
-            predictions: 'Structural predictions generated'
+            simulationStatus: 'Simulation Status - placeholder',
+            modelValidation: 'Model Validation - placeholder',
+            predictions: 'Predictions - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`simulationStatus_${this.featureId}`).textContent = finalResults.simulationStatus;
-        document.getElementById(`modelValidation_${this.featureId}`).textContent = finalResults.modelValidation;
-        document.getElementById(`predictions_${this.featureId}`).textContent = finalResults.predictions;
+        if (finalResults.error) {
+            document.getElementById(`simulationStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.simulationStatus) {
+            document.getElementById(`simulationStatus_${this.featureId}`).textContent = finalResults.simulationStatus;
+        }
+        if (finalResults.modelValidation) {
+            document.getElementById(`modelValidation_${this.featureId}`).textContent = finalResults.modelValidation;
+        }
+        if (finalResults.predictions) {
+            document.getElementById(`predictions_${this.featureId}`).textContent = finalResults.predictions;
+        }
     }
 }
 
