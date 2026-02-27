@@ -12,3 +12,6 @@ requests==2.31.0
 
 # Materials Data
 pymatgen>=2024.6.0
+
+# Testing
+pytest==8.2.2
