@@ -9,42 +9,44 @@ class AdvancedCharacterizationFeature(BaseFeature):
         super().__init__("Advanced Characterization", logger)
     
     def info(self):
-        return "Advanced Characterization: Advanced electronic and structural characterization"
+        return "Advanced Characterization: Advanced characterization techniques for electronic materials evaluation"
     
     def extract_inputs(self, input_data):
         return {
-            'characterization_technique': input_data.get('characterizationTechnique', 'STM'),
-            'measurement_conditions': input_data.get('measurementConditions', 'UHV'),
-            'sample_preparation': input_data.get('samplePreparation', 'cleaving'),
-            'analysis_parameters': input_data.get('analysisParameters', 'atomic_resolution'),
+            'characterizationTech': input_data.get('characterizationTechnique', 'xrd'),
+            'scanRange': input_data.get('scanRange', '100'),
+            'referenceData': input_data.get('referenceData', ''),
+            'automaticAnalysis': input_data.get('automaticAnalysis', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing advanced characterization...', 'info')
+            self.logger.log('Initializing Advanced Characterization...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Advanced characterization process - python', 'info')
+            self.logger.log('Advanced Characterization processing completed', 'info')
         
         return {
-            'characterization_results': f"{inputs['characterization_technique']} characterization completed",
-            'measurement_quality': f"High resolution data obtained under {inputs['measurement_conditions']}",
-            'analysis_type': inputs['analysis_parameters']
+            'status': 'completed',
+            'message': 'Advanced Characterization feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'characterizationStatus': 'Characterization completed - python',
-            'materialQuality': 'Material quality: Good - python',
-            'analysisReport': 'Analysis report generated - python'
+            'characterizationStatus': 'placeholder text value',
+            'materialQuality': 'placeholder text value',
+            'analysisReport': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -61,12 +63,6 @@ class AdvancedCharacterizationFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'technique': inputs['characterization_technique']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -84,12 +80,6 @@ class AdvancedCharacterizationFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'technique': inputs['characterization_technique']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -107,9 +97,3 @@ class AdvancedCharacterizationFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'conditions': inputs['measurement_conditions']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

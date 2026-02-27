@@ -9,42 +9,44 @@ class ReliabilityAssessmentFeature(BaseFeature):
         super().__init__("Reliability Assessment", logger)
     
     def info(self):
-        return "Reliability Assessment: Assess device reliability and lifetime prediction"
+        return "Reliability Assessment: Reliability assessment and failure analysis for electronic materials"
     
     def extract_inputs(self, input_data):
         return {
-            'stress_conditions': input_data.get('stressConditions', 'thermal'),
-            'test_duration': input_data.get('testDuration', '1000h'),
-            'failure_criteria': input_data.get('failureCriteria', '10% degradation'),
-            'reliability_model': input_data.get('reliabilityModel', 'Arrhenius'),
+            'reliabilityTest': input_data.get('reliabilityTest', 'thermal_cycling'),
+            'testDuration': input_data.get('testDuration(hours)', '1000'),
+            'failureCriteria': input_data.get('failureCriteria(%)', '10'),
+            'acceleratedTest': input_data.get('acceleratedTesting', 'False'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing reliability assessment...', 'info')
+            self.logger.log('Initializing Reliability Assessment...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Reliability assessment process - python', 'info')
+            self.logger.log('Reliability Assessment processing completed', 'info')
         
         return {
-            'reliability_results': f"Reliability assessment under {inputs['stress_conditions']} stress",
-            'predicted_lifetime': f"Predicted lifetime: 50,000 hours",
-            'model_used': inputs['reliability_model']
+            'status': 'completed',
+            'message': 'Reliability Assessment feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'assessmentStatus': 'Reliability assessment completed - python',
-            'mttfValue': '18,750 hours - python',
-            'failureAnalysis': 'Failure modes identified - python'
+            'assessmentStatus': 'placeholder text value',
+            'mttfValue': 'placeholder text value',
+            'failureAnalysis': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -61,12 +63,6 @@ class ReliabilityAssessmentFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'stress_type': inputs['stress_conditions']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -84,12 +80,6 @@ class ReliabilityAssessmentFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'test_type': inputs['stress_conditions']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -107,9 +97,3 @@ class ReliabilityAssessmentFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'duration': inputs['test_duration']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

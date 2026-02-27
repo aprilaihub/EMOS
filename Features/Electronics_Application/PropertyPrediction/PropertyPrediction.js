@@ -6,23 +6,19 @@ class PropertyPredictionFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure parameters for ${this.featureName}</p>
+            <p>Configure input parameters for Property Prediction</p>
             <div class="input-controls">
                 ${this.createTextInput(`materialSystem_${this.featureId}`, 'Material System', 'e.g., III-V, II-VI')}
-                ${this.createSelectInput(`propertyPrediction_${this.featureId}`, 'Property to Predict', [
-                    { value: 'bandgap', text: 'Band Gap' },
-                    { value: 'mobility', text: 'Carrier Mobility' },
-                    { value: 'conductivity', text: 'Electrical Conductivity' }
-                ])}
+                ${this.createSelectInput(`propertyPrediction_${this.featureId}`, 'Property to Predict', [{value: 'bandgap', text: 'Band Gap'}, {value: 'mobility', text: 'Carrier Mobility'}, {value: 'conductivity', text: 'Electrical Conductivity'}])}
                 ${this.createNumberInput(`temperature_${this.featureId}`, 'Temperature (K)', '0', '1000', '1')}
-                ${this.createCheckboxInput(`includeDefects_${this.featureId}`, 'Include Defects', false)}
+                ${this.createCheckboxInput(`includeDefects_${this.featureId}`, 'Include Defects', true)}
             </div>
         `;
     }
 
     createOutputsHTML() {
         return `
-            <p>Electronic property prediction results</p>
+            <p>Property Prediction results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Prediction Status:</strong> <span id="predictionStatus_${this.featureId}">Pending...</span>
@@ -38,20 +34,31 @@ class PropertyPredictionFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for property prediction
+        // Placeholder processing logic for Property Prediction
         return {
-            predictionStatus: 'Electronic properties predicted',
-            bandGap: '2.7 eV (direct)',
-            carrierMobility: '745 cm²/Vs'
+            predictionStatus: 'Prediction Status - placeholder',
+            bandGap: 'Band Gap - placeholder',
+            carrierMobility: 'Carrier Mobility - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`predictionStatus_${this.featureId}`).textContent = finalResults.predictionStatus;
-        document.getElementById(`bandGap_${this.featureId}`).textContent = finalResults.bandGap;
-        document.getElementById(`carrierMobility_${this.featureId}`).textContent = finalResults.carrierMobility;
+        if (finalResults.error) {
+            document.getElementById(`predictionStatus_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.predictionStatus) {
+            document.getElementById(`predictionStatus_${this.featureId}`).textContent = finalResults.predictionStatus;
+        }
+        if (finalResults.bandGap) {
+            document.getElementById(`bandGap_${this.featureId}`).textContent = finalResults.bandGap;
+        }
+        if (finalResults.carrierMobility) {
+            document.getElementById(`carrierMobility_${this.featureId}`).textContent = finalResults.carrierMobility;
+        }
     }
 }
 

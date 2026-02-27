@@ -6,22 +6,12 @@ class InterfaceCalculationFeature extends BaseFeature {
 
     createInputsHTML() {
         return `
-            <p>Configure interface calculation parameters</p>
+            <p>Configure input parameters for Interface Calculation</p>
             <div class="input-controls">
-                ${this.createTextInput(`material1_${this.featureId}`, 'Material 1', 'e.g., Si, GaAs, AlN', true)}
-                ${this.createTextInput(`material2_${this.featureId}`, 'Material 2', 'e.g., SiO2, Al2O3, HfO2', true)}
-                ${this.createSelectInput(`interfaceType_${this.featureId}`, 'Interface Type', [
-                    { value: 'coherent', text: 'Coherent Interface' },
-                    { value: 'semicoherent', text: 'Semi-coherent Interface' },
-                    { value: 'incoherent', text: 'Incoherent Interface' },
-                    { value: 'grain_boundary', text: 'Grain Boundary' }
-                ])}
-                ${this.createSelectInput(`calculationMethod_${this.featureId}`, 'Calculation Method', [
-                    { value: 'dft', text: 'DFT (First Principles)' },
-                    { value: 'classical_md', text: 'Classical Molecular Dynamics' },
-                    { value: 'tight_binding', text: 'Tight Binding' },
-                    { value: 'empirical', text: 'Empirical Models' }
-                ])}
+                ${this.createTextInput(`material1_${this.featureId}`, 'Material 1', 'e.g., Si, GaAs, AlN')}
+                ${this.createTextInput(`material2_${this.featureId}`, 'Material 2', 'e.g., SiO2, Al2O3, HfO2')}
+                ${this.createSelectInput(`interfaceType_${this.featureId}`, 'Interface Type', [{value: 'coherent', text: 'Coherent Interface'}, {value: 'semicoherent', text: 'Semi-coherent Interface'}, {value: 'incoherent', text: 'Incoherent Interface'}, {value: 'grain_boundary', text: 'Grain Boundary'}])}
+                ${this.createSelectInput(`calculationMethod_${this.featureId}`, 'Calculation Method', [{value: 'dft', text: 'DFT (First Principles)'}, {value: 'classical_md', text: 'Classical Molecular Dynamics'}, {value: 'tight_binding', text: 'Tight Binding'}, {value: 'empirical', text: 'Empirical Models'}])}
                 ${this.createNumberInput(`supercellSize_${this.featureId}`, 'Supercell Size (atoms)', '50', '1000', '10')}
                 ${this.createCheckboxInput(`includeStrain_${this.featureId}`, 'Include Strain Effects', true)}
                 ${this.createCheckboxInput(`calculateBandOffset_${this.featureId}`, 'Calculate Band Offset', true)}
@@ -31,7 +21,7 @@ class InterfaceCalculationFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Interface calculation results and properties</p>
+            <p>Interface Calculation results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
                     <strong>Interface Energy:</strong> <span id="interfaceEnergy_${this.featureId}">Pending...</span>
@@ -53,24 +43,39 @@ class InterfaceCalculationFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Simple fixed results for interface calculation
+        // Placeholder processing logic for Interface Calculation
         return {
-            interfaceEnergy: '1.247 J/m²',
-            bandOffset: '1.85 eV',
-            latticeMismatch: '2.3%',
-            interfaceStates: '3.24e12 states/cm²',
-            chargeTransfer: '0.285 e⁻'
+            interfaceEnergy: 'Interface Energy - placeholder',
+            bandOffset: 'Band Offset - placeholder',
+            latticeMismatch: 'Lattice Mismatch - placeholder',
+            interfaceStates: 'Interface States - placeholder',
+            chargeTransfer: 'Charge Transfer - placeholder',
         };
     }
 
     updateOutputs(results = null) {
         const finalResults = results || this.results;
         
-        document.getElementById(`interfaceEnergy_${this.featureId}`).textContent = finalResults.interfaceEnergy;
-        document.getElementById(`bandOffset_${this.featureId}`).textContent = finalResults.bandOffset;
-        document.getElementById(`latticeMismatch_${this.featureId}`).textContent = finalResults.latticeMismatch;
-        document.getElementById(`interfaceStates_${this.featureId}`).textContent = finalResults.interfaceStates;
-        document.getElementById(`chargeTransfer_${this.featureId}`).textContent = finalResults.chargeTransfer;
+        if (finalResults.error) {
+            document.getElementById(`interfaceEnergy_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
+            return;
+        }
+        
+        if (finalResults.interfaceEnergy) {
+            document.getElementById(`interfaceEnergy_${this.featureId}`).textContent = finalResults.interfaceEnergy;
+        }
+        if (finalResults.bandOffset) {
+            document.getElementById(`bandOffset_${this.featureId}`).textContent = finalResults.bandOffset;
+        }
+        if (finalResults.latticeMismatch) {
+            document.getElementById(`latticeMismatch_${this.featureId}`).textContent = finalResults.latticeMismatch;
+        }
+        if (finalResults.interfaceStates) {
+            document.getElementById(`interfaceStates_${this.featureId}`).textContent = finalResults.interfaceStates;
+        }
+        if (finalResults.chargeTransfer) {
+            document.getElementById(`chargeTransfer_${this.featureId}`).textContent = finalResults.chargeTransfer;
+        }
     }
 }
 

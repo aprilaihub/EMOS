@@ -9,45 +9,49 @@ class InterfaceCalculationFeature(BaseFeature):
         super().__init__("Interface Calculation", logger)
     
     def info(self):
-        return "Interface Calculation: Calculate interface properties and band alignments"
+        return "Interface Calculation: Calculate and analyze interfaces between different materials in electronic applications"
     
     def extract_inputs(self, input_data):
         return {
-            'interface_type': input_data.get('interfaceType', 'metal-semiconductor'),
-            'material_a': input_data.get('materialA', 'Al'),
-            'material_b': input_data.get('materialB', 'Si'),
-            'calculation_method': input_data.get('calculationMethod', 'DFT'),
+            'material1': input_data.get('material1', ''),
+            'material2': input_data.get('material2', ''),
+            'interfaceType': input_data.get('interfaceType', 'coherent'),
+            'calculationMethod': input_data.get('calculationMethod', 'dft'),
+            'supercellSize': input_data.get('supercellSize(atoms)', '200'),
+            'includeStrain': input_data.get('includeStrainEffects', 'True'),
+            'calculateBandOffset': input_data.get('calculateBandOffset', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing interface calculation...', 'info')
+            self.logger.log('Initializing Interface Calculation...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Interface calculation process - python', 'info')
+            self.logger.log('Interface Calculation processing completed', 'info')
         
         return {
-            'interface_results': f"{inputs['interface_type']} interface between {inputs['material_a']}/{inputs['material_b']}",
-            'calculation_method': inputs['calculation_method'],
-            'band_alignment': "Type-II band alignment calculated"
+            'status': 'completed',
+            'message': 'Interface Calculation feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'interfaceEnergy': '1.247 J/m² - python',
-            'bandOffset': '1.85 eV - python',
-            'latticeMismatch': '2.3% - python',
-            'interfaceStates': '3.24e12 states/cm² - python',
-            'chargeTransfer': '0.285 e⁻ - python'
+            'interfaceEnergy': 'placeholder text value',
+            'bandOffset': 'placeholder text value',
+            'latticeMismatch': 'placeholder text value',
+            'interfaceStates': 'placeholder text value',
+            'chargeTransfer': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -64,12 +68,6 @@ class InterfaceCalculationFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'interface_type': inputs['interface_type']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -87,12 +85,6 @@ class InterfaceCalculationFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'materials': f"{inputs['material_a']}/{inputs['material_b']}"}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -110,9 +102,3 @@ class InterfaceCalculationFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'interface': inputs['interface_type']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

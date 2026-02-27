@@ -1,23 +1,36 @@
-# Process Integration Feature
+# Process Integration
+
+Process integration workflows for electronic device manufacturing
 
 ## Overview
 
-Integrate multiple materials and processes for complete device design workflows, optimizing material selection, structure design, and process sequences.
+This feature provides process integration functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `materials` (list): List of material structures for device layers
-- `processes` (list): Processing steps ('deposition', 'annealing', 'etching', 'doping')
-- `target_properties` (dict): Desired device properties (e.g., {'efficiency': 0.25, 'stability': True})
-- `process_constraints` (dict): Temperature, pressure, and time constraints
-- `optimization_goal` (string): Primary optimization target ('efficiency', 'stability', 'cost')
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `integrated_device` (Structure object): Optimized complete device structure
-- `process_sequence` (list): Recommended processing order and parameters
-- `compatibility_matrix` (array): Material compatibility scores
-- `simulated_properties` (dict): Predicted device performance metrics
-- `optimization_results` (dict): Performance vs. process parameters
-- `manufacturing_report` (dict): Detailed manufacturing guidance
-- `cost_estimate` (float): Estimated production cost
+## Input Parameters
+
+- **Process Step**: Process step
+- **Process Temperature (°C)**: Process temperature
+- **Gas Flow Rates**: Gas flow rates
+- **In-situ Monitoring**: Enable in-situ monitoring
+
+## Output Parameters
+
+- **Integration Status**: Process integration status
+- **Yield Prediction**: Predicted manufacturing yield
+- **Recipe Parameters**: Process recipe parameters
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

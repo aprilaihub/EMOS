@@ -9,38 +9,44 @@ class PropertyPredictionFeature(BaseFeature):
         super().__init__("Property Prediction", logger)
     
     def info(self):
-        return "Property Prediction: Predict electronic and material properties using ML models"
+        return "Property Prediction: Electronic property prediction and optimization for semiconductor applications"
     
     def extract_inputs(self, input_data):
         return {
-            'optimization_target': input_data.get('optimizationTarget', 'performance'),
-            'iterations': input_data.get('iterations', '100'),
-            'config_file': input_data.get('configFile', ''),
-            'verbose_output': input_data.get('verboseOutput', False),
+            'materialSystem': input_data.get('materialSystem', ''),
+            'propertyPrediction': input_data.get('propertyToPredict', 'bandgap'),
+            'temperature': input_data.get('temperature(k)', '300'),
+            'includeDefects': input_data.get('includeDefects', 'False'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing property prediction...', 'info')
+            self.logger.log('Initializing Property Prediction...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Property prediction process - python', 'info')
+            self.logger.log('Property Prediction processing completed', 'info')
         
         return {
-            'predictionStatus': 'Electronic properties predicted - python',
-            'bandGap': '2.7 eV (direct) - python',
-            'carrierMobility': '745 cm²/Vs - python'
+            'status': 'completed',
+            'message': 'Property Prediction feature executed successfully'
         }
     
     def format_outputs(self, results):
-        return results
+        return {
+            'predictionStatus': 'placeholder text value',
+            'bandGap': 'placeholder text value',
+            'carrierMobility': 'placeholder text value',
+        }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -57,12 +63,6 @@ class PropertyPredictionFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'target': inputs['optimization_target'], 'iterations': inputs['iterations']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -80,16 +80,6 @@ class PropertyPredictionFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {
-                        'optimization_target': inputs['optimization_target'], 
-                        'iterations': inputs['iterations'],
-                        'config_file': inputs['config_file']
-                    }
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -107,13 +97,3 @@ class PropertyPredictionFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {
-                        'optimization_target': inputs['optimization_target'],
-                        'iterations': inputs['iterations'],
-                        'verbose': inputs['verbose_output']
-                    }
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

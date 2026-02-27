@@ -1,23 +1,39 @@
-# Device Synthesizability Feature
+# Device Synthesizability
+
+Evaluate the feasibility and methods for synthesizing electronic devices from selected materials
 
 ## Overview
 
-Assess the synthesizability and manufacturability of electronic devices, evaluating thermodynamic stability, kinetic feasibility, and practical manufacturing constraints.
+This feature provides device synthesizability functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `device_structure` (Structure object): Device material/layer structure
-- `synthesis_methods` (list): Available synthesis methods ('sputtering', 'sol_gel', 'cvd', 'mbe', 'annealing')
-- `cost_constraint` (float): Maximum acceptable cost (arbitrary units)
-- `temperature_tolerance` (float): Maximum synthesis temperature (K)
-- `scalability_requirement` (string): Scalability need ('lab', 'pilot', 'industrial')
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `synthesizability_score` (float): Overall synthesizability score (0-100)
-- `stability` (dict): Thermodynamic stability assessment
-- `kinetic_feasibility` (dict): Kinetic barriers and timescales
-- `recommended_methods` (list): Best synthesis routes
-- `difficulty_level` (string): Synthesis difficulty rating
-- `cost_estimate` (float): Estimated synthesis cost
-- `warnings` (list): Potential synthesis challenges
+## Input Parameters
+
+- **Device Type**: Type of device to synthesize
+- **Material Composition**: Material composition
+- **Substrate Type**: Substrate type
+- **Operating Temperature (°C)**: Operating temperature
+- **Preferred Fabrication Method**: Fabrication method
+
+## Output Parameters
+
+- **Synthesis Feasibility**: Feasibility score and level
+- **Recommended Process**: Recommended synthesis process
+- **Estimated Cost**: Cost estimation
+- **Processing Temperature**: Recommended processing temperature
+- **Yield Prediction**: Predicted manufacturing yield
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

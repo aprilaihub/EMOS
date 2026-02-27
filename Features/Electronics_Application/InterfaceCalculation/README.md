@@ -1,25 +1,41 @@
-# Interface Calculation Feature
+# Interface Calculation
+
+Calculate and analyze interfaces between different materials in electronic applications
 
 ## Overview
 
-Calculate electronic properties and stability of material interfaces, including band alignment, interface energy, and charge transfer for multilayer devices.
+This feature provides interface calculation functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `material_1` (Structure object): First material at interface
-- `material_2` (Structure object): Second material at interface
-- `interface_plane` (tuple): Miller indices for interface plane (e.g., (100))
-- `num_layers_1` (int): Number of layers of material 1
-- `num_layers_2` (int): Number of layers of material 2
-- `distance` (float): Initial interlayer distance (Angstrom)
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `interface_structure` (Structure object): Optimized interface structure
-- `interface_energy` (float): Interface formation energy (J/m²)
-- `band_alignment` (dict): Band offset and alignment diagram
-- `band_offset_VB` (float): Valence band offset (eV)
-- `band_offset_CB` (float): Conduction band offset (eV)
-- `charge_transfer` (dict): Charge transfer at interface
-- `interface_dipole` (float): Interface dipole moment
-- `stability_score` (float): Interface stability assessment
+## Input Parameters
+
+- **Material 1**: First material in interface
+- **Material 2**: Second material in interface
+- **Interface Type**: Type of interface
+- **Calculation Method**: Calculation method
+- **Supercell Size (atoms)**: Supercell size
+- **Include Strain Effects**: Include strain effects
+- **Calculate Band Offset**: Calculate band offset
+
+## Output Parameters
+
+- **Interface Energy**: Interface energy
+- **Band Offset**: Band offset value
+- **Lattice Mismatch**: Lattice mismatch percentage
+- **Interface States**: Density of interface states
+- **Charge Transfer**: Charge transfer at interface
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.

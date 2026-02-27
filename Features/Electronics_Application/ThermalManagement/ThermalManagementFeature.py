@@ -9,43 +9,44 @@ class ThermalManagementFeature(BaseFeature):
         super().__init__("Thermal Management", logger)
     
     def info(self):
-        return "Thermal Management: Analyze thermal properties and heat dissipation in devices"
+        return "Thermal Management: Thermal management analysis for electronic device performance optimization"
     
     def extract_inputs(self, input_data):
         return {
-            'device_geometry': input_data.get('deviceGeometry', 'rectangular'),
-            'power_dissipation': input_data.get('powerDissipation', '10W'),
-            'cooling_method': input_data.get('coolingMethod', 'air'),
-            'ambient_temperature': input_data.get('ambientTemperature', '25C'),
+            'thermalProperty': input_data.get('thermalProperty', 'conductivity'),
+            'operatingPower': input_data.get('operatingPower(w)', '100'),
+            'ambientTemp': input_data.get('ambientTemperature(°c)', '25'),
+            'includeConvection': input_data.get('includeConvection', 'True'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing thermal management analysis...', 'info')
+            self.logger.log('Initializing Thermal Management...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Thermal management process - python', 'info')
+            self.logger.log('Thermal Management processing completed', 'info')
         
         return {
-            'thermal_analysis': f"Thermal analysis for {inputs['device_geometry']} device",
-            'max_temperature': f"Max temperature: 85°C with {inputs['cooling_method']} cooling",
-            'power_rating': inputs['power_dissipation']
+            'status': 'completed',
+            'message': 'Thermal Management feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'optimizationStatus': 'Thermal management optimized - python',
-            'maxTemperature': '73.5°C - python',
-            'coolingSolution': 'Cooling solution recommended - python'
+            'optimizationStatus': 'placeholder text value',
+            'maxTemperature': 'placeholder text value',
+            'coolingSolution': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -62,12 +63,6 @@ class ThermalManagementFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'cooling_method': inputs['cooling_method']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -85,12 +80,6 @@ class ThermalManagementFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'geometry': inputs['device_geometry']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -108,9 +97,3 @@ class ThermalManagementFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'power': inputs['power_dissipation']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

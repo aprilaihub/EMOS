@@ -9,45 +9,47 @@ class DeviceSynthesizabilityFeature(BaseFeature):
         super().__init__("Device Synthesizability", logger)
     
     def info(self):
-        return "Device Synthesizability: Assess feasibility and methods for device fabrication"
+        return "Device Synthesizability: Evaluate the feasibility and methods for synthesizing electronic devices from selected materials"
     
     def extract_inputs(self, input_data):
         return {
-            'device_type': input_data.get('deviceType', 'transistor'),
-            'material_composition': input_data.get('materialComposition', 'Si'),
-            'fabrication_method': input_data.get('fabricationMethod', 'CVD'),
-            'target_specifications': input_data.get('targetSpecifications', 'high_mobility'),
+            'deviceType': input_data.get('deviceType', 'transistor'),
+            'materialComposition': input_data.get('materialComposition', ''),
+            'substrateType': input_data.get('substrateType', 'silicon'),
+            'operatingTemp': input_data.get('operatingTemperature(°c)', '25'),
+            'fabricationMethod': input_data.get('preferredFabricationMethod', 'mocvd'),
+            'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'active_predictors': input_data.get('active_predictors', []),
         }
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing device synthesizability analysis...', 'info')
+            self.logger.log('Initializing Device Synthesizability...', 'info')
         
+        # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Device synthesizability process - python', 'info')
+            self.logger.log('Device Synthesizability processing completed', 'info')
         
         return {
-            'synthesizability_score': f"Synthesizability score: 85% for {inputs['device_type']}",
-            'fabrication_method': inputs['fabrication_method'],
-            'material_compatibility': f"{inputs['material_composition']} compatible"
+            'status': 'completed',
+            'message': 'Device Synthesizability feature executed successfully'
         }
     
-    def format_outputs(self, processed_results):
-        """Format the final output results"""
+    def format_outputs(self, results):
         return {
-            'feasibility': '78% (High) - python',
-            'recommendedProcess': 'MOCVD with 3-step annealing - python',
-            'estimatedCost': '$245/wafer - python',
-            'processTemp': '650°C - python',
-            'yieldPrediction': '85% - python'
+            'feasibility': 'placeholder text value',
+            'recommendedProcess': 'placeholder text value',
+            'estimatedCost': 'placeholder text value',
+            'processTemp': 'placeholder text value',
+            'yieldPrediction': 'placeholder text value',
         }
     
     def _process_information_units(self, inputs):
+        """Process active databases, generators, and predictors with proper logging"""
         # Process databases
         active_databases = inputs.get('active_databases', [])
         if not active_databases:
@@ -64,12 +66,6 @@ class DeviceSynthesizabilityFeature(BaseFeature):
                     db_instance = database_factory[db_key](db_key, self.logger)
                     if self.logger:
                         self.logger.log(db_instance.info(), 'info')
-                    retrieve_inputs = {'device_type': inputs['device_type']}
-                    try:
-                        db_instance.retrieve(retrieve_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Database {db_key} retrieve() error: {str(e)}', 'warning')
         
         # Process generators
         active_generators = inputs.get('active_generators', [])
@@ -87,12 +83,6 @@ class DeviceSynthesizabilityFeature(BaseFeature):
                     gen_instance = generator_factory[gen_key](gen_key, self.logger)
                     if self.logger:
                         self.logger.log(gen_instance.info(), 'info')
-                    generate_inputs = {'device_type': inputs['device_type']}
-                    try:
-                        gen_instance.generate(generate_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Generator {gen_key} generate() error: {str(e)}', 'warning')
         
         # Process predictors
         active_predictors = inputs.get('active_predictors', [])
@@ -110,9 +100,3 @@ class DeviceSynthesizabilityFeature(BaseFeature):
                     pred_instance = predictor_factory[pred_key](pred_key, self.logger)
                     if self.logger:
                         self.logger.log(pred_instance.info(), 'info')
-                    predict_inputs = {'material': inputs['material_composition']}
-                    try:
-                        pred_instance.predict(predict_inputs)
-                    except Exception as e:
-                        if self.logger:
-                            self.logger.log(f'Predictor {pred_key} predict() error: {str(e)}', 'warning')

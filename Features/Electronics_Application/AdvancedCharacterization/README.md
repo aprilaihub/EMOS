@@ -1,23 +1,36 @@
-# Advanced Characterization Feature
+# Advanced Characterization
+
+Advanced characterization techniques for electronic materials evaluation
 
 ## Overview
 
-Perform comprehensive multi-technique characterization of materials and devices, combining electronic structure, transport, optical, and defect analysis.
+This feature provides advanced characterization functionality within the EMOS platform.
 
-## Inputs
+## Key Methods
 
-- `structure` (Structure object): Material/device to characterize
-- `analysis_methods` (list): Analysis types ('electronic', 'transport', 'optical', 'xrd', 'defects')
-- `calculation_level` (string): Computation depth ('fast', 'standard', 'comprehensive')
-- `include_defects` (bool): Include point/line defect analysis
-- `temperature` (float): Analysis temperature (K)
+- `info()`: Returns feature description and capabilities
+- `extract_inputs(input_data)`: Extracts and validates input parameters
+- `process_feature(inputs)`: Core feature processing logic
+- `format_outputs(results)`: Formats results to expected output format
+- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
-## Outputs
 
-- `electronic_structure` (dict): Band structure, DOS, effective masses
-- `transport_properties` (dict): Mobility, conductivity, Seebeck coefficient
-- `optical_properties` (dict): Absorption, refractive index, dielectric function
-- `xrd_data` (dict): X-ray diffraction patterns and indexing
-- `defect_analysis` (dict): Formation energies, defect levels, concentrations
-- `comprehensive_report` (dict): Integrated characterization summary
-- `property_uncertainties` (dict): Confidence in calculated properties
+## Input Parameters
+
+- **Characterization Technique**: Characterization technique to use
+- **Scan Range**: Measurement scan range parameter
+- **Reference Data**: Reference data file for comparison
+- **Automatic Analysis**: Enable automatic data analysis
+
+## Output Parameters
+
+- **Characterization Status**: Status of characterization measurement
+- **Material Quality**: Assessment of material quality
+- **Analysis Report**: Detailed analysis report
+
+## Usage
+
+See the base class documentation for detailed usage instructions.
+
+For integration with information units (Databases, Generators, Predictors), 
+the feature automatically processes active units and logs their operations.
