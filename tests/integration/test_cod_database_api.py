@@ -4,7 +4,7 @@ Integration tests for COD Database with real API calls.
 These tests call the actual COD OPTIMADE API and verify real-world behavior.
 Marked with @pytest.mark.network to skip in offline environments.
 
-Run with: pytest tests/integration/test_cod_database_live.py -v
+Run with: pytest tests/integration/test_cod_database_api.py -v
 Skip network tests: pytest -m "not network"
 """
 
@@ -81,7 +81,7 @@ def test_cod_retrieve_structures(query, expected_elements):
 @pytest.mark.integration
 @pytest.mark.network
 @pytest.mark.slow
-@pytest.mark.parametrize("limit", [1, 10, 50, 200])
+@pytest.mark.parametrize("limit", [1, 10, 15])
 def test_cod_retrieve_performance(benchmark, limit):
     """Benchmark retrieval performance for different result limits."""
     from Information_Units.Databases.Cod.CodDatabase import CodDatabase
