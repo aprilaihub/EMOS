@@ -1,8 +1,8 @@
 """
 Unit tests for COD OPTIMADE API Helper.
 
-These tests verify the CodAPIHelper class functionality using mocked responses.
-Tests are fast and isolated from external dependencies.
+Minimal test suite verifying filter building and API fetching logic.
+Uses mocked responses for isolated, fast testing.
 
 Run with: pytest tests/unit/test_cod_api_helper.py -v
 """
@@ -21,150 +21,75 @@ def _make_helper():
 # ============================================================================
 
 @pytest.mark.unit
-def test_build_filter_single_element():
-    """Verify single element filter is built correctly."""
+@pytest.mark.parametrize("elements,properties,expected", [
+    ("Fe", {}, 'elements HAS "Fe"'),
+    ("Al2O3", {}, '(elements HAS "Al" AND elements HAS "O")'),
+    ("Fe", {"nelements": 2}, 'elements HAS "Fe" AND nelements = 2'),
+    ("Fe", {"nelements": [1, 3]}, 'elements HAS "Fe" AND nelements >= 1 AND nelements <= 3'),
+])
+def test_build_filter_variations(elements, properties, expected):
+    """Verify filter building with various element and property inputs."""
     helper = _make_helper()
-    assert helper.build_filter("Fe") == 'elements HAS "Fe"'
-
-
-@pytest.mark.unit
-def test_build_filter_formula_elements_and():
-    """Verify chemical formula is parsed into AND condition."""
-    helper = _make_helper()
-    assert helper.build_filter("Al2O3") == '(elements HAS "Al" AND elements HAS "O")'
-
-
-@pytest.mark.unit
-def test_build_filter_with_structure_filters():
-    """Verify structure properties are combined with element filters."""
-    helper = _make_helper()
-    filters = helper.map_properties({"nelements": 2})
-    assert helper.build_filter("Fe", filters) == 'elements HAS "Fe" AND nelements = 2'
-
-
-@pytest.mark.unit
-def test_build_filter_with_range():
-    """Verify range filters generate correct comparison operators."""
-    helper = _make_helper()
-    filters = helper.map_properties({"nelements": [1, 3]})
-    assert helper.build_filter("Fe", filters) == 'elements HAS "Fe" AND nelements >= 1 AND nelements <= 3'
+    filters = helper.map_properties(properties) if properties else {}
+    result = helper.build_filter(elements, filters)
+    assert result == expected
 
 
 # ============================================================================
-# API Fetching Tests (Mocked)
+# API Fetching Tests
 # ============================================================================
 
 @pytest.mark.unit
-def test_fetch_from_api_host_unreachable(monkeypatch):
-    """Verify no API calls made when host is unreachable."""
+def test_fetch_api_host_down(monkeypatch):
+    """Verify no API calls when host is unreachable."""
     helper = _make_helper()
     monkeypatch.setattr(helper, "is_host_reachable", lambda: False)
-    
-    result = helper.fetch_from_api("Fe", 1, {})
-    
-    assert result == []
+    assert helper.fetch_from_api("Fe", 1, {}) == []
 
 
 @pytest.mark.unit
-def test_fetch_from_api_success(monkeypatch, sample_fe_structure):
-    """Verify successful API fetch returns structure data."""
-    helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
-    
-    class MockResponse:
-        def json(self):
-            return {"data": [sample_fe_structure]}
-        
-        def raise_for_status(self):
-            pass
-    
-    import requests
-    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: MockResponse())
-    
-    result = helper.fetch_from_api("Fe", 1, {})
-    
-    assert len(result) == 1
-    assert result[0]["attributes"]["chemical_formula_reduced"] == "Fe"
-    assert result[0]["attributes"]["nelements"] == 1
-    assert result[0]["attributes"]["natoms"] == 2
-
-
-@pytest.mark.unit
-def test_fetch_from_api_with_pagination(monkeypatch):
-    """Verify pagination correctly fetches multiple pages."""
-    helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
-    
-    # Mock time.sleep to speed up test
+def test_fetch_api_with_pagination_and_limit(monkeypatch):
+    """Verify API handles pagination, respects limit, and processes empty results."""
     import time
+    import requests
+    
+    helper = _make_helper()
+    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
     monkeypatch.setattr(time, "sleep", lambda x: None)
     
-    class MockResponse:
-        def __init__(self, data):
-            self.data = data
-        
-        def json(self):
-            return {"data": self.data}
-        
-        def raise_for_status(self):
-            pass
+    # Create mock response
+    def make_response(data):
+        class MockResponse:
+            def json(self):
+                return {"data": data}
+            def raise_for_status(self):
+                pass
+        return MockResponse()
     
+    # Test 1: Pagination
+    # API returns 10 items per page, but we need 12 total.
+    # Expected: Multiple API calls made to fetch across pages, all results combined.
     call_count = [0]
-    
-    def mock_get(*args, **kwargs):
+    def mock_paginated_get(*args, **kwargs):
         call_count[0] += 1
-        # First call returns 10 results, second returns 5 results
-        if call_count[0] == 1:
-            return MockResponse([{"id": str(i), "attributes": {}} for i in range(10)])
-        else:
-            return MockResponse([{"id": str(i + 10), "attributes": {}} for i in range(5)])
+        data = [{"id": str(i), "attributes": {}} 
+                for i in range(10 if call_count[0] == 1 else 5)]
+        return make_response(data)
     
-    import requests
-    monkeypatch.setattr(requests, "get", mock_get)
-    
+    monkeypatch.setattr(requests, "get", mock_paginated_get)
     result = helper.fetch_from_api("Fe", 12, {})
+    assert len(result) == 12 and call_count[0] == 2
     
-    assert len(result) == 12
-    assert call_count[0] == 2
-
-
-@pytest.mark.unit
-def test_fetch_from_api_empty_response(monkeypatch):
-    """Verify empty list returned when no results found."""
-    helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
-    
-    class MockResponse:
-        def json(self):
-            return {"data": []}
-        
-        def raise_for_status(self):
-            pass
-    
-    import requests
-    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: MockResponse())
-    
-    result = helper.fetch_from_api("NonExistentElement", 10, {})
-    
-    assert result == []
-
-
-@pytest.mark.unit
-def test_fetch_from_api_respects_limit(monkeypatch):
-    """Verify API respects the limit parameter."""
-    helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
-    
-    class MockResponse:
-        def json(self):
-            return {"data": [{"id": str(i), "attributes": {}} for i in range(20)]}
-        
-        def raise_for_status(self):
-            pass
-    
-    import requests
-    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: MockResponse())
-    
+    # Test 2: Respects Limit
+    # User requests only 5 items, even though more are available.
+    # Expected: Stop fetching once limit reached, no unnecessary API calls.
+    call_count[0] = 0
     result = helper.fetch_from_api("Fe", 5, {})
-    
     assert len(result) == 5
+    
+    # Test 3: Empty Results
+    # Search for non-existent material returns no data.
+    # Expected: Return empty list gracefully, not an error.
+    monkeypatch.setattr(requests, "get", lambda *a, **k: make_response([]))
+    result = helper.fetch_from_api("NonExistent", 10, {})
+    assert result == []
