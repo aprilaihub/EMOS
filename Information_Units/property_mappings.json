@@ -9,6 +9,10 @@
       "cod": {
         "name": "chemical_formula_descriptive",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "chemical_formula_descriptive",
+        "retrievable": true
       }
     },
     "elements": {
@@ -16,6 +20,10 @@
       "description": "List of unique chemical elements present",
       "category": "structural",
       "cod": {
+        "name": "elements",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "elements",
         "retrievable": true
       }
@@ -27,6 +35,10 @@
       "cod": {
         "name": "id",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "id",
+        "retrievable": true
       }
     },
     "last_modified": {
@@ -34,6 +46,10 @@
       "description": "Last modification timestamp",
       "category": "metadata",
       "cod": {
+        "name": "last_modified",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "last_modified",
         "retrievable": true
       }
@@ -45,6 +61,10 @@
       "cod": {
         "name": "nelements",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "nelements",
+        "retrievable": true
       }
     },
     "nperiodic_dimensions": {
@@ -54,6 +74,10 @@
       "cod": {
         "name": "nperiodic_dimensions",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "nperiodic_dimensions",
+        "retrievable": true
       }
     },
     "type": {
@@ -61,6 +85,10 @@
       "description": "Entry type (always 'structures')",
       "category": "metadata",
       "cod": {
+        "name": "type",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "type",
         "retrievable": true
       }
