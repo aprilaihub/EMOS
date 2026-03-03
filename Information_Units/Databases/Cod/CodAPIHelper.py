@@ -159,9 +159,6 @@ class CodAPIHelper:
                         self.logger.log(f"Retrieved {len(page_results)} structures (page offset: {page_offset})")
                     all_results.extend(page_results)
                     page_offset += page_limit
-
-                    # Add delay to avoid rate limiting
-                    time.sleep(2.0)
                 else:
                     # No more data available
                     if self.logger:
