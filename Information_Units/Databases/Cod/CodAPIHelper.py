@@ -129,6 +129,7 @@ class CodAPIHelper:
                         'species,'
                         'chemical_formula_reduced,'
                         'nelements,'
+                        'nperiodic_dimensions,'
                         'natoms,'
                         'volume,'
                         'spacegroup_number,'
@@ -160,7 +161,7 @@ class CodAPIHelper:
                     page_offset += page_limit
 
                     # Add delay to avoid rate limiting
-                    time.sleep(1.0)
+                    time.sleep(2.0)
                 else:
                     # No more data available
                     if self.logger:
