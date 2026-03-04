@@ -109,26 +109,83 @@ Comprehensive collection of computed materials properties using high-throughput 
 - Crystal structures
 - Phase stability information
 
-### Alexandria - Materials Database
+### Alexandria - DFT Materials Database (PBEsol)
 **ID**: `alexandria`
 
-Comprehensive database for materials discovery and design with focus on novel materials.
+Curated DFT-calculated materials database using PBEsol functional, optimized for band gap accuracy in semiconductors and optoelectronic materials.
+
+**Overview**:
+- 415K structures (PBEsol-calculated)
+- Formation energies and phase stability data
+- Electronic properties (band gaps, DOS)
+- Stress tensors and other DFT outputs
+- Dual-functional data (PBEsol + SCAN calculations)
 
 **Capabilities**:
-- Curated materials data
-- Novel materials discovery
-- Property prediction integration
-- Advanced search capabilities
+- Band gap filtering for electronics materials
+- Formation energy and stability analysis
+- Dual-functional property comparison (PBEsol vs SCAN)
+- Magnetic properties tracking
+- Thermodynamic stability assessment
 
-**Input Parameters**:
-- `material_class`: Type of material
-- `target_properties`: Desired properties
-- `synthesis_route`: Synthesis constraints
+**Input Parameters (via standard property names)**:
+- `query`: Material formula or element (e.g., 'Al2O3', 'Fe')
+- `limit`: Maximum number of results (default: 10)
+
+**Advanced Filters (PBEsol)**:
+- `band_gap`: [min, max] eV - electronic band gap
+- `band_gap_direct`: [min, max] eV - direct band gap
+- `formation_energy_per_atom`: [min, max] eV/atom - formation energy
+- `space_group`: [min, max] - space group number
+- `hull_distance`: [min, max] eV/atom - distance from convex hull
+- `magnetization`: [min, max] μB/unit_cell - total magnetization
+- `energy`: [min, max] eV - total energy
+- `energy_corrected`: [min, max] eV - energy with corrections
+- `phase_separation_energy`: [min, max] eV/atom - phase stability
+- `decomposition`: string - decomposition products
+- `xc_functional`: string - functional used
+- `dos_ef`: [min, max] - density of states at Fermi level
+- `charges`: [min, max] - atomic charges
+- `forces`: [min, max] eV/Å - forces on atoms
+- `stress_tensor`: [min, max] kbar - stress tensor
+- `magnetic_moments`: [min, max] μB - local magnetic moments
+
+**Advanced Filters (SCAN variant)**:
+- `band_gap_scan`, `band_gap_direct_scan`, `formation_energy_per_atom_scan`, `hull_distance_scan`, `magnetization_scan`, `energy_scan`, `energy_corrected_scan`, `phase_separation_energy_scan`, `decomposition_scan`, `dos_ef_scan`, `charges_scan`, `forces_scan`, `stress_tensor_scan`, `magnetic_moments_scan`
 
 **Output Format**:
-- Materials recommendations
-- Property predictions
-- Synthesis feasibility data
+- CIF files with crystal structures
+- DFT-calculated properties
+- Both PBEsol and SCAN functional results
+
+**Example - Electronics Materials with Band Gap Filter**:
+```python
+db.retrieve({
+    'query': 'Al2O3',
+    'limit': 5,
+    'band_gap': [2.0, 6.0]  # Filter for semiconductors
+})
+```
+
+**Example - Thermodynamic Stability Analysis**:
+```python
+db.retrieve({
+    'query': 'Fe',
+    'limit': 10,
+    'formation_energy_per_atom': [-1.0, 0.0],
+    'hull_distance': [0.0, 0.05]  # Stable/near-stable structures
+})
+```
+
+**Example - PBEsol vs SCAN Comparison**:
+```python
+db.retrieve({
+    'query': 'GaAs',
+    'limit': 5,
+    'band_gap': [1.0, 2.0],
+    'band_gap_scan': [1.0, 2.0]  # Compare both functionals
+})
+```
 
 ### NOMAD - Novel Materials Discovery Repository
 **ID**: `nomad`

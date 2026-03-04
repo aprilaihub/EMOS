@@ -162,6 +162,35 @@ class AlexandriaAPIHelper:
                     self.logger.log(f"Warning: Property '{standard_name}' not in mapping, skipping")
         return mapped
 
+    def _validate_filter_properties(self, filters: dict) -> dict:
+        """
+        Validate that requested filter properties are retrievable in Alexandria.
+        Skip non-retrievable properties to avoid 400 errors from OPTIMADE API.
+
+        Args:
+            filters: Dict with mapped Alexandria property names
+
+        Returns:
+            dict: Validated filters with only retrievable properties
+        """
+        validated = {}
+        for prop_name, value in filters.items():
+            is_retrievable = False
+            
+            # Check if property is marked retrievable in mapping
+            for std_name, prop_info in self.property_mapping.items():
+                if prop_info.get('name') == prop_name and prop_info.get('retrievable'):
+                    is_retrievable = True
+                    break
+            
+            if is_retrievable:
+                validated[prop_name] = value
+            else:
+                if self.logger:
+                    self.logger.log(f"Warning: Property '{prop_name}' not retrievable in Alexandria, skipping from filter")
+        
+        return validated
+
     def fetch_from_api(self, query: str, limit: int, filters: dict = None) -> list:
         """
         Fetch structures from Alexandria OPTIMADE API with pagination support.
@@ -182,6 +211,9 @@ class AlexandriaAPIHelper:
         try:
             if not self.is_host_reachable():
                 return []
+
+            # Validate filters before building OPTIMADE query
+            filters = self._validate_filter_properties(filters)
 
             while len(all_results) < limit:
                 optimade_filter = self.build_filter(query, filters)

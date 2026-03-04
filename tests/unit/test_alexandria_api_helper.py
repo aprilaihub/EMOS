@@ -31,6 +31,10 @@ def _make_helper(monkeypatch):
     ("Al2O3", {}, '(elements HAS "Al" AND elements HAS "O")'),
     ("Fe", {"nelements": 2}, 'elements HAS "Fe" AND nelements = 2'),
     ("Fe", {"nelements": [1, 3]}, 'elements HAS "Fe" AND nelements >= 1 AND nelements <= 3'),
+    ("Fe", {"band_gap": [1.0, 3.0]}, 'elements HAS "Fe" AND _alexandria_band_gap >= 1.0 AND _alexandria_band_gap <= 3.0'),
+    ("Al2O3", {"formation_energy_per_atom": [-1.0, 0.5]}, '(elements HAS "Al" AND elements HAS "O") AND _alexandria_formation_energy_per_atom >= -1.0 AND _alexandria_formation_energy_per_atom <= 0.5'),
+    ("O", {"band_gap_scan": [0.5, 2.5]}, 'elements HAS "O" AND _alexandria_scan_band_gap >= 0.5 AND _alexandria_scan_band_gap <= 2.5'),
+    ("Fe", {"band_gap": [1.0, 3.0], "hull_distance": [0.0, 0.1], "nelements": [1, 3]}, 'elements HAS "Fe" AND _alexandria_band_gap >= 1.0 AND _alexandria_band_gap <= 3.0 AND _alexandria_hull_distance >= 0.0 AND _alexandria_hull_distance <= 0.1 AND nelements >= 1 AND nelements <= 3'),
 ])
 def test_build_filter_variations(monkeypatch, elements, properties, expected):
     """Verify filter building with various element and property inputs."""
@@ -99,6 +103,28 @@ def test_fetch_api_with_pagination_and_limit(monkeypatch):
     result = helper.fetch_from_api("NonExistent", 10, {})
     assert result == []
 
+    # Test 4: Unknown filter properties are removed before API call
+    # Expected: API query contains only retrievable Alexandria filters.
+    captured = []
+
+    def mock_filtered_get(*args, **kwargs):
+        captured.append(kwargs.get("params", {}).get("filter", ""))
+        return make_response([{"id": "1", "attributes": {}}])
+
+    monkeypatch.setattr(requests, "get", mock_filtered_get)
+    result = helper.fetch_from_api(
+        "Fe",
+        1,
+        {
+            "_alexandria_band_gap": [1.0, 3.0],
+            "unknown_property": [0, 1],
+        },
+    )
+    assert len(result) == 1
+    assert captured
+    assert "_alexandria_band_gap >= 1.0 AND _alexandria_band_gap <= 3.0" in captured[0]
+    assert "unknown_property" not in captured[0]
+
 
 # ============================================================================
 # Alexandria-Specific Tests
@@ -166,3 +192,4 @@ def test_response_fields_safe_list(monkeypatch):
     # Verify COD-specific fields are NOT included
     assert "spacegroup_number" not in helper.response_fields
     assert "_cod_cell_formula_units_z" not in helper.response_fields
+
