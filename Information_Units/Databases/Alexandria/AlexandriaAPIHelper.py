@@ -1,35 +1,35 @@
-"""Helper functions for COD database API interaction and data conversion."""
+"""Helper functions for Alexandria database API interaction and data conversion."""
 
 import os
 import re
 import json
-import tempfile
 import time
 import requests
 from pymatgen.core import Structure, Lattice, Composition
 
 
-class CodAPIHelper:
-    """Helper class for COD OPTIMADE API operations."""
+class AlexandriaAPIHelper:
+    """Helper class for Alexandria OPTIMADE API operations."""
 
     def __init__(self, base_url: str, logger=None):
         """
-        Initialize COD API helper.
+        Initialize Alexandria API helper.
 
         Args:
-            base_url: Base URL for COD OPTIMADE API
+            base_url: Base URL for Alexandria OPTIMADE API
             logger: Optional logger instance
         """
         self.base_url = base_url
         self.logger = logger
         self.property_mapping = self._load_property_mapping()
+        self.response_fields = self._build_response_fields()
 
     def _load_property_mapping(self) -> dict:
         """
         Load property mapping from property_mappings.json.
-        
+
         Returns:
-            dict: Mapping with structure {prop_name: {name: cod_name, ...}} for retrievable properties
+            dict: Mapping with structure {prop_name: {name: alexandria_name, ...}} for retrievable properties
         """
         try:
             mapping_file = os.path.join(
@@ -40,72 +40,171 @@ class CodAPIHelper:
             )
             with open(mapping_file, 'r') as f:
                 data = json.load(f)
-            
-            # Create mapping with full property details from COD block
+
             mapping = {}
             for prop_name, prop_details in data.get('properties', {}).items():
-                cod_info = prop_details.get('cod', {})
-                if cod_info.get('retrievable'):
+                alexandria_info = prop_details.get('alexandria', {})
+                if alexandria_info.get('retrievable'):
                     mapping[prop_name] = {
-                        'name': cod_info.get('name'),
+                        'name': alexandria_info.get('name'),
                         'retrievable': True,
-                        'range_support': cod_info.get('range_support', False),
+                        'range_support': alexandria_info.get('range_support', False),
                     }
-            
+
             if self.logger:
-                self.logger.log(f"Loaded property mapping with {len(mapping)} properties")
-            
+                self.logger.log(f"Loaded Alexandria property mapping with {len(mapping)} properties")
+
             return mapping
         except Exception as e:
             if self.logger:
-                self.logger.log(f"Warning: Could not load property mapping: {str(e)}")
+                self.logger.log(f"Warning: Could not load Alexandria property mapping: {str(e)}")
             return {}
+
+    def _build_response_fields(self) -> str:
+        """
+        Build response_fields string dynamically from Alexandria /info/structures.
+        Ensures only safe, supported fields are requested.
+
+        Returns:
+            str: Comma-separated response_fields string
+        """
+        baseline_fields = [
+            'id',
+            'elements',
+            'nelements',
+            'lattice_vectors',
+            'species_at_sites',
+            'cartesian_site_positions',
+            'chemical_formula_reduced',
+            'last_modified',
+            'type',
+            'nperiodic_dimensions',
+        ]
+        optional_fields = [
+            'fractional_site_positions',
+            'species',
+        ]
+
+        try:
+            response = requests.get(
+                f"{self.base_url}info/structures",
+                headers={"Accept": "application/json"},
+                timeout=30,
+            )
+            response.raise_for_status()
+            payload = response.json()
+
+            data = payload.get('data', {})
+            supported_fields = set()
+
+            properties = data.get('properties')
+            if isinstance(properties, dict):
+                supported_fields.update(properties.keys())
+
+            attributes = data.get('attributes', {}) if isinstance(data, dict) else {}
+            attribute_properties = attributes.get('properties')
+            if isinstance(attribute_properties, dict):
+                supported_fields.update(attribute_properties.keys())
+
+            output_fields = data.get('output_fields_by_format', {})
+            if isinstance(output_fields, dict):
+                supported_fields.update(output_fields.get('optimade_json', []) or [])
+
+            attr_output_fields = attributes.get('output_fields_by_format', {})
+            if isinstance(attr_output_fields, dict):
+                supported_fields.update(attr_output_fields.get('optimade_json', []) or [])
+
+            if not supported_fields:
+                if self.logger:
+                    self.logger.log("/info/structures returned no parsable supported fields; using baseline response_fields")
+                return ",".join(baseline_fields)
+
+            response_fields = [field for field in baseline_fields if field in supported_fields]
+            response_fields.extend([field for field in optional_fields if field in supported_fields])
+
+            if not response_fields:
+                response_fields = baseline_fields
+
+            if self.logger:
+                self.logger.log(f"Using Alexandria response_fields: {','.join(response_fields)}")
+
+            return ",".join(response_fields)
+        except Exception as e:
+            if self.logger:
+                self.logger.log(f"Warning: Could not resolve Alexandria response fields dynamically: {str(e)}")
+                self.logger.log("Using baseline Alexandria response_fields")
+            return ",".join(baseline_fields)
 
     def map_properties(self, standard_properties: dict) -> dict:
         """
-        Map standard property names to COD property names.
+        Map standard property names to Alexandria property names.
         Only maps properties that are marked as retrievable.
-        
+
         Args:
             standard_properties: Dict with standard property names as keys
-            
+
         Returns:
-            dict: Dict with COD property names as keys (non-retrievable properties excluded)
+            dict: Dict with Alexandria property names as keys (non-retrievable properties excluded)
         """
         mapped = {}
         for standard_name, value in standard_properties.items():
             if standard_name in self.property_mapping:
                 prop_info = self.property_mapping[standard_name]
                 if prop_info.get('retrievable'):
-                    cod_name = prop_info['name']
-                    mapped[cod_name] = value
+                    mapped[prop_info['name']] = value
                 else:
                     if self.logger:
-                        self.logger.log(f"Property '{standard_name}' is not retrievable in COD OPTIMADE, skipping")
+                        self.logger.log(
+                            f"Property '{standard_name}' is not retrievable in Alexandria OPTIMADE, skipping"
+                        )
             else:
                 if self.logger:
                     self.logger.log(f"Warning: Property '{standard_name}' not in mapping, skipping")
         return mapped
 
+    def _validate_filter_properties(self, filters: dict) -> dict:
+        """
+        Validate that requested filter properties are retrievable in Alexandria.
+        Skip non-retrievable properties to avoid 400 errors from OPTIMADE API.
+
+        Args:
+            filters: Dict with mapped Alexandria property names
+
+        Returns:
+            dict: Validated filters with only retrievable properties
+        """
+        validated = {}
+        for prop_name, value in filters.items():
+            is_retrievable = False
+            
+            # Check if property is marked retrievable in mapping
+            for std_name, prop_info in self.property_mapping.items():
+                if prop_info.get('name') == prop_name and prop_info.get('retrievable'):
+                    is_retrievable = True
+                    break
+            
+            if is_retrievable:
+                validated[prop_name] = value
+            else:
+                if self.logger:
+                    self.logger.log(f"Warning: Property '{prop_name}' not retrievable in Alexandria, skipping from filter")
+        
+        return validated
+
     def fetch_from_api(self, query: str, limit: int, filters: dict = None) -> list:
         """
-        Fetch structures from COD OPTIMADE API with pagination support.
+        Fetch structures from Alexandria OPTIMADE API with pagination support.
 
         Args:
             query: Element or formula to search for
             limit: Maximum number of results to fetch
-            filters: Optional dict with structure property filters:
-                - nelements: int or [min, max] - number of unique elements
-                - natoms: int or [min, max] - atoms in unit cell
-                - volume: [min, max] - unit cell volume range
-                - spacegroup_number: int - space group number (1-230)
-                - spacegroup_symbol: str - Hermann-Mauguin symbol
+            filters: Optional dict with structure property filters
 
         Returns:
             list: Raw structure data from OPTIMADE API
         """
         all_results = []
-        page_limit = 10  # COD's max per request
+        page_limit = 100
         page_offset = 0
         filters = filters or {}
 
@@ -113,91 +212,79 @@ class CodAPIHelper:
             if not self.is_host_reachable():
                 return []
 
+            # Validate filters before building OPTIMADE query
+            filters = self._validate_filter_properties(filters)
+
             while len(all_results) < limit:
-                # Build OPTIMADE filter query
                 optimade_filter = self.build_filter(query, filters)
 
-                # Make API request with pagination
                 params = {
-                    'page_limit': page_limit,
+                    'page_limit': min(page_limit, max(limit - len(all_results), 1)),
                     'page_offset': page_offset,
-                    'response_fields': (
-                        'lattice_vectors,'
-                        'cartesian_site_positions,'
-                        'fractional_site_positions,'
-                        'species_at_sites,'
-                        'species,'
-                        'chemical_formula_reduced,'
-                        'nelements,'
-                        'nperiodic_dimensions,'
-                        'natoms,'
-                        'volume,'
-                        'spacegroup_number,'
-                        'spacegroup_symbol'
-                    )
+                    'response_fields': self.response_fields,
                 }
                 if optimade_filter:
                     params['filter'] = optimade_filter
 
                 if self.logger:
-                    self.logger.log(f"API Request (offset={page_offset}): {self.base_url}structures with params {params}")
+                    self.logger.log(
+                        f"Alexandria API request (offset={page_offset}): "
+                        f"{self.base_url}structures with params {params}"
+                    )
 
                 response = requests.get(
                     f"{self.base_url}structures",
                     params=params,
                     headers={"Accept": "application/json"},
-                    timeout=30
+                    timeout=30,
                 )
                 response.raise_for_status()
 
-                # Parse JSON response
                 data = response.json()
+                page_results = data.get('data', [])
 
-                if 'data' in data and len(data['data']) > 0:
-                    page_results = data['data']
+                if page_results:
                     if self.logger:
                         self.logger.log(f"Retrieved {len(page_results)} structures (page offset: {page_offset})")
                     all_results.extend(page_results)
-                    page_offset += page_limit
+                    page_offset += params['page_limit']
+                    time.sleep(1.0)
                 else:
-                    # No more data available
                     if self.logger:
                         self.logger.log("No more structures available")
                     break
 
             if self.logger:
-                self.logger.log(f"Total retrieved: {len(all_results)} structures")
+                self.logger.log(f"Total retrieved from Alexandria: {len(all_results)} structures")
 
-            # Trim to exact limit
             return all_results[:limit]
 
         except requests.exceptions.RequestException as e:
             if self.logger:
-                self.logger.log(f"API request failed: {str(e)}")
+                self.logger.log(f"Alexandria API request failed: {str(e)}")
             return all_results
         except Exception as e:
             if self.logger:
-                self.logger.log(f"Error fetching from API: {str(e)}")
+                self.logger.log(f"Error fetching from Alexandria API: {str(e)}")
             return all_results
 
     def is_host_reachable(self) -> bool:
         """
-        Check whether the COD OPTIMADE host is reachable.
+        Check whether the Alexandria OPTIMADE host is reachable.
 
         Returns:
             bool: True if reachable, False otherwise
         """
         try:
-            response = requests.get(
+            requests.get(
                 self.base_url,
                 headers={"Accept": "application/json"},
-                timeout=5
+                timeout=5,
             )
-            # Any HTTP response indicates the host is reachable.
             return True
         except requests.exceptions.RequestException as e:
             if self.logger:
-                self.logger.log(f"COD host unreachable: {str(e)}")
+                self.logger.log(f"Alexandria host unreachable: {str(e)}")
             return False
 
     def build_filter(self, query: str, filters: dict = None) -> str:
@@ -214,17 +301,14 @@ class CodAPIHelper:
         filters = filters or {}
         filter_parts = []
 
-        # Build composition filter
         comp_filter = self._build_composition_filter(query)
         if comp_filter:
             filter_parts.append(comp_filter)
 
-        # Build structure property filters
         struct_filters = self._build_structure_filters(filters)
         if struct_filters:
             filter_parts.extend(struct_filters)
 
-        # Combine all filters with AND
         if filter_parts:
             return " AND ".join(filter_parts)
         return None
@@ -242,7 +326,6 @@ class CodAPIHelper:
         if not query or query.lower() == 'all':
             return None
 
-        # Try parsing as a chemical formula first
         try:
             composition = Composition(query)
             elements = [el.symbol for el in composition.elements]
@@ -253,7 +336,6 @@ class CodAPIHelper:
         except Exception:
             pass
 
-        # Fallback: treat the query as a raw element symbol
         return f'elements HAS "{query}"'
 
     def _build_structure_filters(self, filters: dict) -> list:
@@ -269,29 +351,23 @@ class CodAPIHelper:
         """
         filter_parts = []
 
-        # Only process properties that are retrievable according to mapping
         for prop_name, value in filters.items():
-            # Check if this property is mapped and retrievable
             is_retrievable = False
-            for std_name, prop_info in self.property_mapping.items():
+            for _, prop_info in self.property_mapping.items():
                 if prop_info['name'] == prop_name and prop_info.get('retrievable'):
                     is_retrievable = True
                     break
-            
+
             if not is_retrievable:
                 if self.logger:
                     self.logger.log(f"Property '{prop_name}' is not retrievable, skipping from filter")
                 continue
 
-            # Build filter based on value type
             if isinstance(value, list) and len(value) == 2:
-                # Range query [min, max]
                 filter_parts.append(f"{prop_name} >= {value[0]} AND {prop_name} <= {value[1]}")
             elif isinstance(value, str):
-                # String value
                 filter_parts.append(f'{prop_name} = "{value}"')
             else:
-                # Numeric value
                 filter_parts.append(f"{prop_name} = {value}")
 
         return filter_parts
@@ -309,7 +385,6 @@ class CodAPIHelper:
         try:
             attrs = optimade_entry.get('attributes', {})
 
-            # Get lattice vectors
             lattice_vectors = attrs.get('lattice_vectors')
             if not lattice_vectors:
                 if self.logger:
@@ -320,7 +395,6 @@ class CodAPIHelper:
                     self.logger.log("Invalid lattice_vectors shape")
                 return None
 
-            # Get species and positions
             species_at_sites = attrs.get('species_at_sites')
             species_list = attrs.get('species') or []
             positions = attrs.get('cartesian_site_positions')
@@ -346,7 +420,6 @@ class CodAPIHelper:
                     self.logger.log("Invalid positions shape")
                 return None
 
-            # Map OPTIMADE species_at_sites -> pymatgen-compatible species
             species_map = {}
             for entry in species_list:
                 name = entry.get("name")
@@ -373,14 +446,12 @@ class CodAPIHelper:
                         occupancies[str(symbol)] = conc
 
                     if not occupancies:
-                        # Skip pure vacancy sites
                         continue
 
                     site_species.append(occupancies if len(occupancies) > 1 else list(occupancies.keys())[0])
                     site_positions.append(pos)
                     continue
 
-                # Fallback: treat site label as an element symbol or skip vacancies
                 label_str = str(site_label).strip().lower()
                 if label_str in {"vacancy", "vac", "x", "none"}:
                     continue
@@ -397,13 +468,12 @@ class CodAPIHelper:
                     self.logger.log("No valid sites after species mapping")
                 return None
 
-            # Create pymatgen Structure
             lattice = Lattice(lattice_vectors)
             structure = Structure(
                 lattice=lattice,
                 species=site_species,
                 coords=site_positions,
-                coords_are_cartesian=coords_are_cartesian
+                coords_are_cartesian=coords_are_cartesian,
             )
 
             return structure
@@ -427,12 +497,10 @@ class CodAPIHelper:
             str: Path to saved CIF file or None if failed
         """
         try:
-            # Get formula for filename
             attrs = entry.get('attributes', {})
             formula = attrs.get('chemical_formula_reduced') or f'structure_{index}'
             formula = formula.replace(' ', '_')
 
-            # Save CIF
             filename = f"{formula}_{index}.cif"
             filepath = os.path.join(output_dir, filename)
             structure.to(filename=filepath, fmt='cif')

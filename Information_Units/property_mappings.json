@@ -9,6 +9,10 @@
       "cod": {
         "name": "chemical_formula_descriptive",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "chemical_formula_descriptive",
+        "retrievable": true
       }
     },
     "elements": {
@@ -16,6 +20,10 @@
       "description": "List of unique chemical elements present",
       "category": "structural",
       "cod": {
+        "name": "elements",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "elements",
         "retrievable": true
       }
@@ -27,6 +35,10 @@
       "cod": {
         "name": "id",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "id",
+        "retrievable": true
       }
     },
     "last_modified": {
@@ -34,6 +46,10 @@
       "description": "Last modification timestamp",
       "category": "metadata",
       "cod": {
+        "name": "last_modified",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "last_modified",
         "retrievable": true
       }
@@ -45,6 +61,10 @@
       "cod": {
         "name": "nelements",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "nelements",
+        "retrievable": true
       }
     },
     "nperiodic_dimensions": {
@@ -52,6 +72,10 @@
       "description": "Number of periodic dimensions",
       "category": "structural",
       "cod": {
+        "name": "nperiodic_dimensions",
+        "retrievable": true
+      },
+      "alexandria": {
         "name": "nperiodic_dimensions",
         "retrievable": true
       }
@@ -63,6 +87,334 @@
       "cod": {
         "name": "type",
         "retrievable": true
+      },
+      "alexandria": {
+        "name": "type",
+        "retrievable": true
+      }
+    },
+    "band_gap": {
+      "type": "float",
+      "description": "Electronic band gap (PBEsol)",
+      "category": "electronic",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_band_gap",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "band_gap_direct": {
+      "type": "float",
+      "description": "Direct electronic band gap (PBEsol)",
+      "category": "electronic",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_band_gap_direct",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "formation_energy_per_atom": {
+      "type": "float",
+      "description": "Formation energy per atom (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_formation_energy_per_atom",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "space_group": {
+      "type": "integer",
+      "description": "Space group number (PBEsol)",
+      "category": "structural",
+      "alexandria": {
+        "name": "_alexandria_space_group",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "hull_distance": {
+      "type": "float",
+      "description": "Distance from convex hull (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_hull_distance",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "magnetization": {
+      "type": "float",
+      "description": "Total magnetization (PBEsol)",
+      "category": "electronic",
+      "unit": "muB/unit_cell",
+      "alexandria": {
+        "name": "_alexandria_magnetization",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "energy": {
+      "type": "float",
+      "description": "Total energy (PBEsol)",
+      "category": "energetic",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_energy",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "energy_corrected": {
+      "type": "float",
+      "description": "Total energy with pymatgen corrections (PBEsol)",
+      "category": "energetic",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_energy_corrected",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "phase_separation_energy": {
+      "type": "float",
+      "description": "Phase separation energy (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_phase_separation_energy",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "decomposition": {
+      "type": "string",
+      "description": "Most likely decomposition channel (PBEsol)",
+      "category": "energetic",
+      "alexandria": {
+        "name": "_alexandria_decomposition",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
+    "xc_functional": {
+      "type": "string",
+      "description": "Exchange-correlation functional used",
+      "category": "metadata",
+      "alexandria": {
+        "name": "_alexandria_xc_functional",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
+    "dos_ef": {
+      "type": "float",
+      "description": "Density of states at Fermi level (PBEsol)",
+      "category": "electronic",
+      "unit": "states/(eV*unit_cell)",
+      "alexandria": {
+        "name": "_alexandria_dos_ef",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "charges": {
+      "type": "float",
+      "description": "Atomic charges (PBEsol)",
+      "category": "electronic",
+      "alexandria": {
+        "name": "_alexandria_charges",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "forces": {
+      "type": "float",
+      "description": "Forces on atoms (PBEsol)",
+      "category": "structural",
+      "unit": "eV/Angstrom",
+      "alexandria": {
+        "name": "_alexandria_forces",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "stress_tensor": {
+      "type": "float",
+      "description": "Stress tensor (PBEsol)",
+      "category": "structural",
+      "unit": "kbar",
+      "alexandria": {
+        "name": "_alexandria_stress_tensor",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "magnetic_moments": {
+      "type": "float",
+      "description": "Local magnetic moments (PBEsol)",
+      "category": "electronic",
+      "unit": "muB",
+      "alexandria": {
+        "name": "_alexandria_magnetic_moments",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "band_gap_scan": {
+      "type": "float",
+      "description": "Electronic band gap (SCAN)",
+      "category": "electronic_scan",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_scan_band_gap",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "band_gap_direct_scan": {
+      "type": "float",
+      "description": "Direct electronic band gap (SCAN)",
+      "category": "electronic_scan",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_scan_band_gap_direct",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "formation_energy_per_atom_scan": {
+      "type": "float",
+      "description": "Formation energy per atom (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_scan_formation_energy_per_atom",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "hull_distance_scan": {
+      "type": "float",
+      "description": "Distance from convex hull (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_scan_hull_distance",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "magnetization_scan": {
+      "type": "float",
+      "description": "Total magnetization (SCAN)",
+      "category": "electronic_scan",
+      "unit": "muB/unit_cell",
+      "alexandria": {
+        "name": "_alexandria_scan_magnetization",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "energy_scan": {
+      "type": "float",
+      "description": "Total energy (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_scan_energy",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "energy_corrected_scan": {
+      "type": "float",
+      "description": "Total energy with pymatgen corrections (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV",
+      "alexandria": {
+        "name": "_alexandria_scan_energy_corrected",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "phase_separation_energy_scan": {
+      "type": "float",
+      "description": "Phase separation energy (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom",
+      "alexandria": {
+        "name": "_alexandria_scan_phase_separation_energy",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "decomposition_scan": {
+      "type": "string",
+      "description": "Most likely decomposition channel (SCAN)",
+      "category": "energetic_scan",
+      "alexandria": {
+        "name": "_alexandria_scan_decomposition",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
+    "dos_ef_scan": {
+      "type": "float",
+      "description": "Density of states at Fermi level (SCAN)",
+      "category": "electronic_scan",
+      "unit": "states/(eV*unit_cell)",
+      "alexandria": {
+        "name": "_alexandria_scan_dos_ef",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "charges_scan": {
+      "type": "float",
+      "description": "Atomic charges (SCAN)",
+      "category": "electronic_scan",
+      "alexandria": {
+        "name": "_alexandria_scan_charges",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "forces_scan": {
+      "type": "float",
+      "description": "Forces on atoms (SCAN)",
+      "category": "structural_scan",
+      "unit": "eV/Angstrom",
+      "alexandria": {
+        "name": "_alexandria_scan_forces",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "stress_tensor_scan": {
+      "type": "float",
+      "description": "Stress tensor (SCAN)",
+      "category": "structural_scan",
+      "unit": "kbar",
+      "alexandria": {
+        "name": "_alexandria_scan_stress_tensor",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "magnetic_moments_scan": {
+      "type": "float",
+      "description": "Local magnetic moments (SCAN)",
+      "category": "electronic_scan",
+      "unit": "muB",
+      "alexandria": {
+        "name": "_alexandria_scan_magnetic_moments",
+        "retrievable": true,
+        "range_support": true
       }
     }
   }
