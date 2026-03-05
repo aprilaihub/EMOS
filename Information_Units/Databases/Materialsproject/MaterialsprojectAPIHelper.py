@@ -51,9 +51,6 @@ class MaterialsprojectAPIHelper:
                         'range_support': mp_info.get('range_support', False),
                     }
             
-            if self.logger:
-                self.logger.log(f"Loaded Materials Project property mapping with {len(mapping)} properties")
-            
             return mapping
         except Exception as e:
             if self.logger:

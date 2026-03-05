@@ -52,9 +52,6 @@ class CodAPIHelper:
                         'range_support': cod_info.get('range_support', False),
                     }
             
-            if self.logger:
-                self.logger.log(f"Loaded property mapping with {len(mapping)} properties")
-            
             return mapping
         except Exception as e:
             if self.logger:

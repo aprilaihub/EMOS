@@ -14,8 +14,8 @@ class MaterialsprojectDatabase(BaseDatabase):
 
     def info(self):
         return (
-            "Materials Project: Computed materials database with thermodynamic properties "
-            "(3+ million structures, r2SCAN functional)"
+            "Materials Project (via OPTIMADE): DFT-calculated materials database "
+            "(~154K structures, thermodynamic stability with GGA/GGA+U/r2SCAN functionals)"
         )
 
     def retrieve(self, inputs: dict) -> list:

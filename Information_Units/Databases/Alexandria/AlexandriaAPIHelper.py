@@ -51,9 +51,6 @@ class AlexandriaAPIHelper:
                         'range_support': alexandria_info.get('range_support', False),
                     }
 
-            if self.logger:
-                self.logger.log(f"Loaded Alexandria property mapping with {len(mapping)} properties")
-
             return mapping
         except Exception as e:
             if self.logger:
