@@ -13,6 +13,10 @@
       "alexandria": {
         "name": "chemical_formula_descriptive",
         "retrievable": true
+      },
+      "materialsproject": {
+        "name": "chemical_formula_descriptive",
+        "retrievable": true
       }
     },
     "elements": {
@@ -24,6 +28,10 @@
         "retrievable": true
       },
       "alexandria": {
+        "name": "elements",
+        "retrievable": true
+      },
+      "materialsproject": {
         "name": "elements",
         "retrievable": true
       }
@@ -39,6 +47,10 @@
       "alexandria": {
         "name": "id",
         "retrievable": true
+      },
+      "materialsproject": {
+        "name": "id",
+        "retrievable": true
       }
     },
     "last_modified": {
@@ -50,6 +62,10 @@
         "retrievable": true
       },
       "alexandria": {
+        "name": "last_modified",
+        "retrievable": true
+      },
+      "materialsproject": {
         "name": "last_modified",
         "retrievable": true
       }
@@ -65,6 +81,10 @@
       "alexandria": {
         "name": "nelements",
         "retrievable": true
+      },
+      "materialsproject": {
+        "name": "nelements",
+        "retrievable": true
       }
     },
     "nperiodic_dimensions": {
@@ -78,6 +98,10 @@
       "alexandria": {
         "name": "nperiodic_dimensions",
         "retrievable": true
+      },
+      "materialsproject": {
+        "name": "nperiodic_dimensions",
+        "retrievable": true
       }
     },
     "type": {
@@ -89,6 +113,10 @@
         "retrievable": true
       },
       "alexandria": {
+        "name": "type",
+        "retrievable": true
+      },
+      "materialsproject": {
         "name": "type",
         "retrievable": true
       }
@@ -395,17 +423,6 @@
         "range_support": true
       }
     },
-    "stress_tensor_scan": {
-      "type": "float",
-      "description": "Stress tensor (SCAN)",
-      "category": "structural_scan",
-      "unit": "kbar",
-      "alexandria": {
-        "name": "_alexandria_scan_stress_tensor",
-        "retrievable": true,
-        "range_support": true
-      }
-    },
     "magnetic_moments_scan": {
       "type": "float",
       "description": "Local magnetic moments (SCAN)",
@@ -415,6 +432,38 @@
         "name": "_alexandria_scan_magnetic_moments",
         "retrievable": true,
         "range_support": true
+      }
+    },
+    "energy_above_hull_r2scan": {
+      "type": "float",
+      "description": "Distance from convex hull using r2SCAN functional",
+      "category": "thermodynamic",
+      "unit": "eV/atom",
+      "materialsproject": {
+        "name": "_mp_stability.r2scan.energy_above_hull",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "formation_energy_r2scan": {
+      "type": "float",
+      "description": "Formation energy per atom using r2SCAN functional",
+      "category": "thermodynamic",
+      "unit": "eV/atom",
+      "materialsproject": {
+        "name": "_mp_stability.r2scan.formation_energy_per_atom",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "chemical_system": {
+      "type": "string",
+      "description": "Chemical system identifier (e.g., 'Si', 'Fe-O', 'Al-Si-O')",
+      "category": "composition",
+      "materialsproject": {
+        "name": "_mp_chemical_system",
+        "retrievable": true,
+        "range_support": false
       }
     }
   }
