@@ -19,14 +19,9 @@
   },
   "information_units": {
     "databases": {
-      "ICSD": "Inorganic Crystal Structure Database - comprehensive collection of crystal structures",
       "COD": "Crystallography Open Database - open-access collection of crystal structures", 
-      "OQMD": "Open Quantum Materials Database - high-throughput computational database",
-      "AFLOWLIB": "AFLOW Library - comprehensive materials database with computational data",
       "MaterialsProject": "Materials Project - computational materials database",
-      "Alexandria": "Alexandria PBE - DFT database for materials properties", 
-      "NOMAD": "NOMAD Laboratory - repository for computational materials science data",
-      "JARVIS": "Joint Automated Repository for Various Integrated Simulations"
+      "Alexandria": "Alexandria PBE - DFT database for materials properties" 
     },
     "generators": {
       "MatterGen": "Diffusion model for crystal structure generation",
