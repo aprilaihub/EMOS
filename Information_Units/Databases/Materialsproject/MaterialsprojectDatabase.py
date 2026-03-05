@@ -9,7 +9,7 @@ class MaterialsprojectDatabase(BaseDatabase):
     def __init__(self, database_name='materialsproject', logger=None):
         super().__init__(database_name, logger)
         self.output_dir = tempfile.mkdtemp(prefix="materialsproject_")
-        self.base_url = "https://api.materialsproject.org/optimade/v1/"
+        self.base_url = "https://optimade.materialsproject.org/v1/"
         self.api_helper = MaterialsprojectAPIHelper(self.base_url, logger=logger)
 
     def info(self):

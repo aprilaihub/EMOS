@@ -118,7 +118,6 @@ class MaterialsprojectAPIHelper:
                     'response_fields': (
                         'lattice_vectors,'
                         'cartesian_site_positions,'
-                        'fractional_site_positions,'
                         'species_at_sites,'
                         'species,'
                         'chemical_formula_reduced,'

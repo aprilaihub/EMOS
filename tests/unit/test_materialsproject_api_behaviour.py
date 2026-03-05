@@ -13,7 +13,7 @@ from Information_Units.Databases.Materialsproject.MaterialsprojectAPIHelper impo
 
 def _make_helper():
     """Create a MaterialsprojectAPIHelper instance for testing."""
-    return MaterialsprojectAPIHelper("https://api.materialsproject.org/optimade/v1/")
+    return MaterialsprojectAPIHelper("https://optimade.materialsproject.org/v1/")
 
 
 # ============================================================================
