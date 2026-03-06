@@ -21,3 +21,5 @@ Thumbs.db
 # Temporary
 .tmp
 temp/
+# SynthNN model files
+Information_Units/Predictors/Synthnn/.models/

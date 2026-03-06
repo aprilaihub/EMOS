@@ -2,6 +2,7 @@
 
 from pymatgen.core.structure import Structure
 from pymatgen.core.composition import Composition
+import re
 
 
 class CompositionHelper:
@@ -10,14 +11,18 @@ class CompositionHelper:
     @staticmethod
     def extract_from_cif(cif_content: str) -> tuple:
         """
-        Parse CIF string using pymatgen and extract composition.
+        Parse CIF string and extract composition.
+        
+        Tries to extract composition from:
+        1. _chemical_formula_sum field (if present)
+        2. Calculated from structure (if CIF parse succeeds)
         
         Args:
             cif_content (str): CIF file content as string
             
         Returns:
             tuple: (formula_string, success: bool)
-                - formula_string: Reduced formula (e.g., "Al2O3")
+                - formula_string: Formula (e.g., "Al2O3")
                 - success: True if parsing succeeded, False otherwise
                 
         Examples:
@@ -27,12 +32,32 @@ class CompositionHelper:
             
         Gracefully handles:
             - Invalid CIF syntax → return (None, False)
-            - Multi-site occupancies → uses reduced formula
+            - Multi-site occupancies → uses formula from structure
             - Fractional coordinates → normalized
         """
         try:
+            # Try to extract _chemical_formula_sum from CIF first
+            # This is more reliable than calculating from atom positions
+            formula_sum_match = re.search(r"_chemical_formula_sum\s+'([^']+)'", cif_content)
+            if not formula_sum_match:
+                formula_sum_match = re.search(r'_chemical_formula_sum\s+"([^"]+)"', cif_content)
+            if not formula_sum_match:
+                formula_sum_match = re.search(r'_chemical_formula_sum\s+(\S+)', cif_content)
+            
+            if formula_sum_match:
+                # Parse the formula sum (e.g., "Al2 O3" -> "Al2O3")
+                formula_sum = formula_sum_match.group(1).replace(' ', '')
+                # Normalize using Composition to get alphabetical format
+                try:
+                    comp = Composition(formula_sum)
+                    formula = comp.alphabetical_formula.replace(' ', '')
+                    return (formula, True)
+                except:
+                    pass  # Fall through to structure-based extraction
+            
+            # Fall back to extracting from structure
             struct = Structure.from_str(cif_content, fmt='cif')
-            formula = str(struct.composition.reduced_formula)
+            formula = str(struct.composition.alphabetical_formula).replace(' ', '')
             return (formula, True)
         except Exception as e:
             return (None, False)
