@@ -1,0 +1,15 @@
+data_SiO2
+_cell_length_a    4.913670
+_cell_length_b    4.913670
+_cell_length_c    5.405180
+_cell_angle_alpha 90.000000
+_cell_angle_beta  90.000000
+_cell_angle_gamma 120.000000
+loop_
+_atom_site_label
+_atom_site_occupancy
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Si1 1.0 0.469700 0.000000 0.333300
+O1  1.0 0.414200 0.272100 0.213100
