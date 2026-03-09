@@ -15,6 +15,15 @@
         "retrievable": true
       }
     },
+    "chemical_system": {
+      "type": "string",
+      "description": "Chemical system, participating atom types separated with -",
+      "category": "chemical_system",
+      "mattergen": {
+          "name": "chemical_system",
+          "pretrained_models": ["chemical_system", "chemical_system_energy_above_hull"]
+      }
+    },
     "elements": {
       "type": "array",
       "description": "List of unique chemical elements present",
@@ -26,6 +35,9 @@
       "alexandria": {
         "name": "elements",
         "retrievable": true
+      },
+      "mattergen":{
+        "name":"elements"
       }
     },
     "id": {
@@ -113,6 +125,28 @@
         "name": "_alexandria_band_gap_direct",
         "retrievable": true,
         "range_support": true
+      },
+      "mattergen": {
+        "name": "dft_band_gap",
+        "pretrained_models": ["dft_band_gap"]
+      }
+    },
+    "mag_density": {
+      "type": "float",
+      "description": "Mag density",
+      "unit": "T",
+      "mattergen":{
+        "name": "dft_mag_density",
+        "pretrained_models": ["dft_mag_density", "dft_mag_density_hhi_score"]
+      }
+    },
+    "hii_score": {
+      "type": "float",
+      "description": "HII score (?)",
+      "unit": "???",
+      "mattergen":{
+        "name": "hii_score",
+        "pretrained_models": ["dft_mag_density_hhi_score"]
       }
     },
     "formation_energy_per_atom": {
@@ -134,6 +168,10 @@
         "name": "_alexandria_space_group",
         "retrievable": true,
         "range_support": true
+      },
+      "mattergen": {
+        "name": "space_group",
+        "pretrained_models":["space_group"]
       }
     },
     "hull_distance": {
@@ -145,6 +183,10 @@
         "name": "_alexandria_hull_distance",
         "retrievable": true,
         "range_support": true
+      },
+      "mattergen":{
+        "name":"energy_above_hull",
+        "pretrained_models": ["chemical_system_energy_above_hull"]
       }
     },
     "magnetization": {
@@ -156,6 +198,15 @@
         "name": "_alexandria_magnetization",
         "retrievable": true,
         "range_support": true
+      }
+    },
+    "bulk_modulus":{
+      "type": "float",
+      "description": "Bulk modulus",
+      "unit": "Pa",
+      "mattergen":{
+        "name": "ml_bulk_modulus",
+        "pretrained_models":["ml_bulk_modulus"]
       }
     },
     "energy": {

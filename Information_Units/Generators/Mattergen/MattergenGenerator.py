@@ -2,8 +2,7 @@
 MattergenGenerator — EMOS ↔ MatterGen Docker interface
 =======================================================
 This file lives on the **host** (EMOS backend) and communicates with the
-MatterGen container over HTTP.  It extends ``BaseGenerator`` so it plugs
-into the existing ``GeneratorFactory`` / ``generator_registry`` seamlessly.
+MatterGen container over HTTP.  
 
 The MatterGen container runs a FastAPI server (see ``docker/mattergen_api.py``)
 and is started via ``docker compose up mattergen``.
@@ -36,6 +35,13 @@ from Information_Units.Generators.BaseGenerator import BaseGenerator
 _DEFAULT_API_URL = "http://localhost:8100"
 _DEFAULT_TIMEOUT = 600  # seconds
 
+_MODEL_PROPERTIES_MAP = {"chemical_system":["chemical_system"],
+                         "chemical_system_energy_above_hull":["chemical_system", "energy_above_hull"],
+                         "dft_band_gap":["dft_band_gap"],
+                         "dft_mag_density":["dft_mag_density"],
+                         "dft_mag_density_hhi_score":["dft_mag_density", "hhi_score"],
+                         "ml_bulk_modulus":["ml_bulk_modulus"],
+                         "space_group":["space_group"]}
 
 class MattergenGenerator(BaseGenerator):
     """Client-side interface to the containerised MatterGen service."""
@@ -138,6 +144,9 @@ class MattergenGenerator(BaseGenerator):
             )
             resp.raise_for_status()
             result = resp.json()
+
+            print(resp)
+
 
             if self.logger:
                 self.logger.log(

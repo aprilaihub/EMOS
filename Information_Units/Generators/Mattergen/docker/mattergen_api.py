@@ -14,6 +14,7 @@ GET  /results/{job}   – retrieve results of a completed generation job
 
 from __future__ import annotations
 
+import io
 import json
 import logging
 import os
@@ -45,6 +46,8 @@ logger = logging.getLogger("mattergen_api")
 # MatterGen imports (available inside the container after pip install)
 # ---------------------------------------------------------------------------
 from pymatgen.core.structure import Structure
+from pymatgen.core.lattice import Lattice
+from pymatgen.io.cif import CifWriter
 
 from mattergen.common.data.types import TargetProperty
 from mattergen.common.utils.data_classes import MatterGenCheckpointInfo
@@ -120,6 +123,7 @@ class GenerateResponse(BaseModel):
     message: str
     num_structures: int = 0
     structures: list[dict] | None = None
+    cif_strings: list[str] | None = None
     debug_logs: list[str] | None = None
 
 
@@ -136,6 +140,12 @@ _jobs: dict[str, dict] = {}
 def _structure_to_dict(structure: Structure) -> dict:
     """Convert a pymatgen Structure to a JSON-serialisable dict."""
     return json.loads(structure.to_json())
+
+
+def _structure_to_cif(structure: Structure) -> str:
+    """Convert a pymatgen Structure to a CIF-format string."""
+    cifstr=structure.to(fmt='cif')
+    return cifstr
 
 
 def _run_generation(job_id: str, req: GenerateRequest) -> None:
@@ -213,8 +223,9 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
         t_gen = time.time() - t1
         _log(f"Generation complete: {len(structures)} structure(s) in {t_gen:.1f}s")
 
-        _log("Serialising structures to JSON...")
+        _log("Serialising structures to JSON and CIF...")
         results = [_structure_to_dict(s) for s in structures]
+        cifs = [_structure_to_cif(s) for s in structures]
 
         # Log a brief summary per structure
         for i, s in enumerate(structures):
@@ -231,6 +242,7 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
                 "status": JobStatus.completed,
                 "num_structures": len(results),
                 "structures": results,
+                "cif_strings": cifs,
                 "message": f"Generated {len(results)} structure(s) in {t_total:.1f}s.",
                 "debug_logs": logs,
             }
@@ -255,8 +267,8 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
 
 @app.get("/health")
 def health():
-    logger.debug("Health check requested")
-    return {"status": "ok", "service": "mattergen"}
+    logger.debug("Mattergen service health check requested")
+    return {"status": "ok", "service": "mattergen", "message": "Mattergen OK"}
 
 
 @app.get("/info")
@@ -318,6 +330,7 @@ def generate(req: GenerateRequest):
         message=job["message"],
         num_structures=job.get("num_structures", 0),
         structures=job.get("structures"),
+        cif_strings=job.get("cif_strings"),
         debug_logs=job.get("debug_logs"),
     )
 
@@ -334,5 +347,88 @@ def get_results(job_id: str):
         message=job["message"],
         num_structures=job.get("num_structures", 0),
         structures=job.get("structures"),
+        cif_strings=job.get("cif_strings"),
         debug_logs=job.get("debug_logs"),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Demo / testing endpoint — returns a hardcoded structure so the front-end
+# can be developed without waiting for a real generation run.
+# The structure is taken from data/mattergen/outputs/0f249ec2e65b/generated_crystals.extxyz
+# ---------------------------------------------------------------------------
+
+_DEMO_STRUCTURE = Structure(
+    lattice=Lattice([
+        [10.356451988220215, 0.0, 0.16560612618923187],
+        [-2.4214442593693084, 9.319854048729752, -3.681112766265869],
+        [0.0, 0.0, 11.25183391571045],
+    ]),
+    species=[
+        "Sr", "Sr", "I", "Cs", "Sr", "I", "Cs", "I", "I", "Cs",
+        "I", "Sr", "I", "I", "I", "I", "I", "Cs", "I", "I",
+    ],
+    coords=[
+        [4.89878152, 9.27800329, 2.73218545],
+        [2.20597701, 6.46096994, 6.99037194],
+        [2.38055207, 7.48180384, 3.70299452],
+        [2.63326627, 1.44135240, 8.48418443],
+        [6.52382344, 5.54208093, -1.71133506],
+        [5.90285078, 8.52808717, -0.38063449],
+        [3.22416641, 3.96575405, 2.20541075],
+        [5.26742997, 1.94922166, 4.96712937],
+        [7.96304556, 8.44236862, 3.35836302],
+        [-0.40622897, 9.15733615, -0.10823609],
+        [7.32503800, 2.33721565, 8.66478728],
+        [7.77087984, 1.05645209, 0.50339618],
+        [-0.88914865, 6.43593992, 8.28276809],
+        [5.47983506, 7.20897067, 6.73368996],
+        [4.58091570, 0.27485338, 0.50484940],
+        [3.29117519, 5.00603318, -1.51386601],
+        [1.28103117, 3.65560166, 5.53127688],
+        [8.08213535, 4.88278960, 4.93179978],
+        [0.45591711, 1.88368216, 0.55892154],
+        [7.00212069, 4.21551731, 1.25900193],
+    ],
+    coords_are_cartesian=True,
+)
+
+_DEMO_STRUCTURE_DICT = _structure_to_dict(_DEMO_STRUCTURE)
+_DEMO_CIF_STRING = _structure_to_cif(_DEMO_STRUCTURE)
+_DEMO_JOB_ID = "demo000000"
+
+
+@app.post("/demo/generate", response_model=GenerateResponse)
+def demo_generate():
+    """Return a fake generation response for UI/integration testing.
+
+    Uses a real structure from a previous MatterGen run so the data is
+    physically meaningful.  No model loading or GPU work is performed.
+    """
+    logger.info("POST /demo/generate — returning canned response")
+
+    formula = _DEMO_STRUCTURE.composition.reduced_formula
+    n_sites = _DEMO_STRUCTURE.num_sites
+
+    # Also store in the job store so /results/<id> works
+    _jobs[_DEMO_JOB_ID] = {
+        "status": JobStatus.completed,
+        "message": f"Demo: 1 structure returned ({formula}, {n_sites} sites, from cached run 0f249ec2e65b).",
+        "num_structures": 1,
+        "structures": [_DEMO_STRUCTURE_DICT],
+        "cif_strings": [_DEMO_CIF_STRING],
+        "debug_logs": [
+            "[INFO] Demo mode — no model was loaded.",
+            f"[INFO] Returning cached structure: {formula} ({n_sites} sites).",
+        ],
+    }
+
+    return GenerateResponse(
+        job_id=_DEMO_JOB_ID,
+        status=JobStatus.completed,
+        message=_jobs[_DEMO_JOB_ID]["message"],
+        num_structures=1,
+        structures=[_DEMO_STRUCTURE_DICT],
+        cif_strings=[_DEMO_CIF_STRING],
+        debug_logs=_jobs[_DEMO_JOB_ID]["debug_logs"],
     )
