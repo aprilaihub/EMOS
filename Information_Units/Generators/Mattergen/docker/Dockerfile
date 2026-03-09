@@ -59,8 +59,8 @@ RUN mkdir -p /app/outputs /app/models
 # Expose the FastAPI port
 EXPOSE 8000
 
-# Health-check: hit the /health endpoint every 30s
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+# Health-check: hit the /health endpoint every 5 minutes (sparse to avoid log flooding)
+HEALTHCHECK --interval=300s --timeout=10s --retries=2 --start-period=30s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
 
 # Run the FastAPI server

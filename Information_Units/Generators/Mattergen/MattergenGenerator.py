@@ -35,16 +35,14 @@ from Information_Units.Generators.BaseGenerator import BaseGenerator
 _DEFAULT_API_URL = "http://localhost:8100"
 _DEFAULT_TIMEOUT = 600  # seconds
 
-_MODEL_PROPERTIES_MAP = {"chemical_system":["chemical_system"],
-                         "chemical_system_energy_above_hull":["chemical_system", "energy_above_hull"],
-                         "dft_band_gap":["dft_band_gap"],
-                         "dft_mag_density":["dft_mag_density"],
-                         "dft_mag_density_hhi_score":["dft_mag_density", "hhi_score"],
-                         "ml_bulk_modulus":["ml_bulk_modulus"],
-                         "space_group":["space_group"]}
+
 
 class MattergenGenerator(BaseGenerator):
     """Client-side interface to the containerised MatterGen service."""
+
+    # Class-level health cache shared across instances
+    _health_cache: dict = {"healthy": None, "checked_at": 0.0}
+    _HEALTH_CACHE_TTL = 120  # seconds — only re-check health every 2 minutes
 
     def __init__(self, generator_name: str = "mattergen", logger=None):
         super().__init__(generator_name, logger)
@@ -114,6 +112,29 @@ class MattergenGenerator(BaseGenerator):
                 self.logger.log(msg, "error")
             return {"status": "error", "message": msg}
 
+        # ---- demo shortcut: call /demo/generate, skip payload build ----
+        if inputs.get("pretrained_name") == "demo":
+            if self.logger:
+                self.logger.log("MatterGen: using demo endpoint (fake response)", "info")
+            try:
+                resp = requests.post(
+                    f"{self.api_url}/demo/generate",
+                    timeout=30,
+                )
+                resp.raise_for_status()
+                result = resp.json()
+                if self.logger:
+                    self.logger.log(
+                        f"MatterGen demo: {result.get('num_structures', 0)} structure(s)",
+                        "info",
+                    )
+                return result
+            except requests.RequestException as exc:
+                msg = f"MatterGen demo: HTTP error — {exc}"
+                if self.logger:
+                    self.logger.log(msg, "error")
+                return {"status": "error", "message": msg}
+
         # ---- build request payload ----
         payload = {
             "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
@@ -159,12 +180,16 @@ class MattergenGenerator(BaseGenerator):
             msg = f"MatterGen: request timed out after {self.timeout}s"
             if self.logger:
                 self.logger.log(msg, "error")
+            # Invalidate health cache so next call re-checks
+            MattergenGenerator._health_cache["healthy"] = None
             return {"status": "error", "message": msg}
 
         except requests.RequestException as exc:
             msg = f"MatterGen: HTTP error — {exc}"
             if self.logger:
                 self.logger.log(msg, "error")
+            # Invalidate health cache so next call re-checks
+            MattergenGenerator._health_cache["healthy"] = None
             return {"status": "error", "message": msg}
 
     # ------------------------------------------------------------------
@@ -172,12 +197,26 @@ class MattergenGenerator(BaseGenerator):
     # ------------------------------------------------------------------
 
     def is_healthy(self) -> bool:
-        """Return True if the MatterGen container is reachable."""
+        """Return True if the MatterGen container is reachable.
+
+        Results are cached for ``_HEALTH_CACHE_TTL`` seconds so that
+        rapid-fire calls (e.g. multiple generators processed in a row)
+        do not flood the container with health-check requests.
+        """
+        now = time.time()
+        cache = MattergenGenerator._health_cache
+        if cache["healthy"] is not None and (now - cache["checked_at"]) < self._HEALTH_CACHE_TTL:
+            return cache["healthy"]
+
         try:
             resp = requests.get(f"{self.api_url}/health", timeout=5)
-            return resp.status_code == 200
+            healthy = resp.status_code == 200
         except Exception:
-            return False
+            healthy = False
+
+        cache["healthy"] = healthy
+        cache["checked_at"] = now
+        return healthy
 
     def get_available_models(self) -> list[str]:
         """Return the list of pretrained model names from the container."""

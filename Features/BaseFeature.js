@@ -1,3 +1,25 @@
+// ── Generator Inputs Registry ────────────────────────────────────────
+// Maps the sidebar checkbox `value` (e.g. "mattergen") to the script
+// that exposes a `___Inputs` class (with render / attachListeners /
+// collectValues methods).
+//
+// To register a new generator's input UI, add an entry here.
+const GENERATOR_INPUTS_REGISTRY = {
+    mattergen: {
+        script: './Information_Units/Generators/Mattergen/MattergenInputs.js',
+        className: 'MattergenInputs',
+    },
+    // gnome: {
+    //     script: './Information_Units/Generators/Gnome/GnomeInputs.js',
+    //     className: 'GnomeInputs',
+    // },
+    // Add more generators here as their ___Inputs.js files are created.
+};
+
+if (typeof window !== 'undefined') {
+    window.GENERATOR_INPUTS_REGISTRY = GENERATOR_INPUTS_REGISTRY;
+}
+
 // Base Feature Class - Foundation for all EMOS features
 class BaseFeature {
     constructor(featureId, featureName, featureDescription) {
@@ -6,6 +28,9 @@ class BaseFeature {
         this.featureDescription = featureDescription;
         this.isProcessing = false;
         this.results = null;
+
+        /** @type {Object.<string, object>} generator value → ___Inputs instance */
+        this._generatorInputInstances = {};
     }
 
     // Create the complete feature interface
@@ -64,11 +89,11 @@ class BaseFeature {
             <div class="log-terminal" id="logTerminal_${this.featureId}">
                 <div class="log-header">
                     <span>Processing Log</span>
-                    <button class="log-clear-btn" onclick="window.features[${this.featureId}].clearLogs()">Clear</button>
+                    <button type="button" class="log-clear-btn" onclick="window.features[${this.featureId}].clearLogs()">Clear</button>
                 </div>
                 <div class="log-content" id="logContent_${this.featureId}"></div>
             </div>
-            <button class="process-btn" id="processBtn_${this.featureId}" onclick="window.features[${this.featureId}].startProcessing()">Start Processing</button>
+            <button type="button" class="process-btn" id="processBtn_${this.featureId}" onclick="window.features[${this.featureId}].startProcessing()">Start Processing</button>
         `;
     }
 
@@ -285,6 +310,119 @@ class BaseFeature {
         return element.value;
     }
 
+    // ── Generator-inputs helpers ─────────────────────────────────────
+    /**
+     * Return the list of currently-checked generator checkbox values
+     * from the sidebar (e.g. ["mattergen", "gnome"]).
+     */
+    _getActiveGeneratorKeys() {
+        const checkboxes = document.querySelectorAll(
+            "#generatorsList input[type='checkbox']:checked"
+        );
+        return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    /**
+     * Build an HTML string that contains the input sections for **every
+     * checked generator that has an entry in GENERATOR_INPUTS_REGISTRY**.
+     *
+     * Each generator gets its own `<div class="generator-inputs-block">`
+     * wrapper so that styling is straightforward.
+     *
+     * After injecting this HTML into the DOM, call
+     * `this.attachGeneratorInputListeners()` to wire up the dynamic
+     * behaviour (e.g. MatterGen's model-dropdown → property-fields swap).
+     */
+    renderGeneratorInputsHTML() {
+        const activeKeys = this._getActiveGeneratorKeys();
+        let html = '';
+
+        // Reset tracked instances – we'll (re)create them below.
+        this._generatorInputInstances = {};
+
+        for (const key of activeKeys) {
+            const entry = GENERATOR_INPUTS_REGISTRY[key];
+            if (!entry) continue;                       // no UI registered
+
+            const InputClass = window[entry.className];
+            if (!InputClass) continue;                  // script not loaded yet
+
+            const instance = new InputClass(this.featureId);
+            this._generatorInputInstances[key] = instance;
+            html += `<div class="generator-inputs-block" data-generator="${key}">
+                        ${instance.render()}
+                     </div>`;
+        }
+
+        if (html === '') {
+            html = '<p class="mattergen-hint"><em>Select one or more generators from the sidebar to configure their parameters.</em></p>';
+        }
+
+        return html;
+    }
+
+    /**
+     * Call `attachListeners()` on every generator-input instance that was
+     * created during the last `renderGeneratorInputsHTML()` call.
+     *
+     * **Must be called after the HTML has been injected into the DOM.**
+     */
+    attachGeneratorInputListeners() {
+        for (const inst of Object.values(this._generatorInputInstances)) {
+            if (typeof inst.attachListeners === 'function') {
+                inst.attachListeners();
+            }
+        }
+    }
+
+    /**
+     * Collect values from all active generator-input instances and return
+     * an object keyed by generator name.
+     * Example: `{ mattergen: { pretrained_name: "dft_band_gap", ... } }`
+     */
+    collectGeneratorInputValues() {
+        const result = {};
+        for (const [key, inst] of Object.entries(this._generatorInputInstances)) {
+            if (typeof inst.collectValues === 'function') {
+                result[key] = inst.collectValues();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Dynamically load the ___Inputs.js scripts for all currently-checked
+     * generators that have an entry in the registry but whose class hasn't
+     * been loaded yet. Returns a Promise that resolves when all scripts
+     * are loaded.
+     */
+    async loadGeneratorInputScripts() {
+        const activeKeys = this._getActiveGeneratorKeys();
+        const loads = [];
+
+        for (const key of activeKeys) {
+            const entry = GENERATOR_INPUTS_REGISTRY[key];
+            if (!entry) continue;
+            if (window[entry.className]) continue;       // already loaded
+
+            // Reuse the global `loadScript` helper defined in script.js
+            if (typeof loadScript === 'function') {
+                loads.push(loadScript(entry.script));
+            } else {
+                // Inline fallback if loadScript isn't global
+                loads.push(new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = entry.script;
+                    s.onload = resolve;
+                    s.onerror = () => reject(new Error(`Failed to load ${entry.script}`));
+                    document.head.appendChild(s);
+                }));
+            }
+        }
+
+        return Promise.all(loads);
+    }
+
     async callPythonBackend() {
         // Collect input data for this feature
         const inputs = this.collectInputData();
@@ -364,6 +502,9 @@ class BaseFeature {
         });
         inputs['active_databases'] = activeDatabases;
         
+        // Collect generator-specific input values (e.g. MatterGen model & properties)
+        inputs['generator_inputs'] = this.collectGeneratorInputValues();
+
         return inputs;
     }
 }
