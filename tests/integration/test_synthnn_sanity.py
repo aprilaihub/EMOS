@@ -36,6 +36,20 @@ def mock_logger():
     return logger
 
 
+def assert_prediction_envelope(result):
+    """Validate standard predictor response envelope for a single file."""
+    assert isinstance(result, dict)
+    assert 'status' in result
+    assert result['status'] in {'ok', 'error', 'partial', 'skipped'}
+    assert 'predictions' in result
+    assert isinstance(result['predictions'], dict)
+    assert 'synthesizable' in result['predictions']
+    assert 'synthesizability_score' in result['predictions']
+    assert 'warnings' in result
+    assert isinstance(result['warnings'], list)
+    assert 'error' in result
+
+
 @pytest.mark.integration
 @pytest.mark.network
 @pytest.mark.slow
@@ -69,13 +83,13 @@ class TestSynthnnRealModel:
         
         assert 'test.cif' in results
         result = results['test.cif']
-        
-        # Should have valid prediction
-        assert result['synthesizable'] is not None
-        assert result['synthesizability_score'] is not None
-        
-        # Score should be in expected range for common materials
-        score = result['synthesizability_score']
+
+        assert_prediction_envelope(result)
+        assert result['status'] == 'ok'
+        assert result['predictions']['synthesizable'] is not None
+        assert result['predictions']['synthesizability_score'] is not None
+
+        score = result['predictions']['synthesizability_score']
         min_score, max_score = expected_score_range
         assert min_score <= score <= max_score, \
             f"Score {score} not in expected range [{min_score}, {max_score}]"
@@ -99,16 +113,17 @@ class TestSynthnnRealModel:
         
         # Both should have valid scores
         for filename, result in results.items():
-            assert result['synthesizable'] is not None
-            assert result['synthesizability_score'] is not None
-            assert 0.0 <= result['synthesizability_score'] <= 1.0
+            assert_prediction_envelope(result)
+            assert result['status'] == 'ok'
+            assert result['predictions']['synthesizable'] is not None
+            assert result['predictions']['synthesizability_score'] is not None
+            assert 0.0 <= result['predictions']['synthesizability_score'] <= 1.0
     
     def test_predict_invalid_cif(self, cif_files, mock_logger):
         """Verify invalid CIF is handled gracefully with real model."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_invalid',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -117,18 +132,18 @@ class TestSynthnnRealModel:
         
         assert 'invalid.cif' in results
         result = results['invalid.cif']
-        
-        # Should have error, not crash
-        assert result['synthesizable'] is None
-        assert result['synthesizability_score'] is None
-        assert 'error' in result
+
+        assert_prediction_envelope(result)
+        assert result['status'] == 'error'
+        assert result['predictions']['synthesizable'] is None
+        assert result['predictions']['synthesizability_score'] is None
+        assert result['error'] is not None
     
     def test_predict_mixed_batch_with_real_model(self, cif_files, mock_logger):
         """Verify batch with valid and invalid files works with real model."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_mixed',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -138,21 +153,21 @@ class TestSynthnnRealModel:
         })
         
         assert len(results) == 3
-        
-        # Valid files should have predictions
-        assert results['Al2O3.cif']['synthesizable'] is not None
-        assert results['SiO2.cif']['synthesizable'] is not None
-        
-        # Invalid file should have error
-        assert results['invalid.cif']['synthesizable'] is None
-        assert 'error' in results['invalid.cif']
+
+        assert results['Al2O3.cif']['status'] == 'ok'
+        assert results['SiO2.cif']['status'] == 'ok'
+        assert results['Al2O3.cif']['predictions']['synthesizable'] is not None
+        assert results['SiO2.cif']['predictions']['synthesizable'] is not None
+
+        assert results['invalid.cif']['status'] == 'error'
+        assert results['invalid.cif']['predictions']['synthesizable'] is None
+        assert results['invalid.cif']['error'] is not None
     
     def test_predict_output_structure(self, cif_files, mock_logger):
         """Verify output has correct structure with real model."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_structure',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -163,14 +178,10 @@ class TestSynthnnRealModel:
         assert 'Al2O3.cif' in results
         
         result = results['Al2O3.cif']
-        assert isinstance(result, dict)
-        assert 'synthesizable' in result
-        assert 'synthesizability_score' in result
-        
-        # Should be boolean or None
-        assert isinstance(result['synthesizable'], (bool, type(None)))
-        # Should be float or None
-        assert isinstance(result['synthesizability_score'], (float, type(None)))
+        assert_prediction_envelope(result)
+
+        assert isinstance(result['predictions']['synthesizable'], (bool, type(None)))
+        assert isinstance(result['predictions']['synthesizability_score'], (float, type(None)))
     
     def test_predict_json_serializable(self, cif_files, mock_logger):
         """Verify output is JSON-serializable with real model."""
@@ -178,8 +189,7 @@ class TestSynthnnRealModel:
         
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_json',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -200,8 +210,7 @@ class TestSynthnnRealModel:
         """Verify scores have reasonable precision."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_precision',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -209,7 +218,7 @@ class TestSynthnnRealModel:
         })
         
         result = results['Al2O3.cif']
-        score = result['synthesizability_score']
+        score = result['predictions']['synthesizability_score']
         
         if score is not None:
             # Score should be a valid probability
@@ -228,8 +237,7 @@ class TestSynthnnModelPerformance:
         """Verify same input produces same output (deterministic behavior)."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_deterministic',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         # Predict twice
@@ -242,8 +250,8 @@ class TestSynthnnModelPerformance:
         })
         
         # Should get same results
-        score1 = results1['Al2O3.cif']['synthesizability_score']
-        score2 = results2['Al2O3.cif']['synthesizability_score']
+        score1 = results1['Al2O3.cif']['predictions']['synthesizability_score']
+        score2 = results2['Al2O3.cif']['predictions']['synthesizability_score']
         
         assert score1 == score2, "Model should be deterministic"
     
@@ -251,8 +259,7 @@ class TestSynthnnModelPerformance:
         """Verify synthesizable threshold is applied correctly."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_threshold',
-            logger=mock_logger,
-            # Real model is used by default
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -260,10 +267,11 @@ class TestSynthnnModelPerformance:
         })
         
         result = results['Al2O3.cif']
-        
-        # If score >= 0.70, should be synthesizable
-        if result['synthesizability_score'] is not None:
-            if result['synthesizability_score'] >= 0.70:
-                assert result['synthesizable'] is True
+
+        if result['status'] == 'ok':
+            score = result['predictions']['synthesizability_score']
+            synthesizable = result['predictions']['synthesizable']
+            if score >= 0.70:
+                assert synthesizable is True
             else:
-                assert result['synthesizable'] is False
+                assert synthesizable is False

@@ -105,6 +105,20 @@ def mock_model_helper():
             yield
 
 
+def assert_prediction_envelope(result):
+    """Validate standard predictor response envelope for a single file."""
+    assert isinstance(result, dict)
+    assert 'status' in result
+    assert result['status'] in {'ok', 'error', 'partial', 'skipped'}
+    assert 'predictions' in result
+    assert isinstance(result['predictions'], dict)
+    assert 'synthesizable' in result['predictions']
+    assert 'synthesizability_score' in result['predictions']
+    assert 'warnings' in result
+    assert isinstance(result['warnings'], list)
+    assert 'error' in result
+
+
 # ============================================================================
 # Test CompositionHelper
 # ============================================================================
@@ -298,15 +312,13 @@ class TestSynthnnPredictor:
         
         assert 'Al2O3.cif' in results
         result = results['Al2O3.cif']
-        
-        # Check required fields
-        assert 'synthesizable' in result
-        assert 'synthesizability_score' in result
-        
-        # Al2O3 should be synthesizable with high score
-        assert result['synthesizable'] is not None
-        assert result['synthesizability_score'] is not None
-        assert 0.0 <= result['synthesizability_score'] <= 1.0
+
+        assert_prediction_envelope(result)
+        assert result['status'] == 'ok'
+        assert result['predictions']['synthesizable'] is not None
+        assert result['predictions']['synthesizability_score'] is not None
+        assert 0.0 <= result['predictions']['synthesizability_score'] <= 1.0
+        assert result['error'] is None
     
     def test_predict_invalid_filepath(self, mock_logger):
         """Handle non-existent file gracefully."""
@@ -318,11 +330,12 @@ class TestSynthnnPredictor:
         
         assert 'missing.cif' in results
         result = results['missing.cif']
-        
-        # Should have error
-        assert result['synthesizable'] is None
-        assert result['synthesizability_score'] is None
-        assert 'error' in result
+
+        assert_prediction_envelope(result)
+        assert result['status'] == 'error'
+        assert result['predictions']['synthesizable'] is None
+        assert result['predictions']['synthesizability_score'] is None
+        assert result['error'] is not None
         assert 'File not found' in result['error']
     
     def test_predict_invalid_cif_content(self, temp_cif_files, mock_logger, mock_model_helper):
@@ -335,11 +348,12 @@ class TestSynthnnPredictor:
         
         assert 'invalid.cif' in results
         result = results['invalid.cif']
-        
-        # Should have error
-        assert result['synthesizable'] is None
-        assert result['synthesizability_score'] is None
-        assert 'error' in result
+
+        assert_prediction_envelope(result)
+        assert result['status'] == 'error'
+        assert result['predictions']['synthesizable'] is None
+        assert result['predictions']['synthesizability_score'] is None
+        assert result['error'] is not None
     
     def test_predict_output_structure(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify output has correct structure."""
@@ -358,9 +372,7 @@ class TestSynthnnPredictor:
         
         # Each result should be a dict
         for filename, prediction in results.items():
-            assert isinstance(prediction, dict)
-            assert 'synthesizable' in prediction
-            assert 'synthesizability_score' in prediction
+            assert_prediction_envelope(prediction)
     
     def test_predict_mixed_batch(self, temp_cif_files, mock_logger, mock_model_helper):
         """Batch with both valid and invalid files."""
@@ -373,14 +385,15 @@ class TestSynthnnPredictor:
         })
         
         assert len(results) == 3
-        
-        # Valid files should have valid predictions
-        assert results['Al2O3.cif']['synthesizable'] is not None
-        assert results['SiO2.cif']['synthesizable'] is not None
-        
-        # Invalid file should have error
-        assert results['invalid.cif']['synthesizable'] is None
-        assert 'error' in results['invalid.cif']
+
+        assert results['Al2O3.cif']['status'] == 'ok'
+        assert results['SiO2.cif']['status'] == 'ok'
+        assert results['Al2O3.cif']['predictions']['synthesizable'] is not None
+        assert results['SiO2.cif']['predictions']['synthesizable'] is not None
+
+        assert results['invalid.cif']['status'] == 'error'
+        assert results['invalid.cif']['predictions']['synthesizable'] is None
+        assert results['invalid.cif']['error'] is not None
         
         # Logger should have been called
         mock_logger.log.assert_called()
@@ -396,11 +409,13 @@ class TestSynthnnPredictor:
         
         # Both should have high scores and be synthesizable
         for result in results.values():
-            if result['synthesizable'] is not None:
-                if result['synthesizability_score'] >= 0.70:
-                    assert result['synthesizable'] is True
+            if result['status'] == 'ok':
+                score = result['predictions']['synthesizability_score']
+                synthesizable = result['predictions']['synthesizable']
+                if score >= 0.70:
+                    assert synthesizable is True
                 else:
-                    assert result['synthesizable'] is False
+                    assert synthesizable is False
     
     def test_predict_score_is_float(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify scores are floats with correct precision."""
@@ -411,14 +426,14 @@ class TestSynthnnPredictor:
         })
         
         result = results['Al2O3.cif']
-        score = result['synthesizability_score']
+        score = result['predictions']['synthesizability_score']
         
         assert isinstance(score, float)
         # Score should be rounded to 4 decimals
         assert len(str(score).split('.')[-1]) <= 4
     
-    def test_predict_warnings_optional(self, temp_cif_files, mock_logger, mock_model_helper):
-        """Warnings key only present when warnings exist."""
+    def test_predict_warnings_list(self, temp_cif_files, mock_logger, mock_model_helper):
+        """Warnings key is always present and contains a list."""
         predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
@@ -426,10 +441,7 @@ class TestSynthnnPredictor:
         })
         
         result = results['Al2O3.cif']
-        # High score materials shouldn't have warnings in Phase 1
-        # (unless implementation adds them)
-        if 'warnings' in result:
-            assert isinstance(result['warnings'], list)
+        assert isinstance(result['warnings'], list)
     
     def test_predict_logging(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify prediction operations are logged."""
@@ -499,10 +511,11 @@ class TestSynthnnIntegration:
         for filename in input_data.keys():
             assert filename in results
             result = results[filename]
-            assert result['synthesizable'] is True
-            assert result['synthesizability_score'] is not None
-            assert 0.0 <= result['synthesizability_score'] <= 1.0
-            assert 'error' not in result
+            assert result['status'] == 'ok'
+            assert result['predictions']['synthesizable'] is True
+            assert result['predictions']['synthesizability_score'] is not None
+            assert 0.0 <= result['predictions']['synthesizability_score'] <= 1.0
+            assert result['error'] is None
     
     def test_full_workflow_with_error_recovery(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify one error doesn't crash batch."""
@@ -516,14 +529,15 @@ class TestSynthnnIntegration:
         
         # All three should be in results
         assert len(results) == 3
-        
-        # Valid files should have predictions
-        assert results['Al2O3.cif']['synthesizable'] is not None
-        assert results['SiO2.cif']['synthesizable'] is not None
-        
-        # Invalid file should have error but batch continued
-        assert results['invalid.cif']['synthesizable'] is None
-        assert 'error' in results['invalid.cif']
+
+        assert results['Al2O3.cif']['status'] == 'ok'
+        assert results['SiO2.cif']['status'] == 'ok'
+        assert results['Al2O3.cif']['predictions']['synthesizable'] is not None
+        assert results['SiO2.cif']['predictions']['synthesizable'] is not None
+
+        assert results['invalid.cif']['status'] == 'error'
+        assert results['invalid.cif']['predictions']['synthesizable'] is None
+        assert results['invalid.cif']['error'] is not None
 
 
 # ============================================================================
@@ -549,7 +563,8 @@ class TestEdgeCases:
         # All should succeed
         assert len(results) == 10
         for result in results.values():
-            assert result['synthesizable'] is True
+            assert result['status'] == 'ok'
+            assert result['predictions']['synthesizable'] is True
     
     def test_predict_file_with_special_chars_in_name(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle filenames with special characters."""
@@ -560,7 +575,8 @@ class TestEdgeCases:
         })
         
         assert 'material-with_special.chars123.cif' in results
-        assert results['material-with_special.chars123.cif']['synthesizable'] is True
+        assert results['material-with_special.chars123.cif']['status'] == 'ok'
+        assert results['material-with_special.chars123.cif']['predictions']['synthesizable'] is True
     
     def test_predict_very_simple_input(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle minimal valid input."""
@@ -571,4 +587,5 @@ class TestEdgeCases:
         })
         
         assert 'x.cif' in results
-        assert results['x.cif']['synthesizable'] is not None
+        assert results['x.cif']['status'] == 'ok'
+        assert results['x.cif']['predictions']['synthesizable'] is not None

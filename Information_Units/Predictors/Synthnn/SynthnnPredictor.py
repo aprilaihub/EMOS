@@ -11,7 +11,7 @@ class SynthnnPredictor(BasePredictor):
     Lightweight wrapper for SynthNN deep learning model predicting synthesizability.
     
     Input format:  {filename: filepath, ...}
-    Output format: {filename: {property: value, ...}, ...}
+    Output format: {filename: {status, predictions, warnings, error}, ...}
     """
     
     def __init__(self, predictor_name='synthnn', logger=None):
@@ -52,25 +52,39 @@ class SynthnnPredictor(BasePredictor):
                 Example:
                 {
                     'Al2O3.cif': {
-                        'synthesizable': True,
-                        'synthesizability_score': 0.92,
-                        'warnings': ['CIF missing symmetry information']  # optional
+                        'status': 'ok',
+                        'predictions': {
+                            'synthesizable': True,
+                            'synthesizability_score': 0.92
+                        },
+                        'warnings': [],
+                        'error': None
                     },
                     'FeO.cif': {
-                        'synthesizable': False,
-                        'synthesizability_score': 0.31
+                        'status': 'ok',
+                        'predictions': {
+                            'synthesizable': False,
+                            'synthesizability_score': 0.31
+                        },
+                        'warnings': ['Low synthesizability confidence (score near threshold)'],
+                        'error': None
                     },
                     'invalid.cif': {
-                        'synthesizable': None,
-                        'synthesizability_score': None,
+                        'status': 'error',
+                        'predictions': {
+                            'synthesizable': None,
+                            'synthesizability_score': None
+                        },
+                        'warnings': [],
                         'error': 'Failed to parse CIF: Invalid syntax'
                     }
                 }
         
         Notes:
             - Empty input returns empty dict: {}
-            - Failed files included in output with null values + 'error' key
-            - Non-critical warnings included as optional 'warnings' array
+            - Each file result contains: status, predictions, warnings, error
+            - Failed files use status='error' with null predictions
+            - Non-critical warnings are included in warnings array
             - Synthesizable threshold: score >= 0.70
             - All files processed independently (one failure doesn't crash batch)
         """
@@ -82,6 +96,17 @@ class SynthnnPredictor(BasePredictor):
             return {}
         
         results = {}
+
+        def _build_result(status, synthesizable=None, score=None, warnings=None, error=None):
+            return {
+                'status': status,
+                'predictions': {
+                    'synthesizable': synthesizable,
+                    'synthesizability_score': score
+                },
+                'warnings': warnings or [],
+                'error': error
+            }
         
         # Process each file
         for filename, filepath in input_data.items():
@@ -93,21 +118,13 @@ class SynthnnPredictor(BasePredictor):
                     error_msg = f"File not found: {filepath}"
                     if self.logger:
                         self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = {
-                        'synthesizable': None,
-                        'synthesizability_score': None,
-                        'error': error_msg
-                    }
+                    results[filename] = _build_result(status='error', error=error_msg)
                     continue
                 except Exception as e:
                     error_msg = f"Failed to read file: {str(e)}"
                     if self.logger:
                         self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = {
-                        'synthesizable': None,
-                        'synthesizability_score': None,
-                        'error': error_msg
-                    }
+                    results[filename] = _build_result(status='error', error=error_msg)
                     continue
                 
                 # Extract composition from CIF
@@ -117,11 +134,7 @@ class SynthnnPredictor(BasePredictor):
                     error_msg = "Failed to parse CIF: Invalid syntax or missing structure data"
                     if self.logger:
                         self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = {
-                        'synthesizable': None,
-                        'synthesizability_score': None,
-                        'error': error_msg
-                    }
+                    results[filename] = _build_result(status='error', error=error_msg)
                     continue
                 
                 # Normalize composition
@@ -135,21 +148,11 @@ class SynthnnPredictor(BasePredictor):
                     error_msg = f"Model prediction failed for composition: {normalized_formula}"
                     if self.logger:
                         self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = {
-                        'synthesizable': None,
-                        'synthesizability_score': None,
-                        'error': error_msg
-                    }
+                    results[filename] = _build_result(status='error', error=error_msg)
                     continue
                 
                 # Determine if synthesizable (threshold: 0.70)
                 synthesizable = score >= 0.70
-                
-                # Add result for successful prediction
-                result_entry = {
-                    'synthesizable': synthesizable,
-                    'synthesizability_score': round(score, 4)
-                }
                 
                 # Add warnings if present (can be extended for various warning conditions)
                 warnings = []
@@ -158,10 +161,12 @@ class SynthnnPredictor(BasePredictor):
                 if 0.65 <= score < 0.70:
                     warnings.append('Low synthesizability confidence (score near threshold)')
                 
-                if warnings:
-                    result_entry['warnings'] = warnings
-                
-                results[filename] = result_entry
+                results[filename] = _build_result(
+                    status='ok',
+                    synthesizable=synthesizable,
+                    score=round(score, 4),
+                    warnings=warnings
+                )
                 
                 if self.logger:
                     self.logger.log(
@@ -174,14 +179,10 @@ class SynthnnPredictor(BasePredictor):
                 error_msg = f"Unexpected error during prediction: {str(e)}"
                 if self.logger:
                     self.logger.log(f"{filename}: {error_msg}", 'error')
-                results[filename] = {
-                    'synthesizable': None,
-                    'synthesizability_score': None,
-                    'error': error_msg
-                }
+                results[filename] = _build_result(status='error', error=error_msg)
         
         if self.logger:
-            successful = sum(1 for r in results.values() if r['synthesizable'] is not None)
+            successful = sum(1 for r in results.values() if r['status'] == 'ok')
             self.logger.log(
                 f"SynthNN prediction complete: {successful}/{len(results)} successful",
                 'info'
