@@ -46,12 +46,10 @@ class TestSynthnnRealModel:
         """Verify real model can be initialized without errors."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_real',
-            logger=mock_logger,
-            use_mock=False
+            logger=mock_logger
         )
         
         assert predictor is not None
-        assert predictor.model_helper.use_mock is False
         assert predictor.model_helper.model is not None
     
     @pytest.mark.parametrize('cif_key,expected_score_range', [
@@ -62,8 +60,7 @@ class TestSynthnnRealModel:
         """Verify model scores known synthesizable materials appropriately."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_known',
-            logger=mock_logger,
-            use_mock=False
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -87,8 +84,7 @@ class TestSynthnnRealModel:
         """Test batch prediction with real model."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_batch',
-            logger=mock_logger,
-            use_mock=False
+            logger=mock_logger
         )
         
         results = predictor.predict({
@@ -112,7 +108,7 @@ class TestSynthnnRealModel:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_invalid',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({
@@ -132,7 +128,7 @@ class TestSynthnnRealModel:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_mixed',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({
@@ -156,7 +152,7 @@ class TestSynthnnRealModel:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_structure',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({
@@ -183,7 +179,7 @@ class TestSynthnnRealModel:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_json',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({
@@ -205,7 +201,7 @@ class TestSynthnnRealModel:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_precision',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({
@@ -233,7 +229,7 @@ class TestSynthnnModelPerformance:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_deterministic',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         # Predict twice
@@ -256,7 +252,7 @@ class TestSynthnnModelPerformance:
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn_threshold',
             logger=mock_logger,
-            use_mock=False
+            # Real model is used by default
         )
         
         results = predictor.predict({

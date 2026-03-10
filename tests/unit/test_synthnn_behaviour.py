@@ -12,12 +12,58 @@ Run: pytest tests/unit/test_synthnn_behaviour.py -v
 """
 
 import pytest
+import json
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from Information_Units.Predictors.Synthnn.composition_helper import CompositionHelper
 from Information_Units.Predictors.Synthnn.synthnn_model_helper import SynthnnModelHelper
 from Information_Units.Predictors.Synthnn import SynthnnPredictor
+
+
+# ============================================================================
+# Mock Functions
+# ============================================================================
+
+def mock_predict_batch(compositions):
+    """
+    Return deterministic fallback scores for testing.
+    
+    Mock scoring rules:
+    - Common synthesis oxides (Al2O3, SiO2, TiO2): 0.85-0.95
+    - Common stable compounds: 0.70-0.85
+    - Organic/complex elements (C, N, H): 0.50-0.65
+    - Unknown/rare compositions: 0.60-0.75
+    
+    Returns float scores 0.0-1.0 indicating synthesizability likelihood.
+    """
+    # Common highly synthesizable materials
+    common_high_score = {
+        'Al2O3': 0.92,      # Alumina (extremely common)
+        'Fe2O3': 0.88,      # Iron oxide (common)
+        'SiO2': 0.95,       # Silica (ubiquitous)
+        'TiO2': 0.90,       # Titania (widely used)
+        'ZnO': 0.87,        # Zinc oxide (common)
+        'MgO': 0.91,        # Magnesium oxide
+        'CaO': 0.89,        # Calcium oxide
+        'NaCl': 0.93,       # Rock salt (iconic structure)
+    }
+    
+    results = {}
+    
+    for comp in compositions:
+        if comp in common_high_score:
+            # Known high-synthesizability compounds
+            results[comp] = common_high_score[comp]
+        elif any(elem in comp for elem in ['C', 'N', 'H']):
+            # Organic or complex compounds - lower synthesizability
+            results[comp] = 0.55
+        else:
+            # Default for unknown simple inorganic materials
+            # Most simple binary oxides and salts have moderate-to-high synthesizability
+            results[comp] = 0.73
+    
+    return results
 
 
 # ============================================================================
@@ -44,6 +90,19 @@ def mock_logger():
     logger = Mock()
     logger.log = Mock()
     return logger
+
+
+@pytest.fixture
+def mock_model_helper():
+    """Mock the model loading and provide deterministic predictions."""
+    def _mock_init(self, logger=None):
+        """Mock init that doesn't load the real model."""
+        self.logger = logger
+        self.model = None  # No real model in tests
+    
+    with patch.object(SynthnnModelHelper, '__init__', _mock_init):
+        with patch.object(SynthnnModelHelper, 'predict_batch', side_effect=mock_predict_batch):
+            yield
 
 
 # ============================================================================
@@ -124,42 +183,33 @@ class TestCompositionNormalization:
 class TestModelBehaviour:
     """Test model wrapper logic with mock predictions."""
     
-    def test_model_init_with_mock(self, mock_logger):
-        """Initialize model helper with mock (Phase 1)."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+    def test_model_init(self, mock_logger, mock_model_helper):
+        """Initialize model helper."""
+        helper = SynthnnModelHelper(logger=mock_logger)
         
-        assert helper.use_mock is True
         assert helper.logger is mock_logger
-        # Model should not be loaded in mock mode
+        # Model should not be loaded in unit tests
         assert helper.model is None
     
-    def test_model_init_without_mock(self, mock_logger):
-        """Initialize model helper in real mode (Phase 2/3 placeholder)."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=False)
-        
-        assert helper.use_mock is False
-        # Should warn about real model not implemented
-        mock_logger.log.assert_called()
-    
-    def test_predict_batch_empty_list(self, mock_logger):
+    def test_predict_batch_empty_list(self, mock_logger, mock_model_helper):
         """Empty composition list returns empty dict."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         results = helper.predict_batch([])
         
         assert results == {}
     
-    def test_predict_batch_single_composition(self, mock_logger):
+    def test_predict_batch_single_composition(self, mock_logger, mock_model_helper):
         """Single composition prediction."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         results = helper.predict_batch(['Al2O3'])
         
         assert 'Al2O3' in results
         assert isinstance(results['Al2O3'], float)
         assert 0.0 <= results['Al2O3'] <= 1.0
     
-    def test_predict_batch_multiple_compositions(self, mock_logger):
+    def test_predict_batch_multiple_compositions(self, mock_logger, mock_model_helper):
         """Multiple composition predictions."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         compositions = ['Al2O3', 'Fe2O3', 'SiO2', 'ZnO']
         results = helper.predict_batch(compositions)
         
@@ -168,9 +218,9 @@ class TestModelBehaviour:
             assert comp in results
             assert isinstance(results[comp], float)
     
-    def test_mock_scores_deterministic(self, mock_logger):
+    def test_mock_scores_deterministic(self, mock_logger, mock_model_helper):
         """Mock scores are deterministic (same input → same output)."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         
         # Call twice with same input
         results1 = helper.predict_batch(['Al2O3', 'Fe2O3'])
@@ -182,9 +232,9 @@ class TestModelBehaviour:
         (['Al2O3', 'SiO2', 'TiO2'], 0.85, 'greater'),
         (['CH4', 'C2H6', 'NH3'], 0.65, 'less'),
     ])
-    def test_mock_score_ranges(self, mock_logger, compositions, threshold, comparison):
+    def test_mock_score_ranges(self, mock_logger, mock_model_helper, compositions, threshold, comparison):
         """Verify mock scores for different material types."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         results = helper.predict_batch(compositions)
         
         for score in results.values():
@@ -193,9 +243,9 @@ class TestModelBehaviour:
             else:
                 assert score < threshold
     
-    def test_predict_batch_unknown_composition(self, mock_logger):
+    def test_predict_batch_unknown_composition(self, mock_logger, mock_model_helper):
         """Unknown compositions get default moderate score."""
-        helper = SynthnnModelHelper(logger=mock_logger, use_mock=True)
+        helper = SynthnnModelHelper(logger=mock_logger)
         results = helper.predict_batch(['UnknownMaterial123'])
         
         assert 'UnknownMaterial123' in results
@@ -211,17 +261,15 @@ class TestModelBehaviour:
 class TestSynthnnPredictor:
     """Test SynthNN predictor orchestration and workflow."""
     
-    def test_predictor_init(self, mock_logger):
+    def test_predictor_init(self, mock_logger, mock_model_helper):
         """Initialize predictor successfully."""
         predictor = SynthnnPredictor(
             predictor_name='test_synthnn',
-            logger=mock_logger,
-            use_mock=True
+            logger=mock_logger
         )
         
         assert predictor.predictor_name == 'test_synthnn'
         assert predictor.logger is mock_logger
-        assert predictor.model_helper.use_mock is True
     
     def test_info_returns_string(self, mock_logger):
         """Info method returns description string."""
@@ -234,15 +282,15 @@ class TestSynthnnPredictor:
     
     def test_predict_empty_input(self, mock_logger):
         """Empty input returns empty dict."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         results = predictor.predict({})
         
         assert isinstance(results, dict)
         assert len(results) == 0
     
-    def test_predict_valid_cif_file(self, temp_cif_files, mock_logger):
+    def test_predict_valid_cif_file(self, temp_cif_files, mock_logger, mock_model_helper):
         """Predict from valid CIF file."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path']
@@ -262,7 +310,7 @@ class TestSynthnnPredictor:
     
     def test_predict_invalid_filepath(self, mock_logger):
         """Handle non-existent file gracefully."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'missing.cif': '/nonexistent/path/to/missing.cif'
@@ -277,9 +325,9 @@ class TestSynthnnPredictor:
         assert 'error' in result
         assert 'File not found' in result['error']
     
-    def test_predict_invalid_cif_content(self, temp_cif_files, mock_logger):
+    def test_predict_invalid_cif_content(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle invalid CIF content gracefully."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'invalid.cif': temp_cif_files['invalid_path']
@@ -293,9 +341,9 @@ class TestSynthnnPredictor:
         assert result['synthesizability_score'] is None
         assert 'error' in result
     
-    def test_predict_output_structure(self, temp_cif_files, mock_logger):
+    def test_predict_output_structure(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify output has correct structure."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path'],
@@ -314,9 +362,9 @@ class TestSynthnnPredictor:
             assert 'synthesizable' in prediction
             assert 'synthesizability_score' in prediction
     
-    def test_predict_mixed_batch(self, temp_cif_files, mock_logger):
+    def test_predict_mixed_batch(self, temp_cif_files, mock_logger, mock_model_helper):
         """Batch with both valid and invalid files."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path'],
@@ -337,9 +385,9 @@ class TestSynthnnPredictor:
         # Logger should have been called
         mock_logger.log.assert_called()
     
-    def test_predict_synthesizable_threshold(self, temp_cif_files, mock_logger):
+    def test_predict_synthesizable_threshold(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify synthesizable threshold is ≥ 0.70."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path'],
@@ -354,9 +402,9 @@ class TestSynthnnPredictor:
                 else:
                     assert result['synthesizable'] is False
     
-    def test_predict_score_is_float(self, temp_cif_files, mock_logger):
+    def test_predict_score_is_float(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify scores are floats with correct precision."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path']
@@ -369,9 +417,9 @@ class TestSynthnnPredictor:
         # Score should be rounded to 4 decimals
         assert len(str(score).split('.')[-1]) <= 4
     
-    def test_predict_warnings_optional(self, temp_cif_files, mock_logger):
+    def test_predict_warnings_optional(self, temp_cif_files, mock_logger, mock_model_helper):
         """Warnings key only present when warnings exist."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path']
@@ -383,9 +431,9 @@ class TestSynthnnPredictor:
         if 'warnings' in result:
             assert isinstance(result['warnings'], list)
     
-    def test_predict_logging(self, temp_cif_files, mock_logger):
+    def test_predict_logging(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify prediction operations are logged."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path']
@@ -397,9 +445,9 @@ class TestSynthnnPredictor:
         # - Completion summary
         assert mock_logger.log.called
     
-    def test_predict_returns_dict(self, temp_cif_files, mock_logger):
+    def test_predict_returns_dict(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify predict always returns dict."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path']
@@ -407,10 +455,10 @@ class TestSynthnnPredictor:
         
         assert isinstance(results, dict)
     
-    def test_predict_json_serializable(self, temp_cif_files, mock_logger):
+    def test_predict_json_serializable(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify output is JSON-serializable."""
         import json
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path'],
@@ -440,7 +488,7 @@ class TestSynthnnIntegration:
     ])
     def test_full_workflow(self, temp_cif_files, mock_logger, input_files, expected_count):
         """Complete workflow: file → CIF → composition → prediction."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         input_data = {name: temp_cif_files[path_key] for name, path_key in input_files}
         results = predictor.predict(input_data)
@@ -456,9 +504,9 @@ class TestSynthnnIntegration:
             assert 0.0 <= result['synthesizability_score'] <= 1.0
             assert 'error' not in result
     
-    def test_full_workflow_with_error_recovery(self, temp_cif_files, mock_logger):
+    def test_full_workflow_with_error_recovery(self, temp_cif_files, mock_logger, mock_model_helper):
         """Verify one error doesn't crash batch."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'Al2O3.cif': temp_cif_files['al2o3_path'],
@@ -486,9 +534,9 @@ class TestSynthnnIntegration:
 class TestEdgeCases:
     """Test edge cases and boundary conditions."""
     
-    def test_predict_many_files(self, temp_cif_files, mock_logger):
+    def test_predict_many_files(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle batch of many files."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         # Create input for 10 copies of same file
         input_data = {
@@ -503,9 +551,9 @@ class TestEdgeCases:
         for result in results.values():
             assert result['synthesizable'] is True
     
-    def test_predict_file_with_special_chars_in_name(self, temp_cif_files, mock_logger):
+    def test_predict_file_with_special_chars_in_name(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle filenames with special characters."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'material-with_special.chars123.cif': temp_cif_files['al2o3_path']
@@ -514,9 +562,9 @@ class TestEdgeCases:
         assert 'material-with_special.chars123.cif' in results
         assert results['material-with_special.chars123.cif']['synthesizable'] is True
     
-    def test_predict_very_simple_input(self, temp_cif_files, mock_logger):
+    def test_predict_very_simple_input(self, temp_cif_files, mock_logger, mock_model_helper):
         """Handle minimal valid input."""
-        predictor = SynthnnPredictor(logger=mock_logger, use_mock=True)
+        predictor = SynthnnPredictor(logger=mock_logger)
         
         results = predictor.predict({
             'x.cif': temp_cif_files['al2o3_path']

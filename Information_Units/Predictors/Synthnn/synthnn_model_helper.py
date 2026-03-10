@@ -7,27 +7,21 @@ import numpy as np
 
 
 class SynthnnModelHelper:
-    """Wrapper for SynthNN model with caching and mock capability."""
+    """Wrapper for SynthNN model with caching."""
     
     MODEL_CACHE_DIR = Path(__file__).parent / '.models'
     MODEL_FILE = 'synthnn_model.pt'
     
-    def __init__(self, logger=None, use_mock=True):
+    def __init__(self, logger=None):
         """
         Initialize SynthNN model helper.
         
         Args:
             logger: Optional logger for warnings/errors
-            use_mock (bool): If True, return deterministic fallback scores.
-                           If False, load the model files.
-                           Default: True
         """
         self.logger = logger
-        self.use_mock = use_mock
         self.model = None
-        
-        if not use_mock:
-            self._load_model()  # Only load when model-based prediction is enabled
+        self._load_model()
     
     def _load_model(self):
         """
@@ -89,52 +83,9 @@ class SynthnnModelHelper:
             >>> predictions
             {'Al2O3': 0.92, 'FeO': 0.31}
         """
-        if self.use_mock:
-            return self._predict_mock(compositions)
-        else:
-            return self._predict_real(compositions)
+        return self._predict(compositions)
     
-    def _predict_mock(self, compositions: List[str]) -> Dict[str, float]:
-        """
-        Return deterministic fallback scores for testing.
-        
-        Mock scoring rules:
-        - Common synthesis oxides (Al2O3, SiO2, TiO2): 0.85-0.95
-        - Common stable compounds: 0.70-0.85
-        - Organic/complex elements (C, N, H): 0.50-0.65
-        - Unknown/rare compositions: 0.60-0.75
-        
-        Returns float scores 0.0-1.0 indicating synthesizability likelihood.
-        """
-        # Common highly synthesizable materials
-        common_high_score = {
-            'Al2O3': 0.92,      # Alumina (extremely common)
-            'Fe2O3': 0.88,      # Iron oxide (common)
-            'SiO2': 0.95,       # Silica (ubiquitous)
-            'TiO2': 0.90,       # Titania (widely used)
-            'ZnO': 0.87,        # Zinc oxide (common)
-            'MgO': 0.91,        # Magnesium oxide
-            'CaO': 0.89,        # Calcium oxide
-            'NaCl': 0.93,       # Rock salt (iconic structure)
-        }
-        
-        results = {}
-        
-        for comp in compositions:
-            if comp in common_high_score:
-                # Known high-synthesizability compounds
-                results[comp] = common_high_score[comp]
-            elif any(elem in comp for elem in ['C', 'N', 'H']):
-                # Organic or complex compounds - lower synthesizability
-                results[comp] = 0.55
-            else:
-                # Default for unknown simple inorganic materials
-                # Most simple binary oxides and salts have moderate-to-high synthesizability
-                results[comp] = 0.73
-        
-        return results
-    
-    def _predict_real(self, compositions: List[str]) -> Dict[str, float]:
+    def _predict(self, compositions: List[str]) -> Dict[str, float]:
         """
         Call the integrated SynthNN model.
         

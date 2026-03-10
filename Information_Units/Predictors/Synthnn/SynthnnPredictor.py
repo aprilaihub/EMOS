@@ -14,19 +14,16 @@ class SynthnnPredictor(BasePredictor):
     Output format: {filename: {property: value, ...}, ...}
     """
     
-    def __init__(self, predictor_name='synthnn', logger=None, use_mock=True):
+    def __init__(self, predictor_name='synthnn', logger=None):
         """
         Initialize SynthNN predictor.
         
         Args:
             predictor_name (str): Name of predictor (default: 'synthnn')
             logger: Optional logger instance
-            use_mock (bool): If True, use deterministic fallback predictions.
-                           If False, use model-based predictions.
-                           Default: True
         """
         super().__init__(predictor_name, logger)
-        self.model_helper = SynthnnModelHelper(logger=logger, use_mock=use_mock)
+        self.model_helper = SynthnnModelHelper(logger=logger)
         self.composition_helper = CompositionHelper()
 
     def info(self):
