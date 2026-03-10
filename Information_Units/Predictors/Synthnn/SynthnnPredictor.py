@@ -10,9 +10,6 @@ class SynthnnPredictor(BasePredictor):
     """
     Lightweight wrapper for SynthNN deep learning model predicting synthesizability.
     
-    Phase 1 (Current): Mock predictions for testing and architecture validation
-    Phase 2/3 (Future): Real SynthNN model integration
-    
     Input format:  {filename: filepath, ...}
     Output format: {filename: {property: value, ...}, ...}
     """
@@ -24,8 +21,8 @@ class SynthnnPredictor(BasePredictor):
         Args:
             predictor_name (str): Name of predictor (default: 'synthnn')
             logger: Optional logger instance
-            use_mock (bool): If True, use mock predictions (Phase 1).
-                           Ignored in Phase 2/3 (always use model).
+            use_mock (bool): If True, use deterministic fallback predictions.
+                           If False, use model-based predictions.
                            Default: True
         """
         super().__init__(predictor_name, logger)

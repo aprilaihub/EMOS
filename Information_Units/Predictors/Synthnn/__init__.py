@@ -1,4 +1,4 @@
-"""SynthNN Predictor - Phase 1 Mock Implementation."""
+"""SynthNN Predictor module."""
 
 from Information_Units.Predictors.Synthnn.SynthnnPredictor import SynthnnPredictor
 

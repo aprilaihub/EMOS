@@ -18,22 +18,20 @@ class SynthnnModelHelper:
         
         Args:
             logger: Optional logger for warnings/errors
-            use_mock (bool): If True, return deterministic mock scores (Phase 1).
-                           If False, load actual model (Phase 2/3).
-                           Default: True (Phase 1 mock mode)
+            use_mock (bool): If True, return deterministic fallback scores.
+                           If False, load the model files.
+                           Default: True
         """
         self.logger = logger
         self.use_mock = use_mock
         self.model = None
         
         if not use_mock:
-            self._load_model()  # Only load if using real model (Phase 2/3)
+            self._load_model()  # Only load when model-based prediction is enabled
     
     def _load_model(self):
         """
-        Load SynthNN model from cache (Phase 2/3 implementation).
-        
-        Phase 2/3: Load model weights from Paper_final_model directory
+        Load SynthNN model weights from cache.
         
         Adds the SynthNN module to Python path and verifies model files exist.
         """
@@ -90,9 +88,6 @@ class SynthnnModelHelper:
             >>> predictions = model_helper.predict_batch(['Al2O3', 'FeO'])
             >>> predictions
             {'Al2O3': 0.92, 'FeO': 0.31}
-        
-        Phase 1: Returns deterministic mock scores
-        Phase 2/3: Returns actual SynthNN model predictions
         """
         if self.use_mock:
             return self._predict_mock(compositions)
@@ -101,7 +96,7 @@ class SynthnnModelHelper:
     
     def _predict_mock(self, compositions: List[str]) -> Dict[str, float]:
         """
-        Return deterministic mock scores for testing (Phase 1).
+        Return deterministic fallback scores for testing.
         
         Mock scoring rules:
         - Common synthesis oxides (Al2O3, SiO2, TiO2): 0.85-0.95
@@ -141,7 +136,7 @@ class SynthnnModelHelper:
     
     def _predict_real(self, compositions: List[str]) -> Dict[str, float]:
         """
-        Call actual SynthNN model (Phase 2/3 implementation).
+        Call the integrated SynthNN model.
         
         Uses the official SynthNN model from:
         https://github.com/antoniuk1/SynthNN
