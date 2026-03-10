@@ -1,0 +1,35 @@
+data_Al2O3
+_chemical_name_common                  'corundum'
+_chemical_formula_sum                  'Al2 O3'
+_cell_length_a                         4.758590
+_cell_length_b                         4.758590
+_cell_length_c                         12.992842
+_cell_angle_alpha                      90.000000
+_cell_angle_beta                       90.000000
+_cell_angle_gamma                      120.000000
+_space_group_name_H-M_alt              'R -3 c'
+_space_group_IT_number                 167
+
+loop_
+_space_group_symop_operation_xyz
+'x, y, z'
+'-y, x-y, z'
+'-x+y, -x, z'
+'y, x, -z+1/2'
+'x-y, -y, -z+1/2'
+'-x, -x+y, -z+1/2'
+'-x, -y, -z'
+'y, -x+y, -z'
+'x-y, x, -z'
+'-y, -x, z+1/2'
+'-x+y, y, z+1/2'
+'x, x-y, z+1/2'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Al1 Al 0.00000 0.00000 0.35220 1.0
+O1  O  0.30600 0.00000 0.25000 1.0

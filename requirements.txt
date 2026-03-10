@@ -13,6 +13,9 @@ requests==2.31.0
 # Materials Data
 pymatgen>=2024.6.0
 
+# Machine Learning (for SynthNN Predictor)
+tensorflow>=2.0.0
+
 # Testing
 pytest==8.2.2
 pytest-benchmark==4.0.0
