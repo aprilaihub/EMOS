@@ -9,7 +9,7 @@ import numpy as np
 class SynthnnModelHelper:
     """Wrapper for SynthNN model with caching."""
     
-    MODEL_CACHE_DIR = Path(__file__).parent / '.models'
+    MODEL_CACHE_DIR = Path(__file__).parent / 'models'
     MODEL_FILE = 'synthnn_model.pt'
     
     def __init__(self, logger=None):
