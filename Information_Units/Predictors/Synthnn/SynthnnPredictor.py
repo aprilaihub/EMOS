@@ -1,5 +1,6 @@
 """SynthNN Predictor - Synthesis Neural Network for predicting synthesizability."""
 
+import json
 from pathlib import Path
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.Predictors.Synthnn.composition_helper import CompositionHelper
@@ -11,8 +12,10 @@ class SynthnnPredictor(BasePredictor):
     Lightweight wrapper for SynthNN deep learning model predicting synthesizability.
     
     Input format:  {filename: filepath, ...}
-    Output format: {filename: {status, predictions, warnings, error}, ...}
+    Output format: {filename: {status, properties, warnings, error}, ...}
     """
+
+    OUTPUT_PROPERTIES = ('synthesizable', 'synthesizability_score')
     
     def __init__(self, predictor_name='synthnn', logger=None):
         """
@@ -25,6 +28,37 @@ class SynthnnPredictor(BasePredictor):
         super().__init__(predictor_name, logger)
         self.model_helper = SynthnnModelHelper(logger=logger)
         self.composition_helper = CompositionHelper()
+        self._mapped_output_properties = self._load_mapped_output_properties()
+        self._check_output_properties_in_mapping({prop: None for prop in self.OUTPUT_PROPERTIES})
+
+    def _load_mapped_output_properties(self) -> set:
+        """Load SynthNN-mapped output properties from property_mappings.json."""
+        mapping_file = Path(__file__).resolve().parents[2] / 'property_mappings.json'
+
+        try:
+            with mapping_file.open('r', encoding='utf-8') as f:
+                data = json.load(f)
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to load property mappings from {mapping_file}: {str(e)}"
+            ) from e
+
+        mapped = set()
+        for prop_name, prop_details in data.get('properties', {}).items():
+            synthnn_info = prop_details.get('synthnn')
+            if isinstance(synthnn_info, dict) and synthnn_info.get('predicatble'):
+                mapped.add(prop_name)
+
+        return mapped
+
+    def _check_output_properties_in_mapping(self, properties: dict) -> None:
+        """Ensure all output properties are declared under the SynthNN block in mappings."""
+        missing = sorted(set(properties.keys()) - self._mapped_output_properties)
+        if missing:
+            raise ValueError(
+                "SynthNN output properties missing in property_mappings.json: "
+                + ", ".join(missing)
+            )
 
     def info(self):
         """Return description of predictor capabilities."""
@@ -48,12 +82,12 @@ class SynthnnPredictor(BasePredictor):
                 }
         
         Returns:
-            dict: Synthesizability predictions for each input file
+            dict: Synthesizability properties for each input file
                 Example:
                 {
                     'Al2O3.cif': {
                         'status': 'ok',
-                        'predictions': {
+                        'properties': {
                             'synthesizable': True,
                             'synthesizability_score': 0.92
                         },
@@ -62,7 +96,7 @@ class SynthnnPredictor(BasePredictor):
                     },
                     'FeO.cif': {
                         'status': 'ok',
-                        'predictions': {
+                        'properties': {
                             'synthesizable': False,
                             'synthesizability_score': 0.31
                         },
@@ -71,7 +105,7 @@ class SynthnnPredictor(BasePredictor):
                     },
                     'invalid.cif': {
                         'status': 'error',
-                        'predictions': {
+                        'properties': {
                             'synthesizable': None,
                             'synthesizability_score': None
                         },
@@ -82,8 +116,8 @@ class SynthnnPredictor(BasePredictor):
         
         Notes:
             - Empty input returns empty dict: {}
-            - Each file result contains: status, predictions, warnings, error
-            - Failed files use status='error' with null predictions
+            - Each file result contains: status, properties, warnings, error
+            - Failed files use status='error' with null properties
             - Non-critical warnings are included in warnings array
             - Synthesizable threshold: score >= 0.70
             - All files processed independently (one failure doesn't crash batch)
@@ -98,12 +132,15 @@ class SynthnnPredictor(BasePredictor):
         results = {}
 
         def _build_result(status, synthesizable=None, score=None, warnings=None, error=None):
+            output_properties = {
+                'synthesizable': synthesizable,
+                'synthesizability_score': score
+            }
+            self._check_output_properties_in_mapping(output_properties)
+
             return {
                 'status': status,
-                'predictions': {
-                    'synthesizable': synthesizable,
-                    'synthesizability_score': score
-                },
+                'properties': output_properties,
                 'warnings': warnings or [],
                 'error': error
             }
@@ -141,8 +178,8 @@ class SynthnnPredictor(BasePredictor):
                 normalized_formula = self.composition_helper.normalize_composition(formula)
                 
                 # Predict synthesizability score
-                predictions = self.model_helper.predict_batch([normalized_formula])
-                score = predictions.get(normalized_formula)
+                model_scores = self.model_helper.predict_batch([normalized_formula])
+                score = model_scores.get(normalized_formula)
                 
                 if score is None:
                     error_msg = f"Model prediction failed for composition: {normalized_formula}"

@@ -3,7 +3,7 @@
 ## Overview
 Lightweight wrapper for SynthNN deep learning model predicting synthesizability of inorganic crystalline materials. Based on COD database pattern for consistency.
 
-**Core workflow**: CIF files → Extract compositions → Call SynthNN model → Return standardized predictions
+**Core workflow**: CIF files → Extract compositions → Call SynthNN model → Return standardized properties
 
 ---
 
@@ -54,22 +54,35 @@ Example:
 
 ### Output
 ```python
-{filename: {properties}, ...}
+{filename: {status, properties, warnings, error}, ...}
 
 Example:
 {
     'Al2O3.cif': {
-        'synthesizable': True,
-        'synthesizability_score': 0.92,
-        'warnings': ['CIF missing symmetry info']  # Optional
+        'status': 'ok',
+        'properties': {
+            'synthesizable': True,
+            'synthesizability_score': 0.92
+        },
+        'warnings': [],
+        'error': None
     },
     'FeO.cif': {
-        'synthesizable': False,
-        'synthesizability_score': 0.31
+        'status': 'ok',
+        'properties': {
+            'synthesizable': False,
+            'synthesizability_score': 0.31
+        },
+        'warnings': [],
+        'error': None
     },
     'invalid.cif': {
-        'synthesizable': None,
-        'synthesizability_score': None,
+        'status': 'error',
+        'properties': {
+            'synthesizable': None,
+            'synthesizability_score': None
+        },
+        'warnings': [],
         'error': 'Failed to parse CIF: Invalid syntax'
     }
 }
@@ -77,8 +90,8 @@ Example:
 
 **Output Rules**:
 - ✅ All input files present in output
-- ✅ Critical errors: null values + `'error'` key
-- ✅ Warnings: valid values + optional `'warnings'` array
+- ✅ Critical errors: null property values + `'error'` key
+- ✅ `warnings` always present as list
 - ✅ JSON-serializable (None → null)
 
 ---

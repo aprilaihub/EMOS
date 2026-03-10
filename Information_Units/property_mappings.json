@@ -465,6 +465,27 @@
         "retrievable": true,
         "range_support": false
       }
+    },
+    "synthesizable": {
+      "type": "boolean",
+      "description": "Predicted SynthNN synthesizability label",
+      "category": "predictor",
+      "synthnn": {
+        "name": "synthesizable",
+        "predicatble": true,
+        "range_support": false
+      }
+    },
+    "synthesizability_score": {
+      "type": "float",
+      "description": "Predicted SynthNN synthesizability score",
+      "category": "predictor",
+      "unit": "probability",
+      "synthnn": {
+        "name": "synthesizability_score",
+        "predicatble": true,
+        "range_support": true
+      }
     }
   }
 }

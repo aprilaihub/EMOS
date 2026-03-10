@@ -52,17 +52,30 @@ results = predictor.predict(input_data)
 # Output structure:
 # {
 #     'Al2O3.cif': {
-#         'synthesizable': True,
-#         'synthesizability_score': 0.92,
-#         'warnings': [...]  # optional
+#         'status': 'ok',
+#         'properties': {
+#             'synthesizable': True,
+#             'synthesizability_score': 0.92
+#         },
+#         'warnings': [],
+#         'error': None
 #     },
 #     'FeO.cif': {
-#         'synthesizable': False,
-#         'synthesizability_score': 0.31
+#         'status': 'ok',
+#         'properties': {
+#             'synthesizable': False,
+#             'synthesizability_score': 0.31
+#         },
+#         'warnings': ['Low synthesizability confidence (score near threshold)'],
+#         'error': None
 #     },
 #     'invalid.cif': {
-#         'synthesizable': None,
-#         'synthesizability_score': None,
+#         'status': 'error',
+#         'properties': {
+#             'synthesizable': None,
+#             'synthesizability_score': None
+#         },
+#         'warnings': [],
 #         'error': 'Failed to parse CIF: Invalid syntax'
 #     }
 # }
@@ -84,18 +97,22 @@ results = predictor.predict(input_data)
 
 ### Output Format
 
-Returns a dictionary with filename keys containing prediction results:
+Returns a dictionary with filename keys containing result envelopes:
 
 #### Successful Prediction (with warning example)
 ```python
 {
     'Al2O3.cif': {
-        'synthesizable': True,
-        'synthesizability_score': 0.92,
+        'status': 'ok',
+        'properties': {
+            'synthesizable': True,
+            'synthesizability_score': 0.92
+        },
         'warnings': [
             'CIF missing symmetry information',
             'Using default tolerance for site occupancy'
-        ]
+        ],
+        'error': None
     }
 }
 ```
@@ -104,8 +121,13 @@ Returns a dictionary with filename keys containing prediction results:
 ```python
 {
     'SiO2.cif': {
-        'synthesizable': True,
-        'synthesizability_score': 0.95
+        'status': 'ok',
+        'properties': {
+            'synthesizable': True,
+            'synthesizability_score': 0.95
+        },
+        'warnings': [],
+        'error': None
     }
 }
 ```
@@ -114,8 +136,12 @@ Returns a dictionary with filename keys containing prediction results:
 ```python
 {
     'invalid.cif': {
-        'synthesizable': None,
-        'synthesizability_score': None,
+        'status': 'error',
+        'properties': {
+            'synthesizable': None,
+            'synthesizability_score': None
+        },
+        'warnings': [],
         'error': 'Failed to parse CIF: Invalid syntax at line 5'
     }
 }
@@ -125,16 +151,30 @@ Returns a dictionary with filename keys containing prediction results:
 ```python
 {
     'Al2O3.cif': {
-        'synthesizable': True,
-        'synthesizability_score': 0.92
+        'status': 'ok',
+        'properties': {
+            'synthesizable': True,
+            'synthesizability_score': 0.92
+        },
+        'warnings': [],
+        'error': None
     },
     'FeO.cif': {
-        'synthesizable': False,
-        'synthesizability_score': 0.31
+        'status': 'ok',
+        'properties': {
+            'synthesizable': False,
+            'synthesizability_score': 0.31
+        },
+        'warnings': [],
+        'error': None
     },
     'corrupted.cif': {
-        'synthesizable': None,
-        'synthesizability_score': None,
+        'status': 'error',
+        'properties': {
+            'synthesizable': None,
+            'synthesizability_score': None
+        },
+        'warnings': [],
         'error': 'Failed to read file: ...'
     }
 }
@@ -144,10 +184,12 @@ Returns a dictionary with filename keys containing prediction results:
 
 | Field | Type | Always Present | Description |
 |-------|------|---|---|
-| `synthesizable` | bool/null | Yes | True if score ≥ 0.70, False if < 0.70, null if prediction failed |
-| `synthesizability_score` | float/null | Yes | Likelihood of successful synthesis (0-1), or null if failed |
-| `warnings` | list | Only if warnings exist | Non-critical issues (e.g., missing metadata, low confidence) |
-| `error` | str | Only if critical failure | Error message explaining why prediction failed |
+| `status` | str | Yes | `ok`, `error`, `partial`, or `skipped` |
+| `properties` | dict | Yes | Property payload containing SynthNN outputs |
+| `properties.synthesizable` | bool/null | Yes | True if score ≥ 0.70, False if < 0.70, null if prediction failed |
+| `properties.synthesizability_score` | float/null | Yes | Likelihood of successful synthesis (0-1), or null if failed |
+| `warnings` | list | Yes | Non-critical issues (e.g., missing metadata, low confidence) |
+| `error` | str/null | Yes | Error message explaining why prediction failed |
 
 ---
 
@@ -192,9 +234,10 @@ results = predictor.predict({
 
 # Check results
 for filename, prediction in results.items():
-    if prediction['synthesizable'] is not None:
-        score = prediction['synthesizability_score']
-        status = "synthesizable" if prediction['synthesizable'] else "not synthesizable"
+    props = prediction['properties']
+    if props['synthesizable'] is not None:
+        score = props['synthesizability_score']
+        status = "synthesizable" if props['synthesizable'] else "not synthesizable"
         print(f"{filename}: {status} (score: {score})")
     else:
         print(f"{filename}: Failed - {prediction['error']}")
@@ -303,7 +346,7 @@ Batch predict with model_helper
     ↓
 Format results + error handling
     ↓
-Output (filenames → predictions)
+Output (filenames → result envelopes with properties)
 ```
 
 ---
@@ -341,7 +384,7 @@ predictor = SynthnnPredictor(use_mock=False)
 
 ## Error Handling
 
-### Critical Errors (∅ predictions)
+### Critical Errors (∅ properties)
 
 | Error | Cause | Response |
 |-------|-------|----------|
@@ -350,7 +393,7 @@ predictor = SynthnnPredictor(use_mock=False)
 | Parse failure | Corrupted CIF data | Null score + error message |
 | Model error | Prediction failure | Null score + error message |
 
-### Non-Critical Warnings (✓ predictions)
+### Non-Critical Warnings (✓ properties)
 
 | Warning | Cause | Response |
 |---------|-------|----------|

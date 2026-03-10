@@ -42,9 +42,9 @@ def assert_prediction_envelope(result):
     """Validate standard predictor response envelope for a single file."""
     assert isinstance(result, dict)
     assert result.get('status') in {'ok', 'error', 'partial', 'skipped'}
-    assert isinstance(result.get('predictions'), dict)
-    assert 'synthesizable' in result['predictions']
-    assert 'synthesizability_score' in result['predictions']
+    assert isinstance(result.get('properties'), dict)
+    assert 'synthesizable' in result['properties']
+    assert 'synthesizability_score' in result['properties']
     assert isinstance(result.get('warnings'), list)
     assert 'error' in result
 
@@ -53,9 +53,9 @@ def assert_ok_prediction(result):
     """Validate a successful prediction payload."""
     assert_prediction_envelope(result)
     assert result['status'] == 'ok'
-    assert result['predictions']['synthesizable'] is not None
-    assert result['predictions']['synthesizability_score'] is not None
-    assert 0.0 <= result['predictions']['synthesizability_score'] <= 1.0
+    assert result['properties']['synthesizable'] is not None
+    assert result['properties']['synthesizability_score'] is not None
+    assert 0.0 <= result['properties']['synthesizability_score'] <= 1.0
     assert result['error'] is None
 
 
@@ -63,8 +63,8 @@ def assert_error_prediction(result):
     """Validate a failed prediction payload."""
     assert_prediction_envelope(result)
     assert result['status'] == 'error'
-    assert result['predictions']['synthesizable'] is None
-    assert result['predictions']['synthesizability_score'] is None
+    assert result['properties']['synthesizable'] is None
+    assert result['properties']['synthesizability_score'] is None
     assert result['error'] is not None
 
 
@@ -133,7 +133,7 @@ def test_known_synthesizable_materials_score_high(cif_files, predictor, cif_key,
 
     assert_ok_prediction(result)
 
-    score = result['predictions']['synthesizability_score']
+    score = result['properties']['synthesizability_score']
     min_score, max_score = expected_score_range
     assert min_score <= score <= max_score, (
         f"Score {score} not in expected range [{min_score}, {max_score}]"
@@ -145,8 +145,8 @@ def test_model_deterministic_predictions(cif_files, predictor):
     results1 = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
     results2 = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
 
-    score1 = results1['Al2O3.cif']['predictions']['synthesizability_score']
-    score2 = results2['Al2O3.cif']['predictions']['synthesizability_score']
+    score1 = results1['Al2O3.cif']['properties']['synthesizability_score']
+    score2 = results2['Al2O3.cif']['properties']['synthesizability_score']
     assert score1 == score2
 
 
@@ -159,5 +159,5 @@ def test_synthesizable_flag_follows_threshold(cif_files, predictor):
 
     for result in results.values():
         assert_ok_prediction(result)
-        score = result['predictions']['synthesizability_score']
-        assert result['predictions']['synthesizable'] is (score >= 0.70)
+        score = result['properties']['synthesizability_score']
+        assert result['properties']['synthesizable'] is (score >= 0.70)

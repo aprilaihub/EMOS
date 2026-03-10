@@ -87,9 +87,9 @@ def assert_prediction_envelope(result):
     """Standard response-envelope assertion, reusable across predictor tests."""
     assert isinstance(result, dict)
     assert result.get('status') in {'ok', 'error', 'partial', 'skipped'}
-    assert isinstance(result.get('predictions'), dict)
-    assert 'synthesizable' in result['predictions']
-    assert 'synthesizability_score' in result['predictions']
+    assert isinstance(result.get('properties'), dict)
+    assert 'synthesizable' in result['properties']
+    assert 'synthesizability_score' in result['properties']
     assert isinstance(result.get('warnings'), list)
     assert 'error' in result
 
@@ -136,8 +136,8 @@ def test_predict_valid_cif_returns_ok_envelope(cif_files, mock_logger, mock_mode
     r = results['material.cif']
     assert_prediction_envelope(r)
     assert r['status'] == 'ok'
-    assert r['predictions']['synthesizable'] is not None
-    assert 0.0 <= r['predictions']['synthesizability_score'] <= 1.0
+    assert r['properties']['synthesizable'] is not None
+    assert 0.0 <= r['properties']['synthesizability_score'] <= 1.0
     assert r['error'] is None
 
 
@@ -156,8 +156,8 @@ def test_predict_error_cases_return_error_envelope(cif_files, mock_logger, mock_
     r = results[label]
     assert_prediction_envelope(r)
     assert r['status'] == 'error'
-    assert r['predictions']['synthesizable'] is None
-    assert r['predictions']['synthesizability_score'] is None
+    assert r['properties']['synthesizable'] is None
+    assert r['properties']['synthesizability_score'] is None
     assert r['error'] is not None
     if expected_error_fragment:
         assert expected_error_fragment in r['error']
@@ -281,4 +281,52 @@ def test_mock_score_ranges(mock_logger, mock_model_helper, compositions, thresho
             assert score > threshold
         else:
             assert score < threshold
+
+
+# ============================================================================
+# SynthNN-Specific: Output Contract
+# ============================================================================
+
+@pytest.mark.unit
+def test_output_properties_are_registered_in_property_mappings(mock_logger, mock_model_helper):
+    """All SynthNN output properties must be declared in property_mappings.json."""
+    predictor = SynthnnPredictor(logger=mock_logger)
+
+    assert set(predictor.OUTPUT_PROPERTIES).issubset(predictor._mapped_output_properties)
+
+
+@pytest.mark.unit
+def test_checker_rejects_unmapped_output_properties(mock_logger, mock_model_helper):
+    """Checker raises if predictor output contains a property not in mapping."""
+    predictor = SynthnnPredictor(logger=mock_logger)
+
+    with pytest.raises(ValueError, match="missing in property_mappings.json"):
+        predictor._check_output_properties_in_mapping({'not_in_mapping': 1})
+
+
+@pytest.mark.unit
+def test_synthesizable_flag_follows_threshold(cif_files, mock_logger, mock_model_helper):
+    """synthesizable is True iff synthesizability_score ≥ 0.70."""
+    predictor = SynthnnPredictor(logger=mock_logger)
+    results = predictor.predict({
+        'Al2O3.cif': cif_files['al2o3_path'],
+        'SiO2.cif':  cif_files['sio2_path'],
+    })
+
+    for result in results.values():
+        if result['status'] == 'ok':
+            score = result['properties']['synthesizability_score']
+            assert result['properties']['synthesizable'] is (score >= 0.70)
+
+
+@pytest.mark.unit
+def test_score_is_float_with_bounded_precision(cif_files, mock_logger, mock_model_helper):
+    """Score is a float rounded to at most 4 decimal places."""
+    predictor = SynthnnPredictor(logger=mock_logger)
+    results = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
+
+    score = results['Al2O3.cif']['properties']['synthesizability_score']
+    assert isinstance(score, float)
+    decimal_part = str(score).split('.')[-1] if '.' in str(score) else ''
+    assert len(decimal_part) <= 4
 
