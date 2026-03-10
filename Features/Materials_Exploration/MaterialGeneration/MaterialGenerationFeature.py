@@ -91,3 +91,140 @@ class MaterialGenerationFeature(BaseFeature):
         """Return the raw generation results so the JS front-end can
         render them (structure dropdown, CIF viewer, etc.)."""
         return results
+
+    # ── Streaming variant ─────────────────────────────────────────────
+
+    def process_feature_stream(self, inputs):
+        """Yield SSE-formatted strings while generators run.
+
+        Each ``yield`` is a complete SSE block (``event: … \\n data: …\\n\\n``).
+        The final ``event: result`` carries the same payload as the synchronous
+        ``process_feature`` return value.
+        """
+        import json
+
+        def _sse(event: str, data: dict) -> str:
+            return f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+        if self.logger:
+            self.logger.log('Initializing Material Generation (streaming)...', 'info')
+        yield _sse("log", {"message": "Initializing Material Generation...", "level": "info"})
+
+        generator_inputs = inputs.get('generator_inputs', {})
+        all_generation_results = {}
+
+        active_generators = inputs.get('active_generators', [])
+        if not active_generators:
+            if self.logger:
+                self.logger.log('No active generators selected.', 'warning')
+            yield _sse("log", {"message": "No active generators selected.", "level": "warning"})
+        else:
+            names = ', '.join(g['name'] for g in active_generators)
+            msg = f'Active generators ({len(active_generators)}): {names}'
+            if self.logger:
+                self.logger.log(msg, 'info')
+            yield _sse("log", {"message": msg, "level": "info"})
+
+        for gen_info in active_generators:
+            gen_key = gen_info['value']
+
+            if gen_key in generator_registry:
+                gen_instance = generator_registry[gen_key]
+            elif gen_key in generator_factory:
+                gen_instance = generator_factory[gen_key](gen_key, self.logger)
+            else:
+                msg = f'Generator "{gen_key}" not found in factory — skipping.'
+                if self.logger:
+                    self.logger.log(msg, 'warning')
+                yield _sse("log", {"message": msg, "level": "warning"})
+                continue
+
+            gen_params = generator_inputs.get(gen_key, {})
+            if self.logger:
+                self.logger.log(f'Calling {gen_key}.generate_stream() with params: {gen_params}', 'info')
+            yield _sse("log", {"message": f"Calling {gen_key}.generate_stream()...", "level": "info"})
+
+            # Check if the generator supports streaming
+            if hasattr(gen_instance, 'generate_stream'):
+                try:
+                    final_result = None
+                    for sse_event in gen_instance.generate_stream(gen_params):
+                        evt = sse_event.get("event", "log")
+                        if evt == "result":
+                            final_result = sse_event
+                            # Forward final result info as a log
+                            n = sse_event.get("num_structures", 0)
+                            msg = f'{gen_key}: {n} structure(s) generated.'
+                            yield _sse("log", {"message": msg, "level": "info"})
+                            # Forward debug_logs
+                            for dl in sse_event.get("debug_logs", []):
+                                if self.logger:
+                                    self.logger.log(f'  [{gen_key}] {dl}', 'info')
+                        elif evt == "progress":
+                            yield _sse("progress", {
+                                "progress": sse_event.get("progress", 0),
+                                "message": sse_event.get("message", ""),
+                                "generator": gen_key,
+                            })
+                        elif evt == "error":
+                            msg = sse_event.get("message", "Unknown error")
+                            if self.logger:
+                                self.logger.log(f'{gen_key}: {msg}', 'error')
+                            yield _sse("log", {"message": f"{gen_key}: {msg}", "level": "error"})
+                        elif evt == "log":
+                            yield _sse("log", {
+                                "message": f"[{gen_key}] {sse_event.get('message', '')}",
+                                "level": sse_event.get("level", "info"),
+                            })
+                        # "done" events are ignored — we handle end-of-stream ourselves
+
+                    if final_result:
+                        # Remove the "event" key before storing
+                        final_result.pop("event", None)
+                        all_generation_results[gen_key] = final_result
+                    else:
+                        all_generation_results[gen_key] = {
+                            "status": "error",
+                            "message": f"{gen_key}: No result received from stream",
+                        }
+
+                except Exception as exc:
+                    msg = f'{gen_key}.generate_stream() failed: {exc}'
+                    if self.logger:
+                        self.logger.log(msg, 'error')
+                    yield _sse("log", {"message": msg, "level": "error"})
+                    all_generation_results[gen_key] = {
+                        'status': 'error',
+                        'message': str(exc),
+                    }
+            else:
+                # Fallback: synchronous generate()
+                yield _sse("log", {"message": f"{gen_key}: no streaming support, using sync generate()", "level": "info"})
+                try:
+                    result = gen_instance.generate(gen_params)
+                    all_generation_results[gen_key] = result
+                    status = result.get('status', 'unknown')
+                    n_structs = result.get('num_structures', 0)
+                    if self.logger:
+                        self.logger.log(f'{gen_key}: status={status}, {n_structs} structure(s).', 'info')
+                    for dl in result.get('debug_logs', []):
+                        if self.logger:
+                            self.logger.log(f'  [{gen_key}] {dl}', 'info')
+                except Exception as exc:
+                    if self.logger:
+                        self.logger.log(f'{gen_key}.generate() failed: {exc}', 'error')
+                    all_generation_results[gen_key] = {
+                        'status': 'error',
+                        'message': str(exc),
+                    }
+
+        if self.logger:
+            self.logger.log('Material Generation processing completed.', 'info')
+        yield _sse("log", {"message": "Material Generation processing completed.", "level": "info"})
+
+        # Final result event with full payload
+        final_payload = {
+            'status': 'completed',
+            'generation_results': all_generation_results,
+        }
+        yield _sse("result", final_payload)

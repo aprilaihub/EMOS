@@ -79,9 +79,10 @@ class MaterialGenerationFeature extends BaseFeature {
             }
         }
 
-        this.addLog('Sending request to EMOS backend…', 'info');
+        this.addLog('Sending streaming request to EMOS backend…', 'info');
 
-        const response = await fetch(`${backendUrl}/api/process/${this.featureId}`, {
+        // ── SSE streaming via fetch + ReadableStream ─────────────────
+        const response = await fetch(`${backendUrl}/api/process/${this.featureId}/stream`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(inputs),
@@ -92,16 +93,104 @@ class MaterialGenerationFeature extends BaseFeature {
             throw new Error(`HTTP ${response.status}: ${errBody}`);
         }
 
-        const data = await response.json();
+        // Update the progress bar element (if available)
+        const progressFill = document.getElementById(`progressFill_${this.featureId}`);
 
-        // Replay backend logs into the Processing Log panel
-        if (data.logs && Array.isArray(data.logs)) {
-            for (const log of data.logs) {
-                this.addLog(log.message, log.level);
+        // Read the SSE stream
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let finalResult = null;
+
+        // Track the last progress log element so we can update it in-place
+        let lastProgressEl = null;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+
+            // Process complete SSE blocks (separated by double newlines)
+            const blocks = buffer.split('\n\n');
+            // Keep the last (possibly incomplete) chunk in the buffer
+            buffer = blocks.pop() || '';
+
+            for (const block of blocks) {
+                if (!block.trim()) continue;
+
+                let eventType = 'log';
+                let dataStr = '';
+
+                for (const line of block.split('\n')) {
+                    if (line.startsWith('event: ')) {
+                        eventType = line.slice(7).trim();
+                    } else if (line.startsWith('data: ')) {
+                        dataStr += line.slice(6);
+                    } else if (line.startsWith(':')) {
+                        // SSE comment (keepalive) — ignore
+                    }
+                }
+
+                if (!dataStr) continue;
+
+                let data;
+                try {
+                    data = JSON.parse(dataStr);
+                } catch {
+                    continue;
+                }
+
+                // Handle each event type
+                if (eventType === 'log') {
+                    this.addLog(data.message || JSON.stringify(data), data.level || 'info');
+                    // If a real log line arrives, don't let the next progress
+                    // update overwrite it — force a new progress element.
+                    lastProgressEl = null;
+                } else if (eventType === 'progress') {
+                    const pct = Math.round((data.progress || 0) * 100);
+                    const msg = `⏳ ${data.message || `${pct}%`}`;
+                    if (lastProgressEl) {
+                        // Update the existing progress line in-place
+                        lastProgressEl.textContent = msg;
+                    } else {
+                        // Create a new log entry and remember it
+                        this.addLog(msg, 'info');
+                        const logContent = document.getElementById(`logContent_${this.featureId}`);
+                        if (logContent && logContent.lastElementChild) {
+                            lastProgressEl = logContent.lastElementChild;
+                        }
+                    }
+                    if (progressFill) {
+                        progressFill.style.transition = 'width 0.3s ease';
+                        progressFill.style.width = `${pct}%`;
+                    }
+                } else if (eventType === 'result') {
+                    finalResult = data;
+                    this.addLog('Generation result received.', 'success');
+                } else if (eventType === 'logs') {
+                    // Batch of accumulated backend logs
+                    if (Array.isArray(data)) {
+                        // These were already streamed in real-time, skip duplicates
+                    }
+                } else if (eventType === 'error') {
+                    this.addLog(`Error: ${data.message || 'Unknown error'}`, 'error');
+                } else if (eventType === 'done') {
+                    // Stream ended
+                }
             }
         }
 
-        return data.results || data;
+        if (progressFill) {
+            progressFill.style.width = '100%';
+        }
+
+        if (finalResult) {
+            return finalResult;
+        }
+
+        // If no streaming result arrived, something went wrong
+        throw new Error('No result received from streaming endpoint');
     }
 
     // ── Output rendering ─────────────────────────────────────────────

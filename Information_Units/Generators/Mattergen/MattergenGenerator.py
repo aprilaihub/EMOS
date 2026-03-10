@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 import os
 import time
-from typing import Any, Optional
+from typing import Any, Generator, Optional
 
 import requests
 
@@ -191,6 +191,124 @@ class MattergenGenerator(BaseGenerator):
             # Invalidate health cache so next call re-checks
             MattergenGenerator._health_cache["healthy"] = None
             return {"status": "error", "message": msg}
+
+    # ------------------------------------------------------------------
+    # Streaming generation — SSE bridge
+    # ------------------------------------------------------------------
+
+    def generate_stream(self, inputs: dict) -> Generator[dict, None, None]:
+        """Generate crystal structures, yielding SSE events as they arrive.
+
+        Each yielded dict has an ``"event"`` key (``log``, ``progress``,
+        ``result``, ``error``, ``done``) and event-specific payload keys.
+
+        Falls back to the synchronous ``generate()`` method (wrapped as a
+        single ``result`` event) if the container doesn't support streaming
+        or if the call fails.
+        """
+        if self.logger:
+            self.logger.log("MatterGen: sending streaming generation request", "info")
+
+        # Health check
+        if not self.is_healthy():
+            msg = (
+                f"MatterGen container is not reachable at {self.api_url}. "
+                "Start it with: docker compose up mattergen"
+            )
+            if self.logger:
+                self.logger.log(msg, "error")
+            yield {"event": "error", "message": msg}
+            yield {"event": "done", "message": "Stream ended"}
+            return
+
+        # Demo shortcut — not streamable, just wrap the sync response
+        if inputs.get("pretrained_name") == "demo":
+            if self.logger:
+                self.logger.log("MatterGen: using demo endpoint (no streaming)", "info")
+            yield {"event": "log", "message": "Demo mode — no streaming", "level": "info"}
+            try:
+                resp = requests.post(f"{self.api_url}/demo/generate", timeout=30)
+                resp.raise_for_status()
+                result = resp.json()
+                result["event"] = "result"
+                yield result
+            except requests.RequestException as exc:
+                yield {"event": "error", "message": f"MatterGen demo: HTTP error — {exc}"}
+            yield {"event": "done", "message": "Stream ended"}
+            return
+
+        # Build payload (same as generate())
+        payload = {
+            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
+            "batch_size": int(inputs.get("batch_size", 64)),
+            "num_batches": int(inputs.get("num_batches", 1)),
+            "record_trajectories": inputs.get("record_trajectories", True),
+        }
+        if inputs.get("model_path"):
+            payload["model_path"] = inputs["model_path"]
+            payload["pretrained_name"] = None
+        if inputs.get("properties_to_condition_on"):
+            payload["properties_to_condition_on"] = inputs["properties_to_condition_on"]
+        if inputs.get("target_compositions"):
+            payload["target_compositions"] = inputs["target_compositions"]
+        if inputs.get("diffusion_guidance_factor") is not None:
+            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+
+        # Call the streaming endpoint
+        try:
+            resp = requests.post(
+                f"{self.api_url}/generate/stream",
+                json=payload,
+                stream=True,
+                timeout=self.timeout,
+            )
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            if self.logger:
+                self.logger.log(f"MatterGen: stream request failed — {exc}", "error")
+            MattergenGenerator._health_cache["healthy"] = None
+            yield {"event": "error", "message": f"MatterGen stream request failed: {exc}"}
+            yield {"event": "done", "message": "Stream ended"}
+            return
+
+        # Parse the SSE stream
+        current_event = "log"
+        current_data_lines: list[str] = []
+
+        for raw_line in resp.iter_lines(decode_unicode=True):
+            if raw_line is None:
+                continue
+            line = raw_line  # already decoded
+
+            if line.startswith("event: "):
+                current_event = line[7:].strip()
+                continue
+
+            if line.startswith("data: "):
+                current_data_lines.append(line[6:])
+                continue
+
+            if line == "" and current_data_lines:
+                # End of an SSE block — parse and yield
+                data_str = "\n".join(current_data_lines)
+                current_data_lines = []
+                try:
+                    data = json.loads(data_str)
+                    data["event"] = current_event
+                    yield data
+                except json.JSONDecodeError:
+                    yield {"event": "log", "message": data_str, "level": "warning"}
+                current_event = "log"
+
+        # Flush any remaining data
+        if current_data_lines:
+            data_str = "\n".join(current_data_lines)
+            try:
+                data = json.loads(data_str)
+                data["event"] = current_event
+                yield data
+            except json.JSONDecodeError:
+                yield {"event": "log", "message": data_str, "level": "warning"}
 
     # ------------------------------------------------------------------
     # Extra helpers (not part of BaseGenerator but useful for the UI)

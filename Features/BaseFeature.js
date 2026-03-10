@@ -184,7 +184,8 @@ class BaseFeature {
         
         if (progressFill) {
             progressFill.style.width = '0%';
-            progressFill.style.width = '100%';
+            progressFill.style.transition = 'width 0.3s ease';
+            progressFill.style.width = '5%'; // small initial indication
         }
         
         try {
