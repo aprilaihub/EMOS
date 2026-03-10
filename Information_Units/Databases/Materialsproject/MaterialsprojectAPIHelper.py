@@ -1,23 +1,22 @@
-"""Helper functions for COD database API interaction and data conversion."""
+"""Helper functions for Materials Project database API interaction and data conversion."""
 
 import os
 import re
 import json
-import tempfile
 import time
 import requests
 from pymatgen.core import Structure, Lattice, Composition
 
 
-class CodAPIHelper:
-    """Helper class for COD OPTIMADE API operations."""
+class MaterialsprojectAPIHelper:
+    """Helper class for Materials Project OPTIMADE API operations."""
 
     def __init__(self, base_url: str, logger=None):
         """
-        Initialize COD API helper.
+        Initialize Materials Project API helper.
 
         Args:
-            base_url: Base URL for COD OPTIMADE API
+            base_url: Base URL for Materials Project OPTIMADE API
             logger: Optional logger instance
         """
         self.base_url = base_url
@@ -29,7 +28,7 @@ class CodAPIHelper:
         Load property mapping from property_mappings.json.
         
         Returns:
-            dict: Mapping with structure {prop_name: {name: cod_name, ...}} for retrievable properties
+            dict: Mapping with structure {prop_name: {name: mp_name, ...}} for retrievable properties
         """
         try:
             mapping_file = os.path.join(
@@ -41,44 +40,44 @@ class CodAPIHelper:
             with open(mapping_file, 'r') as f:
                 data = json.load(f)
             
-            # Create mapping with full property details from COD block
+            # Create mapping with full property details from materialsproject block
             mapping = {}
             for prop_name, prop_details in data.get('properties', {}).items():
-                cod_info = prop_details.get('cod', {})
-                if cod_info.get('retrievable'):
+                mp_info = prop_details.get('materialsproject', {})
+                if mp_info.get('retrievable'):
                     mapping[prop_name] = {
-                        'name': cod_info.get('name'),
+                        'name': mp_info.get('name'),
                         'retrievable': True,
-                        'range_support': cod_info.get('range_support', False),
+                        'range_support': mp_info.get('range_support', False),
                     }
             
             return mapping
         except Exception as e:
             if self.logger:
-                self.logger.log(f"Warning: Could not load property mapping: {str(e)}")
+                self.logger.log(f"Warning: Could not load Materials Project property mapping: {str(e)}")
             return {}
 
     def map_properties(self, standard_properties: dict) -> dict:
         """
-        Map standard property names to COD property names.
+        Map standard property names to Materials Project property names.
         Only maps properties that are marked as retrievable.
         
         Args:
             standard_properties: Dict with standard property names as keys
             
         Returns:
-            dict: Dict with COD property names as keys (non-retrievable properties excluded)
+            dict: Dict with Materials Project property names as keys (non-retrievable properties excluded)
         """
         mapped = {}
         for standard_name, value in standard_properties.items():
             if standard_name in self.property_mapping:
                 prop_info = self.property_mapping[standard_name]
                 if prop_info.get('retrievable'):
-                    cod_name = prop_info['name']
-                    mapped[cod_name] = value
+                    mp_name = prop_info['name']
+                    mapped[mp_name] = value
                 else:
                     if self.logger:
-                        self.logger.log(f"Property '{standard_name}' is not retrievable in COD OPTIMADE, skipping")
+                        self.logger.log(f"Property '{standard_name}' is not retrievable in Materials Project OPTIMADE, skipping")
             else:
                 if self.logger:
                     self.logger.log(f"Warning: Property '{standard_name}' not in mapping, skipping")
@@ -86,23 +85,18 @@ class CodAPIHelper:
 
     def fetch_from_api(self, query: str, limit: int, filters: dict = None) -> list:
         """
-        Fetch structures from COD OPTIMADE API with pagination support.
+        Fetch structures from Materials Project OPTIMADE API with pagination support.
 
         Args:
             query: Element or formula to search for
             limit: Maximum number of results to fetch
-            filters: Optional dict with structure property filters:
-                - nelements: int or [min, max] - number of unique elements
-                - natoms: int or [min, max] - atoms in unit cell
-                - volume: [min, max] - unit cell volume range
-                - spacegroup_number: int - space group number (1-230)
-                - spacegroup_symbol: str - Hermann-Mauguin symbol
+            filters: Optional dict with structure property filters
 
         Returns:
             list: Raw structure data from OPTIMADE API
         """
         all_results = []
-        page_limit = 10  # COD's max per request
+        page_limit = 10  # Materials Project's default page size
         page_offset = 0
         filters = filters or {}
 
@@ -121,16 +115,11 @@ class CodAPIHelper:
                     'response_fields': (
                         'lattice_vectors,'
                         'cartesian_site_positions,'
-                        'fractional_site_positions,'
                         'species_at_sites,'
                         'species,'
                         'chemical_formula_reduced,'
                         'nelements,'
-                        'nperiodic_dimensions,'
-                        'natoms,'
-                        'volume,'
-                        'spacegroup_number,'
-                        'spacegroup_symbol'
+                        'nperiodic_dimensions'
                     )
                 }
                 if optimade_filter:
@@ -179,7 +168,7 @@ class CodAPIHelper:
 
     def is_host_reachable(self) -> bool:
         """
-        Check whether the COD OPTIMADE host is reachable.
+        Check whether the Materials Project OPTIMADE host is reachable.
 
         Returns:
             bool: True if reachable, False otherwise
@@ -194,7 +183,7 @@ class CodAPIHelper:
             return True
         except requests.exceptions.RequestException as e:
             if self.logger:
-                self.logger.log(f"COD host unreachable: {str(e)}")
+                self.logger.log(f"Materials Project host unreachable: {str(e)}")
             return False
 
     def build_filter(self, query: str, filters: dict = None) -> str:
