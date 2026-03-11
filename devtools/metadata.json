@@ -30,6 +30,15 @@
         "folder_path": "Information_Units/Databases/Alexandria",
         "class_name": "AlexandriaDatabase",
         "file_name": "AlexandriaDatabase.py"
+      },
+      {
+        "id": "mathub3d",
+        "name": "Mathub3d",
+        "display_name": "Mathub3d",
+        "description": "MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research",
+        "folder_path": "Information_Units/Databases/Mathub3d",
+        "class_name": "Mathub3dDatabase",
+        "file_name": "Mathub3dDatabase.py"
       }
     ],
     "generators": [
