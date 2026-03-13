@@ -39,6 +39,15 @@
         "folder_path": "Information_Units/Databases/Mathub3d",
         "class_name": "Mathub3dDatabase",
         "file_name": "Mathub3dDatabase.py"
+      },
+      {
+        "id": "jarvisdft",
+        "name": "Jarvisdft",
+        "display_name": "JarvisDFT",
+        "description": "JARVIS-DFT - NIST computational materials database with electronic, optical, and solar cell properties",
+        "folder_path": "Information_Units/Databases/Jarvisdft",
+        "class_name": "JarvisdftDatabase",
+        "file_name": "JarvisdftDatabase.py"
       }
     ],
     "generators": [
