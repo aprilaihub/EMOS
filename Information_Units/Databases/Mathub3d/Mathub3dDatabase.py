@@ -1,16 +1,84 @@
+import tempfile
 from Information_Units.Databases.BaseDatabase import BaseDatabase
+from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
+from Information_Units.Databases.Cod.CodDatabase import CodDatabase
+from Information_Units.Databases.Materialsproject.MaterialsprojectDatabase import MaterialsprojectDatabase
 
 
 class Mathub3dDatabase(BaseDatabase):
-    def __init__(self, database_name, logger=None):
-        super().__init__(database_name, logger)
-    
-    def info(self):
-        msg = "MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research"
-        return msg
+    """MatHub-3d database: local JSON filtering + CIF cross-referencing via COD/MP."""
 
-    def retrieve(self, inputs: dict) -> str:
-        # Implement retrieve logic here
-        if self.logger:
-            self.logger.log("Retrieved from Mathub3d")
-        return None
+    def __init__(self, database_name='mathub3d', logger=None):
+        super().__init__(database_name, logger)
+        self.output_dir = tempfile.mkdtemp(prefix="mathub3d_")
+        self.helper = Mathub3dHelper(logger=logger)
+        self.cod_db = CodDatabase(logger=logger)
+        self.mp_db = MaterialsprojectDatabase(logger=logger)
+
+    def info(self):
+        return (
+            "MatHub-3d: first-principles materials repository "
+            "(74K structures, thermoelectric transport properties). "
+            "CIF files retrieved via COD/Materials Project cross-referencing."
+        )
+
+    def retrieve(self, inputs: dict) -> list:
+        """
+        Filter MatHub-3d dataset and retrieve CIF files via COD/MP cross-referencing.
+
+        Args:
+            inputs (dict): Query parameters with standard property names
+                - query: Material query (e.g., 'Fe', 'Al2O3')
+                - limit: Max number of CIF results (default: 10)
+                - Additional keys are treated as standard property filters:
+                  band_gap, energy_per_atom, bulk_modulus, density, volume,
+                  space_group, magnetization, is_magnetic, nelements, etc.
+
+        Returns:
+            list: Paths to CIF files matched from COD/Materials Project
+        """
+        try:
+            query = inputs.get('query', '')
+            limit = inputs.get('limit', 10)
+
+            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            filters = self.helper.map_properties(properties) if properties else {}
+
+            if self.logger:
+                filter_str = f" with filters {filters}" if filters else ""
+                self.logger.log(
+                    f"Retrieving from MatHub-3d: {query} (limit: {limit}){filter_str}"
+                )
+
+            data = self.helper.load_data()
+            results = self.helper.filter_by_formula(data, query)
+            results = self.helper.filter_by_properties(results, filters)
+
+            if self.logger:
+                self.logger.log(f"MatHub-3d filtered: {len(results)} candidates")
+
+            if not results:
+                return []
+
+            # Cross-reference with COD/MP to get CIF files
+            cif_paths = []
+            for entry in results:
+                if len(cif_paths) >= limit:
+                    break
+                cif_path = self.helper.find_cif_match(
+                    entry, self.cod_db, self.mp_db, self.output_dir
+                )
+                if cif_path:
+                    cif_paths.append(cif_path)
+                    if self.logger:
+                        self.logger.log(f"CIF match: {entry.get('formula')} -> {cif_path}")
+
+            if self.logger:
+                self.logger.log(f"Total CIF files retrieved: {len(cif_paths)}")
+
+            return cif_paths
+
+        except Exception as e:
+            if self.logger:
+                self.logger.log(f"Error: {str(e)}")
+            return []

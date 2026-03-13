@@ -4,8 +4,11 @@
 
 Unlike COD, Materials Project, and Alexandria — which use the OPTIMADE API to query a remote server
 and return full crystal structures (with atomic positions) as CIF files — **MatHub-3d is a local,
-file-based dataset**. The data must be loaded from the shipped files (`MatHub-3d.json`,
-`MatHub-3d.pkl`, `electric_data.xlsx`) inside the zip archive.
+file-based dataset**. The data is loaded from `MatHub-3d.json` inside the shipped zip archive.
+
+> **Note**: The zip also contains `MatHub-3d.pkl` and `electric_data.xlsx`, but these are derived
+> subsets created later. The JSON file is the **original and authoritative data source** from the
+> MatHub-3d website, containing all 74,177 entries and 54 fields.
 
 ### Critical Limitation: No Atomic Positions
 
@@ -20,75 +23,58 @@ directly generate a CIF file. This means:
 
 ---
 
-## Dataset Selection Strategy
+## Data Source: MatHub-3d.json
 
-The `retrieve` method should select the appropriate dataset file based on what properties the user
-is filtering on.
+Single file, 74,177 entries, 54 fields. Loaded once into memory on first `retrieve()` call.
 
-### Decision Tree
+### Available Properties
 
-```
-User provides filter properties
-        │
-        ├── Contains thermoelectric-specific properties?
-        │   (Seebeck, power_factor, thermal_conductivity_electronic, pf_ke_ratio)
-        │   │
-        │   └── YES → Load electric_data.xlsx (elecinfo sheet)
-        │             10,195 entries, 20 columns
-        │             Unique properties: Seebeck_n/p, PF_n/p, Ke_n/p, PF/Ke
-        │
-        ├── Contains electrical transport properties only?
-        │   (carrier_concentration, conductivity, mobility)
-        │   BUT NOT Seebeck/PF/Ke
-        │   │
-        │   └── YES → Load MatHub-3d.pkl (via joblib)
-        │             7,150 entries, 11 columns
-        │             Fastest to load (839 KB), has mobility data
-        │
-        └── Contains only basic structural/electronic/energetic properties?
-            (formula, elements, spacegroup, gap, energy, density, volume,
-             bulk_modulus, magnetic properties, lattice parameters)
-            │
-            └── YES → Load MatHub-3d.json
-                      74,177 entries, 54 fields
-                      Most complete dataset, broadest coverage
-```
+The "Standard Name" column refers to the universal property key in
+`Information_Units/property_mappings.json` — the central corpus that maps standardised names to
+source-specific field names for every database. A `mathub3d` entry must be added there for each
+property mathub3d exposes.
 
-### Property-to-File Mapping
+| Category | JSON Field | Standard Name (property_mappings.json) | Completeness |
+|----------|-----------|----------------------------------------|-------------|
+| **Identity** | `formula` | `query` | 100% |
+| **Identity** | `elements` | (element filter) | 100% |
+| **Identity** | `nelements` | `nelements` | 100% |
+| **Identity** | `name` / `folder` | (ICSD cross-ref) | 100% |
+| **Lattice (initial)** | `before_a/b/c` | `lattice_a/b/c` (initial) | 100% |
+| **Lattice (initial)** | `before_alpha/beta/gamma` | `lattice_alpha/beta/gamma` (initial) | 100% |
+| **Lattice (relaxed)** | `after_a/b/c` | `lattice_a/b/c` (relaxed) | ~40% |
+| **Lattice (relaxed)** | `after_alpha/beta/gamma` | `lattice_alpha/beta/gamma` (relaxed) | ~40% |
+| **Structure** | `spacegroup` | `spacegroup` | 100% |
+| **Structure** | `spacegroup_type` | `spacegroup_type` | 100% |
+| **Structure** | `natoms` | `natoms` | ~40% |
+| **Structure** | `volume` | `volume` | ~40% |
+| **Structure** | `density` | `density` | ~40% |
+| **Structure** | `mass` | `mass` | ~40% |
+| **Energetics** | `energy` | `energy` | ~40% |
+| **Energetics** | `energy_per_atom` | `energy_per_atom` | ~40% |
+| **Electronic** | `gap` | `gap` | ~40% |
+| **Electronic** | `vbm` | `vbm` | ~8.5% |
+| **Electronic** | `cbm` | `cbm` | ~8.5% |
+| **Electronic** | `efermi` | `efermi` | ~40% |
+| **Magnetic** | `is_magnetic` | `is_magnetic` | ~40% |
+| **Magnetic** | `total_magnetic_moment` | `total_magnetic_moment` | ~40% |
+| **Mechanical** | `bulk_modulus` | `bulk_modulus` | ~22% |
+| **Transport** | `dp_n` | `deformation_potential_n` | ~14% |
+| **Transport** | `dp_p` | `deformation_potential_p` | ~14% |
+| **Transport** | `trans` | (transport flag) | ~5% |
 
-| Standard Property | JSON | PKL | XLSX | Recommended Source |
-|---|:---:|:---:|:---:|---|
-| `query` (formula/elements) | ✓ | ✓ | ✓ | JSON (largest pool) |
-| `spacegroup` | ✓ | ✓ | — | JSON |
-| `nelements` | ✓ | — | — | JSON |
-| `gap` (band gap) | ✓ | ✓ | — | JSON |
-| `energy_per_atom` | ✓ | ✓ | — | JSON |
-| `density` | ✓ | — | — | JSON |
-| `volume` | ✓ | — | — | JSON |
-| `bulk_modulus` | ✓ | — | ✓ (as BM) | JSON (22% coverage) |
-| `is_magnetic` | ✓ | — | — | JSON |
-| `total_magnetic_moment` | ✓ | — | — | JSON |
-| `vbm` / `cbm` | ✓ | — | — | JSON |
-| `efermi` | ✓ | — | — | JSON |
-| `lattice_a/b/c` | ✓ | — | — | JSON |
-| `carrier_concentration_n` | ✓* | ✓ | ✓ | PKL (cleanest) |
-| `carrier_concentration_p` | ✓* | ✓ | ✓ | PKL (cleanest) |
-| `conductivity_n` | ✓* | ✓ | ✓ | PKL (cleanest) |
-| `conductivity_p` | ✓* | ✓ | ✓ | PKL (cleanest) |
-| `mobility_n` | — | ✓ | — | PKL (exclusive) |
-| `mobility_p` | — | ✓ | — | PKL (exclusive) |
-| `deformation_potential_n` | ✓* | — | ✓ | XLSX |
-| `deformation_potential_p` | ✓* | — | ✓ | XLSX |
-| `seebeck_n` | — | — | ✓ | XLSX (exclusive) |
-| `seebeck_p` | — | — | ✓ | XLSX (exclusive) |
-| `power_factor_n` | — | — | ✓ | XLSX (exclusive) |
-| `power_factor_p` | — | — | ✓ | XLSX (exclusive) |
-| `thermal_conductivity_electronic_n` | — | — | ✓ | XLSX (exclusive) |
-| `thermal_conductivity_electronic_p` | — | — | ✓ | XLSX (exclusive) |
-| `pf_ke_ratio_n` | — | — | ✓ | XLSX (exclusive) |
-| `pf_ke_ratio_p` | — | — | ✓ | XLSX (exclusive) |
+### Property Completeness Notes
 
-*\* JSON has `dp_n`/`dp_p` fields but only for ~14% of entries; XLSX has broader coverage.*
+Not all 74,177 entries have full DFT results. The coverage breakdown:
+
+- **100%** (74,177): Identity fields, initial lattice, spacegroup, formula, elements
+- **~40%** (~30K): Relaxed lattice, energy, gap, efermi, magnetic properties, density, volume
+- **~22%** (~16K): Bulk modulus
+- **~14%** (~10K): Deformation potentials (`dp_n`, `dp_p`)
+- **~8.5%** (~6K): Band edge details (`vbm`, `cbm`)
+
+When filtering on a property with partial coverage, entries where that property is `null` / missing
+are excluded from results (they simply don't match).
 
 ---
 
@@ -111,12 +97,8 @@ db.retrieve({
     # Energetic filters
     'energy_per_atom': [-7.0, -4.0],  # range (eV)
     'bulk_modulus': [50, 200],  # range (GPa)
-    # Transport filters (triggers PKL)
-    'mobility_n': [10, 500],    # range (cm²/Vs)
-    'conductivity_n': [1000, None],  # min only
-    # Thermoelectric filters (triggers XLSX)
-    'seebeck_n': [None, -200],  # max only (µV/K)
-    'power_factor_n': [10, None],  # min only
+    # Transport filters
+    'deformation_potential_n': [-10, -1],  # range (eV)
 })
 ```
 
@@ -159,85 +141,93 @@ Each returned dict should contain:
 
 ## Implementation Approach
 
-### Step 1: Load Data on First Call (Lazy Loading)
+### Step 1: Load JSON on First Call (Lazy Loading)
 
 ```python
+import json
+import zipfile
+from pathlib import Path
+
 class Mathub3dDatabase(BaseDatabase):
     def __init__(self, ...):
         ...
-        self._json_data = None    # Loaded on demand
-        self._pkl_data = None     # Loaded on demand
-        self._xlsx_data = None    # Loaded on demand
+        self._data = None  # Loaded on demand
         self._zip_path = Path(__file__).parent / 'MatHub-3d.zip'
+
+    def _load_data(self):
+        """Lazy-load MatHub-3d.json from the zip archive."""
+        if self._data is None:
+            with zipfile.ZipFile(self._zip_path, 'r') as zf:
+                with zf.open('MatHub-3d.json') as f:
+                    self._data = json.load(f)
+        return self._data
 ```
 
-### Step 2: Determine Which File to Load
+### Step 2: Property Name Mapping via `property_mappings.json`
+
+Instead of a hardcoded local dict, the mapping from standard property names to MatHub-3d JSON
+field names is read from **`Information_Units/property_mappings.json`** — the same central file
+used by COD, Alexandria, and Materials Project.
+
+Each property in that file will have a `"mathub3d"` key:
+
+```json
+"nelements": {
+  "type": "integer",
+  "description": "Number of unique chemical elements",
+  "category": "structural",
+  "cod":            { "name": "nelements", "retrievable": true },
+  "alexandria":     { "name": "nelements", "retrievable": true },
+  "materialsproject": { "name": "nelements", "retrievable": true },
+  "mathub3d":       { "name": "nelements", "retrievable": true, "range_support": true }
+}
+```
+
+At runtime, the database class loads the mapping once and builds a lookup:
 
 ```python
-XLSX_ONLY_PROPERTIES = {
-    'seebeck_n', 'seebeck_p',
-    'power_factor_n', 'power_factor_p',
-    'thermal_conductivity_electronic_n', 'thermal_conductivity_electronic_p',
-    'pf_ke_ratio_n', 'pf_ke_ratio_p',
-    'deformation_potential_n', 'deformation_potential_p',
-}
+import json
+from pathlib import Path
 
-PKL_ONLY_PROPERTIES = {
-    'mobility_n', 'mobility_p',
-}
-
-PKL_SHARED_PROPERTIES = {
-    'carrier_concentration_n', 'carrier_concentration_p',
-    'conductivity_n', 'conductivity_p',
-}
-
-def _select_source(self, filter_keys: set) -> str:
-    """Determine which data file to query based on requested properties."""
-    if filter_keys & XLSX_ONLY_PROPERTIES:
-        return 'xlsx'
-    if filter_keys & (PKL_ONLY_PROPERTIES | PKL_SHARED_PROPERTIES):
-        return 'pkl'
-    return 'json'
+def _load_property_map(self):
+    """Build {standard_name: json_field_name} from property_mappings.json."""
+    mappings_path = Path(__file__).parent.parent / 'property_mappings.json'
+    with open(mappings_path) as f:
+        mappings = json.load(f)
+    return {
+        prop_name: prop_info['mathub3d']['name']
+        for prop_name, prop_info in mappings['properties'].items()
+        if 'mathub3d' in prop_info and prop_info['mathub3d'].get('retrievable')
+    }
 ```
 
-### Step 3: Property Name Mapping
+This keeps the mapping centralised — any new property added to `property_mappings.json` with a
+`mathub3d` key is automatically available, with no code changes in the database class.
 
-Map standard input names to file-specific column/field names:
+The full list of `mathub3d` entries to add to `property_mappings.json`:
 
-```python
-PROPERTY_MAP = {
-    # Standard name → {source: column_name}
-    'query':                          {'json': 'formula',  'pkl': 'formula',  'xlsx': None},
-    'spacegroup':                     {'json': 'spacegroup', 'pkl': 'spacegroup', 'xlsx': None},
-    'gap':                            {'json': 'gap', 'pkl': 'gap', 'xlsx': None},
-    'energy_per_atom':                {'json': 'energy_per_atom', 'pkl': 'energy_per_atom', 'xlsx': None},
-    'carrier_concentration_n':        {'json': 'dp_n', 'pkl': 'carr_n(10^20/cm3)', 'xlsx': 'carr_n(10^20/cm3)'},
-    'carrier_concentration_p':        {'json': 'dp_p', 'pkl': 'carr_p(10^20/cm3)', 'xlsx': 'carr_p(10^20/cm3)'},
-    'conductivity_n':                 {'json': None, 'pkl': 'sigma_n(S/m)', 'xlsx': 'sigma_n(S/m)'},
-    'conductivity_p':                 {'json': None, 'pkl': 'sigma_p(S/m)', 'xlsx': 'sigma_p(S/m)'},
-    'mobility_n':                     {'json': None, 'pkl': 'mob_n(cm2/Vs)', 'xlsx': None},
-    'mobility_p':                     {'json': None, 'pkl': 'mob_p(cm2/Vs)', 'xlsx': None},
-    'seebeck_n':                      {'json': None, 'pkl': None, 'xlsx': 'Seebeck_n(uV/K)'},
-    'seebeck_p':                      {'json': None, 'pkl': None, 'xlsx': 'Seebeck_p(uV/K)'},
-    'power_factor_n':                 {'json': None, 'pkl': None, 'xlsx': 'PF_n(1E-4Wm-1K-2)'},
-    'power_factor_p':                 {'json': None, 'pkl': None, 'xlsx': 'PF_p(1E-4Wm-1K-2)'},
-    'thermal_conductivity_electronic_n': {'json': None, 'pkl': None, 'xlsx': 'Ke_n(Wm-1K-1)'},
-    'thermal_conductivity_electronic_p': {'json': None, 'pkl': None, 'xlsx': 'Ke_p(Wm-1K-1)'},
-    'deformation_potential_n':        {'json': 'dp_n', 'pkl': None, 'xlsx': 'DP_n(eV)'},
-    'deformation_potential_p':        {'json': 'dp_p', 'pkl': None, 'xlsx': 'DP_p(eV)'},
-    'pf_ke_ratio_n':                  {'json': None, 'pkl': None, 'xlsx': 'PF/Ke_N'},
-    'pf_ke_ratio_p':                  {'json': None, 'pkl': None, 'xlsx': 'PF/Ke_P'},
-    'bulk_modulus':                    {'json': 'bulk_modulus', 'pkl': None, 'xlsx': 'BM(GPa)'},
-    # Structural (JSON only)
-    'nelements':                      {'json': 'nelements', 'pkl': None, 'xlsx': None},
-    'density':                        {'json': 'density', 'pkl': None, 'xlsx': None},
-    'volume':                         {'json': 'volume', 'pkl': None, 'xlsx': None},
-    'is_magnetic':                    {'json': 'is_magnetic', 'pkl': None, 'xlsx': None},
-    'total_magnetic_moment':          {'json': 'total_magnetic_moment', 'pkl': None, 'xlsx': None},
-}
-```
+| Standard Name | mathub3d `name` | `range_support` | Notes |
+|---|---|---|---|
+| `elements` | `elements` | false | Already exists, add mathub3d key |
+| `nelements` | `nelements` | true | Already exists, add mathub3d key |
+| `energy` | `energy` | true | Already exists (alexandria), add mathub3d key |
+| `band_gap` | `gap` | true | Already exists (alexandria), add mathub3d key |
+| `space_group` | `spacegroup` | true | Already exists (alexandria), add mathub3d key |
+| `magnetization` | `total_magnetic_moment` | true | Already exists (alexandria), reuse for mathub3d |
+| `energy_per_atom` | `energy_per_atom` | true | **New property** (total DFT energy/atom, distinct from `formation_energy_per_atom`) |
+| `density` | `density` | true | **New property** |
+| `volume` | `volume` | true | **New property** |
+| `mass` | `mass` | true | **New property** |
+| `natoms` | `natoms` | true | **New property** |
+| `bulk_modulus` | `bulk_modulus` | true | **New property** |
+| `is_magnetic` | `is_magnetic` | false | **New property** (boolean) |
+| `vbm` | `vbm` | true | **New property** |
+| `cbm` | `cbm` | true | **New property** |
+| `efermi` | `efermi` | true | **New property** |
+| `deformation_potential_n` | `dp_n` | true | **New property** |
+| `deformation_potential_p` | `dp_p` | true | **New property** |
 
-### Step 4: Filter and Return
+### Step 3: Filter and Return
 
 ```python
 def retrieve(self, inputs: dict) -> list:
@@ -245,18 +235,21 @@ def retrieve(self, inputs: dict) -> list:
     limit = inputs.get('limit', 10)
     filters = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
 
-    source = self._select_source(set(filters.keys()))
-    data = self._load_source(source)               # lazy load from zip
-    results = self._apply_formula_filter(data, query, source)
-    results = self._apply_property_filters(results, filters, source)
+    prop_map = self._load_property_map()  # from property_mappings.json
+    data = self._load_data()
+    results = self._apply_formula_filter(data, query)
+    results = self._apply_property_filters(results, filters, prop_map)
     results = results[:limit]
 
-    return self._format_results(results, source)    # → list[dict]
+    return self._format_results(results)
 ```
+
+No file-selection logic needed — every query hits the same JSON dataset.
+Property name translation is driven entirely by `property_mappings.json`.
 
 ---
 
-## CIF Generation: Cross-Reference via COD Formula + Lattice Matching
+## CIF Generation: Cross-Reference via COD + Materials Project
 
 ### Why Not a Direct ICSD Lookup?
 
@@ -270,25 +263,49 @@ ICSD collection code. However, **COD and ICSD are separate databases** with inde
 
 Therefore, **direct ICSD identifier lookup through COD is not possible**.
 
-### Adopted Strategy: Formula + Lattice Parameter Matching (Approximate)
+### Adopted Strategy: Multi-Database Formula + Lattice Parameter Matching
 
-A two-step approach is used to obtain CIF files for MatHub-3d materials:
+To maximize coverage, we query **both COD and Materials Project** via their OPTIMADE APIs. This
+combines:
+
+- **COD** (~500K structures): Experimental crystal structures from published literature.
+- **Materials Project** (~154K structures): Computed (DFT) crystal structures, many originally
+  sourced from ICSD — giving the highest overlap with MatHub-3d's ICSD-derived entries.
+
+The approach:
 
 1. **Filter** materials locally using MatHub-3d's property data (thermoelectric, electronic, etc.).
-2. **Retrieve CIF candidates** from COD by querying the chemical formula and then **post-filtering
-   by lattice parameter similarity** to identify the best structural match.
+2. **Query both COD and Materials Project** by chemical formula via OPTIMADE.
+3. **Post-filter by lattice parameter similarity** to identify the best structural match across
+   both databases.
+4. **Prefer the best lattice match** regardless of source. If both databases have a match, the
+   one with the smallest lattice deviation wins.
 
-This is an approximate matching strategy — not every MatHub-3d entry will have a COD match, and
-some formulas may return multiple candidates.
+This is still an approximate matching strategy, but using two databases significantly increases the
+chance of finding a match.
+
+### Why Both Databases?
+
+| Database | Strengths | Limitations |
+|---|---|---|
+| **COD** | Largest open-access collection (~500K); experimental structures | No ICSD cross-ref; spacegroup filter unreliable |
+| **Materials Project** | Many structures from ICSD; computed (relaxed) lattice params closer to MatHub-3d's DFT values | Smaller total count (~154K); requires functional matching considerations |
+
+MatHub-3d's lattice parameters are DFT-relaxed, so **Materials Project's computed lattice parameters
+are likely a closer match** than COD's experimental values. However, COD's larger catalog ensures
+broader formula coverage. Using both gives the best of both worlds.
 
 ### Implementation
 
 ```python
 from Information_Units.Databases.Cod.CodDatabase import CodDatabase
+from Information_Units.Databases.Materialsproject.MaterialsprojectDatabase import MaterialsprojectDatabase
+
 
 def retrieve_cif_for_mathub_results(mathub_results, lattice_tolerance=0.05):
     """
-    Attempt to retrieve CIF files from COD for MatHub-3d filtered results.
+    Attempt to retrieve CIF files from COD and Materials Project for MatHub-3d
+    filtered results. Queries both databases and selects the best lattice match.
     
     Args:
         mathub_results: list[dict] from Mathub3dDatabase.retrieve()
@@ -299,50 +316,68 @@ def retrieve_cif_for_mathub_results(mathub_results, lattice_tolerance=0.05):
         list[dict]: mathub_results enriched with 'cif_path' where a match was found
     """
     cod_db = CodDatabase()
+    mp_db = MaterialsprojectDatabase()
     
     for result in mathub_results:
         formula = result['formula']
+        mathub_lattice = result.get('lattice', {})
         
-        # Step 1: Query COD by formula (elements)
+        # Query both databases by formula
         cod_cif_paths = cod_db.retrieve({
             'query': formula,
-            'limit': 10  # Fetch several candidates for lattice comparison
+            'limit': 10
+        })
+        mp_cif_paths = mp_db.retrieve({
+            'query': formula,
+            'limit': 10
         })
         
-        if not cod_cif_paths:
+        # Tag each path with its source for reporting
+        all_candidates = []
+        for p in (cod_cif_paths or []):
+            all_candidates.append(('cod', p))
+        for p in (mp_cif_paths or []):
+            all_candidates.append(('materialsproject', p))
+        
+        if not all_candidates:
             result['cif_path'] = None
-            result['cif_match_status'] = 'no_cod_match'
+            result['cif_source'] = None
+            result['cif_match_status'] = 'no_match'
             continue
         
-        # Step 2: Post-filter by lattice parameter similarity
-        # Compare COD structures against MatHub-3d relaxed lattice params
-        mathub_lattice = result.get('lattice', {})
+        # Find best lattice match across both databases
         best_match = _find_best_lattice_match(
-            cod_cif_paths, mathub_lattice, lattice_tolerance
+            all_candidates, mathub_lattice, lattice_tolerance
         )
         
         if best_match:
-            result['cif_path'] = best_match
+            result['cif_path'] = best_match[1]
+            result['cif_source'] = best_match[0]
             result['cif_match_status'] = 'matched'
         else:
-            # Fallback: use first COD result (same composition, different polymorph possible)
-            result['cif_path'] = cod_cif_paths[0]
+            # Fallback: use first available result (prefer MP over COD since
+            # MatHub-3d entries are ICSD-derived and MP has high ICSD overlap)
+            mp_first = next((c for c in all_candidates if c[0] == 'materialsproject'), None)
+            fallback = mp_first or all_candidates[0]
+            result['cif_path'] = fallback[1]
+            result['cif_source'] = fallback[0]
             result['cif_match_status'] = 'approximate'
     
     return mathub_results
 
 
-def _find_best_lattice_match(cif_paths, target_lattice, tolerance):
+def _find_best_lattice_match(candidates, target_lattice, tolerance):
     """
     Compare CIF file lattice parameters against MatHub-3d target values.
+    Selects the best match across all candidate CIF files from any source.
     
     Args:
-        cif_paths: list of CIF file paths from COD
+        candidates: list of (source_name, cif_path) tuples
         target_lattice: dict with keys 'a', 'b', 'c', 'alpha', 'beta', 'gamma'
         tolerance: fractional tolerance (e.g., 0.05 for 5%)
     
     Returns:
-        str: path to best matching CIF, or None if no match within tolerance
+        tuple: (source_name, cif_path) of best match, or None if no match within tolerance
     """
     from pymatgen.core import Structure
     
@@ -353,10 +388,10 @@ def _find_best_lattice_match(cif_paths, target_lattice, tolerance):
     if not all([target_a, target_b, target_c]):
         return None
     
-    best_path = None
+    best_candidate = None
     best_deviation = float('inf')
     
-    for cif_path in cif_paths:
+    for source, cif_path in candidates:
         try:
             structure = Structure.from_file(cif_path)
             lat = structure.lattice
@@ -369,48 +404,63 @@ def _find_best_lattice_match(cif_paths, target_lattice, tolerance):
             
             if max_dev < tolerance and max_dev < best_deviation:
                 best_deviation = max_dev
-                best_path = cif_path
+                best_candidate = (source, cif_path)
         except Exception:
             continue
     
-    return best_path
+    return best_candidate
 ```
 
 ### Usage Example
 
 ```python
-# Step 1: Filter MatHub-3d for thermoelectric candidates
+# Step 1: Filter MatHub-3d for candidate materials
 mathub_db = Mathub3dDatabase('mathub3d')
 candidates = mathub_db.retrieve({
     'query': 'Ni',
     'gap': [0.1, 1.0],
-    'seebeck_n': [None, -150],
+    'bulk_modulus': [50, 200],
     'limit': 5
 })
 
-# Step 2: Retrieve CIF files from COD via formula + lattice matching
+# Step 2: Retrieve CIF files from COD + Materials Project via formula + lattice matching
 enriched = retrieve_cif_for_mathub_results(candidates, lattice_tolerance=0.05)
 
 for entry in enriched:
-    print(f"{entry['formula']}: CIF={entry['cif_path']} ({entry['cif_match_status']})")
+    print(f"{entry['formula']}: CIF={entry['cif_path']} "
+          f"(source={entry['cif_source']}, status={entry['cif_match_status']})")
 ```
 
 ### Expected Outcomes
 
-| Scenario | `cif_match_status` | Meaning |
-|---|---|---|
-| COD has same structure | `matched` | Lattice params match within tolerance — high confidence |
-| COD has same formula, different polymorph | `approximate` | Same composition found but lattice differs — use with caution |
-| Formula not in COD | `no_cod_match` | No COD entry for this composition — CIF unavailable |
+| Scenario | `cif_match_status` | `cif_source` | Meaning |
+|---|---|---|---|
+| Lattice match found | `matched` | `cod` or `materialsproject` | Lattice params match within tolerance — high confidence |
+| Formula found, lattice differs | `approximate` | `materialsproject` (preferred) or `cod` | Same composition, different polymorph possible — use with caution |
+| Formula not in either database | `no_match` | `None` | No entry for this composition — CIF unavailable |
+
+### Lookup Priority
+
+When no exact lattice match is found, the fallback preference is:
+
+1. **Materials Project first** — because MatHub-3d entries originate from ICSD, and MP has
+   significant ICSD overlap. MP's DFT-relaxed lattice parameters are also methodologically
+   closer to MatHub-3d's computed values.
+2. **COD second** — broader coverage but experimental lattice parameters may differ more from
+   MatHub-3d's DFT values.
+
+When an exact lattice match *is* found, the best match wins regardless of source.
 
 ### Limitations
 
-- **Not all MatHub-3d entries will have COD matches.** COD contains ~500K structures from published
-  literature; MatHub-3d's 74K entries originate from ICSD, and the overlap is partial.
-- **Polymorphism:** A formula like `SiO2` has dozens of polymorphs in COD. Lattice parameter
-  matching helps select the right one, but is not infallible.
-- **COD API rate limits:** COD's OPTIMADE API returns max 10 results per page. For large-scale
-  cross-referencing, batch processing with delays is recommended.
+- **Not all MatHub-3d entries will have matches.** Combined, COD (~500K) and MP (~154K) cover a
+  large portion of known materials, but gaps remain for novel or rare compositions.
+- **Polymorphism:** A formula like `SiO2` has dozens of polymorphs across both databases. Lattice
+  parameter matching helps select the right one, but is not infallible.
+- **API rate limits:** Both COD and MP OPTIMADE APIs have per-page limits (COD: 10, MP: varies).
+  For large-scale cross-referencing, batch processing with delays is recommended.
+- **DFT vs experimental lattice:** MP values (DFT-relaxed) will generally be closer to MatHub-3d's
+  values than COD's experimental values. This is accounted for by the tolerance-based matching.
 - **Approximate, not exact:** This is a best-effort approach. For guaranteed structural accuracy,
   direct ICSD access (institutional license required) is the definitive source.
 
@@ -420,10 +470,10 @@ for entry in enriched:
 
 | Aspect | COD / MP / Alexandria | MatHub-3d |
 |--------|----------------------|-----------|
-| **Data Source** | Remote OPTIMADE API | Local files (zip) |
+| **Data Source** | Remote OPTIMADE API | Local JSON (from zip) |
 | **Has Atomic Positions** | Yes | No |
-| **Returns CIF** | Yes (directly) | Via COD cross-reference (approximate) |
-| **CIF Match Method** | N/A (native) | Formula + lattice parameter matching |
+| **Returns CIF** | Yes (directly) | Via COD + MP cross-reference (approximate) |
+| **CIF Match Method** | N/A (native) | Formula + lattice matching across COD & MP |
 | **Unique Value** | Full crystal structures | Thermoelectric transport properties |
-| **Query Method** | HTTP API calls | In-memory DataFrame filtering |
+| **Query Method** | HTTP API calls | In-memory JSON filtering |
 | **Best For** | Structure retrieval | Property-based material screening |
