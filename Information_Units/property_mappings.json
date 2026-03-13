@@ -34,6 +34,11 @@
       "materialsproject": {
         "name": "elements",
         "retrievable": true
+      },
+      "mathub3d": {
+        "name": "elements",
+        "retrievable": true,
+        "range_support": false
       }
     },
     "id": {
@@ -85,6 +90,11 @@
       "materialsproject": {
         "name": "nelements",
         "retrievable": true
+      },
+      "mathub3d": {
+        "name": "nelements",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "nperiodic_dimensions": {
@@ -130,6 +140,11 @@
         "name": "_alexandria_band_gap",
         "retrievable": true,
         "range_support": true
+      },
+      "mathub3d": {
+        "name": "gap",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "band_gap_direct": {
@@ -162,6 +177,11 @@
         "name": "_alexandria_space_group",
         "retrievable": true,
         "range_support": true
+      },
+      "mathub3d": {
+        "name": "spacegroup",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "hull_distance": {
@@ -184,6 +204,11 @@
         "name": "_alexandria_magnetization",
         "retrievable": true,
         "range_support": true
+      },
+      "mathub3d": {
+        "name": "total_magnetic_moment",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "energy": {
@@ -193,6 +218,11 @@
       "unit": "eV",
       "alexandria": {
         "name": "_alexandria_energy",
+        "retrievable": true,
+        "range_support": true
+      },
+      "mathub3d": {
+        "name": "energy",
         "retrievable": true,
         "range_support": true
       }
@@ -484,6 +514,136 @@
       "synthnn": {
         "name": "synthesizability_score",
         "predicatble": true,
+        "range_support": true
+      }
+    },
+    "energy_per_atom": {
+      "type": "float",
+      "description": "Total DFT energy per atom",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "mathub3d": {
+        "name": "energy_per_atom",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "density": {
+      "type": "float",
+      "description": "Mass density",
+      "category": "structural",
+      "unit": "g/cm3",
+      "mathub3d": {
+        "name": "density",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "volume": {
+      "type": "float",
+      "description": "Unit cell volume",
+      "category": "structural",
+      "unit": "Angstrom3",
+      "mathub3d": {
+        "name": "volume",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "mass": {
+      "type": "float",
+      "description": "Unit cell mass",
+      "category": "structural",
+      "unit": "amu",
+      "mathub3d": {
+        "name": "mass",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "natoms": {
+      "type": "integer",
+      "description": "Number of atoms in unit cell",
+      "category": "structural",
+      "mathub3d": {
+        "name": "natoms",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "bulk_modulus": {
+      "type": "float",
+      "description": "Bulk modulus",
+      "category": "mechanical",
+      "unit": "GPa",
+      "mathub3d": {
+        "name": "bulk_modulus",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "is_magnetic": {
+      "type": "boolean",
+      "description": "Whether the material is magnetic",
+      "category": "magnetic",
+      "mathub3d": {
+        "name": "is_magnetic",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
+    "vbm": {
+      "type": "float",
+      "description": "Valence band maximum",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "vbm",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "cbm": {
+      "type": "float",
+      "description": "Conduction band minimum",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "cbm",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "efermi": {
+      "type": "float",
+      "description": "Fermi energy",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "efermi",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "deformation_potential_n": {
+      "type": "float",
+      "description": "n-type deformation potential",
+      "category": "transport",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "dp_n",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "deformation_potential_p": {
+      "type": "float",
+      "description": "p-type deformation potential",
+      "category": "transport",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "dp_p",
+        "retrievable": true,
         "range_support": true
       }
     }

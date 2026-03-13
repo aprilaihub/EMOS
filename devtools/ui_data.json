@@ -21,7 +21,8 @@
     "databases": {
       "COD": "Crystallography Open Database - open-access collection of crystal structures", 
       "MaterialsProject": "Materials Project - computational materials database",
-      "Alexandria": "Alexandria PBE - DFT database for materials properties" 
+      "Alexandria": "Alexandria PBE - DFT database for materials properties",
+      "Mathub3d": "MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research"
     },
     "generators": {
       "MatterGen": "Diffusion model for crystal structure generation",
