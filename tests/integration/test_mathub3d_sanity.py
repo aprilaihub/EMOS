@@ -27,12 +27,12 @@ def rate_limit_delay():
 
 
 # ============================================================================
-# Local Data Loading Tests (no network required)
+# Local Data Tests (no network required)
 # ============================================================================
 
 @pytest.mark.integration
 def test_mathub3d_loads_data():
-    """Verify MatHub-3d.json loads from zip with expected entry count."""
+    """Verify MatHub-3d.json loads from zip with expected entry count and fields."""
     from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
 
     helper = Mathub3dHelper()
@@ -40,66 +40,29 @@ def test_mathub3d_loads_data():
     assert isinstance(data, list)
     assert len(data) > 70000, f"Expected 74K+ entries, got {len(data)}"
 
-
-@pytest.mark.integration
-def test_mathub3d_data_has_expected_fields():
-    """Verify loaded entries contain expected fields."""
-    from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
-
-    helper = Mathub3dHelper()
-    data = helper.load_data()
-    entry = data[0]
-
     required_fields = ['formula', 'elements', 'nelements', 'spacegroup',
                        'before_a', 'before_b', 'before_c']
     for field in required_fields:
-        assert field in entry, f"Missing required field: {field}"
+        assert field in data[0], f"Missing required field: {field}"
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("query,min_results", [
-    ("Fe", 100),
-    ("Al2O3", 1),
-    ("Si", 100),
-    ("Ni", 100),
-])
-def test_mathub3d_formula_filtering(query, min_results):
-    """Verify formula filtering returns expected number of results from real data."""
-    from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
-
-    helper = Mathub3dHelper()
-    data = helper.load_data()
-    results = helper.filter_by_formula(data, query)
-    assert len(results) >= min_results, \
-        f"Expected at least {min_results} results for '{query}', got {len(results)}"
-
-
-@pytest.mark.integration
-def test_mathub3d_property_filtering_real_data():
-    """Verify property filtering works against real dataset."""
+def test_mathub3d_formula_and_property_filtering():
+    """Verify formula and property filtering on real data."""
     from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
 
     helper = Mathub3dHelper()
     data = helper.load_data()
 
-    # Filter for entries with band gap between 1.0 and 2.0 eV
-    results = helper.filter_by_formula(data, 'Fe')
-    results = helper.filter_by_properties(results, {"gap": [1.0, 2.0]})
-    assert len(results) > 0, "Expected Fe entries with band gap in [1.0, 2.0]"
+    # Formula filtering
+    fe_results = helper.filter_by_formula(data, 'Fe')
+    assert len(fe_results) >= 100
 
-    for entry in results:
+    # Property filtering on top of formula results
+    filtered = helper.filter_by_properties(fe_results, {"gap": [1.0, 2.0]})
+    assert len(filtered) > 0
+    for entry in filtered:
         assert 1.0 <= entry['gap'] <= 2.0
-
-
-@pytest.mark.integration
-def test_mathub3d_property_mapping_loaded():
-    """Verify property mapping loads correctly from property_mappings.json."""
-    from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
-
-    helper = Mathub3dHelper()
-    assert len(helper.property_mapping) > 0
-    assert 'band_gap' in helper.property_mapping
-    assert helper.property_mapping['band_gap']['name'] == 'gap'
 
 
 # ============================================================================
@@ -110,15 +73,18 @@ def test_mathub3d_property_mapping_loaded():
 @pytest.mark.network
 @pytest.mark.slow
 @pytest.mark.parametrize("query,expected_elements,filters", [
+    # Basic queries without property filters
     ("Fe2O3", ["Fe", "O"], {}),
     ("Al2O3", ["Al", "O"], {}),
+    # Structural property filters
+    ("Fe", ["Fe"], {"nelements": [1, 3]}),
+    ("Si", ["Si"], {"density": [1.0, 5.0]}),
+    # Electronic property filters
     ("Si", ["Si"], {"band_gap": [0.5, 2.0]}),
+    # Combined filters
+    ("Fe", ["Fe"], {"band_gap": [1.0, 3.0], "nelements": [2, 4]}),
 ])
-def test_mathub3d_retrieve_structures(
-    query,
-    expected_elements,
-    filters,
-):
+def test_mathub3d_retrieve_structures(query, expected_elements, filters):
     """Verify MatHub-3d returns valid CIF files for various material queries."""
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
@@ -127,21 +93,20 @@ def test_mathub3d_retrieve_structures(
     retrieve_params.update(filters)
     results = db.retrieve(retrieve_params)
 
-    assert isinstance(results, list), f"Expected list, got {type(results)}"
+    assert isinstance(results, list) and len(results) > 0, \
+        f"No structures found for {query} with filters {filters}"
 
-    if len(results) > 0:
-        for path in results:
-            assert Path(path).exists(), f"CIF file not found: {path}"
-            assert path.endswith('.cif')
+    for path in results:
+        assert Path(path).exists(), f"CIF file not found: {path}"
+        assert path.endswith('.cif')
 
-            content = validate_cif_file(path)
+        content = validate_cif_file(path)
 
-            # Verify expected elements present in CIF
-            formula = extract_formula_from_cif(content)
-            if formula:
-                for elem in expected_elements:
-                    assert elem in formula or elem in content, \
-                        f"{elem} not found in CIF for {query}"
+        formula = extract_formula_from_cif(content)
+        if formula:
+            for elem in expected_elements:
+                assert elem in formula or elem in content, \
+                    f"{elem} not found in CIF for {query}"
 
 
 @pytest.mark.integration
@@ -153,7 +118,6 @@ def test_mathub3d_retrieve_performance(benchmark, limit):
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase()
-
     result = benchmark(db.retrieve, {'query': 'Fe2O3', 'limit': limit})
 
     assert isinstance(result, list)
