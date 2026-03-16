@@ -19,9 +19,13 @@
       "type": "string",
       "description": "Chemical system, participating atom types separated with -",
       "category": "chemical_system",
-      "mattergen": {
-          "name": "chemical_system",
-          "pretrained_models": ["chemical_system", "chemical_system_energy_above_hull"]
+      "mattergen_chemical_system": {
+        "name": "chemical_system",
+        "range_support": false
+      },
+      "mattergen_chemical_system_stability": {
+        "name": "chemical_system",
+        "range_support": false
       }
     },
     "elements": {
@@ -35,9 +39,6 @@
       "alexandria": {
         "name": "elements",
         "retrievable": true
-      },
-      "mattergen":{
-        "name":"elements"
       }
     },
     "id": {
@@ -126,27 +127,31 @@
         "retrievable": true,
         "range_support": true
       },
-      "mattergen": {
+      "mattergen_dft_band_gap": {
         "name": "dft_band_gap",
-        "pretrained_models": ["dft_band_gap"]
+        "range_support": false
       }
     },
     "mag_density": {
       "type": "float",
       "description": "Mag density",
       "unit": "T",
-      "mattergen":{
+      "mattergen_magnetic_density": {
         "name": "dft_mag_density",
-        "pretrained_models": ["dft_mag_density", "dft_mag_density_hhi_score"]
+        "range_support": false
+      },
+      "mattergen_magnetic_density_hhi": {
+        "name": "dft_mag_density",
+        "range_support": false
       }
     },
-    "hii_score": {
+    "hhi_score": {
       "type": "float",
       "description": "HII score (?)",
       "unit": "???",
-      "mattergen":{
-        "name": "hii_score",
-        "pretrained_models": ["dft_mag_density_hhi_score"]
+      "mattergen_magnetic_density_hhi": {
+        "name": "hhi_score",
+        "range_support": false
       }
     },
     "formation_energy_per_atom": {
@@ -169,9 +174,9 @@
         "retrievable": true,
         "range_support": true
       },
-      "mattergen": {
+      "mattergen_space_group": {
         "name": "space_group",
-        "pretrained_models":["space_group"]
+        "range_support": false
       }
     },
     "hull_distance": {
@@ -184,9 +189,9 @@
         "retrievable": true,
         "range_support": true
       },
-      "mattergen":{
-        "name":"energy_above_hull",
-        "pretrained_models": ["chemical_system_energy_above_hull"]
+      "mattergen_chemical_system_stability": {
+        "name": "energy_above_hull",
+        "range_support": false
       }
     },
     "magnetization": {
@@ -204,9 +209,9 @@
       "type": "float",
       "description": "Bulk modulus",
       "unit": "Pa",
-      "mattergen":{
+      "mattergen_bulk_modulus": {
         "name": "ml_bulk_modulus",
-        "pretrained_models":["ml_bulk_modulus"]
+        "range_support": false
       }
     },
     "energy": {

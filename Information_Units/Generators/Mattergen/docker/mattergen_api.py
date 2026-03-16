@@ -134,6 +134,14 @@ class GenerateResponse(BaseModel):
 # ---------------------------------------------------------------------------
 _jobs: dict[str, dict] = {}
 
+# Per-job cancellation flags — checked by the generation thread
+_cancel_flags: dict[str, threading.Event] = {}
+
+
+class GenerationCancelledError(Exception):
+    """Raised inside a generation thread when the user cancels."""
+    pass
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -373,6 +381,15 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         {"event": "error",    "message": "..."}
     A sentinel ``None`` is pushed when the thread is done.
     """
+    # Register a per-job cancel flag
+    cancel_flag = threading.Event()
+    _cancel_flags[job_id] = cancel_flag
+
+    def _check_cancelled():
+        """Raise GenerationCancelledError if the user requested cancellation."""
+        if cancel_flag.is_set():
+            raise GenerationCancelledError(f"Job {job_id} cancelled by user.")
+
     logs: list[str] = []
 
     def _log(msg: str, level: str = "info") -> None:
@@ -381,6 +398,9 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         progress_queue.put({"event": "log", "message": msg, "level": level})
 
     try:
+        # Announce the job_id so upstream consumers can use it for cancellation
+        progress_queue.put({"event": "job_id", "job_id": job_id})
+
         _log(f"Starting generation — model={req.pretrained_name or req.model_path}, "
              f"batch_size={req.batch_size}, num_batches={req.num_batches}")
 
@@ -459,6 +479,8 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
 
             def update(self, n=1):
                 super().update(n)
+                # Check for cancellation on every step
+                _check_cancelled()
                 if not self._is_inner:
                     # Outer batch loop — track which batch we're on
                     _current_batch[0] = self.n
@@ -505,6 +527,7 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
 
         # Progress callback — fires per-batch from draw_samples_from_sampler
         def _progress_callback(progress: float = 0.0, **kwargs):
+            _check_cancelled()  # check between batches too
             batch_num = max(1, round(progress * total_batches))
             if progress >= 1.0:
                 msg = f"All batches complete ({total_batches}/{total_batches})"
@@ -568,6 +591,16 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
             "debug_logs": logs,
         })
 
+    except GenerationCancelledError:
+        _log(f"Generation CANCELLED by user", "info")
+        progress_queue.put({
+            "event": "cancelled",
+            "job_id": job_id,
+            "status": "cancelled",
+            "message": "Generation cancelled by user.",
+            "debug_logs": logs,
+        })
+
     except Exception as exc:
         _log(f"Generation FAILED: {exc}", "error")
         _log(traceback.format_exc(), "error")
@@ -580,6 +613,8 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         })
 
     finally:
+        # Clean up cancel flag
+        _cancel_flags.pop(job_id, None)
         # Sentinel to signal the SSE generator to stop
         progress_queue.put(None)
 
@@ -649,6 +684,32 @@ def generate_stream(req: GenerateRequest):
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         },
     )
+
+
+# ---------------------------------------------------------------------------
+# Cancel endpoint — sets a flag that the generation thread checks
+# ---------------------------------------------------------------------------
+
+@app.post("/cancel/{job_id}")
+def cancel_job(job_id: str):
+    """Request cancellation of a running generation job.
+
+    The generation thread checks ``_cancel_flags[job_id]`` periodically
+    (every tqdm step and every batch callback) and raises
+    ``GenerationCancelledError`` when the flag is set.
+    """
+    logger.info("POST /cancel/%s", job_id)
+
+    flag = _cancel_flags.get(job_id)
+    if flag is None:
+        # Job might already be done, or never existed
+        if job_id in _jobs:
+            return {"status": "ok", "message": f"Job {job_id} already finished."}
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found.")
+
+    flag.set()
+    logger.info("Cancel flag set for job %s", job_id)
+    return {"status": "ok", "message": f"Cancellation requested for job {job_id}."}
 
 
 # ---------------------------------------------------------------------------

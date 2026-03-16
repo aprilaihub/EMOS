@@ -353,3 +353,35 @@ class MattergenGenerator(BaseGenerator):
             return resp.json()
         except requests.RequestException as exc:
             return {"status": "error", "message": str(exc)}
+
+    def cancel_generation(self, job_id: str) -> dict:
+        """Ask the container to cancel a running generation job.
+
+        Parameters
+        ----------
+        job_id : str
+            The job identifier returned in the SSE stream's events.
+
+        Returns
+        -------
+        dict
+            ``{"status": "cancelled", ...}`` on success, or
+            ``{"status": "error", "message": "..."}`` on failure.
+        """
+        if self.logger:
+            self.logger.log(f"MatterGen: requesting cancellation for job {job_id}", "info")
+        try:
+            resp = requests.post(
+                f"{self.api_url}/cancel/{job_id}",
+                timeout=10,
+            )
+            resp.raise_for_status()
+            result = resp.json()
+            if self.logger:
+                self.logger.log(f"MatterGen: cancel response — {result}", "info")
+            return result
+        except requests.RequestException as exc:
+            msg = f"MatterGen: cancel request failed — {exc}"
+            if self.logger:
+                self.logger.log(msg, "error")
+            return {"status": "error", "message": msg}
