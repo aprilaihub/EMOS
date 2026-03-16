@@ -24,7 +24,6 @@
       "Alexandria": "Alexandria PBE - DFT database for materials properties" 
     },
     "generators": {
-      "MatterGen": "Diffusion model for crystal structure generation",
       "MatterGen: Base Model": "Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)",
       "MatterGen: MP-20 Base": "Unconditional base model trained on the MP-20 dataset for crystal structure generation (mp_20_base)",
       "MatterGen: Chemical System": "Conditional model for generating structures within a specified chemical system (chemical_system)",

@@ -33,15 +33,7 @@
       }
     ],
     "generators": [
-      {
-        "id": "mattergen",
-        "name": "Mattergen",
-        "display_name": "MatterGen",
-        "description": "Diffusion model for crystal structure generation",
-        "folder_path": "Information_Units/Generators/Mattergen",
-        "class_name": "MattergenGenerator",
-        "file_name": "MattergenGenerator.py"
-      },
+      
       {
         "id": "mattergen_base_model",
         "name": "MattergenBaseModel",
