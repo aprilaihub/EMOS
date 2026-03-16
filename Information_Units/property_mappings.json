@@ -48,6 +48,12 @@
         "name": "elements",
         "retrievable": true
       },
+      "mathub3d": {
+        "name": "elements",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
     "id": {
       "type": "string",
       "description": "Unique structure ID",
@@ -97,6 +103,16 @@
       "materialsproject": {
         "name": "nelements",
         "retrievable": true
+      },
+      "mathub3d": {
+        "name": "nelements",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "nelements",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "nperiodic_dimensions": {
@@ -112,6 +128,10 @@
         "retrievable": true
       },
       "materialsproject": {
+        "name": "nperiodic_dimensions",
+        "retrievable": true
+      },
+      "jarvisdft": {
         "name": "nperiodic_dimensions",
         "retrievable": true
       }
@@ -140,6 +160,16 @@
       "unit": "eV",
       "alexandria": {
         "name": "_alexandria_band_gap",
+        "retrievable": true,
+        "range_support": true
+      },
+      "mathub3d": {
+        "name": "gap",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_optb88vdw_bandgap",
         "retrievable": true,
         "range_support": true
       }
@@ -190,6 +220,11 @@
         "name": "_alexandria_formation_energy_per_atom",
         "retrievable": true,
         "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_formation_energy_peratom",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "space_group": {
@@ -204,8 +239,17 @@
       "mattergen_space_group": {
         "name": "space_group",
         "range_support": false
-      }
-    },
+      },
+      "mathub3d": {
+        "name": "spacegroup",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_spg_number",
+        "retrievable": true,
+        "range_support": true
+      },
     "hull_distance": {
       "type": "float",
       "description": "Distance from convex hull (PBEsol)",
@@ -219,7 +263,11 @@
       "mattergen_chemical_system_stability": {
         "name": "energy_above_hull",
         "range_support": false
-      }
+      },
+      "jarvisdft": {
+        "name": "_jarvis_ehull",
+        "retrievable": true,
+        "range_support": true
     },
     "magnetization": {
       "type": "float",
@@ -228,6 +276,16 @@
       "unit": "muB/unit_cell",
       "alexandria": {
         "name": "_alexandria_magnetization",
+        "retrievable": true,
+        "range_support": true
+      },
+      "mathub3d": {
+        "name": "total_magnetic_moment",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_magmom_oszicar",
         "retrievable": true,
         "range_support": true
       }
@@ -248,6 +306,16 @@
       "unit": "eV",
       "alexandria": {
         "name": "_alexandria_energy",
+        "retrievable": true,
+        "range_support": true
+      },
+      "mathub3d": {
+        "name": "energy",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_optb88vdw_total_energy",
         "retrievable": true,
         "range_support": true
       }
@@ -519,6 +587,348 @@
         "name": "_mp_chemical_system",
         "retrievable": true,
         "range_support": false
+      }
+    },
+    "synthesizable": {
+      "type": "boolean",
+      "description": "Predicted SynthNN synthesizability label",
+      "category": "predictor",
+      "synthnn": {
+        "name": "synthesizable",
+        "predicatble": true,
+        "range_support": false
+      }
+    },
+    "synthesizability_score": {
+      "type": "float",
+      "description": "Predicted SynthNN synthesizability score",
+      "category": "predictor",
+      "unit": "probability",
+      "synthnn": {
+        "name": "synthesizability_score",
+        "predicatble": true,
+        "range_support": true
+      }
+    },
+    "energy_per_atom": {
+      "type": "float",
+      "description": "Total DFT energy per atom",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "mathub3d": {
+        "name": "energy_per_atom",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "density": {
+      "type": "float",
+      "description": "Mass density",
+      "category": "structural",
+      "unit": "g/cm3",
+      "mathub3d": {
+        "name": "density",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_density",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "volume": {
+      "type": "float",
+      "description": "Unit cell volume",
+      "category": "structural",
+      "unit": "Angstrom3",
+      "mathub3d": {
+        "name": "volume",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "mass": {
+      "type": "float",
+      "description": "Unit cell mass",
+      "category": "structural",
+      "unit": "amu",
+      "mathub3d": {
+        "name": "mass",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "natoms": {
+      "type": "integer",
+      "description": "Number of atoms in unit cell",
+      "category": "structural",
+      "mathub3d": {
+        "name": "natoms",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "bulk_modulus": {
+      "type": "float",
+      "description": "Bulk modulus",
+      "category": "mechanical",
+      "unit": "GPa",
+      "mathub3d": {
+        "name": "bulk_modulus",
+        "retrievable": true,
+        "range_support": true
+      },
+      "jarvisdft": {
+        "name": "_jarvis_bulk_modulus_kv",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "is_magnetic": {
+      "type": "boolean",
+      "description": "Whether the material is magnetic",
+      "category": "magnetic",
+      "mathub3d": {
+        "name": "is_magnetic",
+        "retrievable": true,
+        "range_support": false
+      }
+    },
+    "vbm": {
+      "type": "float",
+      "description": "Valence band maximum",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "vbm",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "cbm": {
+      "type": "float",
+      "description": "Conduction band minimum",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "cbm",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "efermi": {
+      "type": "float",
+      "description": "Fermi energy",
+      "category": "electronic",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "efermi",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "deformation_potential_n": {
+      "type": "float",
+      "description": "n-type deformation potential",
+      "category": "transport",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "dp_n",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "deformation_potential_p": {
+      "type": "float",
+      "description": "p-type deformation potential",
+      "category": "transport",
+      "unit": "eV",
+      "mathub3d": {
+        "name": "dp_p",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "mbj_bandgap": {
+      "type": "float",
+      "description": "Electronic band gap (MBJ functional)",
+      "category": "electronic",
+      "unit": "eV",
+      "jarvisdft": {
+        "name": "_jarvis_mbj_bandgap",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "hse_gap": {
+      "type": "float",
+      "description": "Electronic band gap (HSE functional)",
+      "category": "electronic",
+      "unit": "eV",
+      "jarvisdft": {
+        "name": "_jarvis_hse_gap",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "spillage": {
+      "type": "float",
+      "description": "Spillage value for topological material screening",
+      "category": "electronic",
+      "jarvisdft": {
+        "name": "_jarvis_spillage",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "slme": {
+      "type": "float",
+      "description": "Spectroscopic Limited Maximum Efficiency for solar cells",
+      "category": "solar",
+      "unit": "%",
+      "jarvisdft": {
+        "name": "_jarvis_slme",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "shear_modulus": {
+      "type": "float",
+      "description": "Shear modulus (Voigt)",
+      "category": "mechanical",
+      "unit": "GPa",
+      "jarvisdft": {
+        "name": "_jarvis_shear_modulus_gv",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "poisson_ratio": {
+      "type": "float",
+      "description": "Poisson ratio",
+      "category": "mechanical",
+      "jarvisdft": {
+        "name": "_jarvis_poisson",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "exfoliation_energy": {
+      "type": "float",
+      "description": "Exfoliation energy for 2D materials",
+      "category": "energetic",
+      "unit": "meV/atom",
+      "jarvisdft": {
+        "name": "_jarvis_exfoliation_energy",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "epsx": {
+      "type": "float",
+      "description": "Dielectric constant (x-direction, electronic)",
+      "category": "dielectric",
+      "jarvisdft": {
+        "name": "_jarvis_epsx",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "mepsx": {
+      "type": "float",
+      "description": "Dielectric constant (x-direction, ionic+electronic)",
+      "category": "dielectric",
+      "jarvisdft": {
+        "name": "_jarvis_mepsx",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "n_seebeck": {
+      "type": "float",
+      "description": "n-type Seebeck coefficient",
+      "category": "transport",
+      "unit": "muV/K",
+      "jarvisdft": {
+        "name": "_jarvis_n-Seebeck",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "p_seebeck": {
+      "type": "float",
+      "description": "p-type Seebeck coefficient",
+      "category": "transport",
+      "unit": "muV/K",
+      "jarvisdft": {
+        "name": "_jarvis_p-Seebeck",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "n_powerfact": {
+      "type": "float",
+      "description": "n-type thermoelectric power factor",
+      "category": "transport",
+      "jarvisdft": {
+        "name": "_jarvis_n-powerfact",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "p_powerfact": {
+      "type": "float",
+      "description": "p-type thermoelectric power factor",
+      "category": "transport",
+      "jarvisdft": {
+        "name": "_jarvis_p-powerfact",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "Tc_supercon": {
+      "type": "float",
+      "description": "Superconducting critical temperature",
+      "category": "electronic",
+      "unit": "K",
+      "jarvisdft": {
+        "name": "_jarvis_Tc_supercon",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "dfpt_piezo_max_dij": {
+      "type": "float",
+      "description": "Maximum piezoelectric strain coefficient",
+      "category": "piezoelectric",
+      "unit": "C/N",
+      "jarvisdft": {
+        "name": "_jarvis_dfpt_piezo_max_dij",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "avg_elec_mass": {
+      "type": "float",
+      "description": "Average electron effective mass",
+      "category": "electronic",
+      "unit": "m_e",
+      "jarvisdft": {
+        "name": "_jarvis_avg_elec_mass",
+        "retrievable": true,
+        "range_support": true
+      }
+    },
+    "avg_hole_mass": {
+      "type": "float",
+      "description": "Average hole effective mass",
+      "category": "electronic",
+      "unit": "m_e",
+      "jarvisdft": {
+        "name": "_jarvis_avg_hole_mass",
+        "retrievable": true,
+        "range_support": true
       }
     }
   }
