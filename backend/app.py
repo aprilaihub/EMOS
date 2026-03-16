@@ -180,6 +180,30 @@ def process_feature(feature_id):
         return jsonify({'error': str(e)}), 500
 
 
+# ── Active feature instances for cancel support ─────────────────────
+# Keyed by feature_id (str), stores the feature object during streaming
+# so the cancel endpoint can call its cancel() method.
+_active_features: dict = {}
+
+
+@app.route('/api/process/<int:feature_id>/cancel', methods=['POST', 'OPTIONS'])
+def cancel_feature_processing(feature_id):
+    """Ask a running feature to cancel its current processing."""
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    fid = str(feature_id)
+    feature = _active_features.get(fid)
+    if feature is None:
+        return jsonify({'status': 'error', 'message': f'No active processing for feature {fid}'}), 404
+
+    try:
+        result = feature.cancel()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 @app.route('/api/process/<int:feature_id>/stream', methods=['POST', 'OPTIONS'])
 def process_feature_stream(feature_id):
     """SSE endpoint — streams progress events during feature processing.
@@ -206,6 +230,9 @@ def process_feature_stream(feature_id):
         print(f"Using Feature architecture (streaming) for feature {feature_id}")
         feature = create_feature(str(feature_id), logger)
 
+        # Register for cancel support
+        _active_features[str(feature_id)] = feature
+
         # Extract inputs the same way the sync endpoint does
         inputs = feature.extract_inputs(input_data)
 
@@ -230,6 +257,10 @@ def process_feature_stream(feature_id):
             except Exception as exc:
                 print(f"Error in streaming process: {exc}")
                 yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
+
+            finally:
+                # Unregister from cancel support
+                _active_features.pop(str(feature_id), None)
 
             yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
 

@@ -141,22 +141,15 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             currentFeatureInstance = new FeatureClass(featureId);
             window.features[featureId] = currentFeatureInstance;
 
-            // Pre-load any ___Inputs.js scripts for checked generators
-            // so that createFeatureHTML → renderGeneratorInputsHTML can
-            // find the classes on window.
-            try {
-                await currentFeatureInstance.loadGeneratorInputScripts();
-            } catch (err) {
-                console.warn('Some generator input scripts failed to load:', err);
+            // Ensure property_mappings.json is loaded before building UI
+            // (the cache is shared, so this is a no-op after the first load)
+            if (typeof _loadPropertyMappings === 'function') {
+                await _loadPropertyMappings();
             }
             
             // Replace the feature view content with the specific feature's interface
             featureView.innerHTML = currentFeatureInstance.createFeatureHTML();
             console.log('Feature HTML created successfully');
-
-            // Post-DOM hook: let generator ___Inputs instances wire up
-            // their dynamic behaviour (e.g. dropdown → property-fields).
-            currentFeatureInstance.attachGeneratorInputListeners();
             
         } else {
             // Fallback to generic processing view for features not yet implemented
@@ -190,7 +183,7 @@ function loadScript(src) {
         document.head.appendChild(script);
     });
 }
-// Expose globally so BaseFeature.loadGeneratorInputScripts() can reuse it
+// Expose globally so other scripts can dynamically load modules
 window.loadScript = loadScript;
 
 // Create generic feature view for fallback
