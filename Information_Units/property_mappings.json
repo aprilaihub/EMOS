@@ -17,6 +17,10 @@
       "materialsproject": {
         "name": "chemical_formula_descriptive",
         "retrievable": true
+      },
+      "aflow": {
+        "name": "compound",
+        "retrievable": true
       }
     },
     "elements": {
@@ -39,6 +43,11 @@
         "name": "elements",
         "retrievable": true,
         "range_support": false
+      },
+      "aflow": {
+        "name": "species",
+        "retrievable": true,
+        "range_support": false
       }
     },
     "id": {
@@ -56,6 +65,10 @@
       "materialsproject": {
         "name": "id",
         "retrievable": true
+      },
+      "aflow": {
+        "name": "auid",
+        "retrievable": true
       }
     },
     "last_modified": {
@@ -72,6 +85,10 @@
       },
       "materialsproject": {
         "name": "last_modified",
+        "retrievable": true
+      },
+      "aflow": {
+        "name": "aflowlib_date",
         "retrievable": true
       }
     },
@@ -98,6 +115,11 @@
       },
       "jarvisdft": {
         "name": "nelements",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "nspecies",
         "retrievable": true,
         "range_support": true
       }
@@ -159,6 +181,11 @@
         "name": "_jarvis_optb88vdw_bandgap",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "Egap",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "band_gap_direct": {
@@ -206,6 +233,11 @@
         "name": "_jarvis_spg_number",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "spacegroup_relax",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "hull_distance": {
@@ -241,6 +273,11 @@
       },
       "jarvisdft": {
         "name": "_jarvis_magmom_oszicar",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "spin_cell",
         "retrievable": true,
         "range_support": true
       }
@@ -338,6 +375,11 @@
         "name": "_alexandria_forces",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "forces",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "stress_tensor": {
@@ -347,6 +389,11 @@
       "unit": "kbar",
       "alexandria": {
         "name": "_alexandria_stress_tensor",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "stress_tensor",
         "retrievable": true,
         "range_support": true
       }
@@ -565,6 +612,11 @@
         "name": "energy_per_atom",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "energy_atom",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "density": {
@@ -581,6 +633,11 @@
         "name": "_jarvis_density",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "density",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "volume": {
@@ -590,6 +647,11 @@
       "unit": "Angstrom3",
       "mathub3d": {
         "name": "volume",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "volume_cell",
         "retrievable": true,
         "range_support": true
       }
@@ -613,6 +675,11 @@
         "name": "natoms",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "natoms",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "bulk_modulus": {
@@ -627,6 +694,11 @@
       },
       "jarvisdft": {
         "name": "_jarvis_bulk_modulus_kv",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "ael_bulk_modulus_vrh",
         "retrievable": true,
         "range_support": true
       }
@@ -748,6 +820,11 @@
         "name": "_jarvis_shear_modulus_gv",
         "retrievable": true,
         "range_support": true
+      },
+      "aflow": {
+        "name": "ael_shear_modulus_vrh",
+        "retrievable": true,
+        "range_support": true
       }
     },
     "poisson_ratio": {
@@ -756,6 +833,11 @@
       "category": "mechanical",
       "jarvisdft": {
         "name": "_jarvis_poisson",
+        "retrievable": true,
+        "range_support": true
+      },
+      "aflow": {
+        "name": "ael_poisson_ratio",
         "retrievable": true,
         "range_support": true
       }
