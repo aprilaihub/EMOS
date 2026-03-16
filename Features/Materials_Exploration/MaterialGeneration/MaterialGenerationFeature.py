@@ -7,6 +7,9 @@ from Information_Units.Predictors.PredictorFactory import predictor_factory
 class MaterialGenerationFeature(BaseFeature):
     def __init__(self, logger=None):
         super().__init__("Material Generation", logger)
+        # Cancel support: track the active generator and job_id during streaming
+        self._active_generator = None
+        self._active_job_id = None
     
     def info(self):
         return "Material Generation: Generate new material compositions using AI-powered algorithms and predictive models"
@@ -92,6 +95,33 @@ class MaterialGenerationFeature(BaseFeature):
         render them (structure dropdown, CIF viewer, etc.)."""
         return results
 
+    # ── Cancel support ────────────────────────────────────────────────
+
+    def cancel(self) -> dict:
+        """Cancel the currently running generation, if any.
+
+        Delegates to the active generator's ``cancel_generation()`` method
+        which POSTs to the Docker container's ``/cancel/{job_id}`` endpoint.
+        """
+        gen = self._active_generator
+        job_id = self._active_job_id
+
+        if gen is None or job_id is None:
+            return {"status": "error", "message": "No active generation to cancel."}
+
+        if self.logger:
+            self.logger.log(f"Cancelling generation job {job_id}...", "info")
+
+        if hasattr(gen, 'cancel_generation'):
+            result = gen.cancel_generation(job_id)
+        else:
+            result = {"status": "error", "message": f"Generator {type(gen).__name__} does not support cancellation."}
+
+        # Clear tracking state regardless
+        self._active_generator = None
+        self._active_job_id = None
+        return result
+
     # ── Streaming variant ─────────────────────────────────────────────
 
     def process_feature_stream(self, inputs):
@@ -148,8 +178,15 @@ class MaterialGenerationFeature(BaseFeature):
             if hasattr(gen_instance, 'generate_stream'):
                 try:
                     final_result = None
+                    # Track active generator/job for cancel support
+                    self._active_generator = gen_instance
                     for sse_event in gen_instance.generate_stream(gen_params):
                         evt = sse_event.get("event", "log")
+
+                        # Capture job_id from any event that carries it
+                        if "job_id" in sse_event and self._active_job_id is None:
+                            self._active_job_id = sse_event["job_id"]
+
                         if evt == "result":
                             final_result = sse_event
                             # Forward final result info as a log
@@ -171,12 +208,21 @@ class MaterialGenerationFeature(BaseFeature):
                             if self.logger:
                                 self.logger.log(f'{gen_key}: {msg}', 'error')
                             yield _sse("log", {"message": f"{gen_key}: {msg}", "level": "error"})
+                        elif evt == "cancelled":
+                            msg = sse_event.get("message", "Generation cancelled.")
+                            if self.logger:
+                                self.logger.log(f'{gen_key}: {msg}', 'info')
+                            yield _sse("cancelled", {"message": f"{gen_key}: {msg}"})
                         elif evt == "log":
                             yield _sse("log", {
                                 "message": f"[{gen_key}] {sse_event.get('message', '')}",
                                 "level": sse_event.get("level", "info"),
                             })
                         # "done" events are ignored — we handle end-of-stream ourselves
+
+                    # Clear tracking after this generator finishes
+                    self._active_generator = None
+                    self._active_job_id = None
 
                     if final_result:
                         # Remove the "event" key before storing
@@ -197,6 +243,9 @@ class MaterialGenerationFeature(BaseFeature):
                         'status': 'error',
                         'message': str(exc),
                     }
+                    # Clear tracking on failure
+                    self._active_generator = None
+                    self._active_job_id = None
             else:
                 # Fallback: synchronous generate()
                 yield _sse("log", {"message": f"{gen_key}: no streaming support, using sync generate()", "level": "info"})

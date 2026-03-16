@@ -4,15 +4,20 @@ class MaterialGenerationFeature extends BaseFeature {
         super(featureId, 'Material Generation', 'Generate new material compositions using AI-powered algorithms and predictive models');
         // Store raw generation results per generator for the output viewer
         this._genResults = {};  // { generatorKey: { structures, cif_strings, ... } }
+        // Cancel support: reader reference for aborting the SSE stream
+        this._sseReader = null;
+        this._cancelled = false;
     }
 
     createInputsHTML() {
-        // Dynamically render input sections for every checked generator
-        // that has a registered ___Inputs.js class (e.g. MattergenInputs).
+        // Build input sections from property_mappings.json for every
+        // checked generator.  The cache is pre-loaded by script.js
+        // before createFeatureHTML() is called.
+        const mappings = _propertyMappingsCache || { properties: {} };
         return `
             <p>Configure input parameters for Material Generation</p>
             <div class="input-controls" id="generatorInputs_${this.featureId}">
-                ${this.renderGeneratorInputsHTML()}
+                ${this.buildGeneratorPropertyInputsHTML(mappings)}
             </div>
         `;
     }
@@ -72,7 +77,7 @@ class MaterialGenerationFeature extends BaseFeature {
         // Log what we're sending
         const genInputs = inputs.generator_inputs || {};
         for (const [genKey, params] of Object.entries(genInputs)) {
-            this.addLog(`${genKey}: model=${params.pretrained_name}, batch_size=${params.batch_size}, num_batches=${params.num_batches}`, 'info');
+            this.addLog(`${genKey}: batch_size=${params.batch_size}`, 'info');
             const props = params.properties_to_condition_on || {};
             if (Object.keys(props).length > 0) {
                 this.addLog(`${genKey}: conditioning on ${JSON.stringify(props)}`, 'info');
@@ -98,6 +103,8 @@ class MaterialGenerationFeature extends BaseFeature {
 
         // Read the SSE stream
         const reader = response.body.getReader();
+        this._sseReader = reader;  // store for cancel support
+        this._cancelled = false;
         const decoder = new TextDecoder();
         let buffer = '';
         let finalResult = null;
@@ -175,6 +182,9 @@ class MaterialGenerationFeature extends BaseFeature {
                     }
                 } else if (eventType === 'error') {
                     this.addLog(`Error: ${data.message || 'Unknown error'}`, 'error');
+                } else if (eventType === 'cancelled') {
+                    this._cancelled = true;
+                    this.addLog(`⛔ ${data.message || 'Generation cancelled.'}`, 'warning');
                 } else if (eventType === 'done') {
                     // Stream ended
                 }
@@ -185,12 +195,65 @@ class MaterialGenerationFeature extends BaseFeature {
             progressFill.style.width = '100%';
         }
 
+        // Clean up reader reference
+        this._sseReader = null;
+
+        if (this._cancelled) {
+            // Return a minimal result so updateOutputs doesn't crash
+            return {
+                status: 'cancelled',
+                generation_results: {},
+            };
+        }
+
         if (finalResult) {
             return finalResult;
         }
 
         // If no streaming result arrived, something went wrong
         throw new Error('No result received from streaming endpoint');
+    }
+
+    // ── Cancel support ───────────────────────────────────────────────
+    async cancelProcessing() {
+        if (!this.isProcessing) return;
+
+        // Set cancelled flag FIRST so the catch block in startProcessing
+        // sees it immediately when the reader abort causes an error.
+        this._cancelled = true;
+
+        const cancelBtn = document.getElementById(`cancelBtn_${this.featureId}`);
+        if (cancelBtn) {
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = 'Cancelling…';
+        }
+
+        this.addLog('Requesting cancellation…', 'warning');
+
+        // 1. Abort the SSE reader so the read loop exits immediately
+        if (this._sseReader) {
+            try {
+                await this._sseReader.cancel();
+            } catch { /* already closed */ }
+            this._sseReader = null;
+        }
+
+        // 2. Tell the Flask backend to cancel the feature's active generation
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
+        try {
+            const resp = await fetch(`${backendUrl}/api/process/${this.featureId}/cancel`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                this.addLog(`Backend: ${data.message || 'cancel acknowledged'}`, 'info');
+            } else {
+                this.addLog(`Backend cancel returned HTTP ${resp.status}`, 'warning');
+            }
+        } catch (err) {
+            this.addLog(`Cancel request failed: ${err.message}`, 'error');
+        }
     }
 
     // ── Output rendering ─────────────────────────────────────────────
@@ -200,6 +263,11 @@ class MaterialGenerationFeature extends BaseFeature {
 
         if (data && data.error) {
             if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+            return;
+        }
+
+        if (data && data.status === 'cancelled') {
+            if (statusEl) statusEl.textContent = '⛔ Generation cancelled.';
             return;
         }
 
