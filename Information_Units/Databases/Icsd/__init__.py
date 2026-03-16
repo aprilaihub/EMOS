@@ -1,1 +1,0 @@
-# ICSD Database Implementation

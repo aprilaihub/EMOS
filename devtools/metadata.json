@@ -5,15 +5,6 @@
   "information_units": {
     "databases": [
       {
-        "id": "icsd",
-        "name": "Icsd",
-        "display_name": "ICSD",
-        "description": "Inorganic Crystal Structure Database - comprehensive collection of crystal structures",
-        "folder_path": "Information_Units/Databases/Icsd",
-        "class_name": "IcsdDatabase",
-        "file_name": "IcsdDatabase.py"
-      },
-      {
         "id": "cod",
         "name": "Cod",
         "display_name": "COD",
@@ -21,24 +12,6 @@
         "folder_path": "Information_Units/Databases/Cod",
         "class_name": "CodDatabase",
         "file_name": "CodDatabase.py"
-      },
-      {
-        "id": "oqmd",
-        "name": "Oqmd",
-        "display_name": "OQMD",
-        "description": "Open Quantum Materials Database - high-throughput computational database",
-        "folder_path": "Information_Units/Databases/Oqmd",
-        "class_name": "OqmdDatabase",
-        "file_name": "OqmdDatabase.py"
-      },
-      {
-        "id": "aflowlib",
-        "name": "Aflowlib",
-        "display_name": "AFLOWLIB",
-        "description": "AFLOW Library - comprehensive materials database with computational data",
-        "folder_path": "Information_Units/Databases/Aflowlib",
-        "class_name": "AflowlibDatabase",
-        "file_name": "AflowlibDatabase.py"
       },
       {
         "id": "materialsproject",
@@ -57,24 +30,6 @@
         "folder_path": "Information_Units/Databases/Alexandria",
         "class_name": "AlexandriaDatabase",
         "file_name": "AlexandriaDatabase.py"
-      },
-      {
-        "id": "nomad",
-        "name": "Nomad",
-        "display_name": "NOMAD",
-        "description": "NOMAD Laboratory - repository for computational materials science data",
-        "folder_path": "Information_Units/Databases/Nomad",
-        "class_name": "NomadDatabase",
-        "file_name": "NomadDatabase.py"
-      },
-      {
-        "id": "jarvis",
-        "name": "Jarvis",
-        "display_name": "JARVIS",
-        "description": "Joint Automated Repository for Various Integrated Simulations",
-        "folder_path": "Information_Units/Databases/Jarvis",
-        "class_name": "JarvisDatabase",
-        "file_name": "JarvisDatabase.py"
       }
     ],
     "generators": [
