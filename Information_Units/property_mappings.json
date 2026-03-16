@@ -249,7 +249,8 @@
         "name": "_jarvis_spg_number",
         "retrievable": true,
         "range_support": true
-      },
+      }
+    },
     "hull_distance": {
       "type": "float",
       "description": "Distance from convex hull (PBEsol)",
@@ -268,6 +269,7 @@
         "name": "_jarvis_ehull",
         "retrievable": true,
         "range_support": true
+      }
     },
     "magnetization": {
       "type": "float",
