@@ -90,3 +90,67 @@ OPTIMADE_FILTERS = {
     "with_nelements": 'elements HAS "Fe" AND nelements = 2',
     "with_range": 'elements HAS "Fe" AND nelements >= 1 AND nelements <= 3'
 }
+
+# MatHub-3d JSON entry samples (matching structure of MatHub-3d.json)
+MATHUB3D_FE_ENTRY = {
+    "_id": "12345",
+    "name": "icsd-100001-Fe2O3",
+    "folder": "icsd-100001",
+    "formula": "Fe2O3",
+    "elements": ["Fe", "O"],
+    "nelements": 2,
+    "spacegroup": 167,
+    "spacegroup_type": "R-3c",
+    "before_a": 5.035, "before_b": 5.035, "before_c": 13.747,
+    "before_alpha": 90.0, "before_beta": 90.0, "before_gamma": 120.0,
+    "after_a": 5.10, "after_b": 5.10, "after_c": 13.85,
+    "after_alpha": 90.0, "after_beta": 90.0, "after_gamma": 120.0,
+    "energy": -44.5, "energy_per_atom": -4.45,
+    "gap": 1.8, "efermi": 3.2, "vbm": 2.1, "cbm": 3.9,
+    "is_magnetic": True, "total_magnetic_moment": 10.0,
+    "natoms": 10, "volume": 310.5, "density": 5.27, "mass": 159.69,
+    "bulk_modulus": 200.0,
+    "dp_n": None, "dp_p": None,
+}
+
+MATHUB3D_AL2O3_ENTRY = {
+    "_id": "67890",
+    "name": "icsd-100002-Al2O3",
+    "folder": "icsd-100002",
+    "formula": "Al2O3",
+    "elements": ["Al", "O"],
+    "nelements": 2,
+    "spacegroup": 167,
+    "spacegroup_type": "R-3c",
+    "before_a": 4.759, "before_b": 4.759, "before_c": 12.993,
+    "before_alpha": 90.0, "before_beta": 90.0, "before_gamma": 120.0,
+    "after_a": 4.80, "after_b": 4.80, "after_c": 13.10,
+    "after_alpha": 90.0, "after_beta": 90.0, "after_gamma": 120.0,
+    "energy": -55.0, "energy_per_atom": -5.5,
+    "gap": 6.3, "efermi": 1.5, "vbm": None, "cbm": None,
+    "is_magnetic": False, "total_magnetic_moment": 0.0,
+    "natoms": 10, "volume": 260.0, "density": 3.95, "mass": 101.96,
+    "bulk_modulus": 252.0,
+    "dp_n": None, "dp_p": None,
+}
+
+MATHUB3D_NI_ENTRY = {
+    "_id": "11111",
+    "name": "icsd-100003-Ni3Sn1",
+    "folder": "icsd-100003",
+    "formula": "Ni3Sn",
+    "elements": ["Ni", "Sn"],
+    "nelements": 2,
+    "spacegroup": 194,
+    "spacegroup_type": "P6_3/mmc",
+    "before_a": 5.28, "before_b": 5.28, "before_c": 4.24,
+    "before_alpha": 90.0, "before_beta": 90.0, "before_gamma": 120.0,
+    "after_a": None, "after_b": None, "after_c": None,
+    "after_alpha": None, "after_beta": None, "after_gamma": None,
+    "energy": None, "energy_per_atom": None,
+    "gap": 0.0, "efermi": None,
+    "is_magnetic": True, "total_magnetic_moment": 2.5,
+    "natoms": None, "volume": None, "density": None, "mass": None,
+    "bulk_modulus": None,
+    "dp_n": None, "dp_p": None,
+}
