@@ -18,13 +18,14 @@
     "display_to_path": "Features/{Category}/{FolderName}/ or Information_Units/{Type}/{FolderName}/"
   },
   "information_units": {
-    "databases": {
-      "COD": "Crystallography Open Database - open-access collection of crystal structures", 
-      "MaterialsProject": "Materials Project - computational materials database",
-      "Alexandria": "Alexandria PBE - DFT database for materials properties",
-      "Mathub3d": "MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research",
-      "JarvisDFT": "JARVIS-DFT - NIST computational materials database with electronic, optical, and solar cell properties"
-    },
+      "databases": {
+        "COD": "Crystallography Open Database - open-access collection of crystal structures", 
+        "MaterialsProject": "Materials Project - computational materials database",
+        "Alexandria": "Alexandria PBE - DFT database for materials properties",
+        "Mathub3d": "MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research",
+        "JarvisDFT": "JARVIS-DFT - NIST computational materials database with electronic, optical, and solar cell properties",
+        "AFLOW": "AFLOW - Automatic FLOW database for computational materials science with rich mechanical, thermal, and electronic properties"
+      },
     "generators": {
       "MatterGen: Base Model": "Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)",
       "MatterGen: MP-20 Base": "Unconditional base model trained on the MP-20 dataset for crystal structure generation (mp_20_base)",
