@@ -144,7 +144,7 @@ def _clear_logger():
 @pytest.fixture(autouse=True)
 def _clear_health_cache():
     """Reset health cache so every test starts with a fresh check."""
-    from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+    from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
     MattergenGenerator._health_cache = {"healthy": None, "checked_at": 0.0}
     yield
     MattergenGenerator._health_cache = {"healthy": None, "checked_at": 0.0}
@@ -154,7 +154,7 @@ def _clear_health_cache():
 def _register_mattergen():
     """Ensure mattergen is in the generator_registry so the feature can find it."""
     from Information_Units.Generators.GeneratorFactory import generator_registry
-    from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+    from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
 
     gen = MattergenGenerator(generator_name="mattergen", logger=app_logger)
     generator_registry["mattergen"] = gen
@@ -219,7 +219,7 @@ class TestContainerReachability:
         PASS: is_healthy() == True.
         FAIL: returns False — container may be down.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator()
         assert gen.is_healthy() is True
 
@@ -229,7 +229,7 @@ class TestContainerReachability:
         PASS: non-empty list containing 'mattergen_base'.
         FAIL: empty list or exception.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator()
         models = gen.get_available_models()
         assert isinstance(models, list) and len(models) >= 1
@@ -242,7 +242,7 @@ class TestContainerReachability:
         PASS: info string contains 'MatterGen v' and 'Pretrained models:'.
         FAIL: contains 'container unreachable' — container is down.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator()
         info = gen.info()
         assert "MatterGen v" in info, f"Got fallback info: {info[:80]}"
@@ -360,7 +360,7 @@ class TestDemoGenerationViaGenerator:
         PASS: status 'completed', num_structures >= 1, CIF strings present.
         FAIL: status 'error' or missing structure data.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator(generator_name="mattergen", logger=app_logger)
         result = gen.generate({"pretrained_name": "demo"})
         assert result["status"] == "completed"
@@ -376,7 +376,7 @@ class TestDemoGenerationViaGenerator:
         PASS: at least one 'result' event with status 'completed'.
         FAIL: no result event or status != 'completed'.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator(generator_name="mattergen", logger=app_logger)
         events = list(gen.generate_stream({"pretrained_name": "demo"}))
 
@@ -790,7 +790,7 @@ class TestGeneratorInterfaceContract:
         PASS: all methods callable.
         FAIL: missing required method.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator()
         assert callable(gen.info)
         assert callable(gen.generate)
@@ -804,7 +804,7 @@ class TestGeneratorInterfaceContract:
         PASS: non-empty string.
         FAIL: exception or empty string.
         """
-        from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+        from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
         gen = MattergenGenerator()
         result = gen.info()
         assert isinstance(result, str)

@@ -8,7 +8,7 @@ target energy above hull.  Pretrained model: ``chemical_system_energy_above_hull
 from __future__ import annotations
 from typing import Generator
 
-from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
 
 
 class MattergenChemicalSystemStabilityGenerator(MattergenGenerator):

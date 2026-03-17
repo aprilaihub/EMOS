@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, patch, PropertyMock
 
 import pytest
 
-from Information_Units.Generators.Mattergen.MattergenGenerator import (
+from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import (
     MattergenGenerator,
     _DEFAULT_API_URL,
     _DEFAULT_TIMEOUT,
@@ -89,7 +89,7 @@ def test_env_override_configuration(monkeypatch):
 # ============================================================================
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_info_success(mock_get, generator):
     """info() returns formatted model metadata when the container responds.
 
@@ -110,7 +110,7 @@ def test_info_success(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_info_fallback_on_error(mock_get, generator):
     """info() returns a human-readable fallback when the container is down.
 
@@ -127,7 +127,7 @@ def test_info_fallback_on_error(mock_get, generator):
 # ============================================================================
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_is_healthy_true(mock_get, generator):
     """is_healthy() returns True when container responds 200.
 
@@ -140,7 +140,7 @@ def test_is_healthy_true(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_is_healthy_false(mock_get, generator):
     """is_healthy() returns False when container is unreachable.
 
@@ -152,7 +152,7 @@ def test_is_healthy_false(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_is_healthy_cache_hit(mock_get, generator):
     """is_healthy() uses cached result within TTL window.
 
@@ -167,7 +167,7 @@ def test_is_healthy_cache_hit(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_is_healthy_cache_expired(mock_get, generator):
     """is_healthy() re-checks after TTL expires.
 
@@ -187,7 +187,7 @@ def test_is_healthy_cache_expired(mock_get, generator):
 # ============================================================================
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_unhealthy_container(mock_get, generator):
     """generate() returns error dict when container health check fails.
 
@@ -201,8 +201,8 @@ def test_generate_unhealthy_container(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_demo_shortcut(mock_get, mock_post, generator):
     """generate() routes to /demo/generate when pretrained_name=='demo'.
 
@@ -225,8 +225,8 @@ def test_generate_demo_shortcut(mock_get, mock_post, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_builds_correct_payload(mock_get, mock_post, generator):
     """generate() sends correct JSON payload with all parameters.
 
@@ -260,8 +260,8 @@ def test_generate_builds_correct_payload(mock_get, mock_post, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_model_path_overrides_pretrained(mock_get, mock_post, generator):
     """generate() sets pretrained_name=None when model_path is given.
 
@@ -279,8 +279,8 @@ def test_generate_model_path_overrides_pretrained(mock_get, mock_post, generator
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_timeout_handling(mock_get, mock_post, generator):
     """generate() returns error dict and invalidates health cache on timeout.
 
@@ -299,8 +299,8 @@ def test_generate_timeout_handling(mock_get, mock_post, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_http_error_handling(mock_get, mock_post, generator):
     """generate() returns error dict on HTTP error (e.g. 500).
 
@@ -330,7 +330,7 @@ def _mock_streaming_response(lines):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_stream_unhealthy(mock_get, generator):
     """generate_stream() yields error + done when container is down.
 
@@ -345,8 +345,8 @@ def test_generate_stream_unhealthy(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_stream_demo_fallback(mock_get, mock_post, generator):
     """generate_stream() wraps sync demo response for demo mode.
 
@@ -370,8 +370,8 @@ def test_generate_stream_demo_fallback(mock_get, mock_post, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_stream_parses_sse_events(mock_get, mock_post, generator):
     """generate_stream() correctly parses SSE event/data lines from the container.
 
@@ -410,8 +410,8 @@ def test_generate_stream_parses_sse_events(mock_get, mock_post, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.post")
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.post")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_generate_stream_request_failure(mock_get, mock_post, generator):
     """generate_stream() yields error + done on connection failure to /generate/stream.
 
@@ -433,7 +433,7 @@ def test_generate_stream_request_failure(mock_get, mock_post, generator):
 # ============================================================================
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_get_available_models_success(mock_get, generator):
     """get_available_models() returns model list from /info.
 
@@ -448,7 +448,7 @@ def test_get_available_models_success(mock_get, generator):
 
 
 @pytest.mark.unit
-@patch("Information_Units.Generators.Mattergen.MattergenGenerator.requests.get")
+@patch("Information_Units.Generators.MattergenBaseModel.MattergenGenerator.requests.get")
 def test_get_available_models_fallback(mock_get, generator):
     """get_available_models() returns empty list when container is unreachable.
 

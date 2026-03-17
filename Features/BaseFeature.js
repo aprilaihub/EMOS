@@ -187,6 +187,7 @@ class BaseFeature {
         if (cancelBtn) {
             cancelBtn.style.display = '';
             cancelBtn.disabled = false;
+            cancelBtn.textContent = 'Cancel';
         }
         
         if (progressFill) {

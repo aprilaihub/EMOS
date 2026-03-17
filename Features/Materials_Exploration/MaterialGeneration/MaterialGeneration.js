@@ -230,15 +230,12 @@ class MaterialGenerationFeature extends BaseFeature {
 
         this.addLog('Requesting cancellation…', 'warning');
 
-        // 1. Abort the SSE reader so the read loop exits immediately
-        if (this._sseReader) {
-            try {
-                await this._sseReader.cancel();
-            } catch { /* already closed */ }
-            this._sseReader = null;
-        }
-
-        // 2. Tell the Flask backend to cancel the feature's active generation
+        // 1. Tell the Flask backend to cancel BEFORE aborting the reader.
+        //    This must happen first so the cancel targets the currently
+        //    registered feature instance in _active_features — if we abort
+        //    the reader first, startProcessing's finally block runs, the
+        //    user can immediately start a new generation, and the cancel
+        //    POST would hit the NEW feature instead of the old one.
         const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
         try {
             const resp = await fetch(`${backendUrl}/api/process/${this.featureId}/cancel`, {
@@ -253,6 +250,16 @@ class MaterialGenerationFeature extends BaseFeature {
             }
         } catch (err) {
             this.addLog(`Cancel request failed: ${err.message}`, 'error');
+        }
+
+        // 2. Now abort the SSE reader so the read loop exits.
+        //    The container has already been told to cancel, so the stream
+        //    will end naturally — this just speeds up the client side.
+        if (this._sseReader) {
+            try {
+                await this._sseReader.cancel();
+            } catch { /* already closed */ }
+            this._sseReader = null;
         }
     }
 

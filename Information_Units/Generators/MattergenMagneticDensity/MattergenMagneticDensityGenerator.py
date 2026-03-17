@@ -8,7 +8,7 @@ magnetic density.  Pretrained model: ``dft_mag_density``.
 from __future__ import annotations
 from typing import Generator
 
-from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
 
 
 class MattergenMagneticDensityGenerator(MattergenGenerator):

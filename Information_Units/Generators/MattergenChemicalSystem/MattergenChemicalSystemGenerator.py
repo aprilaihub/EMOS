@@ -8,7 +8,7 @@ system.  Pretrained model: ``chemical_system``.
 from __future__ import annotations
 from typing import Generator
 
-from Information_Units.Generators.Mattergen.MattergenGenerator import MattergenGenerator
+from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
 
 
 class MattergenChemicalSystemGenerator(MattergenGenerator):

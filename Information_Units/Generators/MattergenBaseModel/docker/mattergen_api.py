@@ -64,9 +64,8 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Persistent output directory (Docker volume or bind mount)
-OUTPUT_DIR = Path(os.getenv("MATTERGEN_OUTPUT_DIR", "/app/outputs"))
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# Generation output goes to a temporary directory that is cleaned up after
+# each request — no persistent disk writes for CIF files.
 
 
 # ---------------------------------------------------------------------------
@@ -174,9 +173,11 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
         _log(f"Starting generation — model={req.pretrained_name or req.model_path}, "
              f"batch_size={req.batch_size}, num_batches={req.num_batches}")
 
-        output_path = OUTPUT_DIR / job_id
-        output_path.mkdir(parents=True, exist_ok=True)
-        _log(f"Output directory: {output_path}")
+        # Temp directory for MatterGen's required output_dir argument.
+        # We only need the in-memory Structure objects; disk files are
+        # discarded when the temp dir is cleaned up in the finally block.
+        tmp_dir = tempfile.mkdtemp(prefix="mattergen_")
+        output_path = Path(tmp_dir)
 
         properties: TargetProperty = req.properties_to_condition_on or {}
         if properties:
@@ -269,6 +270,10 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
                 "debug_logs": logs,
             }
         )
+
+    finally:
+        # Clean up temp directory — we don't need the CIF files on disk
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 # ---------------------------------------------------------------------------
@@ -404,9 +409,10 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         _log(f"Starting generation — model={req.pretrained_name or req.model_path}, "
              f"batch_size={req.batch_size}, num_batches={req.num_batches}")
 
-        output_path = OUTPUT_DIR / job_id
-        output_path.mkdir(parents=True, exist_ok=True)
-        _log(f"Output directory: {output_path}")
+        # Temp directory for MatterGen's required output_dir argument.
+        # Cleaned up in the finally block — we only need in-memory structures.
+        tmp_dir = tempfile.mkdtemp(prefix="mattergen_stream_")
+        output_path = Path(tmp_dir)
 
         properties: TargetProperty = req.properties_to_condition_on or {}
         if properties:
@@ -615,6 +621,8 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
     finally:
         # Clean up cancel flag
         _cancel_flags.pop(job_id, None)
+        # Clean up temp directory — we don't need the CIF files on disk
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         # Sentinel to signal the SSE generator to stop
         progress_queue.put(None)
 

@@ -53,8 +53,8 @@ RUN uv pip install -r /app/requirements.txt
 # ── Copy the FastAPI server ────────────────────────────────────────────────
 COPY mattergen_api.py /app/mattergen_api.py
 
-# Create directories for outputs and model cache
-RUN mkdir -p /app/outputs /app/models
+# Create directory for model cache (generation output uses temp dirs)
+RUN mkdir -p /app/models
 
 # Expose the FastAPI port
 EXPOSE 8000

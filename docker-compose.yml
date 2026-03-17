@@ -19,18 +19,15 @@ services:
   # -----------------------------------------------------------------------
   mattergen:
     build:
-      context: ./Information_Units/Generators/Mattergen/docker
+      context: ./Information_Units/Generators/MattergenBaseModel/docker
       dockerfile: Dockerfile
     container_name: emos-mattergen
     ports:
       - "${MATTERGEN_PORT:-8100}:8000"
     volumes:
-      # Persist generated outputs on the host
-      - ./data/mattergen/outputs:/app/outputs
       # Cache HuggingFace models so they survive container restarts
       - ./data/mattergen/hf_cache:/root/.cache/huggingface
     environment:
-      - MATTERGEN_OUTPUT_DIR=/app/outputs
       # Set to "cpu" to force CPU inference (useful for testing)
       - MATTERGEN_DEVICE=${MATTERGEN_DEVICE:-auto}
     restart: unless-stopped
