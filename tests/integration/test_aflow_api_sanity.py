@@ -44,6 +44,11 @@ def rate_limit_delay():
         ("SiO2", ["Si", "O"], {"band_gap": [0.0, 12.0]}, None, None, {"Egap": (0.0, 12.0)}),
         ("Al2O3", ["Al", "O"], {"density": [0.0, 30.0]}, None, None, {"density": (0.0, 30.0)}),
         ("Al2O3", ["Al", "O"], {"bulk_modulus": [0.0, 1000.0]}, None, None, {"ael_bulk_modulus_vrh": (0.0, 1000.0)}),
+        # Newly added AFLOW-specific properties (non-deprecated).
+        ("Al2O3", ["Al", "O"], {"enthalpy_formation_atom": [-20.0, 20.0]}, None, None, {"enthalpy_formation_atom": (-20.0, 20.0)}),
+        ("Al2O3", ["Al", "O"], {"energy_cutoff": [0.0, 5000.0]}, None, None, {"energy_cutoff": (0.0, 5000.0)}),
+        ("Al2O3", ["Al", "O"], {"calculation_time": [0.0, 1.0e9]}, None, None, {"calculation_time": (0.0, 1.0e9)}),
+        ("Al2O3", ["Al", "O"], {"point_group_order": [1, 1000]}, None, None, {"point_group_order": (1, 1000)}),
         # Combined filters.
         (
             "Al2O3",
