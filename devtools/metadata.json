@@ -48,6 +48,15 @@
         "folder_path": "Information_Units/Databases/Jarvisdft",
         "class_name": "JarvisdftDatabase",
         "file_name": "JarvisdftDatabase.py"
+      },
+      {
+        "id": "aflow",
+        "name": "Aflow",
+        "display_name": "AFLOW",
+        "description": "AFLOW - Automatic FLOW database for computational materials science with rich mechanical, thermal, and electronic properties",
+        "folder_path": "Information_Units/Databases/Aflow",
+        "class_name": "AflowDatabase",
+        "file_name": "AflowDatabase.py"
       }
     ],
     "generators": [
