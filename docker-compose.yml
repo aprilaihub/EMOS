@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  m3gnet:
+    build:
+      context: .
+      dockerfile: Dockerfile.m3gnet
+    image: emos:m3gnet-latest
+    container_name: emos-m3gnet
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    working_dir: /app
+    command: python Information_Units/Predictors/M3gnet/test_m3gnet.py
+    # Uncomment to run as API server
+    # ports:
+    #   - "5001:5000"
+    # command: python -m flask run --host=0.0.0.0 --port=5000
+
+  # -----------------------------------------------------------------------
+  # MatterSim — ML interatomic potential predictor (Microsoft Research)
+  # -----------------------------------------------------------------------
+  mattersim:
+    build:
+      context: ./Information_Units/Predictors/Mattersim/docker
+      dockerfile: Dockerfile
+    container_name: emos-mattersim
+    ports:
+      - "${MATTERSIM_PORT:-8200}:8000"
+    environment:
+      - MATTERSIM_LOG_LEVEL=${MATTERSIM_LOG_LEVEL:-DEBUG}
+    restart: unless-stopped
+
+    # Uncomment the block below (or use --profile gpu) for GPU passthrough
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # -----------------------------------------------------------------------
+  # GPU profile variant — same service but with GPU reservation
+  # Activate with:  docker compose --profile gpu up -d mattersim-gpu
+  # -----------------------------------------------------------------------
+  mattersim-gpu:
+    extends:
+      service: mattersim
+    container_name: emos-mattersim-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: emos:backend-latest
+    container_name: emos-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_APP=backend/app.py
+      - FLASK_ENV=development
+    working_dir: /app
+    command: python -m flask run --host=0.0.0.0
+
+volumes:
+  emos-data:
