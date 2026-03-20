@@ -41,7 +41,8 @@
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
       "eSEN": "Electronic Structure Estimation Network",
       "MyPred1": "Custom predictor 1 - user-defined materials property prediction model",
-      "MyPred2": "Custom predictor 2 - user-defined materials property prediction model"
+      "MyPred2": "Custom predictor 2 - user-defined materials property prediction model",
+      "GBFS_Pred": "Pretrained predictors from GBFS workflow, implemented in Python"
     }
   },
   "features": {

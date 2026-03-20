@@ -178,6 +178,15 @@
         "folder_path": "Information_Units/Predictors/Mypred2",
         "class_name": "Mypred2Predictor",
         "file_name": "Mypred2Predictor.py"
+      },
+      {
+        "id": "gbfspred",
+        "name": "GBFS_Pred",
+        "display_name": "GBFS_Pred",
+        "description": "Pretrained predictors from GBFS workflow, implemented in Python",
+        "folder_path": "Information_Units/Predictors/GBFS_Pred",
+        "class_name": "GBFS_PredPredictor",
+        "file_name": "GBFS_PredPredictor.py"
       }
     ]
   },
