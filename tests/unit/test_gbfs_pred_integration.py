@@ -1,6 +1,22 @@
 """
 Unit tests for GBFS_PredPredictor - Integration Tests
-Tests the high-level prediction functionality
+
+Comprehensive tests for all six GBFS models:
+- Band gap (regression)
+- Formation energy per atom (regression)
+- Dielectric constant (regression)
+- Metal classification (binary classifier)
+- Electron mobility (regression, log10-scaled)
+- Hole mobility (regression, log10-scaled)
+
+Structure mirrors SynthNN test pattern:
+- Generic initialization tests
+- Property-specific validation tests
+- Error handling tests
+- Feature engineering tests
+- End-to-end integration tests
+
+Run: pytest tests/unit/test_gbfs_pred_integration.py -v
 """
 
 import pytest
@@ -8,174 +24,458 @@ import json
 import os
 import numpy as np
 from pathlib import Path
+from unittest.mock import Mock
 
 from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import (
     GBFS_PredPredictor,
     load_cif,
+    generate_features,
 )
 
 
+# ============================================================================
 # Fixtures
-@pytest.fixture
-def gbfs_predictor():
-    """Initialize GBFS predictor with bandgap model files."""
-    bandgap_dir = Path(__file__).parent.parent.parent / "Information_Units" / "Predictors" / "GBFS_Pred" / "bandgap"
-    
-    return GBFS_PredPredictor(
-        predictor_name="gbfs_test",
-        model_path=str(bandgap_dir / "bandgap_model.pkl"),
-        scaler_path=str(bandgap_dir / "bandgap_scaler.pkl"),
-        feature_list_path=str(bandgap_dir / "bandgap_features.pkl")
-    )
-
+# ============================================================================
 
 @pytest.fixture
-def cif_file_path():
-    """Path to test CIF file."""
-    return Path(__file__).parent.parent / "fixtures" / "cif_files" / "Al2O3.cif"
+def cif_files():
+    """Paths to CIF test fixtures."""
+    d = Path(__file__).parent.parent / "fixtures" / "cif_files"
+    return {
+        'al2o3': str(d / "Al2O3.cif"),
+        'sio2': str(d / "SiO2.cif"),
+    }
 
 
-# Tests
-class TestGBFSPredictorInitialization:
-    """Test predictor initialization and file loading."""
-    
-    def test_predictor_initializes(self, gbfs_predictor):
-        """Test that predictor initializes successfully."""
-        assert gbfs_predictor is not None
-        assert gbfs_predictor.predictor_name == "gbfs_test"
-        assert gbfs_predictor.model is not None
-        assert gbfs_predictor.scaler is not None
-        assert gbfs_predictor.feature_list is not None
-    
-    def test_feature_list_is_list(self, gbfs_predictor):
-        """Test that feature_list is a proper Python list."""
-        assert isinstance(gbfs_predictor.feature_list, list)
-        assert len(gbfs_predictor.feature_list) > 0
-    
-    def test_predictor_info(self, gbfs_predictor):
-        """Test predictor info method."""
-        info = gbfs_predictor.info()
-        assert isinstance(info, str)
-        assert "GBFS_Pred" in info
-        assert "LGBM" in info
+@pytest.fixture
+def supported_properties():
+    """All supported GBFS properties."""
+    return ['bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p']
 
 
-class TestCIFLoading:
-    """Test CIF file loading functionality."""
-    
-    def test_load_valid_cif(self, cif_file_path):
-        """Test loading a valid CIF file."""
-        assert cif_file_path.exists(), f"CIF file not found: {cif_file_path}"
-        
-        structure = load_cif(str(cif_file_path))
+@pytest.fixture
+def property_metadata():
+    """Metadata for each property."""
+    return {
+        'bandgap': {
+            'type': 'regression',
+            'unit': 'eV',
+            'min_reasonable': 0.0,
+            'max_reasonable': 20.0,
+        },
+        'e_form': {
+            'type': 'regression',
+            'unit': 'eV/atom',
+            'min_reasonable': -10.0,
+            'max_reasonable': 5.0,
+        },
+        'dielectric': {
+            'type': 'regression',
+            'unit': 'dimensionless',
+            'min_reasonable': 1.0,
+            'max_reasonable': 50.0,
+        },
+        'is_metal': {
+            'type': 'classification',
+            'unit': 'binary',
+            'values': [0.0, 1.0],
+        },
+        'mob_n': {
+            'type': 'regression',
+            'unit': 'cm²/V·s',
+            'min_reasonable': 0.1,
+            'max_reasonable': 1000.0,
+            'note': 'log10-scaled internally, inverse transformed',
+        },
+        'mob_p': {
+            'type': 'regression',
+            'unit': 'cm²/V·s',
+            'min_reasonable': 0.1,
+            'max_reasonable': 1000.0,
+            'note': 'log10-scaled internally, inverse transformed',
+        },
+    }
+
+
+@pytest.fixture
+def gbfs_predictor_factory():
+    """Factory for creating GBFS predictors for any property."""
+    def _create(property_name):
+        return GBFS_PredPredictor(
+            predictor_name=f"gbfs_{property_name}",
+            property_name=property_name
+        )
+    return _create
+
+
+@pytest.fixture
+def mock_logger():
+    """Mock logger for testing."""
+    logger = Mock()
+    logger.log = Mock()
+    return logger
+
+
+# ============================================================================
+# Generic Predictor Interface Tests
+# ============================================================================
+
+@pytest.mark.unit
+def test_init_stores_name_and_property(gbfs_predictor_factory):
+    """Predictor stores predictor_name and property_name on init."""
+    predictor = gbfs_predictor_factory('bandgap')
+    assert predictor.predictor_name == 'gbfs_bandgap'
+    assert predictor.property_name == 'bandgap'
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_all_properties_initialize(gbfs_predictor_factory, property_name):
+    """All six properties can be initialized successfully."""
+    predictor = gbfs_predictor_factory(property_name)
+    assert predictor is not None
+    assert predictor.property_name == property_name
+    assert predictor.model is not None
+    assert predictor.scaler is not None
+    assert predictor.feature_list is not None
+    assert len(predictor.feature_list) > 0
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_info_includes_property_name(gbfs_predictor_factory, property_name):
+    """info() returns description including property name."""
+    predictor = gbfs_predictor_factory(property_name)
+    info = predictor.info()
+    assert isinstance(info, str) and len(info) > 0
+    assert "GBFS_Pred" in info
+    assert property_name in info.lower()
+
+
+@pytest.mark.unit
+def test_invalid_property_raises_error(gbfs_predictor_factory):
+    """Invalid property name raises ValueError with helpful message."""
+    with pytest.raises(ValueError, match="Model directory not found"):
+        gbfs_predictor_factory('invalid_property')
+
+
+# ============================================================================
+# CIF Loading Tests
+# ============================================================================
+
+@pytest.mark.unit
+def test_load_valid_cif(cif_files):
+    """Test loading valid CIF files."""
+    for label, path in cif_files.items():
+        assert Path(path).exists(), f"CIF file not found: {path}"
+        structure = load_cif(path)
         assert structure is not None
         assert len(structure.composition) > 0
-    
-    def test_load_invalid_cif(self):
-        """Test loading non-existent CIF file raises error."""
-        with pytest.raises(FileNotFoundError):
-            load_cif("/nonexistent/structure.cif")
 
 
-class TestPrediction:
-    """Test prediction functionality at high level."""
-    
-    def test_predict_numpy_returns_array(self, gbfs_predictor, cif_file_path):
-        """Test predict_numpy returns numpy array with prediction."""
-        result = gbfs_predictor.predict_numpy(str(cif_file_path))
-        
-        assert isinstance(result, np.ndarray)
-        assert len(result.shape) == 1 or result.shape[0] == 1  # Single prediction value(s)
-    
-    def test_predict_numpy_is_numeric(self, gbfs_predictor, cif_file_path):
-        """Test that prediction value is numeric."""
-        result = gbfs_predictor.predict_numpy(str(cif_file_path))
-        
-        assert np.isfinite(result[0]).all(), "Prediction contains NaN or Inf"
-    
-    def test_predict_returns_json(self, gbfs_predictor, cif_file_path):
-        """Test predict returns JSON string."""
-        result = gbfs_predictor.predict(str(cif_file_path))
-        
-        assert isinstance(result, str)
-        
-        # Parse JSON to verify format
-        parsed = json.loads(result)
-        assert "prediction" in parsed
-        assert isinstance(parsed["prediction"], list)
-    
-    def test_predict_with_string_input(self, gbfs_predictor, cif_file_path):
-        """Test predict accepts string input."""
-        result = gbfs_predictor.predict(str(cif_file_path))
-        
-        assert isinstance(result, str)
-        parsed = json.loads(result)
-        assert "prediction" in parsed
-    
-    def test_predict_with_dict_input_cif_path(self, gbfs_predictor, cif_file_path):
-        """Test predict accepts dict input with cif_path key."""
-        result = gbfs_predictor.predict({"cif_path": str(cif_file_path)})
-        
-        assert isinstance(result, str)
-        parsed = json.loads(result)
-        assert "prediction" in parsed
-    
-    def test_predict_with_dict_input_data_key(self, gbfs_predictor, cif_file_path):
-        """Test predict accepts dict input with input_data key."""
-        result = gbfs_predictor.predict({"input_data": str(cif_file_path)})
-        
-        assert isinstance(result, str)
-        parsed = json.loads(result)
-        assert "prediction" in parsed
-    
-    def test_predict_invalid_path_raises_error(self, gbfs_predictor):
-        """Test predict raises FileNotFoundError for invalid path."""
-        with pytest.raises(FileNotFoundError):
-            gbfs_predictor.predict("/nonexistent/structure.cif")
-    
-    def test_predict_no_input_raises_error(self, gbfs_predictor):
-        """Test predict raises ValueError when no input provided."""
-        with pytest.raises(ValueError, match="No CIF file path provided"):
-            gbfs_predictor.predict({})
+@pytest.mark.unit
+def test_load_nonexistent_cif():
+    """Loading non-existent CIF raises FileNotFoundError."""
+    with pytest.raises(FileNotFoundError):
+        load_cif("/nonexistent/structure.cif")
 
 
-class TestEndToEnd:
-    """End-to-end integration tests."""
+# ============================================================================
+# Regression Property Tests (bandgap, e_form, dielectric, mob_n, mob_p)
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'mob_n', 'mob_p'
+])
+def test_regression_predict_numpy_returns_float_array(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """Regression models return float arrays with predictions."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict_numpy(cif_files['al2o3'])
     
-    def test_full_pipeline_al2o3(self, gbfs_predictor, cif_file_path):
-        """Test full prediction pipeline on Al2O3 structure."""
-        # Load structure
-        structure = load_cif(str(cif_file_path))
-        # Verify it's aluminum oxide (may be primitive or conventional cell)
-        assert "Al" in structure.composition.formula and "O" in structure.composition.formula
-        
-        # Generate features and predict
-        numpy_result = gbfs_predictor.predict_numpy(str(cif_file_path))
-        json_result = gbfs_predictor.predict(str(cif_file_path))
-        
-        # Verify results - numpy result is 1D array of predictions
-        assert numpy_result.shape == (1,) or len(numpy_result) == 1
-        parsed_json = json.loads(json_result)
-        assert len(parsed_json["prediction"]) == 1
-        
-        # Values should match
-        assert np.isclose(numpy_result[0], parsed_json["prediction"][0])
+    assert isinstance(result, np.ndarray)
+    assert result.dtype in [np.float32, np.float64]
+    assert result.shape == (1,) or result.shape[0] == 1
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'mob_n', 'mob_p'
+])
+def test_regression_predict_returns_json(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """Regression models return valid JSON."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict(cif_files['al2o3'])
     
-    def test_multiple_predictions_consistent(self, gbfs_predictor, cif_file_path):
-        """Test that multiple predictions on same file are consistent."""
-        result1 = gbfs_predictor.predict_numpy(str(cif_file_path))
-        result2 = gbfs_predictor.predict_numpy(str(cif_file_path))
-        
-        assert np.allclose(result1, result2), "Predictions are not consistent"
+    assert isinstance(result, str)
+    parsed = json.loads(result)
+    assert "prediction" in parsed
+    assert isinstance(parsed["prediction"], list)
+    assert len(parsed["prediction"]) == 1
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name,metadata', [
+    ('bandgap', {'min': 0.0, 'max': 20.0}),
+    ('e_form', {'min': -10.0, 'max': 5.0}),
+    ('dielectric', {'min': 1.0, 'max': 50.0}),
+    ('mob_n', {'min': 0.1, 'max': 1000.0}),
+    ('mob_p', {'min': 0.1, 'max': 1000.0}),
+])
+def test_regression_predictions_in_reasonable_range(
+    gbfs_predictor_factory, cif_files, property_name, metadata
+):
+    """Regression predictions fall within physically reasonable ranges."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict_numpy(cif_files['al2o3'])
+    prediction = result[0]
     
-    def test_prediction_in_reasonable_range(self, gbfs_predictor, cif_file_path):
-        """Test that band gap prediction is in reasonable physical range."""
-        result = gbfs_predictor.predict_numpy(str(cif_file_path))
-        prediction_value = result[0]
+    assert metadata['min'] <= prediction <= metadata['max'], \
+        f"{property_name} prediction {prediction} outside range [{metadata['min']}, {metadata['max']}]"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'mob_n', 'mob_p'
+])
+def test_regression_predictions_are_finite(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """Regression predictions are finite (not NaN or Inf)."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict_numpy(cif_files['al2o3'])
+    
+    assert np.isfinite(result).all(), \
+        f"{property_name} produced NaN or Inf values"
+
+
+# ============================================================================
+# Classification Property Tests (is_metal)
+# ============================================================================
+
+@pytest.mark.unit
+def test_classification_predict_numpy_returns_binary(
+    gbfs_predictor_factory, cif_files
+):
+    """Classification model returns binary (0 or 1) predictions."""
+    predictor = gbfs_predictor_factory('is_metal')
+    result = predictor.predict_numpy(cif_files['al2o3'])
+    
+    assert isinstance(result, np.ndarray)
+    assert result.shape == (1,) or result.shape[0] == 1
+    assert result[0] in [0.0, 1.0], f"Expected binary output, got {result[0]}"
+
+
+@pytest.mark.unit
+def test_classification_predict_returns_json_with_probabilities(
+    gbfs_predictor_factory, cif_files
+):
+    """Classification model returns JSON with prediction and probabilities."""
+    predictor = gbfs_predictor_factory('is_metal')
+    result = predictor.predict(cif_files['al2o3'])
+    
+    assert isinstance(result, str)
+    parsed = json.loads(result)
+    assert "prediction" in parsed
+    assert isinstance(parsed["prediction"], list)
+    
+    # Classification should include probabilities
+    if "probabilities" in parsed:
+        assert isinstance(parsed["probabilities"], list)
+
+
+# ============================================================================
+# Mobility Model-Specific Tests (log10 inverse transformation)
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', ['mob_n', 'mob_p'])
+def test_mobility_predictions_are_positive(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """Mobility predictions are positive (inverse log10 applied)."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict_numpy(cif_files['al2o3'])
+    prediction = result[0]
+    
+    assert prediction > 0, f"{property_name} should be positive after inverse transform"
+
+
+@pytest.mark.unit
+def test_electron_mobility_typically_exceeds_hole_mobility(
+    gbfs_predictor_factory, cif_files
+):
+    """For oxide semiconductors, electron mobility usually exceeds hole mobility."""
+    mob_n = gbfs_predictor_factory('mob_n').predict_numpy(cif_files['al2o3'])[0]
+    mob_p = gbfs_predictor_factory('mob_p').predict_numpy(cif_files['al2o3'])[0]
+    
+    # This is a physical expectation for oxide semiconductors
+    assert mob_n > mob_p, \
+        f"Expected mob_n ({mob_n}) > mob_p ({mob_p}) for oxide semiconductor"
+
+
+# ============================================================================
+# Input Handling Tests
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_accepts_string_path(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """predict() accepts string file path."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict(cif_files['al2o3'])
+    
+    assert isinstance(result, str)
+    json.loads(result)  # Verify valid JSON
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_accepts_dict_with_cif_path(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """predict() accepts dict with 'cif_path' key."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict({"cif_path": cif_files['al2o3']})
+    
+    assert isinstance(result, str)
+    json.loads(result)  # Verify valid JSON
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_accepts_dict_with_input_data(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """predict() accepts dict with 'input_data' key."""
+    predictor = gbfs_predictor_factory(property_name)
+    result = predictor.predict({"input_data": cif_files['al2o3']})
+    
+    assert isinstance(result, str)
+    json.loads(result)  # Verify valid JSON
+
+
+# ============================================================================
+# Error Handling Tests
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_nonexistent_file_raises_error(
+    gbfs_predictor_factory, property_name
+):
+    """predict() raises FileNotFoundError for missing file."""
+    predictor = gbfs_predictor_factory(property_name)
+    with pytest.raises(FileNotFoundError):
+        predictor.predict("/nonexistent/structure.cif")
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_empty_dict_raises_error(
+    gbfs_predictor_factory, property_name
+):
+    """predict() raises ValueError for empty input."""
+    predictor = gbfs_predictor_factory(property_name)
+    with pytest.raises(ValueError, match="No CIF file path"):
+        predictor.predict({})
+
+
+# ============================================================================
+# Consistency Tests
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_multiple_predictions_consistent(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """Multiple predictions on same file are consistent."""
+    predictor = gbfs_predictor_factory(property_name)
+    result1 = predictor.predict_numpy(cif_files['al2o3'])
+    result2 = predictor.predict_numpy(cif_files['al2o3'])
+    
+    assert np.allclose(result1, result2), \
+        f"{property_name} predictions are not consistent"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('property_name', [
+    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+])
+def test_predict_methods_agree(
+    gbfs_predictor_factory, cif_files, property_name
+):
+    """predict() and predict_numpy() return equivalent values."""
+    predictor = gbfs_predictor_factory(property_name)
+    numpy_result = predictor.predict_numpy(cif_files['al2o3'])
+    json_result = json.loads(predictor.predict(cif_files['al2o3']))
+    
+    assert np.isclose(numpy_result[0], json_result["prediction"][0]), \
+        f"{property_name}: predict() and predict_numpy() don't agree"
+
+
+# ============================================================================
+# End-to-End Tests
+# ============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize('cif_key', ['al2o3', 'sio2'])
+def test_full_pipeline_all_properties(
+    gbfs_predictor_factory, supported_properties, cif_files, cif_key
+):
+    """Test full prediction pipeline for all properties on multiple structures."""
+    cif_path = cif_files[cif_key]
+    results = {}
+    
+    for prop in supported_properties:
+        predictor = gbfs_predictor_factory(prop)
+        result = predictor.predict_numpy(cif_path)
+        results[prop] = result[0]
+    
+    # Verify all properties have valid predictions
+    for prop, value in results.items():
+        assert np.isfinite(value), f"{prop} prediction is not finite for {cif_key}"
+
+
+@pytest.mark.unit
+def test_json_output_is_serializable(
+    gbfs_predictor_factory, supported_properties, cif_files
+):
+    """All property predictions can be serialized to JSON and back."""
+    cif_path = cif_files['al2o3']
+    
+    for prop in supported_properties:
+        predictor = gbfs_predictor_factory(prop)
+        result = predictor.predict(cif_path)
         
-        # Band gap typically ranges from 0 to 20 eV
-        assert -5 < prediction_value < 25, \
-            f"Prediction {prediction_value} is outside expected band gap range"
+        # Serialize and deserialize
+        serialized = json.dumps(json.loads(result))
+        deserialized = json.loads(serialized)
+        
+        assert "prediction" in deserialized
 
 
 if __name__ == "__main__":

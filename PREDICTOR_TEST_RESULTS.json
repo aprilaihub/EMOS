@@ -1,0 +1,40 @@
+{
+  "timestamp": "1774269212.7205453",
+  "cif_files": [
+    "Al2O3",
+    "CsDy(WO4)2",
+    "SiO2"
+  ],
+  "properties": [
+    "bandgap",
+    "e_form",
+    "dielectric",
+    "is_metal"
+  ],
+  "results": {
+    "Al2O3": {
+      "bandgap": 5.128638944627045,
+      "e_form": -3.0823784836220414,
+      "dielectric": 10.968307574690218,
+      "is_metal": "False"
+    },
+    "CsDy(WO4)2": {
+      "bandgap": 3.4242327939553716,
+      "e_form": -2.5360588321204087,
+      "dielectric": 15.623810665637825,
+      "is_metal": "False"
+    },
+    "SiO2": {
+      "bandgap": 5.48984103545244,
+      "e_form": -2.929809359454882,
+      "dielectric": 5.976579969585535,
+      "is_metal": "False"
+    }
+  },
+  "units": {
+    "bandgap": "eV",
+    "e_form": "eV/atom",
+    "dielectric": "dimensionless",
+    "is_metal": "classification"
+  }
+}

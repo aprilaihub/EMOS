@@ -1,0 +1,42 @@
+{
+  "structure": "Al2O3 (corundum)",
+  "cif_file": "tests\\fixtures\\cif_files\\Al2O3.cif",
+  "predictions": {
+    "bandgap": {
+      "label": "Band Gap (eV)",
+      "type": "regression",
+      "value": 5.128638944627045,
+      "features": 130,
+      "base_features": 130,
+      "engineered_features": 0
+    },
+    "e_form": {
+      "label": "Formation Energy (eV/atom)",
+      "type": "regression",
+      "value": -3.0823784836220414,
+      "features": 133,
+      "base_features": 133,
+      "engineered_features": 0
+    },
+    "dielectric": {
+      "label": "Dielectric Constant",
+      "type": "regression",
+      "value": 10.968307574690218,
+      "features": 91,
+      "base_features": 88,
+      "engineered_features": 3
+    },
+    "is_metal": {
+      "label": "Metal Classification",
+      "type": "classification",
+      "value": 1.0,
+      "features": 117,
+      "base_features": 117,
+      "engineered_features": 0,
+      "probabilities": [
+        0.013547666547935822,
+        0.9864523334520642
+      ]
+    }
+  }
+}

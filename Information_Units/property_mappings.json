@@ -486,6 +486,71 @@
         "predicatble": true,
         "range_support": true
       }
+    },
+    "band_gap_gbfs": {
+      "type": "float",
+      "description": "Predicted electronic band gap using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "eV",
+      "gbfs": {
+        "name": "bandgap",
+        "predictable": true,
+        "range_support": true
+      }
+    },
+    "formation_energy_gbfs": {
+      "type": "float",
+      "description": "Predicted formation energy per atom using GBFS LightGBM model",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "gbfs": {
+        "name": "e_form",
+        "predictable": true,
+        "range_support": true
+      }
+    },
+    "dielectric_constant_gbfs": {
+      "type": "float",
+      "description": "Predicted dielectric constant using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "dimensionless",
+      "gbfs": {
+        "name": "dielectric",
+        "predictable": true,
+        "range_support": true
+      }
+    },
+    "is_metal_gbfs": {
+      "type": "boolean",
+      "description": "Predicted metal/non-metal classification using GBFS LightGBM classifier",
+      "category": "electronic",
+      "gbfs": {
+        "name": "is_metal",
+        "predictable": true,
+        "range_support": false
+      }
+    },
+    "electron_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted electron mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s",
+      "gbfs": {
+        "name": "mob_n",
+        "predictable": true,
+        "range_support": true
+      }
+    },
+    "hole_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted hole mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s",
+      "gbfs": {
+        "name": "mob_p",
+        "predictable": true,
+        "range_support": true
+      }
     }
   }
 }

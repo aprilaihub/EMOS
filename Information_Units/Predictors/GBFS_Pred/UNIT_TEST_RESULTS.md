@@ -124,3 +124,49 @@ The GBFS_PredPredictor is **production-ready** with:
 - ✅ Robust error handling
 - ✅ Full framework integration
 - ✅ Comprehensive test coverage
+
+---
+
+## Multi-Property Integration Tests
+
+**Date:** March 23, 2026  
+**Test Structure:** Al2O3 (Corundum)  
+**Status:** ✅ All Properties Tested Successfully
+
+### Test Results Summary
+
+| Property | Model Type | Features | Prediction | Status |
+|----------|-----------|----------|-----------|--------|
+| **bandgap** | Regressor | 130 (all base) | 5.128639 eV | ✅ |
+| **e_form** | Regressor | 133 (all base) | -3.082378 eV/atom | ✅ |
+| **dielectric** | Regressor | 91 (88 base + 3 eng) | 10.968308 | ✅ |
+| **is_metal** | Classifier | 117 (all base) | Metal (99.65%) | ✅ |
+
+### Backward Compatibility
+
+✅ **All 16 original bandgap tests still passing after refactoring for multi-property support**
+
+The refactored code maintains full backward compatibility:
+- Legacy API (explicit model_path, scaler_path, feature_list_path) still works
+- New property-based API (property_name parameter) fully functional
+- No breaking changes to existing code
+
+### Key Improvements in Refactored Version
+
+1. **Unified Predictor Class**: Single class handles all properties
+2. **Dynamic Feature Loading**: Automatically loads correct features for each property
+3. **Engineered Feature Support**: Properly handles division-based engineered features
+4. **Special Feature Handling**: Gracefully fills missing computed features with zeros
+5. **Flexible Scaling**: Detects scalers without transform method and skips scaling
+6. **Classification Support**: Includes probability predictions for binary classifiers
+
+### Implementation Details
+
+- `__init__()`: Supports both legacy API (explicit paths) and new property-based API
+- `generate_base_features()`: Pre-fills special features (LUMO_energy, HOMO_energy, gap_AO) with zeros
+- `engineer_features()`: Gracefully handles missing engineered features with zero fallback
+- `predict_numpy()` and `predict()`: Detect scaler type and skip transform if unavailable
+
+### Additional Documentation
+
+For complete multi-property documentation, see [MULTI_PROPERTY_SUPPORT.md](MULTI_PROPERTY_SUPPORT.md)

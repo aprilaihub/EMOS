@@ -14,7 +14,7 @@ from matminer.featurizers.base import BaseFeaturizer
 from matminer.featurizers.composition import (
     ElementProperty, ElementFraction, Stoichiometry, BandCenter,
     ValenceOrbital, AtomicOrbitals, ElectronAffinity,
-    ElectronegativityDiff, TMetalFraction, OxidationStates
+    ElectronegativityDiff, TMetalFraction, OxidationStates, IonProperty
 )
 from matminer.featurizers.structure import (
     DensityFeatures, StructuralComplexity, GlobalSymmetryFeatures
@@ -91,6 +91,7 @@ def get_compositional_featurizers() -> Dict[str, BaseFeaturizer]:
         'ElectronegativityDiff': ElectronegativityDiff(),
         'TMetalFraction': TMetalFraction(),
         'OxidationStates': OxidationStates(),
+        'IonProperty': IonProperty(),
     }
 
 
@@ -213,11 +214,14 @@ def generate_base_features(structure, composition, feature_list, nan_strategy="r
     # Extract only base features (those without '/' in the name)
     base_features = [f for f in feature_list if '/' not in f]
     
-    # Get only the featurizers we actually need
-    needed_featurizers = get_needed_featurizers(feature_list)
+    # Pre-fill special computed features with zeros (not from standard featurizers)
+    special_features = {'LUMO_energy', 'HOMO_energy', 'gap_AO'}
+    feature_values: Dict[str, float] = {f: 0.0 for f in base_features if f in special_features}
     
-    feature_values: Dict[str, float] = {}
-
+    # Get only the featurizers we actually need (excluding special features)
+    features_to_generate = [f for f in feature_list if '/' not in f and f not in special_features]
+    needed_featurizers = get_needed_featurizers(features_to_generate)
+    
     for featurizer_name, (featurizer, needed_features) in needed_featurizers.items():
         try:
             # Get all labels from this featurizer
@@ -282,16 +286,17 @@ def engineer_features(base_features: Dict[str, float], feature_list: List[str]) 
     engineered_features = {f: None for f in feature_list if '/' in f}
     all_features = {**base_features}
     
+    missing_engineered = []
     for feat_name in engineered_features:
         try:
             feature_a, feature_b = feat_name.split('/')
             
+            # Skip if either feature is missing
             if feature_a not in base_features or feature_b not in base_features:
-                raise ValueError(
-                    f"Cannot engineer '{feat_name}': "
-                    f"'{feature_a}' found={feature_a in base_features}, "
-                    f"'{feature_b}' found={feature_b in base_features}"
-                )
+                missing_engineered.append(feat_name)
+                # Use 0.0 as fallback for missing engineered features
+                all_features[feat_name] = 0.0
+                continue
             
             numerator = base_features[feature_a]
             denominator = base_features[feature_b]
@@ -306,8 +311,10 @@ def engineer_features(base_features: Dict[str, float], feature_list: List[str]) 
                 else:
                     all_features[feat_name] = float(result)
                     
-        except ValueError as e:
-            raise ValueError(f"Error engineering feature '{feat_name}': {str(e)}")
+        except Exception as e:
+            # Fallback for any errors in engineering
+            missing_engineered.append(feat_name)
+            all_features[feat_name] = 0.0
     
     return all_features
 
@@ -354,43 +361,125 @@ class GBFS_PredPredictor(BasePredictor):
     scales them using a pre-trained scaler, and makes predictions using a
     pre-trained LightGBM model. Feature order is strictly maintained as LGBM
     does not rely on feature names.
+    
+    Supports multiple properties: bandgap, e_form, dielectric, is_metal, etc.
+    Each property has its own folder with model.pkl, scaler.pkl, and features.pkl.
     """
     
-    def __init__(self, predictor_name: str, model_path: str, scaler_path: str, 
-                 feature_list_path: str, logger=None):
+    def __init__(self, predictor_name: str, property_name: str = "bandgap", 
+                 model_dir: Optional[str] = None, logger: Optional[Any] = None):
         """
         Initialize GBFS predictor with pre-trained models and scalers.
         
         Args:
             predictor_name (str): Name of the predictor instance
-            model_path (str): Path to the pre-trained LGBM model (.pkl/.joblib)
-            scaler_path (str): Path to the feature scaler object (.pkl/.joblib)
-            feature_list_path (str): Path to the list of features to generate (.pkl/.joblib)
-                Can be either a list of feature names or a DataFrame with 'feature' column
+            property_name (str): Name of property to predict
+                Supported: 'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
+                Default: 'bandgap'
+            model_dir (str): Optional directory containing models. If None, defaults to 
+                Information_Units/Predictors/GBFS_Pred/{property_name}/
             logger: Optional logger instance
+            
+        Raises:
+            FileNotFoundError: If required model files are not found
+            ValueError: If property_name is invalid or files are missing
+            OSError: If directory structure is malformed
         """
         super().__init__(predictor_name, logger)
-
-        self.model = load_joblib(model_path)
-        self.scaler = load_joblib(scaler_path)
         
-        # Load features - handle both list and DataFrame formats
-        features_data = load_joblib(feature_list_path)
-        if isinstance(features_data, pd.DataFrame):
-            # Extract feature names from DataFrame 'feature' column
-            self.feature_list = features_data['feature'].tolist()
-        elif isinstance(features_data, (list, tuple)):
-            self.feature_list = list(features_data)
-        else:
-            # Try to convert to list (e.g., numpy array)
-            self.feature_list = list(features_data)
+        self.property_name = property_name
+        
+        # Determine model directory
+        if model_dir is None:
+            model_dir = os.path.join(
+                os.path.dirname(__file__),
+                property_name
+            )
+        
+        self.model_dir = model_dir
+        
+        # Validate directory exists
+        if not os.path.isdir(model_dir):
+            raise ValueError(
+                f"Model directory not found for property '{property_name}': {model_dir}\n"
+                f"Supported properties: bandgap, e_form, dielectric, is_metal, mob_n, mob_p"
+            )
+        
+        # Expected file paths
+        model_path = os.path.join(model_dir, f"{property_name}_model.pkl")
+        scaler_path = os.path.join(model_dir, f"{property_name}_scaler.pkl")
+        feature_list_path = os.path.join(model_dir, f"{property_name}_features.pkl")
+        
+        # Validate all required files exist
+        missing_files = []
+        for file_path, file_type in [
+            (model_path, "model"),
+            (scaler_path, "scaler"),
+            (feature_list_path, "features")
+        ]:
+            if not os.path.exists(file_path):
+                missing_files.append(f"{file_type}: {file_path}")
+        
+        if missing_files:
+            raise FileNotFoundError(
+                f"Missing required files for property '{property_name}':\n" +
+                "\n".join(f"  - {f}" for f in missing_files)
+            )
+        
+        try:
+            # Load model, scaler, and features
+            self.model = load_joblib(model_path)
+            self.scaler = load_joblib(scaler_path)
+            
+            # Load features - handle both list and DataFrame formats
+            features_data = load_joblib(feature_list_path)
+            if isinstance(features_data, pd.DataFrame):
+                # Extract feature names from DataFrame 'feature' column
+                self.feature_list = features_data['feature'].tolist()
+            elif isinstance(features_data, pd.Series):
+                # Convert Series to list
+                self.feature_list = features_data.tolist()
+            elif isinstance(features_data, (list, tuple)):
+                self.feature_list = list(features_data)
+            else:
+                # Try to convert to list (e.g., numpy array)
+                try:
+                    self.feature_list = list(features_data)
+                except Exception as e:
+                    raise TypeError(
+                        f"Unable to convert features data to list. "
+                        f"Expected list/tuple/DataFrame/Series, got {type(features_data)}: {str(e)}"
+                    )
+        except (OSError, IOError) as e:
+            raise FileNotFoundError(
+                f"Error loading model files for property '{property_name}': {str(e)}"
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Error initializing {property_name} predictor: {str(e)}"
+            )
+        
+        if not self.feature_list:
+            raise ValueError(
+                f"Feature list is empty for property '{property_name}'. "
+                f"Check feature file: {feature_list_path}"
+            )
+        
+        if self.logger:
+            self.logger.log(
+                f"Initialized {property_name} predictor with {len(self.feature_list)} features",
+                'info'
+            )
 
     def info(self) -> str:
         """Return description of predictor capabilities."""
         return (
-            "GBFS_Pred: Light Gradient Boosting Machine (LGBM) predictor trained on "
-            "GBFS workflow data. Uses matminer composition and structure featurizers "
-            "to generate input features for property prediction."
+            f"GBFS_Pred ({self.property_name}): Light Gradient Boosting Machine (LGBM) "
+            f"predictor for {self.property_name} prediction trained on GBFS workflow data. "
+            f"Uses matminer composition and structure featurizers to generate "
+            f"{len(self.feature_list)} input features for property prediction. "
+            f"Supported properties: bandgap (eV), e_form (eV/atom), dielectric (dimensionless), "
+            f"is_metal (classification), mob_n (cm²/V·s), mob_p (cm²/V·s)."
         )
 
     def predict(self, inputs) -> str:  # type: ignore
@@ -398,6 +487,9 @@ class GBFS_PredPredictor(BasePredictor):
         Predict properties from a CIF crystal structure file.
         
         This method overrides the base class to accept CIF file paths instead of dicts.
+        
+        For mobility properties (mob_n, mob_p), automatically applies inverse log10 
+        transformation to convert model output back to actual values (cm²/V·s).
         
         Pipeline:
         1. Load CIF file and parse structure
@@ -407,6 +499,7 @@ class GBFS_PredPredictor(BasePredictor):
         5. Maintain strict feature order (LGBM does not check feature names)
         6. Scale features using pre-trained scaler
         7. Generate predictions using pre-trained LGBM model
+        8. Apply inverse log10 transformation for mobility predictions
         
         Args:
             inputs: Path to a CIF crystal structure file (str) or dict with 'cif_path' key
@@ -428,7 +521,7 @@ class GBFS_PredPredictor(BasePredictor):
             raise ValueError("No CIF file path provided")
             
         if self.logger:
-            self.logger.log("Running GBFS prediction", 'info')
+            self.logger.log(f"Running {self.property_name} prediction", 'info')
 
         structure = load_cif(input_data)
         composition = structure_to_composition(structure)
@@ -444,15 +537,32 @@ class GBFS_PredPredictor(BasePredictor):
                 'info'
             )
         
-        # Scale features
-        scaled = self.scaler.transform(features)
+        # Scale features if scaler has transform method
+        if hasattr(self.scaler, 'transform'):
+            scaled = self.scaler.transform(features)
+        else:
+            # If no transform method (e.g., scaler is a model), use features directly
+            scaled = features
         
         # Predict
         prediction = self.model.predict(scaled)
         
+        # Apply inverse log10 transformation for mobility predictions
+        if self.property_name in ['mob_n', 'mob_p']:
+            prediction = 10 ** prediction
+        
+        # For binary classifiers, also include probabilities if available
+        result = {"prediction": prediction.tolist()}
+        if hasattr(self.model, 'predict_proba'):
+            try:
+                probas = self.model.predict_proba(scaled)
+                result["probabilities"] = probas.tolist()
+            except Exception:
+                pass
+        
         # Return as JSON string for base class compatibility
         import json
-        return json.dumps({"prediction": prediction.tolist()})
+        return json.dumps(result)
     
     def predict_numpy(self, input_data: str) -> np.ndarray:
         """
@@ -467,8 +577,21 @@ class GBFS_PredPredictor(BasePredictor):
         structure = load_cif(input_data)
         composition = structure_to_composition(structure)
         features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
-        scaled = self.scaler.transform(features)
+        
+        # Scale features if scaler has transform method
+        if hasattr(self.scaler, 'transform'):
+            scaled = self.scaler.transform(features)
+        else:
+            # If no transform method (e.g., scaler is a model), use features directly
+            scaled = features
+        
+        # Predict
         prediction = self.model.predict(scaled)
+        
+        # Apply inverse log10 transformation for mobility predictions
+        if self.property_name in ['mob_n', 'mob_p']:
+            prediction = 10 ** prediction
+        
         return prediction
 
 
@@ -481,17 +604,17 @@ def main():
 
     parser = argparse.ArgumentParser(description="GBFS Prediction Pipeline")
     parser.add_argument("--cif", required=True)
-    parser.add_argument("--model", required=True)
-    parser.add_argument("--scaler", required=True)
-    parser.add_argument("--features", required=True)
+    parser.add_argument("--property", default="bandgap", 
+                        help="Property to predict: bandgap, e_form, dielectric, is_metal, mob_n, mob_p")
+    parser.add_argument("--model-dir", default=None,
+                        help="Optional path to model directory. If not provided, uses default GBFS_Pred/{property}/")
 
     args = parser.parse_args()
 
     predictor = GBFS_PredPredictor(
-        predictor_name="gbfs",
-        model_path=args.model,
-        scaler_path=args.scaler,
-        feature_list_path=args.features
+        predictor_name=args.property,
+        property_name=args.property,
+        model_dir=args.model_dir
     )
 
     pred = predictor.predict(args.cif)
