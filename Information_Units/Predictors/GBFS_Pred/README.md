@@ -95,6 +95,11 @@ e_form_pred = GBFS_PredPredictor(
     property_name='e_form'
 )
 
+dielectric_pred = GBFS_PredPredictor(
+    predictor_name='dielectric_model',
+    property_name='dielectric'
+)
+
 mob_n_pred = GBFS_PredPredictor(
     predictor_name='electron_mobility_model',
     property_name='mob_n'
@@ -113,12 +118,14 @@ is_metal_pred = GBFS_PredPredictor(
 # Make predictions
 bandgap = bandgap_pred.predict_numpy("structure.cif")[0]
 e_form = e_form_pred.predict_numpy("structure.cif")[0]
+dielectric = dielectric_pred.predict_numpy("structure.cif")[0]
 mob_n = mob_n_pred.predict_numpy("structure.cif")[0]  # Already inverse log10 transformed
 mob_p = mob_p_pred.predict_numpy("structure.cif")[0]  # Already inverse log10 transformed
 is_metal = is_metal_pred.predict_numpy("structure.cif")[0]
 
 print(f"Band Gap: {bandgap:.4f} eV")
 print(f"Formation Energy: {e_form:.4f} eV/atom")
+print(f"Dielectric Constant: {dielectric:.4f}")
 print(f"Electron Mobility: {mob_n:.4f} cm²/V·s")
 print(f"Hole Mobility: {mob_p:.4f} cm²/V·s")
 print(f"Metal: {'Yes' if is_metal else 'No'}")
