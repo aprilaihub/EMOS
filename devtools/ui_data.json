@@ -27,7 +27,15 @@
         "AFLOW": "AFLOW - Automatic FLOW database for computational materials science with rich mechanical, thermal, and electronic properties"
       },
     "generators": {
-      "MatterGen": "Diffusion model for crystal structure generation",
+      "MatterGen: Base Model": "Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)",
+      "MatterGen: MP-20 Base": "Unconditional base model trained on the MP-20 dataset for crystal structure generation (mp_20_base)",
+      "MatterGen: Chemical System": "Conditional model for generating structures within a specified chemical system (chemical_system)",
+      "MatterGen: Chemical System + Stability": "Conditional model for generating structures within a chemical system with target energy above hull (chemical_system_energy_above_hull)",
+      "MatterGen: DFT Band Gap": "Property-conditioned model for generating structures with a target DFT band gap (dft_band_gap)",
+      "MatterGen: Magnetic Density": "Property-conditioned model for generating structures with a target DFT magnetic density (dft_mag_density)",
+      "MatterGen: Magnetic Density + HHI": "Multi-property-conditioned model targeting magnetic density and Herfindahl-Hirschman elemental scarcity index (dft_mag_density_hhi_score)",
+      "MatterGen: Bulk Modulus": "Property-conditioned model for generating structures with a target ML-predicted bulk modulus (ml_bulk_modulus)",
+      "MatterGen: Space Group": "Symmetry-conditioned model for generating structures in a target crystallographic space group (space_group)",
       "GNoME": "Graph Networks for Materials Exploration", 
       "iMatGen": "Inverse materials generation using deep learning",
       "MatGAN": "Generative Adversarial Network for materials design",

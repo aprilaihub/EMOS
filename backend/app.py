@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import os
 import sys
 import pathlib
+import json
 
 # Get absolute paths regardless of where the script is run from
 BACKEND_DIR = pathlib.Path(__file__).parent.resolve()  # /home/soe/EMOS/backend
@@ -177,6 +178,114 @@ def process_feature(feature_id):
     except Exception as e:
         print(f"Error in process_feature: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+# ── Active feature instances for cancel support ─────────────────────
+# Keyed by feature_id (str), stores the feature object during streaming
+# so the cancel endpoint can call its cancel() method.
+_active_features: dict = {}
+
+
+@app.route('/api/process/<int:feature_id>/cancel', methods=['POST', 'OPTIONS'])
+def cancel_feature_processing(feature_id):
+    """Ask a running feature to cancel its current processing."""
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    fid = str(feature_id)
+    feature = _active_features.get(fid)
+    if feature is None:
+        return jsonify({'status': 'error', 'message': f'No active processing for feature {fid}'}), 404
+
+    try:
+        result = feature.cancel()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@app.route('/api/process/<int:feature_id>/stream', methods=['POST', 'OPTIONS'])
+def process_feature_stream(feature_id):
+    """SSE endpoint — streams progress events during feature processing.
+
+    Returns ``text/event-stream`` with events:
+    * ``event: log``       — ``{"message": "...", "level": "info"}``
+    * ``event: progress``  — ``{"progress": 0.25, "message": "Batch 1/4"}``
+    * ``event: result``    — final JSON result payload
+    * ``event: done``      — stream end
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        logger.clear_logs()
+        input_data = request.json or {}
+
+        if not NEW_FEATURE_ARCHITECTURE:
+            def _err():
+                yield f"event: error\ndata: {json.dumps({'message': 'Feature architecture not available'})}\n\n"
+                yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+            return Response(_err(), mimetype='text/event-stream')
+
+        print(f"Using Feature architecture (streaming) for feature {feature_id}")
+        feature = create_feature(str(feature_id), logger)
+
+        # Register for cancel support
+        _active_features[str(feature_id)] = feature
+
+        # Extract inputs the same way the sync endpoint does
+        inputs = feature.extract_inputs(input_data)
+
+        def _generate_sse():
+            """Yield SSE blocks from the feature's streaming processor."""
+            try:
+                # Check if the feature supports streaming
+                if hasattr(feature, 'process_feature_stream'):
+                    for sse_block in feature.process_feature_stream(inputs):
+                        yield sse_block
+                else:
+                    # Fallback: run synchronously and wrap as SSE
+                    yield f"event: log\ndata: {json.dumps({'message': 'No streaming support, running synchronously...', 'level': 'info'})}\n\n"
+                    results = feature.process(input_data)
+                    yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                # Always append accumulated logger logs as a final event
+                logs = logger.get_logs()
+                if logs:
+                    yield f"event: logs\ndata: {json.dumps(logs)}\n\n"
+
+            except Exception as exc:
+                print(f"Error in streaming process: {exc}")
+                yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
+
+            finally:
+                # Unregister from cancel support
+                _active_features.pop(str(feature_id), None)
+
+            yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+
+        return Response(
+            _generate_sse(),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no',
+            },
+        )
+
+    except ValueError as e:
+        print(f"Feature {feature_id} not found: {str(e)}")
+        def _err():
+            yield f"event: error\ndata: {json.dumps({'message': f'Feature {feature_id} not found'})}\n\n"
+            yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+        return Response(_err(), mimetype='text/event-stream')
+    except Exception as e:
+        print(f"Error in process_feature_stream: {str(e)}")
+        def _err():
+            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+            yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+        return Response(_err(), mimetype='text/event-stream')
 
 if __name__ == '__main__':
     print("Starting Flask server for all EMOS features...")
