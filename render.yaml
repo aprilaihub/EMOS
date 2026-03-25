@@ -54,4 +54,3 @@ services:
     envVars:
       - key: MATTERGEN_DEVICE
         value: cpu            # Render standard plans are CPU-only; change to "auto" on a GPU plan
-    healthCheckPath: /health
