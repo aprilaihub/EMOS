@@ -10,6 +10,10 @@ Test Coverage:
 Prerequisites:
 - MatterSim Docker container must be running:
     docker compose up -d mattersim
+- Quick check container status:
+    docker compose ps mattersim
+- Quick check recent container logs:
+    docker compose logs mattersim --tail 20
 - Container exposes API on http://localhost:8200 by default
 
 Run with: pytest tests/integration/test_mattersim_sanity.py -v
@@ -260,7 +264,12 @@ def test_model_deterministic_predictions(cif_files, predictor):
 @pytest.mark.parametrize('cif_key', ['al2o3_path', 'sio2_path'])
 def test_multiple_materials_produce_valid_results(cif_files, predictor, cif_key):
     """Various known materials should all produce valid predictions."""
-    result = predictor.predict({'cif_file': cif_files[cif_key]})
+    # Keep this as a fast smoke test: verify prediction path for multiple
+    # materials without paying the cost of full structure relaxation.
+    result = predictor.predict({
+        'cif_file': cif_files[cif_key],
+        'relax': False,
+    })
     assert_ok_prediction(result)
 
 
