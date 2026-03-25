@@ -22,9 +22,11 @@ Skip slow tests: pytest -m "not slow"
 """
 
 import json
+import time
 from pathlib import Path
 
 import pytest
+import requests
 
 from Information_Units.Predictors.Mattersim.MattersimPredictor import MattersimPredictor
 
@@ -52,6 +54,60 @@ def cif_files():
 def predictor():
     """Instantiate the MatterSim predictor once for this module."""
     return MattersimPredictor(predictor_name='test_mattersim_integration')
+
+
+@pytest.fixture(scope="module", autouse=True)
+def wait_for_mattersim_service_ready(predictor):
+    """Wait for MatterSim Docker API to become healthy after restarts.
+
+    This avoids flaky failures when tests start immediately after
+    `docker compose up` and the model is still loading.
+    """
+    timeout_s = 120
+    poll_s = 2
+    health_timeout_s = 3
+    deadline = time.time() + timeout_s
+    last_error = None
+    consecutive_connection_errors = 0
+    max_connection_errors_before_fail = 3
+
+    while time.time() < deadline:
+        try:
+            response = requests.get(
+                f"{predictor.api_url}/health",
+                timeout=health_timeout_s,
+            )
+            consecutive_connection_errors = 0
+            if response.status_code == 200:
+                # Reset cache to keep predictor health state consistent.
+                MattersimPredictor._health_cache = {
+                    "healthy": True,
+                    "checked_at": time.time(),
+                }
+                return
+            last_error = f"HTTP {response.status_code}: {response.text[:200]}"
+        except requests.exceptions.ConnectionError as exc:
+            last_error = str(exc)
+            consecutive_connection_errors += 1
+
+            # If the service is repeatedly unreachable, fail quickly instead of
+            # waiting the full warm-up window.
+            if consecutive_connection_errors >= max_connection_errors_before_fail:
+                pytest.fail(
+                    f"MatterSim service is unreachable at {predictor.api_url} "
+                    f"after {consecutive_connection_errors} attempts. "
+                    "Docker may be stopped. Start it with: docker compose up -d mattersim"
+                )
+        except Exception as exc:
+            last_error = str(exc)
+            consecutive_connection_errors = 0
+        time.sleep(poll_s)
+
+    pytest.fail(
+        f"MatterSim service did not become healthy within {timeout_s}s at {predictor.api_url}. "
+        f"Last error: {last_error}. "
+        "Start it with: docker compose up -d mattersim"
+    )
 
 
 # ============================================================================
@@ -264,11 +320,10 @@ def test_model_deterministic_predictions(cif_files, predictor):
 @pytest.mark.parametrize('cif_key', ['al2o3_path', 'sio2_path'])
 def test_multiple_materials_produce_valid_results(cif_files, predictor, cif_key):
     """Various known materials should all produce valid predictions."""
-    # Keep this as a fast smoke test: verify prediction path for multiple
-    # materials without paying the cost of full structure relaxation.
+    # Run with relaxation enabled to validate full pipeline for each material.
     result = predictor.predict({
         'cif_file': cif_files[cif_key],
-        'relax': False,
+        'relax': True,
     })
     assert_ok_prediction(result)
 
