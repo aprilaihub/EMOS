@@ -4,6 +4,7 @@ import os
 import sys
 import pathlib
 import json
+import requests
 
 # Get absolute paths regardless of where the script is run from
 BACKEND_DIR = pathlib.Path(__file__).parent.resolve()  # /home/soe/EMOS/backend
@@ -94,6 +95,33 @@ def get_features_info():
 @app.route('/api/health', methods=['GET', 'OPTIONS'])
 def health():
     return jsonify({'status': 'ok'}), 200
+
+
+@app.route('/api/debug/mattergen', methods=['GET'])
+def debug_mattergen_connectivity():
+    """Temporary diagnostics for Render deployment issues."""
+    api_url = os.getenv("MATTERGEN_API_URL", "http://localhost:8100").strip().rstrip("/")
+    if api_url and "://" not in api_url:
+        api_url = f"http://{api_url}"
+    health_url = f"{api_url}/health"
+
+    result = {
+        "configured_api_url": api_url,
+        "health_url": health_url,
+        "health_reachable": False,
+    }
+    try:
+        resp = requests.get(health_url, timeout=8)
+        result["health_reachable"] = resp.status_code == 200
+        result["health_status_code"] = resp.status_code
+        try:
+            result["health_response"] = resp.json()
+        except Exception:
+            result["health_response"] = resp.text[:500]
+    except Exception as exc:
+        result["health_error"] = str(exc)
+
+    return jsonify(result), 200
 
 
 @app.route('/api/process/toggle_IU', methods=["POST", "OPTIONS"])
