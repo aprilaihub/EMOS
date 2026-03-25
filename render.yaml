@@ -31,7 +31,7 @@ services:
       - key: MATTERGEN_API_URL
         fromService:
           name: emos-mattergen
-          type: web
+          type: pserv
           property: hostport
       - key: MATTERGEN_TIMEOUT
         value: "600"
@@ -44,7 +44,7 @@ services:
   # Render exposes the service internally; the Flask backend reaches it
   # via the MATTERGEN_API_URL env var above.
   # -----------------------------------------------------------------------
-  - type: web
+  - type: pserv
     name: emos-mattergen
     runtime: docker
     plan: standard          # needs ≥ 2 GB RAM for model inference
