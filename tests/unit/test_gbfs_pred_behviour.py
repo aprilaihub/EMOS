@@ -1,7 +1,7 @@
 """
-Unit tests for GBFS_PredPredictor - Integration Tests
+Unit tests for GBFS_PredPredictor
 
-Comprehensive tests for all six GBFS models:
+Comprehensive unit test suite for all six GBFS models:
 - Band gap (regression)
 - Formation energy per atom (regression)
 - Dielectric constant (regression)
@@ -9,12 +9,19 @@ Comprehensive tests for all six GBFS models:
 - Electron mobility (regression, log10-scaled)
 - Hole mobility (regression, log10-scaled)
 
-Structure mirrors SynthNN test pattern:
-- Generic initialization tests
-- Property-specific validation tests
+Test Structure (following SynthNN test patterns):
+- Generic initialization tests (all 6 properties)
+- CIF file loading tests
+- Regression property validation (API correctness, ranges, data types)
+- Classification property validation
+- Mobility-specific tests (log10 inverse transformation)
+- Input handling tests (string, dict with cif_path, dict with input_data)
 - Error handling tests
-- Feature engineering tests
-- End-to-end integration tests
+- Consistency tests (repeated predictions, method agreement)
+- End-to-end pipeline tests
+
+This is a UNIT TEST suite - tests API correctness with real models.
+For real material physics validation, see tests/integration/test_gbfs_sanity.py
 
 Run: pytest tests/unit/test_gbfs_pred_integration.py -v
 """
@@ -118,6 +125,7 @@ def mock_logger():
 
 # ============================================================================
 # Generic Predictor Interface Tests
+# (Unit tests validating API correctness - template for future predictors)
 # ============================================================================
 
 @pytest.mark.unit
@@ -186,6 +194,7 @@ def test_load_nonexistent_cif():
 
 # ============================================================================
 # Regression Property Tests (bandgap, e_form, dielectric, mob_n, mob_p)
+# Unit tests validating: return types, JSON format, reasonable ranges, finite values
 # ============================================================================
 
 @pytest.mark.unit
@@ -259,6 +268,7 @@ def test_regression_predictions_are_finite(
 
 # ============================================================================
 # Classification Property Tests (is_metal)
+# Unit tests validating: binary output, JSON format with probabilities
 # ============================================================================
 
 @pytest.mark.unit
@@ -294,6 +304,7 @@ def test_classification_predict_returns_json_with_probabilities(
 
 # ============================================================================
 # Mobility Model-Specific Tests (log10 inverse transformation)
+# Unit tests validating: positive values, inverse log10 transformation applied
 # ============================================================================
 
 @pytest.mark.unit
@@ -324,6 +335,7 @@ def test_electron_mobility_typically_exceeds_hole_mobility(
 
 # ============================================================================
 # Input Handling Tests
+# Unit tests validating: API accepts multiple input formats (string, dict keys)
 # ============================================================================
 
 @pytest.mark.unit
@@ -373,6 +385,7 @@ def test_predict_accepts_dict_with_input_data(
 
 # ============================================================================
 # Error Handling Tests
+# Unit tests validating: appropriate exceptions for invalid inputs
 # ============================================================================
 
 @pytest.mark.unit
@@ -403,6 +416,7 @@ def test_predict_empty_dict_raises_error(
 
 # ============================================================================
 # Consistency Tests
+# Unit tests validating: API behavior repeatability and method equivalence
 # ============================================================================
 
 @pytest.mark.unit
@@ -439,6 +453,7 @@ def test_predict_methods_agree(
 
 # ============================================================================
 # End-to-End Tests
+# Unit tests validating: full prediction pipeline works for all properties
 # ============================================================================
 
 @pytest.mark.unit
