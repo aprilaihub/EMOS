@@ -1,3 +1,25 @@
+// ── Property-mappings cache ──────────────────────────────────────────
+// Loaded once from property_mappings.json; shared by every BaseFeature
+// instance via the class-level cache.
+let _propertyMappingsCache = null;
+
+async function _loadPropertyMappings() {
+    if (_propertyMappingsCache) return _propertyMappingsCache;
+    try {
+        const resp = await fetch('./Information_Units/property_mappings.json');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        _propertyMappingsCache = await resp.json();
+    } catch (err) {
+        console.error('Failed to load property_mappings.json:', err);
+        _propertyMappingsCache = { properties: {} };
+    }
+    return _propertyMappingsCache;
+}
+
+if (typeof window !== 'undefined') {
+    window._loadPropertyMappings = _loadPropertyMappings;
+}
+
 // Base Feature Class - Foundation for all EMOS features
 class BaseFeature {
     constructor(featureId, featureName, featureDescription) {
@@ -5,6 +27,7 @@ class BaseFeature {
         this.featureName = featureName;
         this.featureDescription = featureDescription;
         this.isProcessing = false;
+        this._cancelled = false;
         this.results = null;
     }
 
@@ -64,11 +87,14 @@ class BaseFeature {
             <div class="log-terminal" id="logTerminal_${this.featureId}">
                 <div class="log-header">
                     <span>Processing Log</span>
-                    <button class="log-clear-btn" onclick="window.features[${this.featureId}].clearLogs()">Clear</button>
+                    <button type="button" class="log-clear-btn" onclick="window.features[${this.featureId}].clearLogs()">Clear</button>
                 </div>
                 <div class="log-content" id="logContent_${this.featureId}"></div>
             </div>
-            <button class="process-btn" id="processBtn_${this.featureId}" onclick="window.features[${this.featureId}].startProcessing()">Start Processing</button>
+            <div class="process-btn-group">
+                <button type="button" class="process-btn" id="processBtn_${this.featureId}" onclick="window.features[${this.featureId}].startProcessing()">Start Processing</button>
+                <button type="button" class="cancel-btn" id="cancelBtn_${this.featureId}" onclick="window.features[${this.featureId}].cancelProcessing()" style="display:none;">Cancel</button>
+            </div>
         `;
     }
 
@@ -145,7 +171,9 @@ class BaseFeature {
         if (this.isProcessing) return;
         
         this.isProcessing = true;
+        this._cancelled = false;
         const processBtn = document.getElementById(`processBtn_${this.featureId}`);
+        const cancelBtn = document.getElementById(`cancelBtn_${this.featureId}`);
         const progressFill = document.getElementById(`progressFill_${this.featureId}`);
         
         // Clear previous logs and add initial log
@@ -156,10 +184,16 @@ class BaseFeature {
             processBtn.disabled = true;
             processBtn.textContent = 'Processing...';
         }
+        if (cancelBtn) {
+            cancelBtn.style.display = '';
+            cancelBtn.disabled = false;
+            cancelBtn.textContent = 'Cancel';
+        }
         
         if (progressFill) {
             progressFill.style.width = '0%';
-            progressFill.style.width = '100%';
+            progressFill.style.transition = 'width 0.3s ease';
+            progressFill.style.width = '5%'; // small initial indication
         }
         
         try {
@@ -168,26 +202,37 @@ class BaseFeature {
             console.log(`Calling Python backend for feature ${this.featureId}`);
             const results = await this.callPythonBackend();
             this.results = results;
-            this.addLog('Python backend processing completed successfully!', 'success');
+            if (results && results.status === 'cancelled') {
+                this.addLog('Job cancelled.', 'warning');
+            } else {
+                this.addLog('Python backend processing completed successfully!', 'success');
+            }
             this.updateOutputs();
         } catch (error) {
-            this.addLog(`Backend error: ${error.message}`, 'error');
-            this.addLog('Backend unavailable, using local processing...', 'warning');
-            console.log('Backend failed, using local processing:', error);
-            
-            try {
-                // Simulate processing time
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // Fallback to local processFeature
-                this.addLog('Running local feature processing...', 'info');
-                this.results = await this.processFeature();
-                this.addLog('Local processing completed successfully!', 'success');
+            // If the user cancelled, don't fall back to local processing
+            if (this._cancelled) {
+                this.addLog('Job cancelled.', 'warning');
+                this.results = { status: 'cancelled', generation_results: {} };
                 this.updateOutputs();
-            } catch (localError) {
-                console.error('Processing error:', localError);
-                this.addLog(`Processing error: ${localError.message}`, 'error');
-                this.updateOutputs({ error: localError.message });
+            } else {
+                this.addLog(`Backend error: ${error.message}`, 'error');
+                this.addLog('Backend unavailable, using local processing...', 'warning');
+                console.log('Backend failed, using local processing:', error);
+                
+                try {
+                    // Simulate processing time
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Fallback to local processFeature
+                    this.addLog('Running local feature processing...', 'info');
+                    this.results = await this.processFeature();
+                    this.addLog('Local processing completed successfully!', 'success');
+                    this.updateOutputs();
+                } catch (localError) {
+                    console.error('Processing error:', localError);
+                    this.addLog(`Processing error: ${localError.message}`, 'error');
+                    this.updateOutputs({ error: localError.message });
+                }
             }
         } finally {
             this.isProcessing = false;
@@ -195,12 +240,25 @@ class BaseFeature {
                 processBtn.disabled = false;
                 processBtn.textContent = 'Start Processing';
             }
+            if (cancelBtn) {
+                cancelBtn.style.display = 'none';
+            }
             if (progressFill) {
                 setTimeout(() => {
                     progressFill.style.width = '0%';
                 }, 1000);
             }
         }
+    }
+
+    /**
+     * Cancel the current processing.
+     * Subclasses should override this to implement feature-specific cancellation
+     * (e.g. calling the backend cancel endpoint, aborting an SSE reader, etc.).
+     * The base implementation is a no-op.
+     */
+    async cancelProcessing() {
+        this.addLog('Cancel requested — this feature does not support cancellation.', 'warning');
     }
 
     // Add log entry to the processing log
@@ -285,6 +343,190 @@ class BaseFeature {
         return element.value;
     }
 
+    // ── Property-mappings-driven generator inputs ─────────────────────
+    /**
+     * Return the list of currently-checked generator checkbox values
+     * from the sidebar (e.g. ["mattergen_dft_band_gap", "mattergen_space_group"]).
+     */
+    _getActiveGeneratorKeys() {
+        const checkboxes = document.querySelectorAll(
+            "#generatorsList input[type='checkbox']:checked"
+        );
+        return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    /**
+     * Return the display label for a generator checkbox value by reading
+     * the text content of its parent <label> in the sidebar.
+     */
+    _getGeneratorDisplayName(genKey) {
+        const cb = document.querySelector(
+            `#generatorsList input[type='checkbox'][value='${genKey}']`
+        );
+        if (cb && cb.parentElement) {
+            return cb.parentElement.textContent.trim();
+        }
+        // Fallback: prettify the key
+        return genKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    /**
+     * Scan property_mappings.json and return, for each requested generator
+     * key, the list of properties it conditions on together with their
+     * metadata (type, description, unit, etc.).
+     *
+     * Returns: { generatorKey: [ { propKey, name, type, description, unit, range_support }, … ] }
+     *
+     * The `name` field is the property name as the model expects it
+     * (e.g. "dft_band_gap"), while `propKey` is the universal property
+     * key from property_mappings (e.g. "band_gap_direct").
+     */
+    _getGeneratorProperties(propertyMappings, generatorKeys) {
+        const result = {};
+        for (const gk of generatorKeys) {
+            result[gk] = [];
+        }
+
+        const props = propertyMappings.properties || {};
+        for (const [propKey, propDef] of Object.entries(props)) {
+            for (const gk of generatorKeys) {
+                if (propDef[gk]) {
+                    result[gk].push({
+                        propKey,
+                        name:          propDef[gk].name,
+                        type:          propDef.type        || 'string',
+                        description:   propDef.description || '',
+                        unit:          propDef.unit        || null,
+                        range_support: propDef[gk].range_support || false,
+                    });
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Build an HTML string that contains an <h4> section for each checked
+     * generator, with input fields for every property the model conditions
+     * on (derived from property_mappings.json).
+     *
+     * Generators that have no conditioning properties (unconditional
+     * models) get a short hint message instead of input fields.
+     *
+     * Also renders shared generation parameters (batch_size) per generator.
+     *
+     * @param {object} propertyMappings – the loaded property_mappings.json
+     * @returns {string} HTML
+     */
+    buildGeneratorPropertyInputsHTML(propertyMappings) {
+        const activeKeys = this._getActiveGeneratorKeys();
+        if (activeKeys.length === 0) {
+            return '<p class="mattergen-hint"><em>Select one or more generators from the sidebar to configure their parameters.</em></p>';
+        }
+
+        const genProps = this._getGeneratorProperties(propertyMappings, activeKeys);
+        let html = '';
+
+        for (const gk of activeKeys) {
+            const displayName = this._getGeneratorDisplayName(gk);
+            const props = genProps[gk];
+
+            html += `<div class="generator-inputs-block" data-generator="${gk}">`;
+            html += `<h4>${displayName}</h4>`;
+
+            // Shared generation parameter: batch_size
+            html += `
+                <label>Batch Size:
+                    <input type="number" id="gen_batch_size_${gk}_${this.featureId}"
+                           value="10" min="1" max="1000" step="1">
+                </label>`;
+
+            if (props.length === 0) {
+                html += `<p class="mattergen-hint"><em>This model generates structures unconditionally — no property targets needed.</em></p>`;
+            } else {
+                html += `<div class="generator-property-fields">`;
+                for (const p of props) {
+                    const inputId = `gen_prop_${gk}_${p.name}_${this.featureId}`;
+                    const unitStr = p.unit ? ` (${p.unit})` : '';
+                    // Human-readable label: capitalise description or fall back to name
+                    const label = p.description || p.name;
+                    const labelText = `${label}${unitStr}`;
+
+                    if (p.type === 'string') {
+                        html += `
+                            <label>${labelText}:
+                                <input type="text" id="${inputId}"
+                                       placeholder="e.g. Si-O"
+                                       title="${p.description}">
+                            </label>`;
+                    } else if (p.type === 'integer') {
+                        html += `
+                            <label>${labelText}:
+                                <input type="number" id="${inputId}"
+                                       step="1" min="0"
+                                       title="${p.description}">
+                            </label>`;
+                    } else {
+                        // float or other numeric
+                        html += `
+                            <label>${labelText}:
+                                <input type="number" id="${inputId}"
+                                       step="any" 
+                                       title="${p.description}">
+                            </label>`;
+                    }
+                }
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+        }
+
+        return html;
+    }
+
+    /**
+     * Collect the values from the property-mappings-driven input fields.
+     * Returns an object keyed by generator:
+     * {
+     *   mattergen_dft_band_gap: {
+     *     batch_size: 10,
+     *     properties_to_condition_on: { dft_band_gap: 1.5 }
+     *   },
+     *   ...
+     * }
+     */
+    collectGeneratorPropertyValues(propertyMappings) {
+        const activeKeys = this._getActiveGeneratorKeys();
+        const genProps = this._getGeneratorProperties(propertyMappings, activeKeys);
+        const result = {};
+
+        for (const gk of activeKeys) {
+            const batchEl = document.getElementById(`gen_batch_size_${gk}_${this.featureId}`);
+            const entry = {
+                batch_size: parseInt(batchEl?.value || '10', 10),
+                properties_to_condition_on: {},
+            };
+
+            for (const p of (genProps[gk] || [])) {
+                const el = document.getElementById(`gen_prop_${gk}_${p.name}_${this.featureId}`);
+                if (!el || el.value === '') continue;
+
+                if (p.type === 'integer') {
+                    entry.properties_to_condition_on[p.name] = parseInt(el.value, 10);
+                } else if (p.type === 'float') {
+                    entry.properties_to_condition_on[p.name] = parseFloat(el.value);
+                } else {
+                    entry.properties_to_condition_on[p.name] = el.value;
+                }
+            }
+
+            result[gk] = entry;
+        }
+
+        return result;
+    }
+
     async callPythonBackend() {
         // Collect input data for this feature
         const inputs = this.collectInputData();
@@ -364,6 +606,11 @@ class BaseFeature {
         });
         inputs['active_databases'] = activeDatabases;
         
+        // Collect generator-specific property inputs from property_mappings
+        if (_propertyMappingsCache) {
+            inputs['generator_inputs'] = this.collectGeneratorPropertyValues(_propertyMappingsCache);
+        }
+
         return inputs;
     }
 }

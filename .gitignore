@@ -1,6 +1,7 @@
 *.pyc
 __pycache__/
 *.py[cod]
+*.log
 
 # Virtual Environments
 emos_env/

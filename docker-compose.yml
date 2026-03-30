@@ -1,0 +1,59 @@
+###############################################################################
+# EMOS Docker Compose
+# ---------------------------------------------------------------------------
+# Defines containerised services that the EMOS platform talks to over HTTP.
+# Each heavy/GPU-dependent model lives in its own container.
+#
+# Usage:
+#   docker compose up -d                  # CPU-only (no GPU)
+#   docker compose up -d --build          # rebuild images first
+#   docker compose --profile gpu up -d    # with NVIDIA GPU passthrough
+#
+# The main EMOS backend (Flask on :5001) runs on the host and reaches
+# these services via http://localhost:<port>.
+###############################################################################
+
+services:
+  # -----------------------------------------------------------------------
+  # MatterGen — crystal-structure generator (Microsoft Research)
+  # -----------------------------------------------------------------------
+  mattergen:
+    build:
+      context: ./Information_Units/Generators/MattergenBaseModel/docker
+      dockerfile: Dockerfile
+    container_name: emos-mattergen
+    ports:
+      - "${MATTERGEN_PORT:-8100}:8000"
+    volumes:
+      # Cache HuggingFace models so they survive container restarts
+      - ./data/mattergen/hf_cache:/root/.cache/huggingface
+    environment:
+      # Set to "cpu" to force CPU inference (useful for testing)
+      - MATTERGEN_DEVICE=${MATTERGEN_DEVICE:-auto}
+    restart: unless-stopped
+
+    # Uncomment the block below (or use --profile gpu) for GPU passthrough
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # -----------------------------------------------------------------------
+  # GPU profile variant — same service but with GPU reservation
+  # Activate with:  docker compose --profile gpu up -d
+  # -----------------------------------------------------------------------
+  mattergen-gpu:
+    extends:
+      service: mattergen
+    container_name: emos-mattergen-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
