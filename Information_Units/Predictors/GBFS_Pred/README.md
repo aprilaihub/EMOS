@@ -1,6 +1,6 @@
-# GBFS_Pred Predictor
+# GBFS Predictor
 
-GBFS_Pred: Pretrained predictors from GBFS workflow, implemented in Python with integrated FastAPI service.
+GBFS: Pretrained predictors from GBFS workflow, implemented in Python with integrated FastAPI service.
 
 ## Status
 
@@ -103,7 +103,7 @@ Returns supported properties, descriptions, units, and prediction types.
 **Response:**
 ```json
 {
-  "name": "GBFS_Pred",
+  "name": "GBFS",
   "description": "Materials property predictor using LightGBM models...",
   "version": "1.0.0",
   "supported_properties": ["bandgap", "e_form", "dielectric", "is_metal", "mob_n", "mob_p"],

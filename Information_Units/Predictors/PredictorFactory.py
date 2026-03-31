@@ -17,7 +17,7 @@ predictor_factory = {
     "esen": EsenPredictor,
     "mypred1": Mypred1Predictor,
     "mypred2": Mypred2Predictor,
-    "gbfs_pred": GBFS_PredPredictor,
+    "gbfs": GBFS_PredPredictor,
 }
 
 predictor_registry = {}

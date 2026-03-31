@@ -41,7 +41,7 @@ except ImportError:
     Field = lambda *args, **kwargs: None  # type: ignore
 
 # Set up logging for API server
-_API_LOGGER = logging.getLogger("gbfs_pred_api")
+_API_LOGGER = logging.getLogger("gbfs_api")
 
 # Global predictor cache for API
 _API_PREDICTORS: Dict[str, 'GBFS_PredPredictor'] = {}
@@ -498,7 +498,7 @@ class GBFS_PredPredictor(BasePredictor):
     def info(self) -> str:
         """Return description of predictor capabilities."""
         return (
-            f"GBFS_Pred ({self.property_name}): Light Gradient Boosting Machine (LGBM) "
+            f"GBFS ({self.property_name}): Light Gradient Boosting Machine (LGBM) "
             f"predictor for {self.property_name} prediction trained on GBFS workflow data. "
             f"Uses matminer composition and structure featurizers to generate "
             f"{len(self.feature_list)} input features for property prediction. "
@@ -674,7 +674,7 @@ class GBFS_PredPredictor(BasePredictor):
 # =============================================================================
 # FASTAPI SERVER INTEGRATION
 # =============================================================================
-# This section provides HTTP API capabilities for GBFS_Pred.
+# This section provides HTTP API capabilities for GBFS.
 # When run with --serve flag, the predictor runs as a FastAPI server.
 # 
 # Mirrors the MattergenGenerator architecture where a single file 
@@ -801,9 +801,9 @@ if FASTAPI_AVAILABLE:
             raise ValueError(f"Failed to deserialize structure: {str(e)}")
 
     def create_app() -> FastAPI:
-        """Create and configure the FastAPI application for GBFS_Pred."""
+        """Create and configure the FastAPI application for GBFS."""
         app = FastAPI(
-            title="GBFS_Pred API",
+            title="GBFS API",
             description="Materials property prediction powered by GBFS models",
             version="1.0.0",
         )
@@ -814,8 +814,8 @@ if FASTAPI_AVAILABLE:
             _API_LOGGER.debug("Health check requested")
             return HealthResponse(
                 status="ok",
-                service="gbfs_pred",
-                message="GBFS_Pred service is operational"
+                service="gbfs",
+                message="GBFS service is operational"
             )
 
         @app.get("/info", response_model=InfoResponse)
@@ -823,7 +823,7 @@ if FASTAPI_AVAILABLE:
             """Return model metadata and supported properties."""
             _API_LOGGER.debug("Info endpoint requested")
             return InfoResponse(
-                name="GBFS_Pred",
+                name="GBFS",
                 description=(
                     "Materials property predictor using LightGBM models trained on "
                     "computed materials data. Generates features via matminer."
@@ -984,7 +984,7 @@ def main():
     parser.add_argument("--property", default="bandgap", 
                         help="Property to predict: bandgap, e_form, dielectric, is_metal, mob_n, mob_p")
     parser.add_argument("--model-dir", default=None,
-                        help="Optional path to model directory. If not provided, uses default GBFS_Pred/{property}/")
+                        help="Optional path to model directory. If not provided, uses default GBFS/{property}/")
     
     # Server configuration
     parser.add_argument("--host", default="0.0.0.0", help="Server host (default: 0.0.0.0)")
@@ -1009,7 +1009,7 @@ def main():
         
         import uvicorn
         
-        _API_LOGGER.info(f"Starting GBFS_Pred API server on {args.host}:{args.port}")
+        _API_LOGGER.info(f"Starting GBFS API server on {args.host}:{args.port}")
         app = create_app()
         uvicorn.run(app, host=args.host, port=args.port, log_level=args.log_level.lower())
     

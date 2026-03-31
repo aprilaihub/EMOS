@@ -1,5 +1,5 @@
 """
-Integration tests for GBFS_Pred with real models.
+Integration tests for GBFS with real models.
 
 Test Coverage:
 - Generic predictor contract checks (template for future predictors)

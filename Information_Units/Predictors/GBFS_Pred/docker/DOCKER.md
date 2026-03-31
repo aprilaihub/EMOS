@@ -1,8 +1,8 @@
-# GBFS_Pred Docker Deployment Guide
+# GBFS Docker Deployment Guide
 
 ## Overview
 
-GBFS_Pred is containerized as a FastAPI service with fully integrated FastAPI server code. The service exposes material property predictions via HTTP REST API. All data flows as JSON dictionaries — no auxiliary files are generated during prediction.
+GBFS is containerized as a FastAPI service with fully integrated FastAPI server code. The service exposes material property predictions via HTTP REST API. All data flows as JSON dictionaries — no auxiliary files are generated during prediction.
 
 ## Architecture
 

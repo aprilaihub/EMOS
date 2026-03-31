@@ -57,3 +57,48 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+
+  # -----------------------------------------------------------------------
+  # GBFS — material-property predictor (LightGBM + matminer)
+  # -----------------------------------------------------------------------
+  # Exposes a FastAPI server for predicting material properties from CIF data.
+  #   POST /predict/{property}   – predict a single property
+  #   POST /batch-predict        – predict multiple properties at once
+  #   GET  /info                 – list supported properties
+  #   GET  /health               – health check
+  #   GET  /docs                 – interactive API docs (Swagger)
+  # -----------------------------------------------------------------------
+  gbfs-pred:
+    build:
+      context: .
+      dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+    image: gbfs-pred:latest
+    container_name: emos-gbfs-pred
+    ports:
+      - "${GBFS_PORT:-8200}:8000"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      GBFS_HOST: 0.0.0.0
+      GBFS_PORT: 8000
+      GBFS_LOG_LEVEL: INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3

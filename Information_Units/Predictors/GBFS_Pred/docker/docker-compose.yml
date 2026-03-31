@@ -1,6 +1,6 @@
-# Docker Compose configuration for GBFS_Pred FastAPI Service
+# Docker Compose configuration for GBFS FastAPI Service
 #
-# The GBFS_Pred service exposes material property predictions via HTTP.
+# The GBFS service exposes material property predictions via HTTP.
 # All data is passed as JSON dictionaries (no auxiliary files created).
 #
 # Usage:
@@ -14,7 +14,7 @@
 version: '3.8'
 
 services:
-  gbfs_pred:
+  gbfs:
     build:
       context: ../../../../../../  # Build from EMOS root
       dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile

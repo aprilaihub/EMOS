@@ -160,7 +160,7 @@ def test_info_includes_property_name(gbfs_predictor_factory, property_name):
     predictor = gbfs_predictor_factory(property_name)
     info = predictor.info()
     assert isinstance(info, str) and len(info) > 0
-    assert "GBFS_Pred" in info
+    assert "GBFS" in info
     assert property_name in info.lower()
 
 
