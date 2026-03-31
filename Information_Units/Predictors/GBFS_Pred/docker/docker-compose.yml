@@ -1,0 +1,63 @@
+# Docker Compose configuration for GBFS_Pred FastAPI Service
+#
+# The GBFS_Pred service exposes material property predictions via HTTP.
+# All data is passed as JSON dictionaries (no auxiliary files created).
+#
+# Usage:
+#   docker-compose build        # Build the image
+#   docker-compose up           # Start the service (runs on localhost:8000)
+#   curl -X GET http://localhost:8000/info  # View supported properties
+#
+# To test predictions, use the /predict endpoints or /batch-predict
+# See the API documentation at http://localhost:8000/docs
+
+version: '3.8'
+
+services:
+  gbfs_pred:
+    build:
+      context: ../../../../../../  # Build from EMOS root
+      dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+    
+    image: gbfs-pred:latest
+    container_name: gbfs-predictor
+    
+    # Expose the FastAPI server
+    ports:
+      - "8000:8000"
+    
+    # Environment variables
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      GBFS_HOST: 0.0.0.0
+      GBFS_PORT: 8000
+      GBFS_LOG_LEVEL: INFO
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

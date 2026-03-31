@@ -2,6 +2,9 @@ from Information_Units.Predictors.BasePredictor import BasePredictor
 
 import os
 import joblib
+import logging
+import traceback
+import uuid
 from typing import List, Tuple, Any, Dict, Optional
 
 import numpy as np
@@ -9,6 +12,7 @@ import pandas as pd
 
 from pymatgen.core import Structure, Composition
 from pymatgen.io.cif import CifParser
+from monty.json import MontyDecoder
 
 from matminer.featurizers.base import BaseFeaturizer
 from matminer.featurizers.composition import (
@@ -21,6 +25,26 @@ from matminer.featurizers.structure import (
 )
 
 from sklearn.base import TransformerMixin
+
+# FastAPI imports (optional - only loaded if running in server mode)
+try:
+    from fastapi import FastAPI, HTTPException
+    from pydantic import BaseModel, Field
+    FASTAPI_AVAILABLE = True
+except ImportError:
+    # Provide dummy definitions so linter doesn't complain about unbound names
+    # These are never used at runtime since they're guarded by FASTAPI_AVAILABLE checks
+    FASTAPI_AVAILABLE = False
+    FastAPI = None  # type: ignore
+    HTTPException = None  # type: ignore
+    BaseModel = object  # type: ignore
+    Field = lambda *args, **kwargs: None  # type: ignore
+
+# Set up logging for API server
+_API_LOGGER = logging.getLogger("gbfs_pred_api")
+
+# Global predictor cache for API
+_API_PREDICTORS: Dict[str, 'GBFS_PredPredictor'] = {}
 
 # -----------------------------
 # GLOBAL CACHE
@@ -484,16 +508,20 @@ class GBFS_PredPredictor(BasePredictor):
 
     def predict(self, inputs) -> str:  # type: ignore
         """
-        Predict properties from a CIF crystal structure file.
+        Predict properties from crystal structure data.
         
-        This method overrides the base class to accept CIF file paths instead of dicts.
+        Supports flexible input formats:
+        - str: path to a CIF file (backward compatible)
+        - dict with 'structure': pymatgen Structure object
+        - dict with 'cif_path': path to a CIF file
+        - dict with 'input_data': path to a CIF file
         
         For mobility properties (mob_n, mob_p), automatically applies inverse log10 
         transformation to convert model output back to actual values (cm²/V·s).
         
         Pipeline:
-        1. Load CIF file and parse structure
-        2. Extract composition and structure objects
+        1. Load structure from input (file or dict)
+        2. Extract composition from structure
         3. Generate base features using matminer featurizers
         4. Engineer features by dividing base features (e.g., "feature_a/feature_b")
         5. Maintain strict feature order (LGBM does not check feature names)
@@ -502,28 +530,43 @@ class GBFS_PredPredictor(BasePredictor):
         8. Apply inverse log10 transformation for mobility predictions
         
         Args:
-            inputs: Path to a CIF crystal structure file (str) or dict with 'cif_path' key
-            
+            inputs: One of:
+                - str: path to a CIF file
+                - dict with 'structure': pymatgen Structure object
+                - dict with 'cif_path': path to a CIF file
+                - dict with 'input_data': path to a CIF file
+                
         Returns:
             str: JSON string representation of predicted property values
             
         Raises:
+            ValueError: If no valid input provided
             FileNotFoundError: If CIF file does not exist
-            ValueError: If no structures found or missing features cannot be generated
         """
-        # Handle both string paths and dict inputs
-        if isinstance(inputs, dict):
-            input_data = inputs.get('cif_path', inputs.get('input_data'))
-        else:
-            input_data = str(inputs)
-        
-        if not input_data:
-            raise ValueError("No CIF file path provided")
-            
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')
 
-        structure = load_cif(input_data)
+        # Extract structure from flexible input formats
+        if isinstance(inputs, str):
+            # Legacy: direct string path
+            structure = load_cif(inputs)
+        elif isinstance(inputs, dict):
+            structure = inputs.get('structure')
+            if structure is None:
+                # Fall back to file path from dict
+                cif_path = inputs.get('cif_path') or inputs.get('input_data')
+                if cif_path:
+                    structure = load_cif(cif_path)
+                else:
+                    raise ValueError(
+                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
+                        "'cif_path', or 'input_data' (path to CIF file)"
+                    )
+        else:
+            raise ValueError(
+                "Input must be a file path string or dictionary with structure/cif_path/input_data"
+            )
+
         composition = structure_to_composition(structure)
 
         # Generate base features
@@ -552,7 +595,10 @@ class GBFS_PredPredictor(BasePredictor):
             prediction = 10 ** prediction
         
         # For binary classifiers, also include probabilities if available
-        result = {"prediction": prediction.tolist()}
+        result = {
+            "property": self.property_name,
+            "prediction": prediction.tolist()
+        }
         if hasattr(self.model, 'predict_proba'):
             try:
                 probas = self.model.predict_proba(scaled)
@@ -564,17 +610,47 @@ class GBFS_PredPredictor(BasePredictor):
         import json
         return json.dumps(result)
     
-    def predict_numpy(self, input_data: str) -> np.ndarray:
+    def predict_numpy(self, input_data) -> np.ndarray:
         """
         Predict properties and return raw numpy array.
         
+        Supports flexible input formats:
+        - str: path to a CIF file (backward compatible)
+        - dict with 'structure': pymatgen Structure object
+        - dict with 'cif_path': path to a CIF file
+        - dict with 'input_data': path to a CIF file
+        
         Args:
-            input_data (str): Path to a CIF crystal structure file
+            input_data: One of:
+                - str: path to a CIF file
+                - dict with 'structure': pymatgen Structure object
+                - dict with 'cif_path': path to a CIF file
+                - dict with 'input_data': path to a CIF file
             
         Returns:
             np.ndarray: Predicted property values from the LGBM model
         """
-        structure = load_cif(input_data)
+        # Extract structure from flexible input formats
+        if isinstance(input_data, str):
+            # Legacy: direct string path
+            structure = load_cif(input_data)
+        elif isinstance(input_data, dict):
+            structure = input_data.get('structure')
+            if structure is None:
+                # Fall back to file path from dict
+                cif_path = input_data.get('cif_path') or input_data.get('input_data')
+                if cif_path:
+                    structure = load_cif(cif_path)
+                else:
+                    raise ValueError(
+                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
+                        "'cif_path', or 'input_data' (path to CIF file)"
+                    )
+        else:
+            raise ValueError(
+                "Input must be a file path string or dictionary with structure/cif_path/input_data"
+            )
+        
         composition = structure_to_composition(structure)
         features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
         
@@ -595,30 +671,364 @@ class GBFS_PredPredictor(BasePredictor):
         return prediction
 
 
-# -----------------------------
-# CLI ENTRYPOINT
+# =============================================================================
+# FASTAPI SERVER INTEGRATION
+# =============================================================================
+# This section provides HTTP API capabilities for GBFS_Pred.
+# When run with --serve flag, the predictor runs as a FastAPI server.
+# 
+# Mirrors the MattergenGenerator architecture where a single file 
+# contains both the predictor logic and the API server setup.
+# =============================================================================
+
+# Supported properties and metadata
+SUPPORTED_PROPERTIES = ["bandgap", "e_form", "dielectric", "is_metal", "mob_n", "mob_p"]
+
+PROPERTY_INFO = {
+    "bandgap": {
+        "label": "Band Gap",
+        "unit": "eV",
+        "type": "regression",
+        "description": "Electronic band gap energy"
+    },
+    "e_form": {
+        "label": "Formation Energy",
+        "unit": "eV/atom",
+        "type": "regression",
+        "description": "Enthalpy of formation per atom"
+    },
+    "dielectric": {
+        "label": "Dielectric Constant",
+        "unit": "dimensionless",
+        "type": "regression",
+        "description": "Electronic dielectric constant (eps_inf)"
+    },
+    "is_metal": {
+        "label": "Metal Classification",
+        "unit": "boolean",
+        "type": "classification",
+        "description": "Whether the material is metallic (1) or non-metallic (0)"
+    },
+    "mob_n": {
+        "label": "Electron Mobility",
+        "unit": "cm²/V·s",
+        "type": "regression",
+        "description": "Mobility of electrons (band conductivity)"
+    },
+    "mob_p": {
+        "label": "Hole Mobility",
+        "unit": "cm²/V·s",
+        "type": "regression",
+        "description": "Mobility of holes (valence band)"
+    },
+}
+
+
+if FASTAPI_AVAILABLE:
+    # Pydantic models for API
+    class PredictRequest(BaseModel):
+        """Parameters accepted by the /predict endpoint."""
+        structure: Dict[str, Any] = Field(
+            ...,
+            description=(
+                "Crystal structure as a JSON dictionary in pymatgen format. "
+                "Can be obtained from a Structure object via json.dumps(s.as_dict())"
+            ),
+        )
+
+    class PredictResponse(BaseModel):
+        """Response from the /predict endpoint."""
+        job_id: str = Field(..., description="Unique job identifier")
+        property: str = Field(..., description="Property predicted")
+        prediction: List[float] | float = Field(..., description="Predicted value(s)")
+        probabilities: Optional[List[List[float]]] = Field(
+            None, description="Class probabilities (for classifiers only)"
+        )
+        unit: str = Field(..., description="Unit of the prediction")
+        type: str = Field(..., description="Prediction type (regression or classification)")
+
+    class HealthResponse(BaseModel):
+        """Response from /health endpoint."""
+        status: str
+        service: str
+        message: str
+
+    class InfoResponse(BaseModel):
+        """Response from /info endpoint."""
+        name: str
+        description: str
+        version: str
+        supported_properties: List[str]
+        properties: Dict[str, Dict[str, str]]
+
+    class BatchPredictRequest(BaseModel):
+        """Parameters for batch prediction endpoint."""
+        structure: Dict[str, Any] = Field(
+            ...,
+            description=(
+                "Crystal structure as a JSON dictionary in pymatgen format. "
+                "Can be obtained from a Structure object via json.dumps(s.as_dict())"
+            ),
+        )
+        properties: Optional[List[str]] = Field(
+            None,
+            description=(
+                "List of properties to predict. If not provided, predicts all supported properties. "
+                f"Supported: {SUPPORTED_PROPERTIES}"
+            ),
+        )
+
+    # Helper functions
+    def _get_or_load_predictor(property_name: str) -> GBFS_PredPredictor:
+        """Get a predictor from cache, or load it if not cached."""
+        if property_name not in _API_PREDICTORS:
+            _API_LOGGER.info(f"Loading {property_name} predictor...")
+            _API_PREDICTORS[property_name] = GBFS_PredPredictor(
+                predictor_name=property_name,
+                property_name=property_name,
+                model_dir=None,
+                logger=None
+            )
+            _API_LOGGER.info(f"Loaded {property_name} predictor")
+        return _API_PREDICTORS[property_name]
+
+    def _structure_from_dict(struct_dict: Dict[str, Any]) -> Structure:
+        """Load a Structure from a pymatgen JSON dictionary."""
+        try:
+            decoder = MontyDecoder()
+            return decoder.process_decoded(struct_dict)
+        except Exception as e:
+            raise ValueError(f"Failed to deserialize structure: {str(e)}")
+
+    def create_app() -> FastAPI:
+        """Create and configure the FastAPI application for GBFS_Pred."""
+        app = FastAPI(
+            title="GBFS_Pred API",
+            description="Materials property prediction powered by GBFS models",
+            version="1.0.0",
+        )
+
+        @app.get("/health", response_model=HealthResponse)
+        def health():
+            """Liveness / readiness check."""
+            _API_LOGGER.debug("Health check requested")
+            return HealthResponse(
+                status="ok",
+                service="gbfs_pred",
+                message="GBFS_Pred service is operational"
+            )
+
+        @app.get("/info", response_model=InfoResponse)
+        def info():
+            """Return model metadata and supported properties."""
+            _API_LOGGER.debug("Info endpoint requested")
+            return InfoResponse(
+                name="GBFS_Pred",
+                description=(
+                    "Materials property predictor using LightGBM models trained on "
+                    "computed materials data. Generates features via matminer."
+                ),
+                version="1.0.0",
+                supported_properties=SUPPORTED_PROPERTIES,
+                properties=PROPERTY_INFO,
+            )
+
+        @app.post("/predict/{property_name}", response_model=PredictResponse)
+        def predict(property_name: str, request: PredictRequest):
+            """Predict a material property from a crystal structure."""
+            job_id = uuid.uuid4().hex[:12]
+            
+            if property_name not in SUPPORTED_PROPERTIES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unknown property: {property_name}. Supported: {', '.join(SUPPORTED_PROPERTIES)}"
+                )
+            
+            _API_LOGGER.info(f"[{job_id}] Prediction request for {property_name}")
+            
+            try:
+                structure = _structure_from_dict(request.structure)
+                _API_LOGGER.debug(f"[{job_id}] Loaded structure: {structure.composition.reduced_formula}")
+                
+                predictor = _get_or_load_predictor(property_name)
+                numpy_pred = predictor.predict_numpy({"structure": structure})
+                
+                probabilities = None
+                if hasattr(predictor.model, 'predict_proba'):
+                    try:
+                        composition = structure.composition
+                        features = generate_features(structure, composition, predictor.feature_list, nan_strategy="zero")
+                        if hasattr(predictor.scaler, 'transform'):
+                            scaled = predictor.scaler.transform(features)
+                        else:
+                            scaled = features
+                        probas = predictor.model.predict_proba(scaled)
+                        probabilities = probas.tolist()
+                    except Exception as e:
+                        _API_LOGGER.debug(f"[{job_id}] Could not get probabilities: {str(e)}")
+                
+                _API_LOGGER.info(f"[{job_id}] Prediction complete for {property_name}: {numpy_pred}")
+                
+                prop_info = PROPERTY_INFO[property_name]
+                prediction_value = numpy_pred.tolist()
+                
+                if isinstance(prediction_value, list) and len(prediction_value) == 1:
+                    prediction_value = prediction_value[0]
+                
+                return PredictResponse(
+                    job_id=job_id,
+                    property=property_name,
+                    prediction=prediction_value,
+                    probabilities=probabilities,
+                    unit=prop_info["unit"],
+                    type=prop_info["type"],
+                )
+                
+            except ValueError as e:
+                _API_LOGGER.error(f"[{job_id}] Validation error: {str(e)}")
+                raise HTTPException(status_code=400, detail=str(e))
+            except Exception as e:
+                _API_LOGGER.error(f"[{job_id}] Prediction failed: {str(e)}")
+                _API_LOGGER.error(f"[{job_id}] Traceback: {traceback.format_exc()}")
+                raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+        @app.post("/batch-predict")
+        def batch_predict(request: BatchPredictRequest):
+            """Predict multiple properties for a single structure."""
+            job_id = uuid.uuid4().hex[:12]
+            
+            structure_dict = request.structure
+            properties = request.properties or SUPPORTED_PROPERTIES
+            
+            _API_LOGGER.info(f"[{job_id}] Batch prediction request for {len(properties)} properties")
+            
+            try:
+                structure = _structure_from_dict(structure_dict)
+                _API_LOGGER.debug(f"[{job_id}] Loaded structure: {structure.composition.reduced_formula}")
+                
+                results = {}
+                for prop in properties:
+                    if prop not in SUPPORTED_PROPERTIES:
+                        _API_LOGGER.warning(f"[{job_id}] Skipping unsupported property: {prop}")
+                        continue
+                    
+                    try:
+                        predictor = _get_or_load_predictor(prop)
+                        pred_result = predictor.predict_numpy({"structure": structure})
+                        
+                        prop_info = PROPERTY_INFO[prop]
+                        prediction_value = pred_result.tolist()
+                        
+                        if isinstance(prediction_value, list) and len(prediction_value) == 1:
+                            prediction_value = prediction_value[0]
+                        
+                        probabilities = None
+                        if hasattr(predictor.model, 'predict_proba'):
+                            try:
+                                composition = structure.composition
+                                features = generate_features(structure, composition, predictor.feature_list, nan_strategy="zero")
+                                if hasattr(predictor.scaler, 'transform'):
+                                    scaled = predictor.scaler.transform(features)
+                                else:
+                                    scaled = features
+                                probas = predictor.model.predict_proba(scaled)
+                                probabilities = probas.tolist()
+                            except Exception as pe:
+                                _API_LOGGER.debug(f"[{job_id}] Could not get probabilities for {prop}: {str(pe)}")
+                        
+                        results[prop] = {
+                            "prediction": prediction_value,
+                            "probabilities": probabilities,
+                            "unit": prop_info["unit"],
+                            "type": prop_info["type"],
+                        }
+                        
+                    except Exception as e:
+                        _API_LOGGER.error(f"[{job_id}] Failed to predict {prop}: {str(e)}")
+                        results[prop] = {"error": str(e)}
+                
+                _API_LOGGER.info(f"[{job_id}] Batch prediction complete: {len(results)} properties")
+                
+                return {
+                    "job_id": job_id,
+                    "structure_formula": structure.composition.reduced_formula,
+                    "predictions": results,
+                }
+                
+            except Exception as e:
+                _API_LOGGER.error(f"[{job_id}] Batch prediction failed: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
+
+        return app
+
+
+# ======================== 
+# CLI ENTRYPOINT (backward compatible)
 # -----------------------------
 
 def main():
     import argparse
+    import json
 
     parser = argparse.ArgumentParser(description="GBFS Prediction Pipeline")
-    parser.add_argument("--cif", required=True)
+    
+    # Server mode
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="Run as FastAPI server instead of CLI predictor"
+    )
+    
+    # CLI mode (legacy)
+    parser.add_argument("--cif", default=None, help="Path to CIF structure file")
     parser.add_argument("--property", default="bandgap", 
                         help="Property to predict: bandgap, e_form, dielectric, is_metal, mob_n, mob_p")
     parser.add_argument("--model-dir", default=None,
                         help="Optional path to model directory. If not provided, uses default GBFS_Pred/{property}/")
+    
+    # Server configuration
+    parser.add_argument("--host", default="0.0.0.0", help="Server host (default: 0.0.0.0)")
+    parser.add_argument("--port", type=int, default=8000, help="Server port (default: 8000)")
+    parser.add_argument("--log-level", default="INFO", help="Logging level (default: INFO)")
 
     args = parser.parse_args()
 
-    predictor = GBFS_PredPredictor(
-        predictor_name=args.property,
-        property_name=args.property,
-        model_dir=args.model_dir
+    # Configure logging
+    log_level = getattr(logging, args.log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s | %(levelname)-7s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    pred = predictor.predict(args.cif)
-    print(pred)
+    # Run as FastAPI server
+    if args.serve:
+        if not FASTAPI_AVAILABLE:
+            print("Error: FastAPI is not installed. Install it with: pip install fastapi uvicorn")
+            return
+        
+        import uvicorn
+        
+        _API_LOGGER.info(f"Starting GBFS_Pred API server on {args.host}:{args.port}")
+        app = create_app()
+        uvicorn.run(app, host=args.host, port=args.port, log_level=args.log_level.lower())
+    
+    # Run as CLI predictor (legacy mode)
+    else:
+        if not args.cif:
+            parser.print_help()
+            print("\nError: --cif is required for prediction mode. Use --serve to run as server.")
+            return
+        
+        predictor = GBFS_PredPredictor(
+            predictor_name=args.property,
+            property_name=args.property,
+            model_dir=args.model_dir
+        )
+
+        # Use dictionary-based prediction
+        result = predictor.predict({"cif_path": args.cif})
+        print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

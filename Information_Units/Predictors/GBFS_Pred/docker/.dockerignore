@@ -48,21 +48,3 @@ htmlcov/
 # Fixtures and test data
 fixtures/
 *.cif
-sample_structures/
-
-# Documentation
-docs/
-*.md
-README.*
-
-# Temporary files
-*.tmp
-*.temp
-*.log
-.cache/
-
-# Project specific
-.env
-.env.local
-notebooks/
-*.ipynb

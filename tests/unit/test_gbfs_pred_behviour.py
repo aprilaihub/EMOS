@@ -410,7 +410,7 @@ def test_predict_empty_dict_raises_error(
 ):
     """predict() raises ValueError for empty input."""
     predictor = gbfs_predictor_factory(property_name)
-    with pytest.raises(ValueError, match="No CIF file path"):
+    with pytest.raises(ValueError, match="Input dictionary must contain"):
         predictor.predict({})
 
 
