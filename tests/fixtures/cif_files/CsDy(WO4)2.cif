@@ -1,0 +1,47 @@
+# generated using pymatgen
+data_CsDy(WO4)2
+_symmetry_space_group_name_H-M   C2/c
+_cell_length_a   10.99813800
+_cell_length_b   10.77171800
+_cell_length_c   7.58802381
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   130.21477807
+_cell_angle_gamma   90.00000000
+_symmetry_Int_Tables_number   15
+_chemical_formula_structural   CsDy(WO4)2
+_chemical_formula_sum   'Cs4 Dy4 W8 O32'
+_cell_volume   686.46047293
+_cell_formula_units_Z   4
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+  2  '-x, -y, -z'
+  3  '-x, y, -z+1/2'
+  4  'x, -y, z+1/2'
+  5  'x+1/2, y+1/2, z'
+  6  '-x+1/2, -y+1/2, -z'
+  7  '-x+1/2, y+1/2, -z+1/2'
+  8  'x+1/2, -y+1/2, z+1/2'
+loop_
+ _atom_type_symbol
+ _atom_type_oxidation_number
+  Cs+  1.0
+  Dy3+  3.0
+  W6+  6.0
+  O2-  -2.0
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Cs+  Cs0  4  0.00000000  0.19795900  0.75000000  1
+  Dy3+  Dy1  4  0.00000000  0.22186800  0.25000000  1
+  W6+  W2  8  0.19183200  0.49444100  0.21690300  1
+  O2-  O3  8  0.01731800  0.39037500  0.46158700  1
+  O2-  O4  8  0.13837300  0.08683800  0.20584800  1
+  O2-  O5  8  0.18405550  0.43670650  0.93433100  1
+  O2-  O6  8  0.21433250  0.15362650  0.62335500  1

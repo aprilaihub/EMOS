@@ -534,6 +534,17 @@
         "range_support": true
       }
     },
+    "band_gap_gbfs": {
+      "type": "float",
+      "description": "Predicted electronic band gap using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "eV",
+      "gbfs": {
+        "name": "bandgap",
+        "predictable": true,
+        "range_support": true
+      }
+    },
     "band_gap_scan": {
       "type": "float",
       "description": "Electronic band gap (SCAN)",
@@ -1048,6 +1059,17 @@
         "range_support": false
       }
     },
+    "dielectric_constant_gbfs": {
+      "type": "float",
+      "description": "Predicted dielectric constant using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "dimensionless",
+      "gbfs": {
+        "name": "dielectric",
+        "predictable": true,
+        "range_support": true
+      }
+    },
     "dos_ef": {
       "type": "float",
       "description": "Density of states at Fermi level (PBEsol)",
@@ -1100,6 +1122,17 @@
       "mathub3d": {
         "name": "efermi",
         "retrievable": true,
+        "range_support": true
+      }
+    },
+    "electron_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted electron mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s",
+      "gbfs": {
+        "name": "mob_n",
+        "predictable": true,
         "range_support": true
       }
     },
@@ -1362,6 +1395,17 @@
         "range_support": true
       }
     },
+    "formation_energy_gbfs": {
+      "type": "float",
+      "description": "Predicted formation energy per atom using GBFS LightGBM model",
+      "category": "energetic",
+      "unit": "eV/atom",
+      "gbfs": {
+        "name": "e_form",
+        "predictable": true,
+        "range_support": true
+      }
+    },
     "formation_energy_per_atom_scan": {
       "type": "float",
       "description": "Formation energy per atom (SCAN)",
@@ -1421,6 +1465,17 @@
       "jarvisdft": {
         "name": "_jarvis_hse_gap",
         "retrievable": true,
+        "range_support": true
+      }
+    },
+   "hole_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted hole mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s",
+      "gbfs": {
+        "name": "mob_p",
+        "predictable": true,
         "range_support": true
       }
     },
@@ -1493,6 +1548,16 @@
       "mathub3d": {
         "name": "is_magnetic",
         "retrievable": true,
+        "range_support": false
+      }
+    },
+    "is_metal_gbfs": {
+      "type": "boolean",
+      "description": "Predicted metal/non-metal classification using GBFS LightGBM classifier",
+      "category": "electronic",
+      "gbfs": {
+        "name": "is_metal",
+        "predictable": true,
         "range_support": false
       }
     },
