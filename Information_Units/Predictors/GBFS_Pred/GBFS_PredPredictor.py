@@ -535,6 +535,7 @@ class GBFS_PredPredictor(BasePredictor):
                 - dict with 'structure': pymatgen Structure object
                 - dict with 'cif_path': path to a CIF file
                 - dict with 'input_data': path to a CIF file
+                - dict with 'cif_string': raw CIF text content
                 
         Returns:
             str: JSON string representation of predicted property values
@@ -553,18 +554,28 @@ class GBFS_PredPredictor(BasePredictor):
         elif isinstance(inputs, dict):
             structure = inputs.get('structure')
             if structure is None:
-                # Fall back to file path from dict
-                cif_path = inputs.get('cif_path') or inputs.get('input_data')
-                if cif_path:
-                    structure = load_cif(cif_path)
+                # Try raw CIF string
+                cif_string = inputs.get('cif_string')
+                if cif_string:
+                    import io
+                    parser = CifParser(io.StringIO(cif_string))
+                    structures = parser.get_structures(primitive=True)
+                    if not structures:
+                        raise ValueError("No structures found in CIF string")
+                    structure = structures[0]
                 else:
-                    raise ValueError(
-                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
-                        "'cif_path', or 'input_data' (path to CIF file)"
-                    )
+                    # Fall back to file path from dict
+                    cif_path = inputs.get('cif_path') or inputs.get('input_data')
+                    if cif_path:
+                        structure = load_cif(cif_path)
+                    else:
+                        raise ValueError(
+                            "Input dictionary must contain either 'structure' (pymatgen Structure), "
+                            "'cif_string' (raw CIF text), 'cif_path', or 'input_data' (path to CIF file)"
+                        )
         else:
             raise ValueError(
-                "Input must be a file path string or dictionary with structure/cif_path/input_data"
+                "Input must be a file path string or dictionary with structure/cif_string/cif_path/input_data"
             )
 
         composition = structure_to_composition(structure)
@@ -619,6 +630,7 @@ class GBFS_PredPredictor(BasePredictor):
         - dict with 'structure': pymatgen Structure object
         - dict with 'cif_path': path to a CIF file
         - dict with 'input_data': path to a CIF file
+        - dict with 'cif_string': raw CIF text content
         
         Args:
             input_data: One of:
@@ -626,6 +638,7 @@ class GBFS_PredPredictor(BasePredictor):
                 - dict with 'structure': pymatgen Structure object
                 - dict with 'cif_path': path to a CIF file
                 - dict with 'input_data': path to a CIF file
+                - dict with 'cif_string': raw CIF text content
             
         Returns:
             np.ndarray: Predicted property values from the LGBM model
@@ -637,15 +650,25 @@ class GBFS_PredPredictor(BasePredictor):
         elif isinstance(input_data, dict):
             structure = input_data.get('structure')
             if structure is None:
-                # Fall back to file path from dict
-                cif_path = input_data.get('cif_path') or input_data.get('input_data')
-                if cif_path:
-                    structure = load_cif(cif_path)
+                # Try raw CIF string
+                cif_string = input_data.get('cif_string')
+                if cif_string:
+                    import io
+                    parser = CifParser(io.StringIO(cif_string))
+                    structures = parser.get_structures(primitive=True)
+                    if not structures:
+                        raise ValueError("No structures found in CIF string")
+                    structure = structures[0]
                 else:
-                    raise ValueError(
-                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
-                        "'cif_path', or 'input_data' (path to CIF file)"
-                    )
+                    # Fall back to file path from dict
+                    cif_path = input_data.get('cif_path') or input_data.get('input_data')
+                    if cif_path:
+                        structure = load_cif(cif_path)
+                    else:
+                        raise ValueError(
+                            "Input dictionary must contain either 'structure' (pymatgen Structure), "
+                            "'cif_string' (raw CIF text), 'cif_path', or 'input_data' (path to CIF file)"
+                        )
         else:
             raise ValueError(
                 "Input must be a file path string or dictionary with structure/cif_path/input_data"
