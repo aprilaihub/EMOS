@@ -57,6 +57,36 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+  
+
+
+
+  # -----------------------------------------------------------------------
+  # MatterSim — ML interatomic potential predictor (Microsoft Research)
+  # -----------------------------------------------------------------------
+  mattersim:
+    build:
+      context: ./Information_Units/Predictors/Mattersim/docker
+      dockerfile: Dockerfile
+    container_name: emos-mattersim
+    ports:
+      - "${MATTERSIM_PORT:-8300}:8000"
+    environment:
+      - MATTERSIM_LOG_LEVEL=${MATTERSIM_LOG_LEVEL:-DEBUG}
+
+  mattersim-gpu:
+    extends:
+      service: mattersim
+    container_name: emos-mattersim-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
 
   # -----------------------------------------------------------------------
   # GBFS — material-property predictor (LightGBM + matminer)
