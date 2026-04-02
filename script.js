@@ -140,6 +140,12 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             
             currentFeatureInstance = new FeatureClass(featureId);
             window.features[featureId] = currentFeatureInstance;
+
+            // Ensure property_mappings.json is loaded before building UI
+            // (the cache is shared, so this is a no-op after the first load)
+            if (typeof _loadPropertyMappings === 'function') {
+                await _loadPropertyMappings();
+            }
             
             // Replace the feature view content with the specific feature's interface
             featureView.innerHTML = currentFeatureInstance.createFeatureHTML();
@@ -159,6 +165,11 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
 // Helper function to load scripts dynamically
 function loadScript(src) {
     return new Promise((resolve, reject) => {
+        // Prevent duplicate <script> tags for the same URL
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+        }
         const script = document.createElement('script');
         script.src = src;
         script.onload = () => {
@@ -172,6 +183,8 @@ function loadScript(src) {
         document.head.appendChild(script);
     });
 }
+// Expose globally so other scripts can dynamically load modules
+window.loadScript = loadScript;
 
 // Create generic feature view for fallback
 function createGenericFeatureView(featureName, featureDesc) {

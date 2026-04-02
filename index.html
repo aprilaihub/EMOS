@@ -166,12 +166,23 @@
                             <label><input type="checkbox" ui-type="database" value="cod"> COD</label>
                             <label><input type="checkbox" ui-type="database" value="materialsproject"> MaterialsProject</label>
                             <label><input type="checkbox" ui-type="database" value="alexandria"> Alexandria</label>
+                            <label><input type="checkbox" ui-type="database" value="mathub3d"> Mathub3d</label>
+                            <label><input type="checkbox" ui-type="database" value="jarvisdft"> JarvisDFT</label>
+                            <label><input type="checkbox" ui-type="database" value="aflow"> AFLOW</label>
                             </div>
                         </div>
                         <div class="info-column">
                             <h3>Generators</h3>
                             <div class="radio-group" id="generatorsList">
-                            <label><input type="checkbox" ui-type="generator" value="mattergen"> MatterGen</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_base_model"> MatterGen: Base Model</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_mp_20_base"> MatterGen: MP-20 Base</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system"> MatterGen: Chemical System</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system_stability"> MatterGen: Chemical System + Stability</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_dft_band_gap"> MatterGen: DFT Band Gap</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density"> MatterGen: Magnetic Density</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density_hhi"> MatterGen: Magnetic Density + HHI</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_bulk_modulus"> MatterGen: Bulk Modulus</label>
+                            <label><input type="checkbox" ui-type="generator" value="mattergen_space_group"> MatterGen: Space Group</label>
                             <label><input type="checkbox" ui-type="generator" value="gnome"> GNoME</label>
                             <label><input type="checkbox" ui-type="generator" value="imatgen"> iMatGen</label>
                             <label><input type="checkbox" ui-type="generator" value="matgan"> MatGAN</label>
@@ -192,6 +203,7 @@
                             <label><input type="checkbox" ui-type="predictor" value="esen"> eSEN</label>
                             <label><input type="checkbox" ui-type="predictor" value="mypred1"> MyPred1</label>
                             <label><input type="checkbox" ui-type="predictor" value="mypred2"> MyPred2</label>
+                            <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
                             </div>
                         </div>
                     </div>
@@ -290,6 +302,7 @@
         </div>
     </div>
 
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
     <script src="navigation.js"></script>
     <script src="script.js"></script>
 </body>
