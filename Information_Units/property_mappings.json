@@ -195,6 +195,11 @@
         "name": "_alexandria_energy",
         "retrievable": true,
         "range_support": true
+      },
+      "mattersim": {
+        "name": "energy",
+        "predicatble": true,
+        "range_support": true
       }
     },
     "energy_corrected": {
@@ -269,6 +274,11 @@
         "name": "_alexandria_forces",
         "retrievable": true,
         "range_support": true
+      },
+      "mattersim": {
+        "name": "forces",
+        "predicatble": true,
+        "range_support": true
       }
     },
     "stress_tensor": {
@@ -279,6 +289,11 @@
       "alexandria": {
         "name": "_alexandria_stress_tensor",
         "retrievable": true,
+        "range_support": true
+      },
+      "mattersim": {
+        "name": "stress",
+        "predicatble": true,
         "range_support": true
       }
     },
@@ -463,6 +478,69 @@
       "materialsproject": {
         "name": "_mp_chemical_system",
         "retrievable": true,
+        "range_support": false
+      }
+    },
+    "num_atoms": {
+      "type": "integer",
+      "description": "Number of atoms in the structure",
+      "category": "predictor",
+      "mattersim": {
+        "name": "num_atoms",
+        "predicatble": true,
+        "range_support": true
+      }
+    },
+    "atomic_numbers": {
+      "type": "array",
+      "description": "Atomic numbers for atoms in the structure",
+      "category": "predictor",
+      "mattersim": {
+        "name": "atomic_numbers",
+        "predicatble": true,
+        "range_support": false
+      }
+    },
+    "relaxed_energy": {
+      "type": "float",
+      "description": "Total energy after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV",
+      "mattersim": {
+        "name": "relaxed_energy",
+        "predicatble": true,
+        "range_support": true
+      }
+    },
+    "relaxed_forces": {
+      "type": "float",
+      "description": "Forces on atoms after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV/Angstrom",
+      "mattersim": {
+        "name": "relaxed_forces",
+        "predicatble": true,
+        "range_support": true
+      }
+    },
+    "relaxed_stress": {
+      "type": "float",
+      "description": "Stress tensor after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "GPa",
+      "mattersim": {
+        "name": "relaxed_stress",
+        "predicatble": true,
+        "range_support": true
+      }
+    },
+    "relaxed_cif": {
+      "type": "string",
+      "description": "Path to saved relaxed CIF output from MatterSim",
+      "category": "predictor",
+      "mattersim": {
+        "name": "relaxed_cif",
+        "predicatble": true,
         "range_support": false
       }
     },
