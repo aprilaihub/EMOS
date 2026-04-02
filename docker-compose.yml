@@ -1,35 +1,35 @@
-version: '3.8'
+###############################################################################
+# EMOS Docker Compose
+# ---------------------------------------------------------------------------
+# Defines containerised services that the EMOS platform talks to over HTTP.
+# Each heavy/GPU-dependent model lives in its own container.
+#
+# Usage:
+#   docker compose up -d                  # CPU-only (no GPU)
+#   docker compose up -d --build          # rebuild images first
+#   docker compose --profile gpu up -d    # with NVIDIA GPU passthrough
+#
+# The main EMOS backend (Flask on :5001) runs on the host and reaches
+# these services via http://localhost:<port>.
+###############################################################################
 
 services:
-  m3gnet:
-    build:
-      context: .
-      dockerfile: Dockerfile.m3gnet
-    image: emos:m3gnet-latest
-    container_name: emos-m3gnet
-    volumes:
-      - .:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-    working_dir: /app
-    command: python Information_Units/Predictors/M3gnet/test_m3gnet.py
-    # Uncomment to run as API server
-    # ports:
-    #   - "5001:5000"
-    # command: python -m flask run --host=0.0.0.0 --port=5000
-
   # -----------------------------------------------------------------------
-  # MatterSim — ML interatomic potential predictor (Microsoft Research)
+  # MatterGen — crystal-structure generator (Microsoft Research)
   # -----------------------------------------------------------------------
-  mattersim:
+  mattergen:
     build:
-      context: ./Information_Units/Predictors/Mattersim/docker
+      context: ./Information_Units/Generators/MattergenBaseModel/docker
       dockerfile: Dockerfile
-    container_name: emos-mattersim
+    container_name: emos-mattergen
     ports:
-      - "${MATTERSIM_PORT:-8200}:8000"
+      - "${MATTERGEN_PORT:-8100}:8000"
+    volumes:
+      # Cache HuggingFace models so they survive container restarts
+      - ./data/mattergen/hf_cache:/root/.cache/huggingface
     environment:
-      - MATTERSIM_LOG_LEVEL=${MATTERSIM_LOG_LEVEL:-DEBUG}
+      # Set to "cpu" to force CPU inference (useful for testing)
+      - MATTERGEN_DEVICE=${MATTERGEN_DEVICE:-auto}
     restart: unless-stopped
 
     # Uncomment the block below (or use --profile gpu) for GPU passthrough
@@ -43,8 +43,37 @@ services:
 
   # -----------------------------------------------------------------------
   # GPU profile variant — same service but with GPU reservation
-  # Activate with:  docker compose --profile gpu up -d mattersim-gpu
+  # Activate with:  docker compose --profile gpu up -d
   # -----------------------------------------------------------------------
+  mattergen-gpu:
+    extends:
+      service: mattergen
+    container_name: emos-mattergen-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  
+
+
+
+  # -----------------------------------------------------------------------
+  # MatterSim — ML interatomic potential predictor (Microsoft Research)
+  # -----------------------------------------------------------------------
+  mattersim:
+    build:
+      context: ./Information_Units/Predictors/Mattersim/docker
+      dockerfile: Dockerfile
+    container_name: emos-mattersim
+    ports:
+      - "${MATTERSIM_PORT:-8200}:8000"
+    environment:
+      - MATTERSIM_LOG_LEVEL=${MATTERSIM_LOG_LEVEL:-DEBUG}
+
   mattersim-gpu:
     extends:
       service: mattersim
@@ -58,22 +87,48 @@ services:
               count: 1
               capabilities: [gpu]
 
-  backend:
+
+  # -----------------------------------------------------------------------
+  # GBFS — material-property predictor (LightGBM + matminer)
+  # -----------------------------------------------------------------------
+  # Exposes a FastAPI server for predicting material properties from CIF data.
+  #   POST /predict/{property}   – predict a single property
+  #   POST /batch-predict        – predict multiple properties at once
+  #   GET  /info                 – list supported properties
+  #   GET  /health               – health check
+  #   GET  /docs                 – interactive API docs (Swagger)
+  # -----------------------------------------------------------------------
+  gbfs-pred:
     build:
       context: .
-      dockerfile: Dockerfile.backend
-    image: emos:backend-latest
-    container_name: emos-backend
+      dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+    image: gbfs-pred:latest
+    container_name: emos-gbfs-pred
     ports:
-      - "5000:5000"
-    volumes:
-      - .:/app
+      - "${GBFS_PORT:-8200}:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-      - FLASK_APP=backend/app.py
-      - FLASK_ENV=development
-    working_dir: /app
-    command: python -m flask run --host=0.0.0.0
-
-volumes:
-  emos-data:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      GBFS_HOST: 0.0.0.0
+      GBFS_PORT: 8000
+      GBFS_LOG_LEVEL: INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3

@@ -1,5 +1,0 @@
-formula,SynthPred(Synthesizable=1) 
-SiO2,0.96791303
-O2Si,0.96791303
-O2Si1,0.96791303
-Al2O3,0.724566

@@ -1,0 +1,91 @@
+###############################################################################
+# Render Blueprint — EMOS Platform
+# ---------------------------------------------------------------------------
+# Defines all services for deployment on Render (https://render.com).
+#
+# Usage:
+#   1. Push this file to the repo root.
+#   2. In the Render dashboard → "Blueprints" → "New Blueprint Instance"
+#      → point to this repo.
+#   3. Render will create / update the services automatically.
+#
+# Docs: https://docs.render.com/blueprint-spec
+###############################################################################
+
+services:
+  # -----------------------------------------------------------------------
+  # EMOS Flask Backend — main API server
+  # -----------------------------------------------------------------------
+  - type: web
+    name: emos-backend
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python backend/app.py
+    envVars:
+      - key: PORT
+        value: "5001"
+      - key: PYTHON_VERSION
+        value: "3.12.2"
+      # Point at the MatterGen container's internal Render URL
+      - key: MATTERGEN_API_URL
+        fromService:
+          name: emos-mattergen
+          type: pserv
+          property: hostport
+      - key: MATTERGEN_TIMEOUT
+        value: "600"
+      # Point at the GBFS container's internal Render URL
+      - key: GBFS_PRED_API_URL
+        fromService:
+          name: emos-gbfs-pred
+          type: pserv
+          property: hostport
+    healthCheckPath: /api/health
+
+  # -----------------------------------------------------------------------
+  # MatterGen — crystal-structure generator (Microsoft Research)
+  # -----------------------------------------------------------------------
+  # Deployed as a Docker web service built from the existing Dockerfile.
+  # Render exposes the service internally; the Flask backend reaches it
+  # via the MATTERGEN_API_URL env var above.
+  # -----------------------------------------------------------------------
+  - type: pserv
+    name: emos-mattergen
+    runtime: docker
+    plan: standard          # needs ≥ 2 GB RAM for model inference
+    region: oregon
+    dockerfilePath: ./Information_Units/Generators/MattergenBaseModel/docker/Dockerfile
+    dockerContext: ./Information_Units/Generators/MattergenBaseModel/docker
+    envVars:
+      - key: MATTERGEN_DEVICE
+        value: cpu            # Render standard plans are CPU-only; change to "auto" on a GPU plan
+
+  # -----------------------------------------------------------------------
+  # GBFS — material-property predictor (LightGBM + matminer)
+  # -----------------------------------------------------------------------
+  # Deployed as a Docker private service. Exposes a FastAPI server for
+  # predicting material properties (bandgap, e_form, dielectric, is_metal,
+  # mob_n, mob_p) from crystal structures.
+  # The Flask backend reaches it via the GBFS_PRED_API_URL env var.
+  #
+  # Endpoints:
+  #   POST /predict/{property}  — single property prediction
+  #   POST /batch-predict       — all properties at once
+  #   GET  /info                — supported properties
+  #   GET  /health              — health check
+  # -----------------------------------------------------------------------
+  - type: pserv
+    name: emos-gbfs-pred
+    runtime: docker
+    plan: standard            # needs ≥ 2 GB RAM for matminer featurisation
+    region: oregon
+    dockerfilePath: ./Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+    dockerContext: .           # build from EMOS root so COPY Information_Units/ works
+    envVars:
+      - key: GBFS_HOST
+        value: "0.0.0.0"
+      - key: GBFS_PORT
+        value: "8000"
+      - key: GBFS_LOG_LEVEL
+        value: INFO

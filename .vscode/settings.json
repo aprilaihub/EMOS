@@ -5,5 +5,15 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "liveServer.settings.ignoreFiles": [
+        "data/**",
+        "backend.log",
+        "**/__pycache__/**",
+        "**/*.pyc",
+        "emos_env/**",
+        "setup/emos_env/**",
+        ".git/**",
+        "docs/_build/**"
+    ]
 }
