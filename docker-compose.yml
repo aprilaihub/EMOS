@@ -70,7 +70,7 @@ services:
       dockerfile: Dockerfile
     container_name: emos-mattersim
     ports:
-      - "${MATTERSIM_PORT:-8200}:8000"
+      - "${MATTERSIM_PORT:-8300}:8000"
     environment:
       - MATTERSIM_LOG_LEVEL=${MATTERSIM_LOG_LEVEL:-DEBUG}
 

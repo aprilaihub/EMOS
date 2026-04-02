@@ -11,7 +11,7 @@ Environment variables
 ---------------------
 MATTERSIM_API_URL : str
     Base URL of the MatterSim container API.
-    Default: ``http://localhost:8200``
+    Default: ``http://localhost:8300``
 MATTERSIM_TIMEOUT : int
     HTTP request timeout in seconds (prediction can be slow on CPU).
     Default: ``600``
@@ -32,7 +32,7 @@ from Information_Units.Predictors.BasePredictor import BasePredictor
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-_DEFAULT_API_URL = "http://localhost:8200"
+_DEFAULT_API_URL = "http://localhost:8300"
 _DEFAULT_TIMEOUT = 600  # seconds
 
 

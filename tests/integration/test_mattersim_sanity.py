@@ -14,7 +14,7 @@ Prerequisites:
     docker compose ps mattersim
 - Quick check recent container logs:
     docker compose logs mattersim --tail 20
-- Container exposes API on http://localhost:8200 by default
+- Container exposes API on http://localhost:8300 by default
 
 Run with: pytest tests/integration/test_mattersim_sanity.py -v
 Skip network tests: pytest -m "not network"
