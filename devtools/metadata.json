@@ -153,33 +153,6 @@
         "file_name": "MattersimPredictor.py"
       },
       {
-        "id": "m3gnet",
-        "name": "M3gnet",
-        "display_name": "M3GNet",
-        "description": "Materials 3D Graph Network for property prediction",
-        "folder_path": "Information_Units/Predictors/M3gnet",
-        "class_name": "M3gnetPredictor",
-        "file_name": "M3gnetPredictor.py"
-      },
-      {
-        "id": "pfp",
-        "name": "Pfp",
-        "display_name": "PFP",
-        "description": "Property Fingerprint Predictor for materials properties",
-        "folder_path": "Information_Units/Predictors/Pfp",
-        "class_name": "PfpPredictor",
-        "file_name": "PfpPredictor.py"
-      },
-      {
-        "id": "deepmd",
-        "name": "Deepmd",
-        "display_name": "DeepMD",
-        "description": "Deep potential molecular dynamics for materials simulation",
-        "folder_path": "Information_Units/Predictors/Deepmd",
-        "class_name": "DeepmdPredictor",
-        "file_name": "DeepmdPredictor.py"
-      },
-      {
         "id": "synthnn",
         "name": "Synthnn",
         "display_name": "SynthNN",
@@ -187,33 +160,6 @@
         "folder_path": "Information_Units/Predictors/Synthnn",
         "class_name": "SynthnnPredictor",
         "file_name": "SynthnnPredictor.py"
-      },
-      {
-        "id": "esen",
-        "name": "Esen",
-        "display_name": "eSEN",
-        "description": "Electronic Structure Estimation Network",
-        "folder_path": "Information_Units/Predictors/Esen",
-        "class_name": "EsenPredictor",
-        "file_name": "EsenPredictor.py"
-      },
-      {
-        "id": "mypred1",
-        "name": "Mypred1",
-        "display_name": "MyPred1",
-        "description": "Custom predictor 1 - user-defined materials property prediction model",
-        "folder_path": "Information_Units/Predictors/Mypred1",
-        "class_name": "Mypred1Predictor",
-        "file_name": "Mypred1Predictor.py"
-      },
-      {
-        "id": "mypred2",
-        "name": "Mypred2",
-        "display_name": "MyPred2",
-        "description": "Custom predictor 2 - user-defined materials property prediction model",
-        "folder_path": "Information_Units/Predictors/Mypred2",
-        "class_name": "Mypred2Predictor",
-        "file_name": "Mypred2Predictor.py"
       },
       {
         "id": "gbfs",
