@@ -35,14 +35,7 @@
       "MatterGen: Magnetic Density": "Property-conditioned model for generating structures with a target DFT magnetic density (dft_mag_density)",
       "MatterGen: Magnetic Density + HHI": "Multi-property-conditioned model targeting magnetic density and Herfindahl-Hirschman elemental scarcity index (dft_mag_density_hhi_score)",
       "MatterGen: Bulk Modulus": "Property-conditioned model for generating structures with a target ML-predicted bulk modulus (ml_bulk_modulus)",
-      "MatterGen: Space Group": "Symmetry-conditioned model for generating structures in a target crystallographic space group (space_group)",
-      "GNoME": "Graph Networks for Materials Exploration", 
-      "iMatGen": "Inverse materials generation using deep learning",
-      "MatGAN": "Generative Adversarial Network for materials design",
-      "MolGAN": "Molecular Generative Adversarial Network",
-      "Cond-DFC-VAE": "Conditional Deep Feature Consistent Variational Autoencoder",
-      "MyGen1": "Custom generator 1 - user-defined materials generation model",
-      "MyGen2": "Custom generator 2 - user-defined materials generation model"
+      "MatterGen: Space Group": "Symmetry-conditioned model for generating structures in a target crystallographic space group (space_group)"
     },
     "predictors": {
       "MatterSim": "Universal neural network potential for materials simulation",
