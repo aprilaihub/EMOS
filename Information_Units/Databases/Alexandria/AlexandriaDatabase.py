@@ -18,9 +18,9 @@ class AlexandriaDatabase(BaseDatabase):
             "(415K structures, optimized for band gap accuracy)"
         )
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict) -> dict:
         """
-        Retrieve materials from Alexandria (PBEsol) using OPTIMADE API and save as CIF files.
+        Retrieve materials from Alexandria (PBEsol) using OPTIMADE API as CIF strings.
 
         Args:
             inputs (dict): Query parameters with standard property names
@@ -63,7 +63,7 @@ class AlexandriaDatabase(BaseDatabase):
                 - magnetic_moments_scan (μB): Local magnetic moments (SCAN) [min, max]
 
         Returns:
-            list: Paths to saved CIF files
+            dict: {"source": "alexandria", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Query with band gap filter (PBEsol)
@@ -89,6 +89,12 @@ class AlexandriaDatabase(BaseDatabase):
                 'band_gap_scan': [1.0, 2.0]
             })
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "alexandria",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
             query = inputs.get('query', '')
             limit = inputs.get('limit', 10)
@@ -108,23 +114,21 @@ class AlexandriaDatabase(BaseDatabase):
             if not structures_data:
                 if self.logger:
                     self.logger.log("No structures found in Alexandria")
-                return []
+                return result
 
-            cif_paths = []
+            # Convert to pymatgen structures and serialize as CIF strings
             for i, entry in enumerate(structures_data):
                 structure = self.api_helper.convert_to_structure(entry)
                 if structure:
-                    cif_path = self.api_helper.save_cif_from_structure(
-                        structure, entry, i, self.output_dir
-                    )
-                    if cif_path:
-                        cif_paths.append(cif_path)
+                    cif_str = structure.to(fmt='cif')
+                    if cif_str:
+                        result["cif_strings"].append(cif_str)
                         if self.logger:
-                            self.logger.log(f"Saved: {cif_path}")
+                            self.logger.log(f"Retrieved CIF string {i + 1}")
 
-            return cif_paths
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

@@ -18,9 +18,9 @@ class MaterialsprojectDatabase(BaseDatabase):
             "(~154K structures, thermodynamic stability with GGA/GGA+U/r2SCAN functionals)"
         )
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict) -> dict:
         """
-        Retrieve materials from Materials Project using OPTIMADE API and save as CIF files.
+        Retrieve materials from Materials Project using OPTIMADE API as CIF strings.
 
         Args:
             inputs (dict): Query parameters with standard property names
@@ -43,7 +43,7 @@ class MaterialsprojectDatabase(BaseDatabase):
                 - chemical_system: Chemical system identifier (string)
 
         Returns:
-            list: Paths to saved CIF files
+            dict: {"source": "materialsproject", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Simple element query
@@ -67,6 +67,12 @@ class MaterialsprojectDatabase(BaseDatabase):
                 'formation_energy_r2scan': [-2.0, -0.5]
             })
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "materialsproject",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
             query = inputs.get('query', '')
             limit = inputs.get('limit', 10)
@@ -85,24 +91,21 @@ class MaterialsprojectDatabase(BaseDatabase):
             if not structures_data:
                 if self.logger:
                     self.logger.log("No structures found")
-                return []
+                return result
 
-            # Convert to pymatgen structures and save as CIF
-            cif_paths = []
+            # Convert to pymatgen structures and serialize as CIF strings
             for i, entry in enumerate(structures_data):
                 structure = self.api_helper.convert_to_structure(entry)
                 if structure:
-                    cif_path = self.api_helper.save_cif_from_structure(
-                        structure, entry, i, self.output_dir
-                    )
-                    if cif_path:
-                        cif_paths.append(cif_path)
+                    cif_str = structure.to(fmt='cif')
+                    if cif_str:
+                        result["cif_strings"].append(cif_str)
                         if self.logger:
-                            self.logger.log(f"Saved: {cif_path}")
+                            self.logger.log(f"Retrieved CIF string {i + 1}")
 
-            return cif_paths
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

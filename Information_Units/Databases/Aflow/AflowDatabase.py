@@ -19,13 +19,19 @@ class AflowDatabase(BaseDatabase):
             "with electronic, mechanical, and thermal properties"
         )
 
-    def retrieve(self, inputs: dict) -> list:
-        """Retrieve materials from AFLOW via AFLUX and save as CIF files."""
+    def retrieve(self, inputs: dict) -> dict:
+        """Retrieve materials from AFLOW via AFLUX as CIF strings."""
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "aflow",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
             query = inputs.get('query', '')
             limit = int(inputs.get('limit', 10))
             if limit <= 0:
-                return []
+                return result
 
             properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
             filters = self.api_helper.map_properties(properties) if properties else {}
@@ -41,25 +47,22 @@ class AflowDatabase(BaseDatabase):
             if not entries:
                 if self.logger:
                     self.logger.log("No structures found in AFLOW")
-                return []
+                return result
 
-            cif_paths = []
             for i, entry in enumerate(entries):
                 structure = self.api_helper.convert_to_structure(entry)
                 if not structure:
                     continue
 
-                cif_path = self.api_helper.save_cif_from_structure(
-                    structure, entry, i, self.output_dir
-                )
-                if cif_path:
-                    cif_paths.append(cif_path)
+                cif_str = structure.to(fmt='cif')
+                if cif_str:
+                    result["cif_strings"].append(cif_str)
                     if self.logger:
-                        self.logger.log(f"Saved: {cif_path}")
+                        self.logger.log(f"Retrieved CIF string {i + 1}")
 
-            return cif_paths
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

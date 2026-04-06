@@ -15,9 +15,9 @@ class CodDatabase(BaseDatabase):
     def info(self):
         return "COD: Crystallography Open Database (via OPTIMADE)"
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict) -> dict:
         """
-        Retrieve materials from COD using OPTIMADE API and save as CIF files.
+        Retrieve materials from COD using OPTIMADE API as CIF strings.
 
         Args:
             inputs (dict): Query parameters with standard property names
@@ -35,8 +35,14 @@ class CodDatabase(BaseDatabase):
                   })
 
         Returns:
-            list: Paths to saved CIF files
+            dict: {"source": "cod", "queries": dict, "cif_strings": list[str]}
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "cod",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
             query = inputs.get('query', '')
             # Default limit of 10 is the page size limit provided by the COD OPTIMADE API
@@ -56,24 +62,21 @@ class CodDatabase(BaseDatabase):
             if not structures_data:
                 if self.logger:
                     self.logger.log("No structures found")
-                return []
+                return result
 
-            # Convert to pymatgen structures and save as CIF
-            cif_paths = []
+            # Convert to pymatgen structures and serialize as CIF strings
             for i, entry in enumerate(structures_data):
                 structure = self.api_helper.convert_to_structure(entry)
                 if structure:
-                    cif_path = self.api_helper.save_cif_from_structure(
-                        structure, entry, i, self.output_dir
-                    )
-                    if cif_path:
-                        cif_paths.append(cif_path)
+                    cif_str = structure.to(fmt='cif')
+                    if cif_str:
+                        result["cif_strings"].append(cif_str)
                         if self.logger:
-                            self.logger.log(f"Saved: {cif_path}")
+                            self.logger.log(f"Retrieved CIF string {i + 1}")
 
-            return cif_paths
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

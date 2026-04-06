@@ -10,14 +10,18 @@ class BaseDatabase:
     def info(self):
         return f'Information about database{self.database_name}'
 
-    def retrieve(self, inputs: dict) -> str:
+    def retrieve(self, inputs: dict) -> dict:
         """
         Retrieve data from database.
         Args:
             inputs (dict): Parsed input values from frontend
         Returns:
-            Retrieved materials (to be implemented by subclasses)
+            dict: Standardized database payload:
+                {
+                    "source": str,
+                    "queries": dict,
+                    "cif_strings": list[str]
+                }
         """
         raise NotImplementedError("Subclasses must implement retrieve()")
-
 

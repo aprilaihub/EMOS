@@ -22,7 +22,7 @@ class Mathub3dDatabase(BaseDatabase):
             "CIF files retrieved via COD/Materials Project cross-referencing."
         )
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict) -> dict:
         """
         Filter MatHub-3d dataset and retrieve CIF files via COD/MP cross-referencing.
 
@@ -35,8 +35,14 @@ class Mathub3dDatabase(BaseDatabase):
                   space_group, magnetization, is_magnetic, nelements, etc.
 
         Returns:
-            list: Paths to CIF files matched from COD/Materials Project
+            dict: {"source": "mathub3d", "queries": dict, "cif_strings": list[str]}
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "mathub3d",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
             query = inputs.get('query', '')
             limit = inputs.get('limit', 10)
@@ -58,27 +64,28 @@ class Mathub3dDatabase(BaseDatabase):
                 self.logger.log(f"MatHub-3d filtered: {len(results)} candidates")
 
             if not results:
-                return []
+                return result
 
             # Cross-reference with COD/MP to get CIF files
-            cif_paths = []
+            cif_strings = []
             for entry in results:
-                if len(cif_paths) >= limit:
+                if len(cif_strings) >= limit:
                     break
-                cif_path = self.helper.find_cif_match(
+                cif_str = self.helper.find_cif_match(
                     entry, self.cod_db, self.mp_db, self.output_dir
                 )
-                if cif_path:
-                    cif_paths.append(cif_path)
+                if cif_str:
+                    cif_strings.append(cif_str)
                     if self.logger:
-                        self.logger.log(f"CIF match: {entry.get('formula')} -> {cif_path}")
+                        self.logger.log(f"CIF match for formula: {entry.get('formula')}")
 
             if self.logger:
-                self.logger.log(f"Total CIF files retrieved: {len(cif_paths)}")
+                self.logger.log(f"Total CIF strings retrieved: {len(cif_strings)}")
 
-            return cif_paths
+            result["cif_strings"] = cif_strings
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

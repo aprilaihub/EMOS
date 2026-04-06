@@ -87,20 +87,19 @@ def test_find_cif_match(tmp_path):
     # Create a fake CIF with matching lattice
     lattice = Lattice.from_parameters(5.10, 5.10, 13.85, 90, 90, 120)
     structure = Structure(lattice, ["Fe", "O"], [[0, 0, 0], [0.5, 0.5, 0.5]])
-    cif_path = str(tmp_path / "Fe2O3_0.cif")
-    structure.to(filename=cif_path, fmt='cif')
+    cif_str = structure.to(fmt='cif')
 
     class MockDB:
         def retrieve(self, inputs):
-            return [cif_path]
+            return {"source": "mock", "queries": inputs, "cif_strings": [cif_str]}
 
     class EmptyDB:
         def retrieve(self, inputs):
-            return []
+            return {"source": "mock", "queries": inputs, "cif_strings": []}
 
     # Match found
     result = helper.find_cif_match(MATHUB3D_FE_ENTRY, MockDB(), MockDB(), str(tmp_path))
-    assert result == cif_path
+    assert result == cif_str
 
     # No candidates → None
     assert helper.find_cif_match(MATHUB3D_FE_ENTRY, EmptyDB(), EmptyDB(), '/tmp') is None
@@ -108,7 +107,7 @@ def test_find_cif_match(tmp_path):
 
 @pytest.mark.unit
 def test_database_retrieve(monkeypatch):
-    """Verify retrieve returns CIF path list and respects limit."""
+    """Verify retrieve returns standardized payload and respects limit."""
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase.__new__(Mathub3dDatabase)
@@ -119,10 +118,15 @@ def test_database_retrieve(monkeypatch):
     db.helper = helper
     db.cod_db = db.mp_db = None
 
-    monkeypatch.setattr(helper, 'find_cif_match', lambda *a, **k: '/tmp/fake.cif')
+    monkeypatch.setattr(helper, 'find_cif_match', lambda *a, **k: 'data_fake\n_cell_length_a 1.0')
 
     results = db.retrieve({'query': 'O', 'limit': 1})
-    assert results == ['/tmp/fake.cif']
+    assert results["source"] == "mathub3d"
+    assert results["queries"] == {'query': 'O', 'limit': 1}
+    assert len(results["cif_strings"]) == 1
 
     monkeypatch.setattr(helper, 'find_cif_match', lambda *a, **k: None)
-    assert db.retrieve({'query': 'Unobtainium', 'limit': 5}) == []
+    empty = db.retrieve({'query': 'Unobtainium', 'limit': 5})
+    assert empty["source"] == "mathub3d"
+    assert empty["queries"] == {'query': 'Unobtainium', 'limit': 5}
+    assert empty["cif_strings"] == []
