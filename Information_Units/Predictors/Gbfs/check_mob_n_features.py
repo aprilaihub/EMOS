@@ -3,11 +3,11 @@ Diagnostic script to check mob_n features
 """
 
 from pathlib import Path
-from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import GBFS_PredPredictor
+from Information_Units.Predictors.Gbfs.GbfsPredictor import GbfsPredictor
 
 print("Checking mob_n features...")
 try:
-    predictor = GBFS_PredPredictor("test", property_name="mob_n")
+    predictor = GbfsPredictor("test", property_name="mob_n")
     print(f"\nmob_n predictor loaded successfully")
     print(f"Total features: {len(predictor.feature_list)}")
     print(f"\nFirst 20 features:")

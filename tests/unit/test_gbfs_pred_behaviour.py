@@ -1,5 +1,5 @@
 """
-Unit tests for GBFS_PredPredictor
+Unit tests for GbfsPredictor
 
 Comprehensive unit test suite for all six GBFS models:
 - Band gap (regression)
@@ -33,8 +33,8 @@ import numpy as np
 from pathlib import Path
 from unittest.mock import Mock
 
-from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import (
-    GBFS_PredPredictor,
+from Information_Units.Predictors.Gbfs.GbfsPredictor import (
+    GbfsPredictor,
     load_cif,
     generate_features,
 )
@@ -108,7 +108,7 @@ def property_metadata():
 def gbfs_predictor_factory():
     """Factory for creating GBFS predictors for any property."""
     def _create(property_name):
-        return GBFS_PredPredictor(
+        return GbfsPredictor(
             predictor_name=f"gbfs_{property_name}",
             property_name=property_name
         )

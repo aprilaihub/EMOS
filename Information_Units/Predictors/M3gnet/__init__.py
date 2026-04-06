@@ -1,1 +1,0 @@
-# M3GNet Predictor Implementation

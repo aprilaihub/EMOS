@@ -17,7 +17,7 @@ services:
   gbfs:
     build:
       context: ../../../../../../  # Build from EMOS root
-      dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+      dockerfile: Information_Units/Predictors/Gbfs/docker/Dockerfile
     
     image: gbfs-pred:latest
     container_name: gbfs-predictor

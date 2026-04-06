@@ -39,13 +39,7 @@
     },
     "predictors": {
       "MatterSim": "Universal neural network potential for materials simulation",
-      "M3GNet": "Materials 3D Graph Network for property prediction",
-      "PFP": "Property Fingerprint Predictor for materials properties",
-      "DeepMD": "Deep potential molecular dynamics for materials simulation",
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
-      "eSEN": "Electronic Structure Estimation Network",
-      "MyPred1": "Custom predictor 1 - user-defined materials property prediction model",
-      "MyPred2": "Custom predictor 2 - user-defined materials property prediction model",
       "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python"
     }
   },

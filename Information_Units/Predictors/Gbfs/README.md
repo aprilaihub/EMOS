@@ -7,16 +7,16 @@ GBFS: Pretrained predictors from GBFS workflow, implemented in Python with integ
 ✅ **Production Ready** - All 135 tests passing (86 unit + 49 integration)  
 🎯 **6-Property Support** - bandgap, e_form, dielectric, is_metal, mob_n, mob_p  
 📊 **Feature Generation Optimized** - Selective featurizer instantiation (10-100× faster)  
-🔄 **Unified Architecture** - Single `GBFS_PredPredictor.py` with integrated FastAPI server  
+🔄 **Unified Architecture** - Single `GbfsPredictor.py` with integrated FastAPI server  
 🌐 **HTTP API Ready** - Full REST endpoints with Pydantic validation  
 🐳 **Docker Ready** - Production container with health checks and non-root user  
 
 ## Architecture Overview
 
-GBFS_Pred now uses a unified architecture that mirrors **MattergenGenerator**:
+Gbfs now uses a unified architecture that mirrors **MattergenGenerator**:
 
 ```
-GBFS_PredPredictor.py          ← Single source file containing:
+GbfsPredictor.py          ← Single source file containing:
 ├── Predictor class              • Core LightGBM predictor logic
 ├── Feature generation           • Matminer featurizers
 ├── API models & endpoints       • FastAPI routes
@@ -34,11 +34,11 @@ docker/                         ← Docker deployment folder
 ### Mode 1: Python Library (Programmatic)
 
 ```python
-from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import GBFS_PredPredictor
+from Information_Units.Predictors.Gbfs.GbfsPredictor import GbfsPredictor
 from pymatgen.core import Structure
 
 # Load predictor
-predictor = GBFS_PredPredictor(predictor_name="bandgap", property_name="bandgap")
+predictor = GbfsPredictor(predictor_name="bandgap", property_name="bandgap")
 
 # Load structure
 structure = Structure.from_file("Si.cif")
@@ -51,7 +51,7 @@ print(f"Bandgap: {result[0]} eV")
 ### Mode 2: CLI Prediction (Legacy)
 
 ```bash
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor \
+python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
   --cif /path/to/structure.cif \
   --property bandgap
 ```
@@ -60,7 +60,7 @@ python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor \
 
 ```bash
 # Run server locally
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor --serve
+python -m Information_Units.Predictors.Gbfs.GbfsPredictor --serve
 
 # Or with Docker
 cd docker/
@@ -200,7 +200,7 @@ If `properties` is omitted, predicts all supported properties.
 pip install -r docker/requirements.txt
 
 # Run predictor
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_Pred Predictor --cif test.cif --property bandgap
+python -m Information_Units.Predictors.Gbfs.Gbfs Predictor --cif test.cif --property bandgap
 ```
 
 ### Docker
@@ -217,7 +217,7 @@ See [docker/DOCKER.md](docker/DOCKER.md) for comprehensive Docker deployment doc
 Expected directory structure:
 
 ```
-GBFS_Pred/
+Gbfs/
 ├── bandgap/
 │   ├── bandgap_model.pkl       # LightGBM model
 │   ├── bandgap_scaler.pkl      # MinMaxScaler
@@ -246,7 +246,7 @@ GBFS_Pred/
 
 ## Feature Generation
 
-GBFS_Pred generates features using **matminer** featurizers:
+Gbfs generates features using **matminer** featurizers:
 
 - **Composition-based**: ElementProperty, ElementFraction, Stoichiometry, etc.
 - **Structure-based**: DensityFeatures, StructuralComplexity, GlobalSymmetryFeatures
@@ -364,7 +364,7 @@ This implementation mirrors the **MattergenGenerator** architecture:
 
 To add new prediction modes or properties:
 
-1. Add property-specific model files to `GBFS_Pred/{property}/`
+1. Add property-specific model files to `Gbfs/{property}/`
 2. Model files:  `{property}_model.pkl`, `{property}_scaler.pkl`, `{property}_features.pkl`
 3. No code changes needed - automatically supported
 
@@ -505,7 +505,7 @@ This implementation mirrors the **MattergenGenerator** architecture:
 
 To add new prediction modes or properties:
 
-1. Add property-specific model files to `GBFS_Pred/{property}/`
+1. Add property-specific model files to `Gbfs/{property}/`
 2. Model files: `{property}_model.pkl`, `{property}_scaler.pkl`, `{property}_features.pkl`
 3. No code changes needed - automatically supported
 

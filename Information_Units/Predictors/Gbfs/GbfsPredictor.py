@@ -44,7 +44,7 @@ except ImportError:
 _API_LOGGER = logging.getLogger("gbfs_api")
 
 # Global predictor cache for API
-_API_PREDICTORS: Dict[str, 'GBFS_PredPredictor'] = {}
+_API_PREDICTORS: Dict[str, 'GbfsPredictor'] = {}
 
 # -----------------------------
 # GLOBAL CACHE
@@ -377,7 +377,7 @@ def generate_features(structure, composition, feature_list, nan_strategy="raise"
 # CLASS INTEGRATION
 # -----------------------------
 
-class GBFS_PredPredictor(BasePredictor):
+class GbfsPredictor(BasePredictor):
     """
     GBFS-based property predictor using LightGBM models with matminer features.
     
@@ -401,7 +401,7 @@ class GBFS_PredPredictor(BasePredictor):
                 Supported: 'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
                 Default: 'bandgap'
             model_dir (str): Optional directory containing models. If None, defaults to 
-                Information_Units/Predictors/GBFS_Pred/{property_name}/
+                Information_Units/Predictors/Gbfs/{property_name}/
             logger: Optional logger instance
             
         Raises:
@@ -779,11 +779,11 @@ if FASTAPI_AVAILABLE:
         )
 
     # Helper functions
-    def _get_or_load_predictor(property_name: str) -> GBFS_PredPredictor:
+    def _get_or_load_predictor(property_name: str) -> GbfsPredictor:
         """Get a predictor from cache, or load it if not cached."""
         if property_name not in _API_PREDICTORS:
             _API_LOGGER.info(f"Loading {property_name} predictor...")
-            _API_PREDICTORS[property_name] = GBFS_PredPredictor(
+            _API_PREDICTORS[property_name] = GbfsPredictor(
                 predictor_name=property_name,
                 property_name=property_name,
                 model_dir=None,
@@ -1020,7 +1020,7 @@ def main():
             print("\nError: --cif is required for prediction mode. Use --serve to run as server.")
             return
         
-        predictor = GBFS_PredPredictor(
+        predictor = GbfsPredictor(
             predictor_name=args.property,
             property_name=args.property,
             model_dir=args.model_dir
@@ -1078,7 +1078,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import sys; sys.exit(0)" || exit 1
 
 # Use Python CLI entrypoint
-ENTRYPOINT ["python", "-m", "Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor"]
+ENTRYPOINT ["python", "-m", "Information_Units.Predictors.Gbfs.GbfsPredictor"]
 
 # Usage:
 # docker run -v $(pwd)/models:/models predictor:latest \

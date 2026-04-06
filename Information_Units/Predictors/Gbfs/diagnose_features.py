@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 import joblib
 
-bandgap_dir = Path('Information_Units/Predictors/GBFS_Pred')
+bandgap_dir = Path('Information_Units/Predictors/Gbfs')
 
 print('=' * 80)
 print('Feature Diagnostics')
