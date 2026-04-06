@@ -7,6 +7,7 @@ from Information_Units.Predictors.Esen.EsenPredictor import EsenPredictor
 from Information_Units.Predictors.Mypred1.Mypred1Predictor import Mypred1Predictor
 from Information_Units.Predictors.Mypred2.Mypred2Predictor import Mypred2Predictor
 from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import GBFS_PredPredictor
+from Information_Units.Predictors.AMD.AMDPredictor import AMDPredictor
 
 predictor_factory = {
     "mattersim": MattersimPredictor,
@@ -18,6 +19,7 @@ predictor_factory = {
     "mypred1": Mypred1Predictor,
     "mypred2": Mypred2Predictor,
     "gbfs": GBFS_PredPredictor,
+    "amd": AMDPredictor,
 }
 
 predictor_registry = {}

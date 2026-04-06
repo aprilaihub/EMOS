@@ -60,7 +60,6 @@
       }
     ],
     "generators": [
-      
       {
         "id": "mattergen_base_model",
         "name": "MattergenBaseModel",
@@ -281,12 +280,12 @@
       },
       {
         "id": "gbfs",
-        "name": "GBFS",
+        "name": "Gbfs",
         "display_name": "GBFS",
         "description": "Pretrained predictors from GBFS workflow, implemented in Python",
-        "folder_path": "Information_Units/Predictors/GBFS_Pred",
-        "class_name": "GBFS_PredPredictor",
-        "file_name": "GBFS_PredPredictor.py"
+        "folder_path": "Information_Units/Predictors/Gbfs",
+        "class_name": "GbfsPredictor",
+        "file_name": "GbfsPredictor.py"
       }
     ]
   },
@@ -1155,7 +1154,7 @@
           },
           {
             "name": "operatingTemp",
-            "display_name": "Operating Temperature (\u00b0C)",
+            "display_name": "Operating Temperature (\u00c2\u00b0C)",
             "type": "number",
             "required": false,
             "min": -50,
@@ -1570,7 +1569,7 @@
           },
           {
             "name": "ambientTemp",
-            "display_name": "Ambient Temperature (\u00b0C)",
+            "display_name": "Ambient Temperature (\u00c2\u00b0C)",
             "type": "number",
             "required": false,
             "min": -50,
@@ -1731,7 +1730,7 @@
           },
           {
             "name": "processTemp",
-            "display_name": "Process Temperature (\u00b0C)",
+            "display_name": "Process Temperature (\u00c2\u00b0C)",
             "type": "number",
             "required": false,
             "min": 20,
