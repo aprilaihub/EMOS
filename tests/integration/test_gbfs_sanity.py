@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 import numpy as np
 
-from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import GBFS_PredPredictor
+from Information_Units.Predictors.Gbfs.GbfsPredictor import GbfsPredictor
 
 
 pytestmark = [pytest.mark.integration, pytest.mark.network, pytest.mark.slow]
@@ -88,7 +88,7 @@ def property_metadata():
 def predictor_factory():
     """Factory for creating real GBFS predictors."""
     def _create(property_name):
-        return GBFS_PredPredictor(
+        return GbfsPredictor(
             predictor_name=f"gbfs_{property_name}_integration",
             property_name=property_name
         )

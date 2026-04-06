@@ -80,7 +80,7 @@ services:
     runtime: docker
     plan: standard            # needs ≥ 2 GB RAM for matminer featurisation
     region: oregon
-    dockerfilePath: ./Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+    dockerfilePath: ./Information_Units/Predictors/Gbfs/docker/Dockerfile
     dockerContext: .           # build from EMOS root so COPY Information_Units/ works
     envVars:
       - key: GBFS_HOST

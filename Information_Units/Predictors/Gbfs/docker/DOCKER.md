@@ -8,13 +8,13 @@ GBFS is containerized as a FastAPI service with fully integrated FastAPI server 
 
 The new integrated architecture mirrors the MattergenGenerator pattern:
 
-- **Single Source File**: `GBFS_PredPredictor.py` contains:
+- **Single Source File**: `GbfsPredictor.py` contains:
   - Core predictor logic with matminer featurizers
   - Pydantic models for API request/response validation
   - FastAPI endpoint implementations
   - CLI and server mode entry points
 
-- **Service Setup**: FastAPI server automatically runs when `GBFS_PredPredictor` is invoked with `--serve`
+- **Service Setup**: FastAPI server automatically runs when `GbfsPredictor` is invoked with `--serve`
 
 - **Communication**: All data transmitted as JSON (pymatgen structure dicts)
 
@@ -29,7 +29,7 @@ docker/
 ```
 
 Parent folder contains:
-- `GBFS_PredPredictor.py` – Unified predictor + API server
+- `GbfsPredictor.py` – Unified predictor + API server
 - `README.md` – Usage documentation
 
 ## Building
@@ -37,7 +37,7 @@ Parent folder contains:
 ### Standard Build
 
 ```bash
-cd Information_Units/Predictors/GBFS_Pred
+cd Information_Units/Predictors/Gbfs
 docker build -f docker/Dockerfile -t gbfs-pred:latest ../../../
 ```
 
@@ -45,7 +45,7 @@ docker build -f docker/Dockerfile -t gbfs-pred:latest ../../../
 
 ```bash
 docker build \
-  -f Information_Units/Predictors/GBFS_Pred/docker/Dockerfile \
+  -f Information_Units/Predictors/Gbfs/docker/Dockerfile \
   -t gbfs-pred:latest \
   .
 ```
@@ -61,7 +61,7 @@ docker run -p 8000:8000 gbfs-pred:latest
 ### Docker Compose (Recommended)
 
 ```bash
-cd Information_Units/Predictors/GBFS_Pred/docker
+cd Information_Units/Predictors/Gbfs/docker
 docker-compose build
 docker-compose up
 
@@ -172,10 +172,10 @@ healthcheck:
 pip install -r docker/requirements.txt
 
 # Run server
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor --serve
+python -m Information_Units.Predictors.Gbfs.GbfsPredictor --serve
 
 # Or with custom settings
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor \
+python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
   --serve \
   --host 127.0.0.1 \
   --port 8000 \
@@ -186,7 +186,7 @@ python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor \
 
 ```bash
 # Single prediction
-python -m Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor \
+python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
   --cif /path/to/structure.cif \
   --property bandgap
 ```
@@ -203,7 +203,7 @@ Once the server is running, interactive API docs are available at:
 ### Container fails to start
 
 - Check logs: `docker logs <container_id>`
-- Verify model files exist in `Information_Units/Predictors/GBFS_Pred/{property}/` directories
+- Verify model files exist in `Information_Units/Predictors/Gbfs/{property}/` directories
 - Ensure EMOS root is included in the build context
 
 ### Cannot connect to localhost:8000
