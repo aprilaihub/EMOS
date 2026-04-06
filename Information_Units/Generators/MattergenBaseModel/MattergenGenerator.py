@@ -111,6 +111,7 @@ class MattergenGenerator(BaseGenerator):
         """
         if self.logger:
             self.logger.log("MatterGen: sending generation request to container", "info")
+        queries = self._normalise_queries(inputs)
 
         # ---- check health first ----
         if not self.is_healthy():
@@ -120,7 +121,13 @@ class MattergenGenerator(BaseGenerator):
             )
             if self.logger:
                 self.logger.log(msg, "error")
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
         # ---- demo shortcut: call /demo/generate, skip payload build ----
         if inputs.get("pretrained_name") == "demo":
@@ -132,7 +139,7 @@ class MattergenGenerator(BaseGenerator):
                     timeout=30,
                 )
                 resp.raise_for_status()
-                result = resp.json()
+                result = self._enrich_result(resp.json(), queries)
                 if self.logger:
                     self.logger.log(
                         f"MatterGen demo: {result.get('num_structures', 0)} structure(s)",
@@ -143,7 +150,13 @@ class MattergenGenerator(BaseGenerator):
                 msg = f"MatterGen demo: HTTP error — {exc}"
                 if self.logger:
                     self.logger.log(msg, "error")
-                return {"status": "error", "message": msg}
+                return {
+                    "status": "error",
+                    "message": msg,
+                    "source": self.generator_name,
+                    "queries": queries,
+                    "cif_strings": [],
+                }
 
         # ---- build request payload ----
         payload = {
@@ -174,9 +187,7 @@ class MattergenGenerator(BaseGenerator):
                 timeout=self.timeout,
             )
             resp.raise_for_status()
-            result = resp.json()
-
-            print(resp)
+            result = self._enrich_result(resp.json(), queries)
 
 
             if self.logger:
@@ -192,7 +203,13 @@ class MattergenGenerator(BaseGenerator):
                 self.logger.log(msg, "error")
             # Invalidate health cache so next call re-checks
             MattergenGenerator._health_cache["healthy"] = None
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
         except requests.RequestException as exc:
             msg = f"MatterGen: HTTP error — {exc}"
@@ -200,7 +217,13 @@ class MattergenGenerator(BaseGenerator):
                 self.logger.log(msg, "error")
             # Invalidate health cache so next call re-checks
             MattergenGenerator._health_cache["healthy"] = None
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
     # ------------------------------------------------------------------
     # Streaming generation — SSE bridge
@@ -218,6 +241,7 @@ class MattergenGenerator(BaseGenerator):
         """
         if self.logger:
             self.logger.log("MatterGen: sending streaming generation request", "info")
+        queries = self._normalise_queries(inputs)
 
         # Health check
         if not self.is_healthy():
@@ -227,7 +251,12 @@ class MattergenGenerator(BaseGenerator):
             )
             if self.logger:
                 self.logger.log(msg, "error")
-            yield {"event": "error", "message": msg}
+            yield {
+                "event": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+            }
             yield {"event": "done", "message": "Stream ended"}
             return
 
@@ -239,11 +268,16 @@ class MattergenGenerator(BaseGenerator):
             try:
                 resp = requests.post(f"{self.api_url}/demo/generate", timeout=30)
                 resp.raise_for_status()
-                result = resp.json()
+                result = self._enrich_result(resp.json(), queries)
                 result["event"] = "result"
                 yield result
             except requests.RequestException as exc:
-                yield {"event": "error", "message": f"MatterGen demo: HTTP error — {exc}"}
+                yield {
+                    "event": "error",
+                    "message": f"MatterGen demo: HTTP error — {exc}",
+                    "source": self.generator_name,
+                    "queries": queries,
+                }
             yield {"event": "done", "message": "Stream ended"}
             return
 
@@ -277,7 +311,12 @@ class MattergenGenerator(BaseGenerator):
             if self.logger:
                 self.logger.log(f"MatterGen: stream request failed — {exc}", "error")
             MattergenGenerator._health_cache["healthy"] = None
-            yield {"event": "error", "message": f"MatterGen stream request failed: {exc}"}
+            yield {
+                "event": "error",
+                "message": f"MatterGen stream request failed: {exc}",
+                "source": self.generator_name,
+                "queries": queries,
+            }
             yield {"event": "done", "message": "Stream ended"}
             return
 
@@ -304,6 +343,8 @@ class MattergenGenerator(BaseGenerator):
                 current_data_lines = []
                 try:
                     data = json.loads(data_str)
+                    if current_event == "result" and isinstance(data, dict):
+                        data = self._enrich_result(data, queries)
                     data["event"] = current_event
                     yield data
                 except json.JSONDecodeError:
@@ -315,10 +356,30 @@ class MattergenGenerator(BaseGenerator):
             data_str = "\n".join(current_data_lines)
             try:
                 data = json.loads(data_str)
+                if current_event == "result" and isinstance(data, dict):
+                    data = self._enrich_result(data, queries)
                 data["event"] = current_event
                 yield data
             except json.JSONDecodeError:
                 yield {"event": "log", "message": data_str, "level": "warning"}
+
+    def _normalise_queries(self, inputs: Optional[dict]) -> dict:
+        """Return caller-provided generation inputs in a stable dict shape."""
+        if not isinstance(inputs, dict):
+            return {}
+        return {k: v for k, v in inputs.items() if v is not None}
+
+    def _enrich_result(self, result: Any, queries: dict) -> dict:
+        """Attach consistent metadata fields to generation results."""
+        if not isinstance(result, dict):
+            result = {"status": "error", "message": "Invalid generator response type"}
+        if "source" not in result:
+            result["source"] = self.generator_name
+        if "queries" not in result or not isinstance(result.get("queries"), dict):
+            result["queries"] = dict(queries)
+        if "cif_strings" not in result or not isinstance(result.get("cif_strings"), list):
+            result["cif_strings"] = []
+        return result
 
     # ------------------------------------------------------------------
     # Extra helpers (not part of BaseGenerator but useful for the UI)
