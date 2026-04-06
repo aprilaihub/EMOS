@@ -206,7 +206,7 @@ def test_regression_predict_numpy_returns_float_array(
 ):
     """Regression models return float arrays with predictions."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict_numpy(cif_files['al2o3'])
+    result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     
     assert isinstance(result, np.ndarray)
     assert result.dtype in [np.float32, np.float64]
@@ -217,18 +217,22 @@ def test_regression_predict_numpy_returns_float_array(
 @pytest.mark.parametrize('property_name', [
     'bandgap', 'e_form', 'dielectric', 'mob_n', 'mob_p'
 ])
-def test_regression_predict_returns_json(
+def test_regression_predict_returns_standardized_output(
     gbfs_predictor_factory, cif_files, property_name
 ):
-    """Regression models return valid JSON."""
+    """Regression models return standardized source/results envelope."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict(cif_files['al2o3'])
-    
-    assert isinstance(result, str)
-    parsed = json.loads(result)
-    assert "prediction" in parsed
-    assert isinstance(parsed["prediction"], list)
-    assert len(parsed["prediction"]) == 1
+    cif_text = Path(cif_files['al2o3']).read_text()
+    result = predictor.predict([cif_text])
+
+    assert result["source"] == "gbfs"
+    assert isinstance(result["results"], list)
+    assert len(result["results"]) == 1
+    first = result["results"][0]
+    assert first["status"] == "ok"
+    assert "prediction" in first["properties"]
+    assert isinstance(first["properties"]["prediction"], list)
+    assert len(first["properties"]["prediction"]) == 1
 
 
 @pytest.mark.unit
@@ -244,7 +248,7 @@ def test_regression_predictions_in_reasonable_range(
 ):
     """Regression predictions fall within physically reasonable ranges."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict_numpy(cif_files['al2o3'])
+    result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     prediction = result[0]
     
     assert metadata['min'] <= prediction <= metadata['max'], \
@@ -260,7 +264,7 @@ def test_regression_predictions_are_finite(
 ):
     """Regression predictions are finite (not NaN or Inf)."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict_numpy(cif_files['al2o3'])
+    result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     
     assert np.isfinite(result).all(), \
         f"{property_name} produced NaN or Inf values"
@@ -277,7 +281,7 @@ def test_classification_predict_numpy_returns_binary(
 ):
     """Classification model returns binary (0 or 1) predictions."""
     predictor = gbfs_predictor_factory('is_metal')
-    result = predictor.predict_numpy(cif_files['al2o3'])
+    result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     
     assert isinstance(result, np.ndarray)
     assert result.shape == (1,) or result.shape[0] == 1
@@ -288,12 +292,11 @@ def test_classification_predict_numpy_returns_binary(
 def test_classification_predict_returns_json_with_probabilities(
     gbfs_predictor_factory, cif_files
 ):
-    """Classification model returns JSON with prediction and probabilities."""
+    """Classification model returns standardized output with prediction/probabilities."""
     predictor = gbfs_predictor_factory('is_metal')
-    result = predictor.predict(cif_files['al2o3'])
-    
-    assert isinstance(result, str)
-    parsed = json.loads(result)
+    cif_text = Path(cif_files['al2o3']).read_text()
+    result = predictor.predict([cif_text])
+    parsed = result["results"][0]["properties"]
     assert "prediction" in parsed
     assert isinstance(parsed["prediction"], list)
     
@@ -314,7 +317,7 @@ def test_mobility_predictions_are_positive(
 ):
     """Mobility predictions are positive (inverse log10 applied)."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict_numpy(cif_files['al2o3'])
+    result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     prediction = result[0]
     
     assert prediction > 0, f"{property_name} should be positive after inverse transform"
@@ -325,8 +328,8 @@ def test_electron_mobility_typically_exceeds_hole_mobility(
     gbfs_predictor_factory, cif_files
 ):
     """For oxide semiconductors, electron mobility usually exceeds hole mobility."""
-    mob_n = gbfs_predictor_factory('mob_n').predict_numpy(cif_files['al2o3'])[0]
-    mob_p = gbfs_predictor_factory('mob_p').predict_numpy(cif_files['al2o3'])[0]
+    mob_n = gbfs_predictor_factory('mob_n').predict_numpy([Path(cif_files['al2o3']).read_text()])[0]
+    mob_p = gbfs_predictor_factory('mob_p').predict_numpy([Path(cif_files['al2o3']).read_text()])[0]
     
     # This is a physical expectation for oxide semiconductors
     assert mob_n > mob_p, \
@@ -335,52 +338,22 @@ def test_electron_mobility_typically_exceeds_hole_mobility(
 
 # ============================================================================
 # Input Handling Tests
-# Unit tests validating: API accepts multiple input formats (string, dict keys)
+# Unit tests validating: contract input uses direct list[str] CIF payload
 # ============================================================================
 
 @pytest.mark.unit
 @pytest.mark.parametrize('property_name', [
     'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
 ])
-def test_predict_accepts_string_path(
+def test_predict_accepts_list_input_contract(
     gbfs_predictor_factory, cif_files, property_name
 ):
-    """predict() accepts string file path."""
+    """predict() accepts direct list[str] CIF input."""
     predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict(cif_files['al2o3'])
-    
-    assert isinstance(result, str)
-    json.loads(result)  # Verify valid JSON
-
-
-@pytest.mark.unit
-@pytest.mark.parametrize('property_name', [
-    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
-])
-def test_predict_accepts_dict_with_cif_path(
-    gbfs_predictor_factory, cif_files, property_name
-):
-    """predict() accepts dict with 'cif_path' key."""
-    predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict({"cif_path": cif_files['al2o3']})
-    
-    assert isinstance(result, str)
-    json.loads(result)  # Verify valid JSON
-
-
-@pytest.mark.unit
-@pytest.mark.parametrize('property_name', [
-    'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
-])
-def test_predict_accepts_dict_with_input_data(
-    gbfs_predictor_factory, cif_files, property_name
-):
-    """predict() accepts dict with 'input_data' key."""
-    predictor = gbfs_predictor_factory(property_name)
-    result = predictor.predict({"input_data": cif_files['al2o3']})
-    
-    assert isinstance(result, str)
-    json.loads(result)  # Verify valid JSON
+    cif_text = Path(cif_files['al2o3']).read_text()
+    result = predictor.predict([cif_text])
+    assert result["source"] == "gbfs"
+    assert result["results"][0]["status"] == "ok"
 
 
 # ============================================================================
@@ -392,26 +365,28 @@ def test_predict_accepts_dict_with_input_data(
 @pytest.mark.parametrize('property_name', [
     'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
 ])
-def test_predict_nonexistent_file_raises_error(
+def test_predict_empty_input_returns_error_result(
     gbfs_predictor_factory, property_name
 ):
-    """predict() raises FileNotFoundError for missing file."""
+    """predict() returns structured error for empty contract input."""
     predictor = gbfs_predictor_factory(property_name)
-    with pytest.raises(FileNotFoundError):
-        predictor.predict("/nonexistent/structure.cif")
+    result = predictor.predict([])
+    assert result["source"] == "gbfs"
+    assert result["results"][0]["status"] == "error"
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize('property_name', [
     'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
 ])
-def test_predict_empty_dict_raises_error(
+def test_predict_invalid_input_items_return_error_result(
     gbfs_predictor_factory, property_name
 ):
-    """predict() raises ValueError for empty input."""
+    """predict() returns structured error for invalid list entries."""
     predictor = gbfs_predictor_factory(property_name)
-    with pytest.raises(ValueError, match="Input dictionary must contain"):
-        predictor.predict({})
+    result = predictor.predict([None])
+    assert result["source"] == "gbfs"
+    assert result["results"][0]["status"] == "error"
 
 
 # ============================================================================
@@ -428,8 +403,8 @@ def test_multiple_predictions_consistent(
 ):
     """Multiple predictions on same file are consistent."""
     predictor = gbfs_predictor_factory(property_name)
-    result1 = predictor.predict_numpy(cif_files['al2o3'])
-    result2 = predictor.predict_numpy(cif_files['al2o3'])
+    result1 = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
+    result2 = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
     
     assert np.allclose(result1, result2), \
         f"{property_name} predictions are not consistent"
@@ -444,10 +419,12 @@ def test_predict_methods_agree(
 ):
     """predict() and predict_numpy() return equivalent values."""
     predictor = gbfs_predictor_factory(property_name)
-    numpy_result = predictor.predict_numpy(cif_files['al2o3'])
-    json_result = json.loads(predictor.predict(cif_files['al2o3']))
-    
-    assert np.isclose(numpy_result[0], json_result["prediction"][0]), \
+    numpy_result = predictor.predict_numpy([Path(cif_files['al2o3']).read_text()])
+    cif_text = Path(cif_files['al2o3']).read_text()
+    result = predictor.predict([cif_text])
+    prediction = result["results"][0]["properties"]["prediction"][0]
+
+    assert np.isclose(numpy_result[0], prediction), \
         f"{property_name}: predict() and predict_numpy() don't agree"
 
 
@@ -467,7 +444,7 @@ def test_full_pipeline_all_properties(
     
     for prop in supported_properties:
         predictor = gbfs_predictor_factory(prop)
-        result = predictor.predict_numpy(cif_path)
+        result = predictor.predict_numpy([Path(cif_path).read_text()])
         results[prop] = result[0]
     
     # Verify all properties have valid predictions
@@ -480,17 +457,28 @@ def test_json_output_is_serializable(
     gbfs_predictor_factory, supported_properties, cif_files
 ):
     """All property predictions can be serialized to JSON and back."""
-    cif_path = cif_files['al2o3']
+    cif_text = Path(cif_files['al2o3']).read_text()
     
     for prop in supported_properties:
         predictor = gbfs_predictor_factory(prop)
-        result = predictor.predict(cif_path)
+        result = predictor.predict([cif_text])
         
         # Serialize and deserialize
-        serialized = json.dumps(json.loads(result))
+        serialized = json.dumps(result)
         deserialized = json.loads(serialized)
         
-        assert "prediction" in deserialized
+        assert "results" in deserialized
+
+
+@pytest.mark.unit
+def test_predict_with_list_input_returns_standardized_output(gbfs_predictor_factory, cif_files):
+    predictor = gbfs_predictor_factory("bandgap")
+    cif_text = Path(cif_files["al2o3"]).read_text()
+    result = predictor.predict([cif_text])
+
+    assert result["source"] == "gbfs"
+    assert isinstance(result["results"], list)
+    assert result["results"][0]["status"] == "ok"
 
 
 if __name__ == "__main__":

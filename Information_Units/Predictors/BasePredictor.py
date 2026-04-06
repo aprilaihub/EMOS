@@ -10,14 +10,12 @@ class BasePredictor:
     def info(self):
         return f'Information about predictor {self.predictor_name}'
 
-    def predict(self, inputs: dict) -> str:
+    def predict(self, input_data) -> dict:
         """
         Predict properties.
         Args:
-            inputs (dict): Parsed input values from frontend
+            input_data: Predictor input payload (typically list[str] CIF strings)
         Returns:
-            Predicted properties (to be implemented by subclasses)
+            Standardized prediction payload (to be implemented by subclasses)
         """
         raise NotImplementedError("Subclasses must implement predict()")
-
-
