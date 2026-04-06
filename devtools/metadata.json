@@ -60,7 +60,6 @@
       }
     ],
     "generators": [
-      
       {
         "id": "mattergen_base_model",
         "name": "MattergenBaseModel",
@@ -141,69 +140,6 @@
         "folder_path": "Information_Units/Generators/MattergenSpaceGroup",
         "class_name": "MattergenSpaceGroupGenerator",
         "file_name": "MattergenSpaceGroupGenerator.py"
-      },
-      {
-        "id": "gnome",
-        "name": "Gnome",
-        "display_name": "GNoME",
-        "description": "Graph Networks for Materials Exploration",
-        "folder_path": "Information_Units/Generators/Gnome",
-        "class_name": "GnomeGenerator",
-        "file_name": "GnomeGenerator.py"
-      },
-      {
-        "id": "imatgen",
-        "name": "Imatgen",
-        "display_name": "iMatGen",
-        "description": "Inverse materials generation using deep learning",
-        "folder_path": "Information_Units/Generators/Imatgen",
-        "class_name": "ImatgenGenerator",
-        "file_name": "ImatgenGenerator.py"
-      },
-      {
-        "id": "matgan",
-        "name": "Matgan",
-        "display_name": "MatGAN",
-        "description": "Generative Adversarial Network for materials design",
-        "folder_path": "Information_Units/Generators/Matgan",
-        "class_name": "MatganGenerator",
-        "file_name": "MatganGenerator.py"
-      },
-      {
-        "id": "molgan",
-        "name": "Molgan",
-        "display_name": "MolGAN",
-        "description": "Molecular Generative Adversarial Network",
-        "folder_path": "Information_Units/Generators/Molgan",
-        "class_name": "MolganGenerator",
-        "file_name": "MolganGenerator.py"
-      },
-      {
-        "id": "cond_dfc_vae",
-        "name": "Conddfcvae",
-        "display_name": "Cond-DFC-VAE",
-        "description": "Conditional Deep Feature Consistent Variational Autoencoder",
-        "folder_path": "Information_Units/Generators/Conddfcvae",
-        "class_name": "ConddfcvaeGenerator",
-        "file_name": "ConddfcvaeGenerator.py"
-      },
-      {
-        "id": "mygen1",
-        "name": "Mygen1",
-        "display_name": "MyGen1",
-        "description": "Custom generator 1 - user-defined materials generation model",
-        "folder_path": "Information_Units/Generators/Mygen1",
-        "class_name": "Mygen1Generator",
-        "file_name": "Mygen1Generator.py"
-      },
-      {
-        "id": "mygen2",
-        "name": "Mygen2",
-        "display_name": "MyGen2",
-        "description": "Custom generator 2 - user-defined materials generation model",
-        "folder_path": "Information_Units/Generators/Mygen2",
-        "class_name": "Mygen2Generator",
-        "file_name": "Mygen2Generator.py"
       }
     ],
     "predictors": [
@@ -281,12 +217,12 @@
       },
       {
         "id": "gbfs",
-        "name": "GBFS",
+        "name": "Gbfs",
         "display_name": "GBFS",
         "description": "Pretrained predictors from GBFS workflow, implemented in Python",
-        "folder_path": "Information_Units/Predictors/GBFS_Pred",
-        "class_name": "GBFS_PredPredictor",
-        "file_name": "GBFS_PredPredictor.py"
+        "folder_path": "Information_Units/Predictors/Gbfs",
+        "class_name": "GbfsPredictor",
+        "file_name": "GbfsPredictor.py"
       }
     ]
   },

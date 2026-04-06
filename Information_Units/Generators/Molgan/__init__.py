@@ -1,1 +1,0 @@
-# MolGAN Generator Implementation
