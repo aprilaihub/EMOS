@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Materialsproject.MaterialsprojectAPIHelper import MaterialsprojectAPIHelper
 
@@ -18,12 +19,12 @@ class MaterialsprojectDatabase(BaseDatabase):
             "(~154K structures, thermodynamic stability with GGA/GGA+U/r2SCAN functionals)"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from Materials Project using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
+            inputs (dict[str, Any]): Query parameters with standard property names
                 - query: Material query (e.g., 'Fe', 'Al2O3')
                 - limit: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
@@ -43,7 +44,7 @@ class MaterialsprojectDatabase(BaseDatabase):
                 - chemical_system: Chemical system identifier (string)
 
         Returns:
-            dict: {"source": "materialsproject", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "materialsproject", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Simple element query

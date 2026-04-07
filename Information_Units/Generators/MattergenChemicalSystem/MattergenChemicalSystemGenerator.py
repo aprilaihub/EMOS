@@ -6,7 +6,7 @@ system.  Pretrained model: ``chemical_system``.
 """
 
 from __future__ import annotations
-from typing import Generator
+from typing import Any, Generator
 
 from Information_Units.Generators.MattergenBaseModel.MattergenGenerator import MattergenGenerator
 
@@ -29,7 +29,27 @@ class MattergenChemicalSystemGenerator(MattergenGenerator):
             f"(pretrained: {self.PRETRAINED_NAME})"
         )
 
-    def generate(self, inputs: dict) -> dict:
+    def generate(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Generate structures using the fixed ``chemical_system`` pretrained model.
+
+        Args:
+            inputs (dict[str, Any]): Generation parameters.
+
+        Returns:
+            dict[str, Any]: Generation payload:
+                {
+                    "status": str,
+                    "message": str (optional),
+                    "source": str,
+                    "queries": dict[str, Any],
+                    "cif_strings": list[str],
+                    "num_structures": int (optional),
+                    "structures": list[dict[str, Any]] (optional),
+                    "debug_logs": list[str] (optional),
+                    "job_id": str (optional)
+                }.
+        """
         inputs = {**inputs,
                   "pretrained_name": self.PRETRAINED_NAME,
                   "num_batches": inputs.get("num_batches", self.NUM_BATCHES),

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 
 # Base class for all generators
@@ -10,14 +11,25 @@ class BaseGenerator:
     def info(self):
         return f'Information about generator {self.generator_name}'
 
-    def generate(self, inputs: dict) -> str:
+    def generate(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
-        Generate output based on parsed inputs.
+        Generate materials based on parsed inputs.
+
         Args:
-            inputs (dict): Parsed input values from frontend
+            inputs (dict[str, Any]): Parsed generator inputs from the frontend.
+
         Returns:
-            str: Path to generated output (to be implemented by subclasses)
+            dict[str, Any]: Generation payload with shape:
+                {
+                    "status": str,
+                    "message": str (optional),
+                    "source": str,
+                    "queries": dict[str, Any],
+                    "cif_strings": list[str],
+                    "num_structures": int (optional),
+                    "structures": list[dict[str, Any]] (optional),
+                    "debug_logs": list[str] (optional),
+                    "job_id": str (optional)
+                }.
         """
         raise NotImplementedError("Subclasses must implement generate()")
-
-

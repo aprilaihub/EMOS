@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.Predictors.Synthnn.composition_helper import CompositionHelper
 from Information_Units.Predictors.Synthnn.synthnn_model_helper import SynthnnModelHelper
@@ -69,17 +70,32 @@ class SynthnnPredictor(BasePredictor):
             "higher values indicate higher likelihood of successful synthesis."
         )
 
-    def predict(self, input_data) -> dict:
+    def predict(self, input_data: list[str]) -> dict[str, Any]:
         """
         Predict synthesizability from CIF files.
         
         Args:
-            input_data (list[str]): CIF strings
+            input_data (list[str]): CIF strings.
                 Example:
                 ["data_...", "data_..."]
         
         Returns:
-            dict: Standardized predictor envelope
+            dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": "synthnn",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": "ok" | "error",
+                            "properties": {
+                                "synthesizable": bool | None,
+                                "synthesizability_score": float | None
+                            },
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         
         Notes:
             - Empty or invalid input returns {"source": ..., "results": []}

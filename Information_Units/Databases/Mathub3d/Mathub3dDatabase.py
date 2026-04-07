@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
 from Information_Units.Databases.Cod.CodDatabase import CodDatabase
@@ -22,12 +23,12 @@ class Mathub3dDatabase(BaseDatabase):
             "CIF files retrieved via COD/Materials Project cross-referencing."
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Filter MatHub-3d dataset and retrieve CIF files via COD/MP cross-referencing.
 
         Args:
-            inputs (dict): Query parameters with standard property names
+            inputs (dict[str, Any]): Query parameters with standard property names
                 - query: Material query (e.g., 'Fe', 'Al2O3')
                 - limit: Max number of CIF results (default: 10)
                 - Additional keys are treated as standard property filters:
@@ -35,7 +36,7 @@ class Mathub3dDatabase(BaseDatabase):
                   space_group, magnetization, is_magnetic, nelements, etc.
 
         Returns:
-            dict: {"source": "mathub3d", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "mathub3d", "queries": dict, "cif_strings": list[str]}
         """
         queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
         result = {

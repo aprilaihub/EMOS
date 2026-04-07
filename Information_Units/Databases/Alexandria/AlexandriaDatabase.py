@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Alexandria.AlexandriaAPIHelper import AlexandriaAPIHelper
 
@@ -18,12 +19,12 @@ class AlexandriaDatabase(BaseDatabase):
             "(415K structures, optimized for band gap accuracy)"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from Alexandria (PBEsol) using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
+            inputs (dict[str, Any]): Query parameters with standard property names
                 - query: Material query (e.g., 'Fe', 'Al2O3')
                 - limit: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
@@ -63,7 +64,7 @@ class AlexandriaDatabase(BaseDatabase):
                 - magnetic_moments_scan (μB): Local magnetic moments (SCAN) [min, max]
 
         Returns:
-            dict: {"source": "alexandria", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "alexandria", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Query with band gap filter (PBEsol)

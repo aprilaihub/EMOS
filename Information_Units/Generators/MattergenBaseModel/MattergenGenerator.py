@@ -80,13 +80,13 @@ class MattergenGenerator(BaseGenerator):
                 f"crystal structures (container unreachable: {exc})."
             )
 
-    def generate(self, inputs: dict) -> dict:
+    def generate(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Generate crystal structures by calling the MatterGen container.
 
         Parameters
         ----------
-        inputs : dict
+        inputs : dict[str, Any]
             Accepted keys (all optional except that at least one of
             ``pretrained_name`` / ``model_path`` must be set):
 
@@ -105,7 +105,7 @@ class MattergenGenerator(BaseGenerator):
 
         Returns
         -------
-        dict
+        dict[str, Any]
             ``{"job_id": ..., "status": ..., "message": ...,
             "num_structures": ..., "structures": [...]}``
         """
