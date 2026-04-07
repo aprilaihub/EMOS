@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Jarvisdft.JarvisdftAPIHelper import JarvisdftAPIHelper
 
@@ -18,14 +19,14 @@ class JarvisdftDatabase(BaseDatabase):
             "electronic, optical, thermoelectric, and solar cell properties"
         )
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
-        Retrieve materials from JARVIS-DFT using OPTIMADE API and save as CIF files.
+        Retrieve materials from JARVIS-DFT using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Si', 'Fe2O3')
-                - limit: Max number of results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Si', 'Fe2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
 
                 **Properties**:
@@ -56,13 +57,22 @@ class JarvisdftDatabase(BaseDatabase):
                 - avg_hole_mass (mₑ): Average hole mass [min, max]
 
         Returns:
-            list: Paths to saved CIF files
+            dict[str, Any]: {"source": "jarvisdft", "queries": dict, "cif_strings": list[str]}
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "jarvisdft",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:
@@ -77,23 +87,21 @@ class JarvisdftDatabase(BaseDatabase):
             if not structures_data:
                 if self.logger:
                     self.logger.log("No structures found in JARVIS-DFT")
-                return []
+                return result
 
-            cif_paths = []
+            # Convert to pymatgen structures and serialize as CIF strings
             for i, entry in enumerate(structures_data):
                 structure = self.api_helper.convert_to_structure(entry)
                 if structure:
-                    cif_path = self.api_helper.save_cif_from_structure(
-                        structure, entry, i, self.output_dir
-                    )
-                    if cif_path:
-                        cif_paths.append(cif_path)
+                    cif_str = structure.to(fmt='cif')
+                    if cif_str:
+                        result["cif_strings"].append(cif_str)
                         if self.logger:
-                            self.logger.log(f"Saved: {cif_path}")
+                            self.logger.log(f"Retrieved CIF string {i + 1}")
 
-            return cif_paths
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

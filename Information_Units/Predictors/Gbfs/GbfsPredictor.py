@@ -410,6 +410,7 @@ class GbfsPredictor(BasePredictor):
             OSError: If directory structure is malformed
         """
         super().__init__(predictor_name, logger)
+        self.source = "gbfs"
         
         self.property_name = property_name
         
@@ -506,21 +507,18 @@ class GbfsPredictor(BasePredictor):
             f"is_metal (classification), mob_n (cm²/V·s), mob_p (cm²/V·s)."
         )
 
-    def predict(self, inputs) -> str:  # type: ignore
+    def predict(self, inputs: list[str]) -> dict[str, Any]:
         """
         Predict properties from crystal structure data.
         
-        Supports flexible input formats:
-        - str: path to a CIF file (backward compatible)
-        - dict with 'structure': pymatgen Structure object
-        - dict with 'cif_path': path to a CIF file
-        - dict with 'input_data': path to a CIF file
+        Expects direct list input:
+        - list[str] of CIF contents
         
         For mobility properties (mob_n, mob_p), automatically applies inverse log10 
         transformation to convert model output back to actual values (cm²/V·s).
         
         Pipeline:
-        1. Load structure from input (file or dict)
+        1. Load structure from CIF string input
         2. Extract composition from structure
         3. Generate base features using matminer featurizers
         4. Engineer features by dividing base features (e.g., "feature_a/feature_b")
@@ -530,74 +528,103 @@ class GbfsPredictor(BasePredictor):
         8. Apply inverse log10 transformation for mobility predictions
         
         Args:
-            inputs: One of:
-                - str: path to a CIF file
-                - dict with 'structure': pymatgen Structure object
-                - dict with 'cif_path': path to a CIF file
-                - dict with 'input_data': path to a CIF file
+            inputs (list[str]): CIF string inputs.
                 
         Returns:
-            str: JSON string representation of predicted property values
-            
-        Raises:
-            ValueError: If no valid input provided
-            FileNotFoundError: If CIF file does not exist
+            dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": "gbfs",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": "ok" | "error",
+                            "properties": {
+                                "property": str,
+                                "prediction": list[float],
+                                "probabilities": list[list[float]] (optional)
+                            },
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         """
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')
 
-        # Extract structure from flexible input formats
-        if isinstance(inputs, str):
-            # Legacy: direct string path
-            structure = load_cif(inputs)
-        elif isinstance(inputs, dict):
-            structure = inputs.get('structure')
-            if structure is None:
-                # Fall back to file path from dict
-                cif_path = inputs.get('cif_path') or inputs.get('input_data')
-                if cif_path:
-                    structure = load_cif(cif_path)
-                else:
-                    raise ValueError(
-                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
-                        "'cif_path', or 'input_data' (path to CIF file)"
-                    )
-        else:
-            raise ValueError(
-                "Input must be a file path string or dictionary with structure/cif_path/input_data"
-            )
+        structures = self._extract_structures(inputs)
+        if not structures:
+            return {
+                "source": self.source,
+                "results": [
+                    {
+                        "index": 0,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": "Missing or invalid input. Provide list[str] of CIF strings",
+                    }
+                ],
+            }
 
+        results = []
+        for idx, structure in enumerate(structures):
+            try:
+                properties = self._predict_structure(structure)
+                results.append(
+                    {
+                        "index": idx,
+                        "status": "ok",
+                        "properties": properties,
+                        "warnings": [],
+                        "error": None,
+                    }
+                )
+            except Exception as exc:
+                results.append(
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": str(exc),
+                    }
+                )
+
+        return {"source": self.source, "results": results}
+
+    def _predict_structure(self, structure: Structure) -> Dict[str, Any]:
+        """Run feature generation and prediction for a single structure."""
         composition = structure_to_composition(structure)
 
         # Generate base features
         features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
-        
+
         if self.logger:
             base_count = sum(1 for f in self.feature_list if '/' not in f)
             eng_count = sum(1 for f in self.feature_list if '/' in f)
             self.logger.log(
-                f"Generated {base_count} base + {eng_count} engineered features", 
+                f"Generated {base_count} base + {eng_count} engineered features",
                 'info'
             )
-        
+
         # Scale features if scaler has transform method
         if hasattr(self.scaler, 'transform'):
             scaled = self.scaler.transform(features)
         else:
             # If no transform method (e.g., scaler is a model), use features directly
             scaled = features
-        
+
         # Predict
         prediction = self.model.predict(scaled)
-        
+
         # Apply inverse log10 transformation for mobility predictions
         if self.property_name in ['mob_n', 'mob_p']:
             prediction = 10 ** prediction
-        
-        # For binary classifiers, also include probabilities if available
-        result = {
+
+        result: Dict[str, Any] = {
             "property": self.property_name,
-            "prediction": prediction.tolist()
+            "prediction": prediction.tolist(),
         }
         if hasattr(self.model, 'predict_proba'):
             try:
@@ -605,51 +632,39 @@ class GbfsPredictor(BasePredictor):
                 result["probabilities"] = probas.tolist()
             except Exception:
                 pass
-        
-        # Return as JSON string for base class compatibility
-        import json
-        return json.dumps(result)
+        return result
+
+    def _extract_structures(self, inputs) -> List[Structure]:
+        """Extract structures from direct list input."""
+        structures: List[Structure] = []
+
+        if isinstance(inputs, list):
+            for cif_str in inputs:
+                if not isinstance(cif_str, str) or not cif_str.strip():
+                    continue
+                parser = CifParser.from_str(cif_str)
+                parsed = parser.get_structures(primitive=True)
+                if parsed:
+                    structures.append(parsed[0])
+        return structures
     
     def predict_numpy(self, input_data) -> np.ndarray:
         """
         Predict properties and return raw numpy array.
         
-        Supports flexible input formats:
-        - str: path to a CIF file (backward compatible)
-        - dict with 'structure': pymatgen Structure object
-        - dict with 'cif_path': path to a CIF file
-        - dict with 'input_data': path to a CIF file
+        Expects direct list input:
+        - list[str] of CIF contents
         
         Args:
-            input_data: One of:
-                - str: path to a CIF file
-                - dict with 'structure': pymatgen Structure object
-                - dict with 'cif_path': path to a CIF file
-                - dict with 'input_data': path to a CIF file
+            input_data: list[str]
             
         Returns:
             np.ndarray: Predicted property values from the LGBM model
         """
-        # Extract structure from flexible input formats
-        if isinstance(input_data, str):
-            # Legacy: direct string path
-            structure = load_cif(input_data)
-        elif isinstance(input_data, dict):
-            structure = input_data.get('structure')
-            if structure is None:
-                # Fall back to file path from dict
-                cif_path = input_data.get('cif_path') or input_data.get('input_data')
-                if cif_path:
-                    structure = load_cif(cif_path)
-                else:
-                    raise ValueError(
-                        "Input dictionary must contain either 'structure' (pymatgen Structure), "
-                        "'cif_path', or 'input_data' (path to CIF file)"
-                    )
-        else:
-            raise ValueError(
-                "Input must be a file path string or dictionary with structure/cif_path/input_data"
-            )
+        structures = self._extract_structures(input_data)
+        if not structures:
+            raise ValueError("Missing or invalid input. Provide list[str] of CIF strings")
+        structure = structures[0]
         
         composition = structure_to_composition(structure)
         features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
@@ -851,7 +866,7 @@ if FASTAPI_AVAILABLE:
                 _API_LOGGER.debug(f"[{job_id}] Loaded structure: {structure.composition.reduced_formula}")
                 
                 predictor = _get_or_load_predictor(property_name)
-                numpy_pred = predictor.predict_numpy({"structure": structure})
+                numpy_pred = predictor.predict_numpy([structure.to(fmt="cif")])
                 
                 probabilities = None
                 if hasattr(predictor.model, 'predict_proba'):
@@ -914,7 +929,7 @@ if FASTAPI_AVAILABLE:
                     
                     try:
                         predictor = _get_or_load_predictor(prop)
-                        pred_result = predictor.predict_numpy({"structure": structure})
+                        pred_result = predictor.predict_numpy([structure.to(fmt="cif")])
                         
                         prop_info = PROPERTY_INFO[prop]
                         prediction_value = pred_result.tolist()
@@ -963,7 +978,7 @@ if FASTAPI_AVAILABLE:
 
 
 # ======================== 
-# CLI ENTRYPOINT (backward compatible)
+# CLI ENTRYPOINT
 # -----------------------------
 
 def main():
@@ -979,7 +994,7 @@ def main():
         help="Run as FastAPI server instead of CLI predictor"
     )
     
-    # CLI mode (legacy)
+    # CLI mode
     parser.add_argument("--cif", default=None, help="Path to CIF structure file")
     parser.add_argument("--property", default="bandgap", 
                         help="Property to predict: bandgap, e_form, dielectric, is_metal, mob_n, mob_p")
@@ -1013,7 +1028,7 @@ def main():
         app = create_app()
         uvicorn.run(app, host=args.host, port=args.port, log_level=args.log_level.lower())
     
-    # Run as CLI predictor (legacy mode)
+    # Run as CLI predictor
     else:
         if not args.cif:
             parser.print_help()
@@ -1026,8 +1041,9 @@ def main():
             model_dir=args.model_dir
         )
 
-        # Use dictionary-based prediction
-        result = predictor.predict({"cif_path": args.cif})
+        with open(args.cif, "r", encoding="utf-8") as f:
+            cif_string = f.read()
+        result = predictor.predict([cif_string])
         print(json.dumps(result, indent=2))
 
 

@@ -22,7 +22,7 @@ from __future__ import annotations
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import requests
 
@@ -45,6 +45,7 @@ class MattersimPredictor(BasePredictor):
 
     def __init__(self, predictor_name='mattersim', logger=None):
         super().__init__(predictor_name, logger)
+        self.source = "mattersim"
         self.api_url = os.getenv("MATTERSIM_API_URL", _DEFAULT_API_URL).rstrip("/")
         self.timeout = int(os.getenv("MATTERSIM_TIMEOUT", _DEFAULT_TIMEOUT))
 
@@ -70,48 +71,49 @@ class MattersimPredictor(BasePredictor):
                 f"(container unreachable: {exc})"
             )
 
-    def predict(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    def predict(self, input_data: list[str], **options: Any) -> Dict[str, Any]:
         """
         Predict material properties by calling the MatterSim container.
 
         Args:
-            input_data (dict): Input parameters.
-                Expected keys:
-                {
-                    'cif_file': '/path/to/structure.cif',              # REQUIRED
-                    'compute_energy': True,                            # Optional (default: True)
-                    'compute_forces': True,                            # Optional (default: True)
-                    'compute_stress': True,                            # Optional (default: True)
-                    'relax': True,                                     # Optional (default: True)
-                    'relax_atoms': True,                               # Optional (default: True)
-                    'relax_cell': True,                                # Optional (default: True)
-                    'output_dir': '/path/to/output'                    # Optional: save relaxed CIF
-                }
+            input_data (list[str]): CIF strings.
+            **options (Any): Optional calculation parameters
+                (compute/relax flags, output_dir).
 
         Returns:
-            dict: ``{"status": ..., "properties": {...}, "warnings": [...], "error": ...}``
+            Dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": "mattersim",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": str,
+                            "properties": dict[str, Any],
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         """
         if self.logger:
             self.logger.log("MatterSim: sending prediction request to container", "info")
 
-        # Validate input
-        if not input_data or 'cif_file' not in input_data:
-            error_msg = "Missing required parameter: 'cif_file'"
-            if self.logger:
-                self.logger.log(error_msg, 'error')
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': error_msg}
+        cif_strings = self._extract_cif_strings(input_data)
+        if not cif_strings:
+            return {
+                "source": self.source,
+                "results": [
+                    {
+                        "index": 0,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": "Missing required input: list[str] of CIF strings",
+                    }
+                ],
+            }
 
-        cif_filepath = input_data['cif_file']
-        cif_path = Path(cif_filepath)
-
-        # Validate file exists on host
-        if not cif_path.exists():
-            error_msg = f"File not found: {cif_filepath}"
-            if self.logger:
-                self.logger.log(error_msg, 'error')
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': error_msg}
-
-        # Check container health
+        # Check container health once for the full batch
         if not self.is_healthy():
             msg = (
                 f"MatterSim container is not reachable at {self.api_url}. "
@@ -119,74 +121,93 @@ class MattersimPredictor(BasePredictor):
             )
             if self.logger:
                 self.logger.log(msg, "error")
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': msg}
+            return {
+                "source": self.source,
+                "results": [
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": msg,
+                    }
+                    for idx in range(len(cif_strings))
+                ],
+            }
 
-        # Read CIF file contents to send as string
-        try:
-            cif_string = cif_path.read_text()
-        except Exception as e:
-            error_msg = f"Failed to read CIF file: {e}"
-            if self.logger:
-                self.logger.log(error_msg, 'error')
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': error_msg}
+        results: List[Dict[str, Any]] = []
+        for idx, cif_string in enumerate(cif_strings):
+            payload = {
+                "cif_string": cif_string,
+                "compute_energy": options.get("compute_energy", True),
+                "compute_forces": options.get("compute_forces", True),
+                "compute_stress": options.get("compute_stress", True),
+                "relax": options.get("relax", True),
+                "relax_atoms": options.get("relax_atoms", True),
+                "relax_cell": options.get("relax_cell", True),
+            }
 
-        # Build request payload
-        payload = {
-            "cif_string": cif_string,
-            "compute_energy": input_data.get("compute_energy", True),
-            "compute_forces": input_data.get("compute_forces", True),
-            "compute_stress": input_data.get("compute_stress", True),
-            "relax": input_data.get("relax", True),
-            "relax_atoms": input_data.get("relax_atoms", True),
-            "relax_cell": input_data.get("relax_cell", True),
-        }
+            try:
+                resp = requests.post(
+                    f"{self.api_url}/predict",
+                    json=payload,
+                    timeout=self.timeout,
+                )
+                resp.raise_for_status()
+                result = resp.json()
 
-        if self.logger:
-            self.logger.log(f"MatterSim prediction starting for: {cif_filepath}", 'info')
+                properties = result.get("properties", {}) if isinstance(result, dict) else {}
+                output_dir = options.get("output_dir")
+                if output_dir and properties.get("relaxed_cif_string"):
+                    relaxed_cif_path = self._save_relaxed_cif(
+                        cif_string=properties["relaxed_cif_string"],
+                        cif_filename=f"structure_{idx}.cif",
+                        output_dir=output_dir,
+                    )
+                    properties["relaxed_cif"] = relaxed_cif_path
+                    properties.pop("relaxed_cif_string", None)
 
-        # Call the container
-        try:
-            resp = requests.post(
-                f"{self.api_url}/predict",
-                json=payload,
-                timeout=self.timeout,
-            )
-            resp.raise_for_status()
-            result = resp.json()
-
-            if self.logger:
-                self.logger.log(
-                    f"MatterSim: prediction complete (status={result.get('status')})",
-                    "info",
+                results.append(
+                    {
+                        "index": idx,
+                        "status": result.get("status", "ok"),
+                        "properties": properties,
+                        "warnings": result.get("warnings", []),
+                        "error": result.get("error"),
+                    }
+                )
+            except requests.Timeout:
+                msg = f"MatterSim: request timed out after {self.timeout}s"
+                MattersimPredictor._health_cache["healthy"] = None
+                results.append(
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": msg,
+                    }
+                )
+            except requests.RequestException as exc:
+                msg = f"MatterSim: HTTP error — {exc}"
+                MattersimPredictor._health_cache["healthy"] = None
+                results.append(
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": msg,
+                    }
                 )
 
-            # Save relaxed CIF locally if output_dir provided and container returned one
-            output_dir = input_data.get("output_dir")
-            if output_dir and result.get("properties", {}).get("relaxed_cif_string"):
-                relaxed_cif_path = self._save_relaxed_cif(
-                    cif_string=result["properties"]["relaxed_cif_string"],
-                    cif_filename=cif_path.name,
-                    output_dir=output_dir,
-                )
-                result["properties"]["relaxed_cif"] = relaxed_cif_path
-                # Remove the raw CIF string from the result (it can be large)
-                result["properties"].pop("relaxed_cif_string", None)
+        return {"source": self.source, "results": results}
 
-            return result
-
-        except requests.Timeout:
-            msg = f"MatterSim: request timed out after {self.timeout}s"
-            if self.logger:
-                self.logger.log(msg, "error")
-            MattersimPredictor._health_cache["healthy"] = None
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': msg}
-
-        except requests.RequestException as exc:
-            msg = f"MatterSim: HTTP error — {exc}"
-            if self.logger:
-                self.logger.log(msg, "error")
-            MattersimPredictor._health_cache["healthy"] = None
-            return {'status': 'error', 'properties': {}, 'warnings': [], 'error': msg}
+    def _extract_cif_strings(self, input_data) -> List[str]:
+        """Extract valid CIF strings from direct list input."""
+        if isinstance(input_data, list):
+            return [s for s in input_data if isinstance(s, str) and s.strip()]
+        return []
 
     # ------------------------------------------------------------------
     # Health check

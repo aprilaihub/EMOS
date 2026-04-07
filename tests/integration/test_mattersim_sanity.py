@@ -184,41 +184,42 @@ def test_info_returns_metadata(predictor):
 
 def test_predict_valid_input_returns_ok_envelope(cif_files, predictor):
     """A valid CIF file produces a successful, well-formed result."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
-    assert_ok_prediction(result)
+    result = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    assert result["source"] == "mattersim"
+    assert len(result["results"]) == 1
+    assert_ok_prediction(result["results"][0])
 
 
 def test_predict_missing_cif_file_returns_error(predictor):
-    """Missing 'cif_file' key returns an error."""
-    result = predictor.predict({})
-    assert_error_prediction(result)
-    assert "Missing required parameter" in result['error']
-
-
-def test_predict_nonexistent_file_returns_error(predictor):
-    """A non-existent file path returns an error."""
-    result = predictor.predict({'cif_file': '/nonexistent/file.cif'})
-    assert_error_prediction(result)
-    assert "not found" in result['error'].lower()
+    """Missing/empty contract input returns a structured error."""
+    result = predictor.predict([])
+    assert result["source"] == "mattersim"
+    assert len(result["results"]) == 1
+    assert_error_prediction(result["results"][0])
+    assert "Missing required input" in result["results"][0]['error']
 
 
 def test_predict_invalid_cif_returns_error(cif_files, predictor):
     """An invalid CIF file produces a structured error."""
-    result = predictor.predict({'cif_file': cif_files['invalid_path']})
-    assert_prediction_envelope(result)
+    result = predictor.predict([Path(cif_files['invalid_path']).read_text()])
+    assert result["source"] == "mattersim"
+    assert len(result["results"]) == 1
+    item = result["results"][0]
+    assert_prediction_envelope(item)
     # May be error or ok-with-warnings depending on container behavior
-    assert result['status'] in {'ok', 'error'}
+    assert item['status'] in {'ok', 'error'}
 
 
 def test_predict_output_is_json_serializable(cif_files, predictor):
     """Prediction output can be serialized and deserialized as JSON."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    result = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
 
     serialized = json.dumps(result, default=str)
     deserialized = json.loads(serialized)
 
     assert isinstance(deserialized, dict)
-    assert deserialized['status'] == 'ok'
+    assert deserialized["source"] == "mattersim"
+    assert deserialized["results"][0]['status'] == 'ok'
 
 
 # ============================================================================
@@ -227,7 +228,8 @@ def test_predict_output_is_json_serializable(cif_files, predictor):
 
 def test_al2o3_energy_in_expected_range(cif_files, predictor):
     """Al2O3 (Corundum) energy should be in a physically reasonable range."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     energy = result['properties']['energy']
@@ -240,7 +242,8 @@ def test_al2o3_energy_in_expected_range(cif_files, predictor):
 
 def test_al2o3_has_correct_composition(cif_files, predictor):
     """Al2O3 should have 4 Al (Z=13) and 6 O (Z=8) atoms."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     atomic_numbers = result['properties']['atomic_numbers']
@@ -252,7 +255,8 @@ def test_al2o3_has_correct_composition(cif_files, predictor):
 
 def test_relaxation_lowers_energy(cif_files, predictor):
     """Relaxed energy should be lower than or equal to the initial energy."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     props = result['properties']
@@ -265,7 +269,8 @@ def test_relaxation_lowers_energy(cif_files, predictor):
 
 def test_relaxation_produces_structure_and_cell(cif_files, predictor):
     """Relaxation should produce relaxed positions and cell."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     props = result['properties']
@@ -277,7 +282,8 @@ def test_relaxation_produces_structure_and_cell(cif_files, predictor):
 
 def test_relaxed_forces_near_zero(cif_files, predictor):
     """After relaxation, forces should be near zero (converged)."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     relaxed_forces = result['properties'].get('relaxed_forces')
@@ -296,7 +302,8 @@ def test_relaxed_forces_near_zero(cif_files, predictor):
 
 def test_relaxed_cif_string_returned(cif_files, predictor):
     """Relaxation should return a CIF string for the optimized structure."""
-    result = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
+    result = output["results"][0]
     assert_ok_prediction(result)
 
     cif_string = result['properties'].get('relaxed_cif_string')
@@ -307,8 +314,9 @@ def test_relaxed_cif_string_returned(cif_files, predictor):
 
 def test_model_deterministic_predictions(cif_files, predictor):
     """Running the same input twice should produce the same energy."""
-    result1 = predictor.predict({'cif_file': cif_files['al2o3_path']})
-    result2 = predictor.predict({'cif_file': cif_files['al2o3_path']})
+    al2o3_cif = Path(cif_files['al2o3_path']).read_text()
+    result1 = predictor.predict([al2o3_cif])["results"][0]
+    result2 = predictor.predict([al2o3_cif])["results"][0]
 
     energy1 = result1['properties']['energy']
     energy2 = result2['properties']['energy']
@@ -321,22 +329,34 @@ def test_model_deterministic_predictions(cif_files, predictor):
 def test_multiple_materials_produce_valid_results(cif_files, predictor, cif_key):
     """Various known materials should all produce valid predictions."""
     # Run with relaxation enabled to validate full pipeline for each material.
-    result = predictor.predict({
-        'cif_file': cif_files[cif_key],
-        'relax': True,
-    })
-    assert_ok_prediction(result)
+    result = predictor.predict(
+        [Path(cif_files[cif_key]).read_text()],
+        relax=True,
+    )
+    assert_ok_prediction(result["results"][0])
 
 
 def test_output_dir_saves_relaxed_cif(cif_files, predictor, tmp_path):
     """When output_dir is provided, relaxed CIF should be saved locally."""
-    result = predictor.predict({
-        'cif_file': cif_files['al2o3_path'],
-        'output_dir': str(tmp_path),
-    })
-    assert_ok_prediction(result)
+    result = predictor.predict(
+        [Path(cif_files['al2o3_path']).read_text()],
+        output_dir=str(tmp_path),
+    )
+    first = result["results"][0]
+    assert_ok_prediction(first)
 
-    relaxed_cif_path = result['properties'].get('relaxed_cif')
+    relaxed_cif_path = first['properties'].get('relaxed_cif')
     assert relaxed_cif_path is not None, "No relaxed CIF path returned"
     assert Path(relaxed_cif_path).exists(), f"Relaxed CIF not found at {relaxed_cif_path}"
     assert Path(relaxed_cif_path).stat().st_size > 0
+
+
+def test_predict_with_list_input_returns_standardized_output(cif_files, predictor):
+    """New contract: list[str] input returns source/results envelope."""
+    cif_text = Path(cif_files["al2o3_path"]).read_text()
+    result = predictor.predict([cif_text])
+
+    assert result["source"] == "mattersim"
+    assert isinstance(result["results"], list)
+    assert len(result["results"]) == 1
+    assert result["results"][0]["status"] in {"ok", "error"}

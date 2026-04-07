@@ -198,6 +198,9 @@ def test_generate_unhealthy_container(mock_get, generator):
     result = generator.generate({"pretrained_name": "mattergen_base"})
     assert result["status"] == "error"
     assert "not reachable" in result["message"]
+    assert result["source"] == "mattergen"
+    assert result["queries"] == {"pretrained_name": "mattergen_base"}
+    assert result["cif_strings"] == []
 
 
 @pytest.mark.unit
@@ -219,6 +222,9 @@ def test_generate_demo_shortcut(mock_get, mock_post, generator):
     result = generator.generate({"pretrained_name": "demo"})
     assert result["status"] == "completed"
     assert result["num_structures"] == 1
+    assert result["source"] == "mattergen"
+    assert result["queries"] == {"pretrained_name": "demo"}
+    assert result["cif_strings"] == ["data_demo"]
     # Verify it hit /demo/generate
     call_url = mock_post.call_args[0][0]
     assert "/demo/generate" in call_url
@@ -294,6 +300,9 @@ def test_generate_timeout_handling(mock_get, mock_post, generator):
     result = generator.generate({"pretrained_name": "mattergen_base"})
     assert result["status"] == "error"
     assert "timed out" in result["message"].lower()
+    assert result["source"] == "mattergen"
+    assert result["queries"] == {"pretrained_name": "mattergen_base"}
+    assert result["cif_strings"] == []
     # Cache should be invalidated
     assert MattergenGenerator._health_cache["healthy"] is None
 
@@ -313,6 +322,9 @@ def test_generate_http_error_handling(mock_get, mock_post, generator):
 
     result = generator.generate({"pretrained_name": "mattergen_base"})
     assert result["status"] == "error"
+    assert result["source"] == "mattergen"
+    assert result["queries"] == {"pretrained_name": "mattergen_base"}
+    assert result["cif_strings"] == []
     assert MattergenGenerator._health_cache["healthy"] is None
 
 
@@ -341,6 +353,8 @@ def test_generate_stream_unhealthy(mock_get, generator):
     events = list(generator.generate_stream({"pretrained_name": "mattergen_base"}))
     assert len(events) == 2
     assert events[0]["event"] == "error"
+    assert events[0]["source"] == "mattergen"
+    assert events[0]["queries"] == {"pretrained_name": "mattergen_base"}
     assert events[1]["event"] == "done"
 
 
@@ -364,6 +378,10 @@ def test_generate_stream_demo_fallback(mock_get, mock_post, generator):
     assert "log" in event_types
     assert "result" in event_types
     assert "done" in event_types
+    result_event = next(e for e in events if e["event"] == "result")
+    assert result_event["source"] == "mattergen"
+    assert result_event["queries"] == {"pretrained_name": "demo"}
+    assert result_event["cif_strings"] == []
     # Verify it called /demo/generate, not /generate/stream
     call_url = mock_post.call_args[0][0]
     assert "/demo/generate" in call_url
@@ -406,6 +424,9 @@ def test_generate_stream_parses_sse_events(mock_get, mock_post, generator):
     assert events[1]["progress"] == 0.5
     assert events[2]["event"] == "result"
     assert events[2]["num_structures"] == 2
+    assert events[2]["source"] == "mattergen"
+    assert events[2]["queries"] == {"pretrained_name": "mattergen_base"}
+    assert events[2]["cif_strings"] == []
     assert events[3]["event"] == "done"
 
 
@@ -424,6 +445,8 @@ def test_generate_stream_request_failure(mock_get, mock_post, generator):
 
     events = list(generator.generate_stream({"pretrained_name": "mattergen_base"}))
     assert events[0]["event"] == "error"
+    assert events[0]["source"] == "mattergen"
+    assert events[0]["queries"] == {"pretrained_name": "mattergen_base"}
     assert events[-1]["event"] == "done"
     assert MattergenGenerator._health_cache["healthy"] is None
 

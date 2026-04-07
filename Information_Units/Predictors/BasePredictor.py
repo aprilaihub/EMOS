@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 
 # Base class for all generators
@@ -10,14 +11,24 @@ class BasePredictor:
     def info(self):
         return f'Information about predictor {self.predictor_name}'
 
-    def predict(self, inputs: dict) -> str:
+    def predict(self, input_data: list[str]) -> dict[str, Any]:
         """
         Predict properties.
+
         Args:
-            inputs (dict): Parsed input values from frontend
+            input_data (list[str]): Predictor input CIF strings.
+
         Returns:
-            Predicted properties (to be implemented by subclasses)
+            dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": str,
+                    "results": list[{
+                        "index": int,
+                        "status": str,
+                        "properties": dict[str, Any],
+                        "warnings": list[str],
+                        "error": str | None
+                    }]
+                }.
         """
         raise NotImplementedError("Subclasses must implement predict()")
-
-
