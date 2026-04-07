@@ -567,7 +567,7 @@ class Gbfs2dPredictor(BasePredictor):
             f"is_stable (classification)."
         )
 
-    def predict(self, inputs) -> dict:  # type: ignore
+    def predict(self, input_data) -> dict:  # type: ignore
         """
         Predict properties from crystal structure data.
         
@@ -585,7 +585,7 @@ class Gbfs2dPredictor(BasePredictor):
         8. Generate predictions using pre-trained LGBM model
         
         Args:
-            inputs: list[str]
+            input_data: list[str]
                 
         Returns:
             dict: standardized predictor envelope
@@ -593,7 +593,7 @@ class Gbfs2dPredictor(BasePredictor):
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')
 
-        structures = self._extract_structures(inputs)
+        structures = self._extract_structures(input_data)
         if not structures:
             return {
                 "source": self.source,
