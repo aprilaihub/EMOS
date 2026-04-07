@@ -77,10 +77,27 @@ predictor = Gbfs2dPredictor(predictor_name="bandgap", property_name="bandgap")
 # Load structure
 structure = Structure.from_file("MoS2.cif")
 
-# Predict
-result = predictor.predict_numpy([structure.to(fmt="cif")])
-print(f"Bandgap: {result[0]} eV")
+# Predict using standardized I/O contract
+result = predictor.predict(input_data=[structure.to(fmt="cif")])
+# Returns: {"source": "gbfs-2d", "results": [...]}
+
+# Or use numpy method for quick predictions
+predictions = predictor.predict_numpy([structure.to(fmt="cif")])
+print(f"Bandgap: {predictions[0]} eV")
 ```
+
+**I/O Contract:**
+
+The `predict()` method follows EMOS standardized conventions:
+- **Input**: `input_data` (parameter name) - `list[str]` of CIF strings
+- **Output**: `dict` with keys:
+  - `source`: "gbfs-2d" (predictor identifier)
+  - `results`: `list[dict]` where each dict contains:
+    - `index`: int (structure index in input)
+    - `status`: "ok" or "error"
+    - `properties`: dict with predictions and `is_vdw_layered` flag
+    - `warnings`: list[str] (empty if no warnings)
+    - `error`: str or None (error message if status is "error")
 
 ### Mode 2: CLI Prediction (Legacy)
 
