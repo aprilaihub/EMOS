@@ -1,0 +1,65 @@
+# Docker Compose configuration for GBFS-2D FastAPI Service
+#
+# GBFS-2D specializes in predictions for 2D layered materials:
+# - Automated van der Waals structure detection via space group analysis
+# - Three properties: bandgap (eV), is_metal, is_stable
+# - All data as JSON dictionaries (no auxiliary files created)
+#
+# Usage:
+#   docker-compose build        # Build the image
+#   docker-compose up           # Start the service (runs on localhost:8001)
+#   curl -X GET http://localhost:8001/info  # View supported properties
+#
+# To test predictions, use the /predict endpoints or /batch-predict
+# See the API documentation at http://localhost:8001/docs
+
+version: '3.8'
+
+services:
+  gbfs2d:
+    build:
+      context: ../../../../../../  # Build from EMOS root
+      dockerfile: Information_Units/Predictors/Gbfs2d/docker/Dockerfile
+    
+    image: gbfs2d-pred:latest
+    container_name: gbfs2d-predictor
+    
+    # Expose the FastAPI server on port 8001 to avoid conflict with Gbfs (8000)
+    ports:
+      - "8001:8000"
+    
+    # Environment variables
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      GBFS2D_HOST: 0.0.0.0
+      GBFS2D_PORT: 8000
+      GBFS2D_LOG_LEVEL: INFO
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
