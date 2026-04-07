@@ -136,7 +136,7 @@ class Mathub3dHelper:
         all_candidates = []
         for source_name, db in [('materialsproject', mp_db), ('cod', cod_db)]:
             try:
-                payload = db.retrieve({'query': formula, 'limit': 10})
+                payload = db.retrieve({'target_compositions': formula, 'batch_size': 10})
                 cif_strings = payload.get('cif_strings', []) if isinstance(payload, dict) else []
                 if cif_strings:
                     for cif_str in cif_strings:

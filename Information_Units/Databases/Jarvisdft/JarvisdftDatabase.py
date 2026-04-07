@@ -25,8 +25,8 @@ class JarvisdftDatabase(BaseDatabase):
 
         Args:
             inputs (dict[str, Any]): Query parameters with standard property names
-                - query: Material query (e.g., 'Si', 'Fe2O3')
-                - limit: Max number of results (default: 10)
+                - target_compositions: Material query (e.g., 'Si', 'Fe2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
 
                 **Properties**:
@@ -66,10 +66,13 @@ class JarvisdftDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

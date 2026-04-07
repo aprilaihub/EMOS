@@ -120,13 +120,13 @@ def test_database_retrieve(monkeypatch):
 
     monkeypatch.setattr(helper, 'find_cif_match', lambda *a, **k: 'data_fake\n_cell_length_a 1.0')
 
-    results = db.retrieve({'query': 'O', 'limit': 1})
+    results = db.retrieve({'target_compositions': 'O', 'batch_size': 1})
     assert results["source"] == "mathub3d"
-    assert results["queries"] == {'query': 'O', 'limit': 1}
+    assert results["queries"] == {'target_compositions': 'O', 'batch_size': 1}
     assert len(results["cif_strings"]) == 1
 
     monkeypatch.setattr(helper, 'find_cif_match', lambda *a, **k: None)
-    empty = db.retrieve({'query': 'Unobtainium', 'limit': 5})
+    empty = db.retrieve({'target_compositions': 'Unobtainium', 'batch_size': 5})
     assert empty["source"] == "mathub3d"
-    assert empty["queries"] == {'query': 'Unobtainium', 'limit': 5}
+    assert empty["queries"] == {'target_compositions': 'Unobtainium', 'batch_size': 5}
     assert empty["cif_strings"] == []

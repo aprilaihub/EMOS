@@ -87,7 +87,7 @@ def test_aflow_retrieve_structures(
 
     # End-to-end through database retrieve() and CIF write.
     db = AflowDatabase()
-    params = {"query": query, "limit": 3}
+    params = {"target_compositions": query, "batch_size": 3}
     params.update(filters)
     payload = db.retrieve(params)
     assert isinstance(payload, dict)
@@ -133,7 +133,7 @@ def test_aflow_broad_element_smoke():
     from Information_Units.Databases.Aflow.AflowDatabase import AflowDatabase
 
     db = AflowDatabase()
-    payload = db.retrieve({"query": "Fe", "limit": 1})
+    payload = db.retrieve({"target_compositions": "Fe", "batch_size": 1})
     assert isinstance(payload, dict)
     assert payload.get("source") == "aflow"
     assert isinstance(payload.get("cif_strings"), list)
@@ -148,7 +148,7 @@ def test_aflow_retrieve_performance(benchmark, limit):
     from Information_Units.Databases.Aflow.AflowDatabase import AflowDatabase
 
     db = AflowDatabase()
-    result = benchmark(db.retrieve, {"query": "Al2O3", "limit": limit})
+    result = benchmark(db.retrieve, {"target_compositions": "Al2O3", "batch_size": limit})
 
     assert isinstance(result, dict)
     assert result.get("source") == "aflow"

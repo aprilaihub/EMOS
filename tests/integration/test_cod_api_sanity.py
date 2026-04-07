@@ -50,7 +50,7 @@ def test_cod_retrieve_structures(
     from Information_Units.Databases.Cod.CodDatabase import CodDatabase
     
     db = CodDatabase()
-    retrieve_params = {'query': query, 'limit': 3}
+    retrieve_params = {'target_compositions': query, 'batch_size': 3}
     retrieve_params.update(filters)
     payload = db.retrieve(retrieve_params)
     assert isinstance(payload, dict)
@@ -104,7 +104,7 @@ def test_cod_retrieve_performance(benchmark, limit):
     db = CodDatabase()
     
     # Measure time to retrieve structures
-    result = benchmark(db.retrieve, {'query': 'Fe', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Fe', 'batch_size': limit})
     
     # Verify results are valid
     assert isinstance(result, dict)

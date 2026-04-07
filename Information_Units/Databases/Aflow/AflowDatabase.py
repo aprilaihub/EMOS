@@ -26,7 +26,7 @@ class AflowDatabase(BaseDatabase):
 
         Args:
             inputs (dict[str, Any]): Query parameters, including optional
-                ``query``, ``limit``, and property filters.
+                ``target_compositions``, ``batch_size``, and property filters.
 
         Returns:
             dict[str, Any]: {"source": "aflow", "queries": dict, "cif_strings": list[str]}.
@@ -38,12 +38,15 @@ class AflowDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = int(inputs.get('limit', 10))
+            query = inputs.get('target_compositions', '')
+            limit = int(inputs.get('batch_size', 10))
             if limit <= 0:
                 return result
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

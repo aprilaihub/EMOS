@@ -88,7 +88,7 @@ def test_mathub3d_retrieve_structures(query, expected_elements, filters):
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase()
-    retrieve_params = {'query': query, 'limit': 2}
+    retrieve_params = {'target_compositions': query, 'batch_size': 2}
     retrieve_params.update(filters)
     payload = db.retrieve(retrieve_params)
     assert isinstance(payload, dict)
@@ -118,7 +118,7 @@ def test_mathub3d_retrieve_performance(benchmark, limit):
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase()
-    result = benchmark(db.retrieve, {'query': 'Fe2O3', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Fe2O3', 'batch_size': limit})
 
     assert isinstance(result, dict)
     assert result.get("source") == "mathub3d"

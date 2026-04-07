@@ -29,8 +29,8 @@ class Mathub3dDatabase(BaseDatabase):
 
         Args:
             inputs (dict[str, Any]): Query parameters with standard property names
-                - query: Material query (e.g., 'Fe', 'Al2O3')
-                - limit: Max number of CIF results (default: 10)
+                - target_compositions: Material query (e.g., 'Fe', 'Al2O3')
+                - batch_size: Max number of CIF results (default: 10)
                 - Additional keys are treated as standard property filters:
                   band_gap, energy_per_atom, bulk_modulus, density, volume,
                   space_group, magnetization, is_magnetic, nelements, etc.
@@ -45,10 +45,13 @@ class Mathub3dDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.helper.map_properties(properties) if properties else {}
 
             if self.logger:
