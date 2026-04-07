@@ -65,6 +65,24 @@ Add helper files in the same folder if needed.
 
 > **Note**: Generators and Predictors follow the same workflow. Implement `generate()` for generators and `predict()` for predictors instead of `retrieve()`.
 
+### Required I/O Contracts (Information Units)
+
+- `retrieve(inputs: dict) -> dict`  
+  Required input keys: `target_compositions` (`str`), `batch_size` (`int`)  
+  Required output keys: `source` (`str`), `queries` (`dict`), `cif_strings` (`list[str]`)  
+  Additional database-specific filter keys may be included in `inputs`.
+
+- `generate(inputs: dict) -> dict`  
+  Required input keys: `batch_size` (`int`), `num_batches` (`int`), and one of `pretrained_name` (`str`) or `model_path` (`str`)  
+  Required output keys: `status` (`str`), `source` (`str`), `queries` (`dict`), `cif_strings` (`list[str]`)  
+  Additional generator-specific keys may be included in `inputs`.
+
+- `predict(input_data: list[str]) -> dict`  
+  Required input: `input_data` as CIF strings (`list[str]`)  
+  Required output keys: `source` (`str`), `results` (`list[dict]`)  
+  Required keys per result item: `index` (`int`), `status` (`str`), `properties` (`dict`), `warnings` (`list[str]`), `error` (`str | None`)  
+  Additional predictor-specific options/properties may be included.
+
 ## Adding a Feature
 
 Features are user-facing functionality that combines information units.
