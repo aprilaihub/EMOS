@@ -14,13 +14,15 @@ from utils.comparison_methods import ComparisonMethods
 from utils.information_unit_methods import InformationUnitMethods
 from utils.feature_methods import FeatureMethods
 from utils.ui_update_methods import UIUpdateMethods
+from utils.property_mappings_methods import PropertyMappingsMethods
 
 
 class ContributionTool(
     ComparisonMethods,
     InformationUnitMethods,
     FeatureMethods,
-    UIUpdateMethods
+    UIUpdateMethods,
+    PropertyMappingsMethods
 ):
     def __init__(self, project_root):
         self.project_root = Path(project_root)
@@ -166,9 +168,17 @@ class ContributionTool(
 
         print("\nThis will:")
         print(f"  - Delete {change_info['path']}/")
+        print(f"  - Clean up property mappings")
         print(f"  - Update {unit_type.capitalize()[:-1]}Factory.py")
 
         print("\n🔨 Removing...\n")
+        
+        # Clean up property mappings before deleting folder
+        # source_name is the folder name converted to lowercase
+        source_name = change_info['name'].lower()
+        # unit_type is 'databases', 'generators', 'predictors'
+        self.cleanup_property_mappings_for_removed_unit(source_name, unit_type)
+        
         self.remove_information_unit_folder(change_info)
         self.update_information_unit_factory_remove(change_info)
         print("\n✓ Removal completed successfully!")
