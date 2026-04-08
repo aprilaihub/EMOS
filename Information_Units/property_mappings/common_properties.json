@@ -281,6 +281,12 @@
       "category": "electronic",
       "unit": "eV"
     },
+    "band_gap_gbfs2d": {
+      "type": "float",
+      "description": "Predicted electronic band gap for 2D layered materials using GBFS-2D LightGBM model with van der Waals detection",
+      "category": "electronic",
+      "unit": "eV"
+    },
     "band_gap_scan": {
       "type": "float",
       "description": "Electronic band gap (SCAN)",
@@ -757,6 +763,16 @@
       "type": "boolean",
       "description": "Predicted metal/non-metal classification using GBFS LightGBM classifier",
       "category": "electronic"
+    },
+    "is_metal_gbfs2d": {
+      "type": "boolean",
+      "description": "Predicted metal/non-metal classification for 2D layered materials using GBFS-2D LightGBM classifier with van der Waals detection",
+      "category": "electronic"
+    },
+    "is_stable_gbfs2d": {
+      "type": "boolean",
+      "description": "Predicted structural stability for 2D layered materials using GBFS-2D LightGBM classifier with van der Waals detection",
+      "category": "structural"
     },
     "kpoints_bands_nkpts": {
       "type": "array",

@@ -350,7 +350,9 @@ The predictor handles common errors gracefully:
 
 Gbfs-2D properties are registered in the central property mapping system:
 
-**File**: `Information_Units/property_mappings.json`
+**Files**:
+- `Information_Units/property_mappings/common_properties.json`
+- `Information_Units/property_mappings/sources/predictors/gbfs2d.json`
 
 | Property | Mapping Name | Description | Category |
 |----------|---|---|---|
