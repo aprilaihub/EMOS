@@ -32,7 +32,7 @@ def create_placeholder_models():
     }
     
     for prop, config in properties.items():
-        prop_dir = os.path.join(base_dir, prop)
+        prop_dir = os.path.join(base_dir, f"{prop}_2d")
         os.makedirs(prop_dir, exist_ok=True)
         
         n_features = config['n_features']

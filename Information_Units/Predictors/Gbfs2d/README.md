@@ -154,18 +154,13 @@ Content-Type: application/json
 **Response includes automatic vdW detection:**
 ```json
 {
-  "source": "gbfs-2d",
-  "results": [
-    {
-      "status": "ok",
-      "properties": {
-        "prediction": 2.15,
-        "unit": "eV",
-        "is_vdw_layered": true,
-        "space_group": 194
-      }
-    }
-  ]
+  "job_id": "a1b2c3d4e5f6",
+  "property": "bandgap",
+  "prediction": 2.15,
+  "probabilities": null,
+  "is_vdw_layered": true,
+  "unit": "eV",
+  "type": "regression"
 }
 ```
 
@@ -175,7 +170,10 @@ POST /batch-predict
 Content-Type: application/json
 
 {
-  "cif_string": "...",
+  "structure": {
+    "lattice": {...},
+    "sites": [...]
+  },
   "properties": ["bandgap", "is_metal", "is_stable"]
 }
 ```
@@ -183,7 +181,7 @@ Content-Type: application/json
 **Features:**
 - Single API call for multiple properties
 - vdW detection included in response
-- All predictions standardized to same schema
+- All predictions returned in a single `predictions` object keyed by property name
 - JSON serializable output
 
 ## van der Waals Detection

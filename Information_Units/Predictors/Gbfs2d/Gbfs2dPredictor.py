@@ -593,8 +593,8 @@ class Gbfs2dPredictor(BasePredictor):
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')
 
-        structures = self._extract_structures(input_data)
-        if not structures:
+        structures_with_index, parse_errors = self._extract_structures_for_predict(input_data)
+        if not structures_with_index and not parse_errors:
             return {
                 "source": self.source,
                 "results": [
@@ -608,8 +608,8 @@ class Gbfs2dPredictor(BasePredictor):
                 ],
             }
 
-        results = []
-        for idx, structure in enumerate(structures):
+        results = list(parse_errors)
+        for idx, structure in structures_with_index:
             try:
                 # Check vdW structure
                 is_vdw = check_vdw_layered_structure(structure)
@@ -638,6 +638,8 @@ class Gbfs2dPredictor(BasePredictor):
                     }
                 )
 
+        # Keep output aligned with input ordering for mixed valid/invalid payloads.
+        results.sort(key=lambda r: r["index"])
         return {"source": self.source, "results": results}
 
     def _predict_structure(self, structure: Structure) -> Dict[str, Any]:
@@ -680,18 +682,79 @@ class Gbfs2dPredictor(BasePredictor):
                 
         return result
 
-    def _extract_structures(self, inputs) -> List[Structure]:
-        """Extract structures from direct list input."""
+    def _extract_structures_for_predict(self, inputs) -> Tuple[List[Tuple[int, Structure]], List[Dict[str, Any]]]:
+        """Extract structures and collect per-item parse errors for predict()."""
+        structures_with_index: List[Tuple[int, Structure]] = []
+        errors: List[Dict[str, Any]] = []
+
+        if not isinstance(inputs, list):
+            return structures_with_index, errors
+
+        for idx, cif_str in enumerate(inputs):
+            if not isinstance(cif_str, str) or not cif_str.strip():
+                errors.append(
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": "Input item must be a non-empty CIF string",
+                    }
+                )
+                continue
+
+            try:
+                parser = CifParser.from_str(cif_str)
+                parsed = parser.get_structures(primitive=True)
+                if not parsed:
+                    errors.append(
+                        {
+                            "index": idx,
+                            "status": "error",
+                            "properties": {},
+                            "warnings": [],
+                            "error": "Invalid CIF file with no structures!",
+                        }
+                    )
+                    continue
+                structures_with_index.append((idx, parsed[0]))
+            except Exception as exc:
+                errors.append(
+                    {
+                        "index": idx,
+                        "status": "error",
+                        "properties": {},
+                        "warnings": [],
+                        "error": f"Invalid CIF at index {idx}: {str(exc)}",
+                    }
+                )
+
+        return structures_with_index, errors
+
+    def _extract_structures(self, inputs, strict: bool = False) -> List[Structure]:
+        """Extract structures from direct list input.
+
+        When strict=True, raise on the first invalid entry (used by predict_numpy).
+        """
         structures: List[Structure] = []
 
         if isinstance(inputs, list):
-            for cif_str in inputs:
+            for idx, cif_str in enumerate(inputs):
                 if not isinstance(cif_str, str) or not cif_str.strip():
+                    if strict:
+                        raise ValueError(f"Input item at index {idx} must be a non-empty CIF string")
                     continue
-                parser = CifParser.from_str(cif_str)
-                parsed = parser.get_structures(primitive=True)
+                try:
+                    parser = CifParser.from_str(cif_str)
+                    parsed = parser.get_structures(primitive=True)
+                except Exception as exc:
+                    if strict:
+                        raise ValueError(f"Invalid CIF at index {idx}: {str(exc)}") from exc
+                    continue
                 if parsed:
                     structures.append(parsed[0])
+                elif strict:
+                    raise ValueError(f"Invalid CIF at index {idx}: no structures found")
         return structures
     
     def predict_numpy(self, input_data) -> np.ndarray:
@@ -707,7 +770,7 @@ class Gbfs2dPredictor(BasePredictor):
         Returns:
             np.ndarray: Predicted property values from the LGBM model
         """
-        structures = self._extract_structures(input_data)
+        structures = self._extract_structures(input_data, strict=True)
         if not structures:
             raise ValueError("Missing or invalid input. Provide list[str] of CIF strings")
         structure = structures[0]

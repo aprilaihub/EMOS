@@ -109,11 +109,15 @@ curl -X GET http://localhost:8001/info
 Example response:
 ```json
 {
-  "source": "gbfs-2d",
-  "description": "GBFS-2D: LightGBM-based predictor for 2D layered materials with vdW detection",
+  "name": "GBFS-2D",
+  "description": "Property predictor for 2D layered materials using LightGBM models.",
+  "version": "1.0.0",
   "supported_properties": ["bandgap", "is_metal", "is_stable"],
-  "vdw_detection": true,
-  "vdw_space_groups": [1, 2, 12, 148, 156, 162, 166, 187, 194]
+  "properties": {
+    "bandgap": {"label": "Band Gap", "unit": "eV", "type": "regression", "description": "Electronic band gap energy for 2D materials"},
+    "is_metal": {"label": "Metal Classification", "unit": "boolean", "type": "classification", "description": "Whether the 2D material is metallic (1) or non-metallic (0)"},
+    "is_stable": {"label": "Structural Stability", "unit": "boolean", "type": "classification", "description": "Whether the 2D material structure is dynamically stable (1) or unstable (0)"}
+  }
 }
 ```
 
@@ -123,26 +127,25 @@ Example response:
 curl -X POST http://localhost:8001/predict/bandgap \
   -H "Content-Type: application/json" \
   -d '{
-    "cif_string": "data_MoS2\n_cell_length_a 3.16\n_cell_length_b 3.16\n_cell_length_c 12.30\n..."
+    "structure": {
+      "@module": "pymatgen.core.structure",
+      "@class": "Structure",
+      "lattice": {"matrix": [[3.16, 0, 0], [-1.58, 2.736, 0], [0, 0, 12.3]], "pbc": [true, true, true]},
+      "sites": []
+    }
   }'
 ```
 
 Example response with vdW detection:
 ```json
 {
-  "source": "gbfs-2d",
-  "results": [
-    {
-      "status": "ok",
-      "properties": {
-        "prediction": 1.85,
-        "unit": "eV",
-        "is_vdw_layered": true,
-        "space_group": 187,
-        "material": "MoS2"
-      }
-    }
-  ]
+  "job_id": "a1b2c3d4e5f6",
+  "property": "bandgap",
+  "prediction": 1.85,
+  "probabilities": null,
+  "is_vdw_layered": true,
+  "unit": "eV",
+  "type": "regression"
 }
 ```
 
@@ -152,24 +155,25 @@ Example response with vdW detection:
 curl -X POST http://localhost:8001/predict/is_metal \
   -H "Content-Type: application/json" \
   -d '{
-    "cif_string": "..."
+    "structure": {
+      "@module": "pymatgen.core.structure",
+      "@class": "Structure",
+      "lattice": {"matrix": [[3.16, 0, 0], [-1.58, 2.736, 0], [0, 0, 12.3]], "pbc": [true, true, true]},
+      "sites": []
+    }
   }'
 ```
 
 Example response (MoS2 is non-metallic):
 ```json
 {
-  "source": "gbfs-2d",
-  "results": [
-    {
-      "status": "ok",
-      "properties": {
-        "prediction": 0,
-        "unit": "binary",
-        "is_vdw_layered": true
-      }
-    }
-  ]
+  "job_id": "a1b2c3d4e5f6",
+  "property": "is_metal",
+  "prediction": 0,
+  "probabilities": [[0.92, 0.08]],
+  "is_vdw_layered": true,
+  "unit": "boolean",
+  "type": "classification"
 }
 ```
 
@@ -179,7 +183,12 @@ Example response (MoS2 is non-metallic):
 curl -X POST http://localhost:8001/batch-predict \
   -H "Content-Type: application/json" \
   -d '{
-    "cif_strings": ["..."],
+    "structure": {
+      "@module": "pymatgen.core.structure",
+      "@class": "Structure",
+      "lattice": {"matrix": [[3.16, 0, 0], [-1.58, 2.736, 0], [0, 0, 12.3]], "pbc": [true, true, true]},
+      "sites": []
+    },
     "properties": ["bandgap", "is_metal", "is_stable"]
   }'
 ```
@@ -187,18 +196,14 @@ curl -X POST http://localhost:8001/batch-predict \
 Example response:
 ```json
 {
-  "source": "gbfs-2d",
-  "results": [
-    {
-      "status": "ok",
-      "properties": {
-        "bandgap": {"prediction": 1.85, "unit": "eV"},
-        "is_metal": {"prediction": 0, "unit": "binary"},
-        "is_stable": {"prediction": 1, "unit": "binary"},
-        "is_vdw_layered": true
-      }
-    }
-  ]
+  "job_id": "a1b2c3d4e5f6",
+  "structure_formula": "MoS2",
+  "is_vdw_layered": true,
+  "predictions": {
+    "bandgap": {"prediction": 1.85, "probabilities": null, "unit": "eV", "type": "regression"},
+    "is_metal": {"prediction": 0, "probabilities": [[0.92, 0.08]], "unit": "boolean", "type": "classification"},
+    "is_stable": {"prediction": 1, "probabilities": [[0.11, 0.89]], "unit": "boolean", "type": "classification"}
+  }
 }
 ```
 
@@ -215,19 +220,15 @@ parser = CifParser("mp-2815.cif")  # MoS2
 structures = parser.get_structures(primitive=True)
 structure = structures[0]
 
-# Convert to CIF string for API
-with open("mp-2815.cif") as f:
-    cif_string = f.read()
-
 # Make prediction
 response = requests.post(
     "http://localhost:8001/predict/bandgap",
-    json={"cif_string": cif_string}
+    json={"structure": structure.as_dict()}
 )
 
 result = response.json()
-bandgap = result['results'][0]['properties']['prediction']
-is_vdw = result['results'][0]['properties']['is_vdw_layered']
+bandgap = result['prediction']
+is_vdw = result['is_vdw_layered']
 
 print(f"MoS2 Bandgap: {bandgap} eV")
 print(f"Is 2D vdW layered: {is_vdw}")
@@ -245,23 +246,23 @@ materials = {
 }
 
 for name, cif_file in materials.items():
-    with open(cif_file) as f:
-        cif_string = f.read()
+    parser = CifParser(cif_file)
+    structure = parser.get_structures(primitive=True)[0]
     
     response = requests.post(
         "http://localhost:8001/batch-predict",
         json={
-            "cif_strings": [cif_string],
+            "structure": structure.as_dict(),
             "properties": ["bandgap", "is_metal", "is_stable"]
         }
     )
     
-    result = response.json()['results'][0]['properties']
+    result = response.json()['predictions']
     print(f"{name}:")
     print(f"  Bandgap: {result['bandgap']['prediction']} eV")
     print(f"  Metal: {result['is_metal']['prediction']}")
     print(f"  Stable: {result['is_stable']['prediction']}")
-    print(f"  vdW Layered: {result['is_vdw_layered']}")
+    print(f"  vdW Layered: {response.json()['is_vdw_layered']}")
     print()
 ```
 

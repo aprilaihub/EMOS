@@ -11,5 +11,3 @@ predictor_factory = {
 }
 
 predictor_registry = {}
-
-predictor_registry = {}
