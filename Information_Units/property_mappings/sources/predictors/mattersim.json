@@ -1,0 +1,53 @@
+{
+  "description": "Source-specific mappings for mattersim (predictors).",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "mattersim",
+  "properties": {
+    "energy": {
+      "name": "energy",
+      "predicatble": true,
+      "range_support": true
+    },
+    "forces": {
+      "name": "forces",
+      "predicatble": true,
+      "range_support": true
+    },
+    "stress_tensor": {
+      "name": "stress",
+      "predicatble": true,
+      "range_support": true
+    },
+    "num_atoms": {
+      "name": "num_atoms",
+      "predicatble": true,
+      "range_support": true
+    },
+    "atomic_numbers": {
+      "name": "atomic_numbers",
+      "predicatble": true,
+      "range_support": false
+    },
+    "relaxed_energy": {
+      "name": "relaxed_energy",
+      "predicatble": true,
+      "range_support": true
+    },
+    "relaxed_forces": {
+      "name": "relaxed_forces",
+      "predicatble": true,
+      "range_support": true
+    },
+    "relaxed_stress": {
+      "name": "relaxed_stress",
+      "predicatble": true,
+      "range_support": true
+    },
+    "relaxed_cif": {
+      "name": "relaxed_cif",
+      "predicatble": true,
+      "range_support": false
+    }
+  }
+}

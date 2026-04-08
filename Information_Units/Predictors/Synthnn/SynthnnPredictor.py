@@ -1,11 +1,10 @@
 """SynthNN Predictor - Synthesis Neural Network for predicting synthesizability."""
 
-import json
-from pathlib import Path
 from typing import Any
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.Predictors.Synthnn.composition_helper import CompositionHelper
 from Information_Units.Predictors.Synthnn.synthnn_model_helper import SynthnnModelHelper
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class SynthnnPredictor(BasePredictor):
@@ -34,20 +33,14 @@ class SynthnnPredictor(BasePredictor):
         self._check_output_properties_in_mapping({prop: None for prop in self.OUTPUT_PROPERTIES})
 
     def _load_mapped_output_properties(self) -> set:
-        """Load SynthNN-mapped output properties from property_mappings.json."""
-        mapping_file = Path(__file__).resolve().parents[2] / 'property_mappings.json'
-
+        """Load SynthNN-mapped output properties from modular property files."""
         try:
-            with mapping_file.open('r', encoding='utf-8') as f:
-                data = json.load(f)
+            source_mapping = load_source_property_mapping(source='synthnn', source_type='predictors')
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to load property mappings from {mapping_file}: {str(e)}"
-            ) from e
+            raise RuntimeError(f"Failed to load modular SynthNN property mappings: {str(e)}") from e
 
         mapped = set()
-        for prop_name, prop_details in data.get('properties', {}).items():
-            synthnn_info = prop_details.get('synthnn')
+        for prop_name, synthnn_info in source_mapping.items():
             if isinstance(synthnn_info, dict) and synthnn_info.get('predicatble'):
                 mapped.add(prop_name)
 
@@ -58,7 +51,7 @@ class SynthnnPredictor(BasePredictor):
         missing = sorted(set(properties.keys()) - self._mapped_output_properties)
         if missing:
             raise ValueError(
-                "SynthNN output properties missing in property_mappings.json: "
+                "SynthNN output properties missing in modular property mappings: "
                 + ", ".join(missing)
             )
 

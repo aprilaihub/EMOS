@@ -288,7 +288,7 @@ def test_mock_score_ranges(mock_logger, mock_model_helper, compositions, thresho
 
 @pytest.mark.unit
 def test_output_properties_are_registered_in_property_mappings(mock_logger, mock_model_helper):
-    """All SynthNN output properties must be declared in property_mappings.json."""
+    """All SynthNN output properties must be declared in modular property mappings."""
     predictor = SynthnnPredictor(logger=mock_logger)
 
     assert set(predictor.OUTPUT_PROPERTIES).issubset(predictor._mapped_output_properties)
@@ -299,7 +299,7 @@ def test_checker_rejects_unmapped_output_properties(mock_logger, mock_model_help
     """Checker raises if predictor output contains a property not in mapping."""
     predictor = SynthnnPredictor(logger=mock_logger)
 
-    with pytest.raises(ValueError, match="missing in property_mappings.json"):
+    with pytest.raises(ValueError, match="missing in modular property mappings"):
         predictor._check_output_properties_in_mapping({'not_in_mapping': 1})
 
 

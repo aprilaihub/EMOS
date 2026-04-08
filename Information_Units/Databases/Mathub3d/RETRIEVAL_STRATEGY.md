@@ -30,11 +30,11 @@ Single file, 74,177 entries, 54 fields. Loaded once into memory on first `retrie
 ### Available Properties
 
 The "Standard Name" column refers to the universal property key in
-`Information_Units/property_mappings.json` — the central corpus that maps standardised names to
-source-specific field names for every database. A `mathub3d` entry must be added there for each
-property mathub3d exposes.
+`Information_Units/property_mappings/common_properties.json` — the central corpus that maps
+standardised names. Source-specific field names for mathub3d are defined in
+`Information_Units/property_mappings/sources/databases/mathub3d.json`.
 
-| Category | JSON Field | Standard Name (property_mappings.json) | Completeness |
+| Category | JSON Field | Standard Name (common_properties.json) | Completeness |
 |----------|-----------|----------------------------------------|-------------|
 | **Identity** | `formula` | `query` | 100% |
 | **Identity** | `elements` | (element filter) | 100% |
@@ -163,48 +163,41 @@ class Mathub3dDatabase(BaseDatabase):
         return self._data
 ```
 
-### Step 2: Property Name Mapping via `property_mappings.json`
+### Step 2: Property Name Mapping via Modular Property Mapping Files
 
 Instead of a hardcoded local dict, the mapping from standard property names to MatHub-3d JSON
-field names is read from **`Information_Units/property_mappings.json`** — the same central file
-used by COD, Alexandria, and Materials Project.
+field names is read from **`Information_Units/property_mappings/sources/databases/mathub3d.json`**.
 
-Each property in that file will have a `"mathub3d"` key:
+Property metadata is defined in `common_properties.json`, and source-specific config is defined in
+the mathub3d source file:
 
 ```json
 "nelements": {
-  "type": "integer",
-  "description": "Number of unique chemical elements",
-  "category": "structural",
-  "cod":            { "name": "nelements", "retrievable": true },
-  "alexandria":     { "name": "nelements", "retrievable": true },
-  "materialsproject": { "name": "nelements", "retrievable": true },
-  "mathub3d":       { "name": "nelements", "retrievable": true, "range_support": true }
+    "name": "nelements",
+    "retrievable": true,
+    "range_support": true
 }
 ```
 
 At runtime, the database class loads the mapping once and builds a lookup:
 
 ```python
-import json
-from pathlib import Path
-
 def _load_property_map(self):
-    """Build {standard_name: json_field_name} from property_mappings.json."""
-    mappings_path = Path(__file__).parent.parent / 'property_mappings.json'
-    with open(mappings_path) as f:
+    """Build {standard_name: json_field_name} from modular mappings."""
+    source_path = Path(__file__).parent.parent / 'property_mappings' / 'sources' / 'databases' / 'mathub3d.json'
+    with open(source_path) as f:
         mappings = json.load(f)
     return {
-        prop_name: prop_info['mathub3d']['name']
+        prop_name: prop_info['name']
         for prop_name, prop_info in mappings['properties'].items()
-        if 'mathub3d' in prop_info and prop_info['mathub3d'].get('retrievable')
+        if prop_info.get('retrievable')
     }
 ```
 
-This keeps the mapping centralised — any new property added to `property_mappings.json` with a
-`mathub3d` key is automatically available, with no code changes in the database class.
+This keeps the mapping centralised — any new property added to the modular mapping files is
+automatically available, with no code changes in the database class.
 
-The full list of `mathub3d` entries to add to `property_mappings.json`:
+The full list of `mathub3d` entries to add to the modular mapping files:
 
 | Standard Name | mathub3d `name` | `range_support` | Notes |
 |---|---|---|---|
@@ -235,7 +228,7 @@ def retrieve(self, inputs: dict) -> list:
     limit = inputs.get('limit', 10)
     filters = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
 
-    prop_map = self._load_property_map()  # from property_mappings.json
+    prop_map = self._load_property_map()  # from modular property mappings
     data = self._load_data()
     results = self._apply_formula_filter(data, query)
     results = self._apply_property_filters(results, filters, prop_map)
@@ -245,7 +238,7 @@ def retrieve(self, inputs: dict) -> list:
 ```
 
 No file-selection logic needed — every query hits the same JSON dataset.
-Property name translation is driven entirely by `property_mappings.json`.
+Property name translation is driven entirely by modular property mappings.
 
 ---
 

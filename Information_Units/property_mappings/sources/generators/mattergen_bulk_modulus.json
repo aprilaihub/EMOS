@@ -1,0 +1,12 @@
+{
+  "description": "Source-specific mappings for mattergen_bulk_modulus (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_bulk_modulus",
+  "properties": {
+    "bulk_modulus": {
+      "name": "ml_bulk_modulus",
+      "range_support": false
+    }
+  }
+}
