@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Alexandria.AlexandriaAPIHelper import AlexandriaAPIHelper
 
@@ -18,14 +19,14 @@ class AlexandriaDatabase(BaseDatabase):
             "(415K structures, optimized for band gap accuracy)"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from Alexandria (PBEsol) using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Fe', 'Al2O3')
-                - limit: Max number of results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Fe', 'Al2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
                 
                 **Properties (PBEsol - default functional)**:
@@ -63,28 +64,28 @@ class AlexandriaDatabase(BaseDatabase):
                 - magnetic_moments_scan (μB): Local magnetic moments (SCAN) [min, max]
 
         Returns:
-            dict: {"source": "alexandria", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "alexandria", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Query with band gap filter (PBEsol)
             db.retrieve({
-                'query': 'Al2O3',
-                'limit': 10,
+                'target_compositions': 'Al2O3',
+                'batch_size': 10,
                 'band_gap': [2.0, 5.0]
             })
             
             # Query with multiple filters
             db.retrieve({
-                'query': 'Fe',
-                'limit': 5,
+                'target_compositions': 'Fe',
+                'batch_size': 5,
                 'formation_energy_per_atom': [-1.0, 0.0],
                 'hull_distance': [0.0, 0.05]
             })
             
             # Compare PBEsol vs SCAN band gaps
             db.retrieve({
-                'query': 'GaAs',
-                'limit': 3,
+                'target_compositions': 'GaAs',
+                'batch_size': 3,
                 'band_gap': [1.0, 2.0],
                 'band_gap_scan': [1.0, 2.0]
             })
@@ -96,10 +97,13 @@ class AlexandriaDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

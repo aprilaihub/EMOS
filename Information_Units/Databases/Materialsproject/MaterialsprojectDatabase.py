@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Materialsproject.MaterialsprojectAPIHelper import MaterialsprojectAPIHelper
 
@@ -18,14 +19,14 @@ class MaterialsprojectDatabase(BaseDatabase):
             "(~154K structures, thermodynamic stability with GGA/GGA+U/r2SCAN functionals)"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from Materials Project using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Fe', 'Al2O3')
-                - limit: Max number of results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Fe', 'Al2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
                 
                 **Common Properties (queryable)**:
@@ -43,26 +44,26 @@ class MaterialsprojectDatabase(BaseDatabase):
                 - chemical_system: Chemical system identifier (string)
 
         Returns:
-            dict: {"source": "materialsproject", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "materialsproject", "queries": dict, "cif_strings": list[str]}
             
         Examples:
             # Simple element query
             db.retrieve({
-                'query': 'Fe',
-                'limit': 5
+                'target_compositions': 'Fe',
+                'batch_size': 5
             })
             
             # Query with energy filter
             db.retrieve({
-                'query': 'Fe',
-                'limit': 5,
+                'target_compositions': 'Fe',
+                'batch_size': 5,
                 'energy_above_hull_r2scan': [0.0, 0.05]
             })
             
             # Query with multiple filters
             db.retrieve({
-                'query': 'Al2O3',
-                'limit': 3,
+                'target_compositions': 'Al2O3',
+                'batch_size': 3,
                 'nelements': [2, 3],
                 'formation_energy_r2scan': [-2.0, -0.5]
             })
@@ -74,11 +75,14 @@ class MaterialsprojectDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            # Extract filters: all keys except 'query' and 'limit'
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            # Extract filters: all keys except 'target_compositions' and 'batch_size'
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

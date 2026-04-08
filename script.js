@@ -141,7 +141,7 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             currentFeatureInstance = new FeatureClass(featureId);
             window.features[featureId] = currentFeatureInstance;
 
-            // Ensure property_mappings.json is loaded before building UI
+            // Ensure modular property mappings are loaded before building UI
             // (the cache is shared, so this is a no-op after the first load)
             if (typeof _loadPropertyMappings === 'function') {
                 await _loadPropertyMappings();

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 
 # Base class for all databases
@@ -10,13 +11,15 @@ class BaseDatabase:
     def info(self):
         return f'Information about database{self.database_name}'
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve data from database.
+
         Args:
-            inputs (dict): Parsed input values from frontend
+            inputs (dict[str, Any]): Parsed retrieval inputs from the frontend.
+
         Returns:
-            dict: Standardized database payload:
+            dict[str, Any]: Standardized database payload:
                 {
                     "source": str,
                     "queries": dict,
@@ -24,4 +27,3 @@ class BaseDatabase:
                 }
         """
         raise NotImplementedError("Subclasses must implement retrieve()")
-

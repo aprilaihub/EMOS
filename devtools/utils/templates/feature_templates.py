@@ -330,6 +330,37 @@ class {class_name}Feature extends BaseFeature {{
         `;
     }}
 
+    async cancelProcessing() {{
+        if (!this.isProcessing) return;
+
+        this._cancelled = true;
+
+        const cancelBtn = document.getElementById(`cancelBtn_${{this.featureId}}`);
+        if (cancelBtn) {{
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = 'Cancelling...';
+        }}
+
+        this.addLog('Requesting cancellation...', 'warning');
+
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
+        try {{
+            const resp = await fetch(`${{backendUrl}}/api/process/${{this.featureId}}/cancel`, {{
+                method: 'POST',
+                headers: {{ 'Content-Type': 'application/json' }},
+            }});
+
+            if (resp.ok) {{
+                const data = await resp.json();
+                this.addLog(`Backend: ${{data.message || 'cancel acknowledged'}}`, 'info');
+            }} else {{
+                this.addLog(`Backend cancel returned HTTP ${{resp.status}}`, 'warning');
+            }}
+        }} catch (err) {{
+            this.addLog(`Cancel request failed: ${{err.message}}`, 'error');
+        }}
+    }}
+
     async processFeature() {{
         // Placeholder processing logic for {feature_name}
         return {{

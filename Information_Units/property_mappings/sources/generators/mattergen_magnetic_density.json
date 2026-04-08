@@ -1,0 +1,12 @@
+{
+  "description": "Source-specific mappings for mattergen_magnetic_density (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_magnetic_density",
+  "properties": {
+    "mag_density": {
+      "name": "dft_mag_density",
+      "range_support": false
+    }
+  }
+}

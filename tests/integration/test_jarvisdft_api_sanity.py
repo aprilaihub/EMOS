@@ -91,7 +91,7 @@ def test_jarvisdft_retrieve_structures(
 
     # Retrieve CIF files through database
     db = JarvisdftDatabase()
-    retrieve_params = {'query': query, 'limit': 3}
+    retrieve_params = {'target_compositions': query, 'batch_size': 3}
     retrieve_params.update(filters)
     payload = db.retrieve(retrieve_params)
     assert isinstance(payload, dict)
@@ -143,7 +143,7 @@ def test_jarvisdft_retrieve_performance(benchmark, limit):
     db = JarvisdftDatabase()
 
     # Measure time to retrieve structures
-    result = benchmark(db.retrieve, {'query': 'Si', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Si', 'batch_size': limit})
 
     # Verify results are valid
     assert isinstance(result, dict)

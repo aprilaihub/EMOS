@@ -1,0 +1,36 @@
+{
+  "description": "Source-specific mappings for cod (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "cod",
+  "properties": {
+    "chemical_formula_descriptive": {
+      "name": "chemical_formula_descriptive",
+      "retrievable": true
+    },
+    "elements": {
+      "name": "elements",
+      "retrievable": true
+    },
+    "id": {
+      "name": "id",
+      "retrievable": true
+    },
+    "last_modified": {
+      "name": "last_modified",
+      "retrievable": true
+    },
+    "nelements": {
+      "name": "nelements",
+      "retrievable": true
+    },
+    "nperiodic_dimensions": {
+      "name": "nperiodic_dimensions",
+      "retrievable": true
+    },
+    "type": {
+      "name": "type",
+      "retrievable": true
+    }
+  }
+}

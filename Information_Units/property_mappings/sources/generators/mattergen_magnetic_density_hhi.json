@@ -1,0 +1,16 @@
+{
+  "description": "Source-specific mappings for mattergen_magnetic_density_hhi (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_magnetic_density_hhi",
+  "properties": {
+    "hhi_score": {
+      "name": "hhi_score",
+      "range_support": false
+    },
+    "mag_density": {
+      "name": "dft_mag_density",
+      "range_support": false
+    }
+  }
+}

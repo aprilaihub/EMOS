@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Cod.CodAPIHelper import CodAPIHelper
 
@@ -15,27 +16,27 @@ class CodDatabase(BaseDatabase):
     def info(self):
         return "COD: Crystallography Open Database (via OPTIMADE)"
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from COD using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Fe', 'Al2O3')
-                - limit: Max number of results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Fe', 'Al2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
                   
                 Example:
                   db.retrieve({
-                      'query': 'Fe',
-                      'limit': 5,
+                      'target_compositions': 'Fe',
+                      'batch_size': 5,
                       'natoms': [1, 10],
                       'volume': [20, 100],
                       'spacegroup_number': 225
                   })
 
         Returns:
-            dict: {"source": "cod", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "cod", "queries": dict, "cif_strings": list[str]}
         """
         queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
         result = {
@@ -44,12 +45,15 @@ class CodDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
+            query = inputs.get('target_compositions', '')
             # Default limit of 10 is the page size limit provided by the COD OPTIMADE API
-            limit = inputs.get('limit', 10)
+            limit = inputs.get('batch_size', 10)
 
-            # Extract filters: all keys except 'query' and 'limit'
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            # Extract filters: all keys except 'target_compositions' and 'batch_size'
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

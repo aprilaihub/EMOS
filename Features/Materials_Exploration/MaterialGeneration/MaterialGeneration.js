@@ -10,7 +10,7 @@ class MaterialGenerationFeature extends BaseFeature {
     }
 
     createInputsHTML() {
-        // Build input sections from property_mappings.json for every
+        // Build input sections from modular property mappings for every
         // checked generator.  The cache is pre-loaded by script.js
         // before createFeatureHTML() is called.
         const mappings = _propertyMappingsCache || { properties: {} };

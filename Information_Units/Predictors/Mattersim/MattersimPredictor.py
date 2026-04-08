@@ -71,16 +71,29 @@ class MattersimPredictor(BasePredictor):
                 f"(container unreachable: {exc})"
             )
 
-    def predict(self, input_data, **options) -> Dict[str, Any]:
+    def predict(self, input_data: list[str], **options: Any) -> Dict[str, Any]:
         """
         Predict material properties by calling the MatterSim container.
 
         Args:
             input_data (list[str]): CIF strings.
-            **options: Optional calculation parameters (compute/relax flags, output_dir).
+            **options (Any): Optional calculation parameters
+                (compute/relax flags, output_dir).
 
         Returns:
-            dict: ``{"source": "mattersim", "results": [...]}``
+            Dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": "mattersim",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": str,
+                            "properties": dict[str, Any],
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         """
         if self.logger:
             self.logger.log("MatterSim: sending prediction request to container", "info")

@@ -507,7 +507,7 @@ class GbfsPredictor(BasePredictor):
             f"is_metal (classification), mob_n (cm²/V·s), mob_p (cm²/V·s)."
         )
 
-    def predict(self, inputs) -> dict:  # type: ignore
+    def predict(self, inputs: list[str]) -> dict[str, Any]:
         """
         Predict properties from crystal structure data.
         
@@ -528,10 +528,26 @@ class GbfsPredictor(BasePredictor):
         8. Apply inverse log10 transformation for mobility predictions
         
         Args:
-            inputs: list[str]
+            inputs (list[str]): CIF string inputs.
                 
         Returns:
-            dict: standardized predictor envelope
+            dict[str, Any]: Prediction payload with shape:
+                {
+                    "source": "gbfs",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": "ok" | "error",
+                            "properties": {
+                                "property": str,
+                                "prediction": list[float],
+                                "probabilities": list[list[float]] (optional)
+                            },
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         """
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')

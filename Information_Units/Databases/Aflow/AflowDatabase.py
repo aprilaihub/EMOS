@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 
 from Information_Units.Databases.Aflow.AflowAPIHelper import AflowAPIHelper
 from Information_Units.Databases.BaseDatabase import BaseDatabase
@@ -19,8 +20,17 @@ class AflowDatabase(BaseDatabase):
             "with electronic, mechanical, and thermal properties"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
-        """Retrieve materials from AFLOW via AFLUX as CIF strings."""
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Retrieve materials from AFLOW via AFLUX as CIF strings.
+
+        Args:
+            inputs (dict[str, Any]): Query parameters, including optional
+                ``target_compositions``, ``batch_size``, and property filters.
+
+        Returns:
+            dict[str, Any]: {"source": "aflow", "queries": dict, "cif_strings": list[str]}.
+        """
         queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
         result = {
             "source": "aflow",
@@ -28,12 +38,15 @@ class AflowDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = int(inputs.get('limit', 10))
+            query = inputs.get('target_compositions', '')
+            limit = int(inputs.get('batch_size', 10))
             if limit <= 0:
                 return result
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:

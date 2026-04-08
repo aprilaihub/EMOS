@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Jarvisdft.JarvisdftAPIHelper import JarvisdftAPIHelper
 
@@ -18,14 +19,14 @@ class JarvisdftDatabase(BaseDatabase):
             "electronic, optical, thermoelectric, and solar cell properties"
         )
 
-    def retrieve(self, inputs: dict) -> dict:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Retrieve materials from JARVIS-DFT using OPTIMADE API as CIF strings.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Si', 'Fe2O3')
-                - limit: Max number of results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Si', 'Fe2O3')
+                - batch_size: Max number of results (default: 10)
                 - Additional keys are treated as standard property filters
 
                 **Properties**:
@@ -56,7 +57,7 @@ class JarvisdftDatabase(BaseDatabase):
                 - avg_hole_mass (mₑ): Average hole mass [min, max]
 
         Returns:
-            dict: {"source": "jarvisdft", "queries": dict, "cif_strings": list[str]}
+            dict[str, Any]: {"source": "jarvisdft", "queries": dict, "cif_strings": list[str]}
         """
         queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
         result = {
@@ -65,10 +66,13 @@ class JarvisdftDatabase(BaseDatabase):
             "cif_strings": [],
         }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.api_helper.map_properties(properties) if properties else {}
 
             if self.logger:
