@@ -1,0 +1,16 @@
+{
+  "description": "Source-specific mappings for mattergen_chemical_system_stability (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_chemical_system_stability",
+  "properties": {
+    "chemical_system": {
+      "name": "chemical_system",
+      "range_support": false
+    },
+    "hull_distance": {
+      "name": "energy_above_hull",
+      "range_support": false
+    }
+  }
+}

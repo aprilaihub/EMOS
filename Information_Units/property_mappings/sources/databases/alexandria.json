@@ -1,0 +1,181 @@
+{
+  "description": "Source-specific mappings for alexandria (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "alexandria",
+  "properties": {
+    "band_gap": {
+      "name": "_alexandria_band_gap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap_direct": {
+      "name": "_alexandria_band_gap_direct",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap_direct_scan": {
+      "name": "_alexandria_scan_band_gap_direct",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap_scan": {
+      "name": "_alexandria_scan_band_gap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "charges": {
+      "name": "_alexandria_charges",
+      "retrievable": true,
+      "range_support": true
+    },
+    "charges_scan": {
+      "name": "_alexandria_scan_charges",
+      "retrievable": true,
+      "range_support": true
+    },
+    "chemical_formula_descriptive": {
+      "name": "chemical_formula_descriptive",
+      "retrievable": true
+    },
+    "decomposition": {
+      "name": "_alexandria_decomposition",
+      "retrievable": true,
+      "range_support": false
+    },
+    "decomposition_scan": {
+      "name": "_alexandria_scan_decomposition",
+      "retrievable": true,
+      "range_support": false
+    },
+    "dos_ef": {
+      "name": "_alexandria_dos_ef",
+      "retrievable": true,
+      "range_support": true
+    },
+    "dos_ef_scan": {
+      "name": "_alexandria_scan_dos_ef",
+      "retrievable": true,
+      "range_support": true
+    },
+    "elements": {
+      "name": "elements",
+      "retrievable": true
+    },
+    "energy": {
+      "name": "_alexandria_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_corrected": {
+      "name": "_alexandria_energy_corrected",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_corrected_scan": {
+      "name": "_alexandria_scan_energy_corrected",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_scan": {
+      "name": "_alexandria_scan_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "forces": {
+      "name": "_alexandria_forces",
+      "retrievable": true,
+      "range_support": true
+    },
+    "forces_scan": {
+      "name": "_alexandria_scan_forces",
+      "retrievable": true,
+      "range_support": true
+    },
+    "formation_energy_per_atom": {
+      "name": "_alexandria_formation_energy_per_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "formation_energy_per_atom_scan": {
+      "name": "_alexandria_scan_formation_energy_per_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "hull_distance": {
+      "name": "_alexandria_hull_distance",
+      "retrievable": true,
+      "range_support": true
+    },
+    "hull_distance_scan": {
+      "name": "_alexandria_scan_hull_distance",
+      "retrievable": true,
+      "range_support": true
+    },
+    "id": {
+      "name": "id",
+      "retrievable": true
+    },
+    "last_modified": {
+      "name": "last_modified",
+      "retrievable": true
+    },
+    "magnetic_moments": {
+      "name": "_alexandria_magnetic_moments",
+      "retrievable": true,
+      "range_support": true
+    },
+    "magnetic_moments_scan": {
+      "name": "_alexandria_scan_magnetic_moments",
+      "retrievable": true,
+      "range_support": true
+    },
+    "magnetization": {
+      "name": "_alexandria_magnetization",
+      "retrievable": true,
+      "range_support": true
+    },
+    "magnetization_scan": {
+      "name": "_alexandria_scan_magnetization",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nelements": {
+      "name": "nelements",
+      "retrievable": true
+    },
+    "nperiodic_dimensions": {
+      "name": "nperiodic_dimensions",
+      "retrievable": true
+    },
+    "phase_separation_energy": {
+      "name": "_alexandria_phase_separation_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "phase_separation_energy_scan": {
+      "name": "_alexandria_scan_phase_separation_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "space_group": {
+      "name": "_alexandria_space_group",
+      "retrievable": true,
+      "range_support": true
+    },
+    "stress_tensor": {
+      "name": "_alexandria_stress_tensor",
+      "retrievable": true,
+      "range_support": true
+    },
+    "type": {
+      "name": "type",
+      "retrievable": true
+    },
+    "xc_functional": {
+      "name": "_alexandria_xc_functional",
+      "retrievable": true,
+      "range_support": false
+    }
+  }
+}

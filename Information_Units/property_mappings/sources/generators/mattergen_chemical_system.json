@@ -1,0 +1,12 @@
+{
+  "description": "Source-specific mappings for mattergen_chemical_system (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_chemical_system",
+  "properties": {
+    "chemical_system": {
+      "name": "chemical_system",
+      "range_support": false
+    }
+  }
+}

@@ -12,7 +12,7 @@ This EMOS integration uses **AFLUX** (not OPTIMADE) for retrieval, then download
 - **Backend API**: AFLUX (`https://aflow.org/API/aflux/`)
 - **Data scope**: Electronic, structural, thermodynamic, and mechanical metadata
 - **Output**: Local CIF files (same EMOS behavior as other database units)
-- **Filtering**: Uses EMOS standard property names mapped via `property_mappings.json`
+- **Filtering**: Uses EMOS standard property names mapped via modular files in `property_mappings/`
 
 ## Key Methods
 

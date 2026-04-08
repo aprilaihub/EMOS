@@ -1,0 +1,12 @@
+{
+  "description": "Source-specific mappings for mattergen_dft_band_gap (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_dft_band_gap",
+  "properties": {
+    "band_gap_direct": {
+      "name": "dft_band_gap",
+      "range_support": false
+    }
+  }
+}

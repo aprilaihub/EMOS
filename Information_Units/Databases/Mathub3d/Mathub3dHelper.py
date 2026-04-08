@@ -4,6 +4,7 @@ import os
 import json
 import zipfile
 from pymatgen.core import Structure, Composition
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class Mathub3dHelper:
@@ -16,17 +17,11 @@ class Mathub3dHelper:
         self.property_mapping = self._load_property_mapping()
 
     def _load_property_mapping(self) -> dict:
-        """Load mathub3d property mapping from property_mappings.json."""
+        """Load MatHub-3d property mapping from modular property files."""
         try:
-            mapping_file = os.path.join(
-                os.path.dirname(__file__), '..', '..', 'property_mappings.json'
-            )
-            with open(mapping_file, 'r') as f:
-                data = json.load(f)
-
             mapping = {}
-            for prop_name, prop_details in data.get('properties', {}).items():
-                mathub3d_info = prop_details.get('mathub3d', {})
+            source_mapping = load_source_property_mapping(source='mathub3d', source_type='databases')
+            for prop_name, mathub3d_info in source_mapping.items():
                 if mathub3d_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': mathub3d_info.get('name'),

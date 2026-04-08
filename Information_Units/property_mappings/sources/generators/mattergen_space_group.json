@@ -1,0 +1,12 @@
+{
+  "description": "Source-specific mappings for mattergen_space_group (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_space_group",
+  "properties": {
+    "space_group": {
+      "name": "space_group",
+      "range_support": false
+    }
+  }
+}

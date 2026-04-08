@@ -1,0 +1,38 @@
+{
+  "description": "Source-specific mappings for gbfs (predictors).",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "gbfs",
+  "properties": {
+    "band_gap_gbfs": {
+      "name": "bandgap",
+      "predictable": true,
+      "range_support": true
+    },
+    "dielectric_constant_gbfs": {
+      "name": "dielectric",
+      "predictable": true,
+      "range_support": true
+    },
+    "electron_mobility_gbfs": {
+      "name": "mob_n",
+      "predictable": true,
+      "range_support": true
+    },
+    "formation_energy_gbfs": {
+      "name": "e_form",
+      "predictable": true,
+      "range_support": true
+    },
+    "hole_mobility_gbfs": {
+      "name": "mob_p",
+      "predictable": true,
+      "range_support": true
+    },
+    "is_metal_gbfs": {
+      "name": "is_metal",
+      "predictable": true,
+      "range_support": false
+    }
+  }
+}
