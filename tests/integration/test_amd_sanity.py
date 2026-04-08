@@ -73,18 +73,20 @@ def test_info_returns_string(amd_predictor):
 @pytest.mark.integration
 def test_predict_valid_input_returns_json_string(cif_files, amd_predictor):
     """Valid input produces JSON string output."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = amd_predictor.predict(inputs)
     
     assert isinstance(result, str)
     parsed = json.loads(result)
     assert isinstance(parsed, dict)
+    assert "source" in parsed
+    assert "results" in parsed
 
 
 @pytest.mark.integration
 def test_predict_output_is_json_serializable(cif_files, amd_predictor):
     """Prediction output can be serialized and deserialized."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = amd_predictor.predict(inputs)
     
     # Parse JSON
@@ -98,13 +100,14 @@ def test_predict_output_is_json_serializable(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_predict_invalid_input_raises_error(cif_files, amd_predictor):
     """Invalid input (missing file) returns error JSON."""
-    inputs = {'cif_paths': [cif_files['invalid_path'], cif_files['al2o3_path']]}
+    inputs = {'input_data': [cif_files['invalid_path'], cif_files['al2o3_path']]}
     
     result_json = amd_predictor.predict(inputs)
     result = json.loads(result_json)
     
-    # Should return error JSON
-    assert "error" in result
+    # Should return error JSON with standardized format
+    assert result["results"][0]["status"] == "failed"
+    assert result["results"][0]["error"] is not None
 
 
 # ============================================================================
@@ -114,11 +117,11 @@ def test_predict_invalid_input_raises_error(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_identical_crystals_have_zero_distance(cif_files, amd_predictor):
     """Identical crystals (same file compared to itself) have near-zero distance."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    pair = result["pairwise_distances"][0]
-    assert "error" not in pair
+    assert result["results"][0]["status"] == "success"
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
     
     # Identical structures should have very close to zero distance
     assert pair["pdd_emd_distance"] < 0.01, \
@@ -129,11 +132,11 @@ def test_identical_crystals_have_zero_distance(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_different_crystals_have_nonzero_distance(cif_files, amd_predictor):
     """Different crystals (Al2O3 vs SiO2) have significant distance."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    pair = result["pairwise_distances"][0]
-    assert "error" not in pair
+    assert result["results"][0]["status"] == "success"
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
     
     # Different structures should have larger distance
     assert pair["pdd_emd_distance"] > 0.01, \
@@ -144,33 +147,33 @@ def test_different_crystals_have_nonzero_distance(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_pdd_distance_nonnegative(cif_files, amd_predictor):
     """PDD/EMD distances are always non-negative."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    for pair in result["pairwise_distances"]:
-        if "error" not in pair:
+    if result["results"][0]["status"] == "success":
+        for pair in result["results"][0]["properties"]["pairwise_distances"]:
             assert pair["pdd_emd_distance"] >= 0.0
 
 
 @pytest.mark.integration
 def test_amd_distance_nonnegative(cif_files, amd_predictor):
     """AMD distances are always non-negative."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    for pair in result["pairwise_distances"]:
-        if "error" not in pair:
+    if result["results"][0]["status"] == "success":
+        for pair in result["results"][0]["properties"]["pairwise_distances"]:
             assert pair["amd_distance"] >= 0.0
 
 
 @pytest.mark.integration
 def test_distance_is_finite(cif_files, amd_predictor):
     """Calculated distances are finite (not NaN or Inf)."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    for pair in result["pairwise_distances"]:
-        if "error" not in pair:
+    if result["results"][0]["status"] == "success":
+        for pair in result["results"][0]["properties"]["pairwise_distances"]:
             assert np.isfinite(pair["pdd_emd_distance"])
             assert np.isfinite(pair["amd_distance"])
 
@@ -178,17 +181,32 @@ def test_distance_is_finite(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_results_include_all_required_fields(cif_files, amd_predictor):
     """Prediction results include all expected fields."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    # Top-level fields
-    assert "pairwise_distances" in result
-    assert "crystal_info" in result
-    assert "parameters" in result
-    assert "n_comparisons" in result
+    # Top-level standardized fields
+    assert "source" in result
+    assert "results" in result
+    assert isinstance(result["results"], list)
+    assert len(result["results"]) > 0
+    
+    # First result object
+    result_obj = result["results"][0]
+    assert "index" in result_obj
+    assert "status" in result_obj
+    assert "properties" in result_obj
+    assert "warnings" in result_obj
+    assert "error" in result_obj
+    
+    # Properties should have pairwise distances, crystal info, etc.
+    props = result_obj["properties"]
+    assert "pairwise_distances" in props
+    assert "crystal_info" in props
+    assert "parameters" in props
+    assert "n_comparisons" in props
     
     # Pairwise distance fields
-    pair = result["pairwise_distances"][0]
+    pair = props["pairwise_distances"][0]
     assert "crystal_1_index" in pair
     assert "crystal_2_index" in pair
     assert "crystal_1_file" in pair
@@ -197,7 +215,7 @@ def test_results_include_all_required_fields(cif_files, amd_predictor):
     assert "amd_distance" in pair
     
     # Parameters fields
-    params = result["parameters"]
+    params = props["parameters"]
     assert "k" in params
     assert "metric" in params
     assert "n_crystals" in params
@@ -207,10 +225,11 @@ def test_results_include_all_required_fields(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_crystal_info_fields_populated(cif_files, amd_predictor):
     """Crystal info fields are properly populated."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    for info in result["crystal_info"]:
+    crystal_info = result["results"][0]["properties"]["crystal_info"]
+    for info in crystal_info:
         assert "name" in info
         assert "n_atoms" in info
         assert "n_asym" in info
@@ -230,10 +249,10 @@ def test_parameters_match_predictor_config(cif_files):
     metric_value = "chebyshev"
     predictor = AMDPredictor(predictor_name="param_test", k=k_value, metric=metric_value)
     
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(predictor.predict(inputs))
     
-    params = result["parameters"]
+    params = result["results"][0]["properties"]["parameters"]
     assert params["k"] == k_value
     assert params["metric"] == metric_value
 
@@ -245,33 +264,34 @@ def test_parameters_match_predictor_config(cif_files):
 @pytest.mark.integration
 def test_repeated_predictions_identical(cif_files, amd_predictor):
     """Running the same prediction twice gives identical results."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     
     result1 = json.loads(amd_predictor.predict(inputs))
     result2 = json.loads(amd_predictor.predict(inputs))
     
     # Compare all pairwise distances
-    for p1, p2 in zip(result1["pairwise_distances"], result2["pairwise_distances"]):
-        if "error" not in p1 and "error" not in p2:
-            # Should be exactly equal for deterministic calculations
-            assert abs(p1["pdd_emd_distance"] - p2["pdd_emd_distance"]) < 1e-10
-            assert abs(p1["amd_distance"] - p2["amd_distance"]) < 1e-10
+    pairs1 = result1["results"][0]["properties"]["pairwise_distances"]
+    pairs2 = result2["results"][0]["properties"]["pairwise_distances"]
+    for p1, p2 in zip(pairs1, pairs2):
+        # Should be exactly equal for deterministic calculations
+        assert abs(p1["pdd_emd_distance"] - p2["pdd_emd_distance"]) < 1e-10
+        assert abs(p1["amd_distance"] - p2["amd_distance"]) < 1e-10
 
 
 @pytest.mark.integration
 def test_prediction_order_independence(cif_files, amd_predictor):
     """Prediction is order-independent for symmetric comparisons."""
     # First order: Al2O3 -> SiO2
-    inputs1 = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs1 = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result1 = json.loads(amd_predictor.predict(inputs1))
     
     # Second order: SiO2 -> Al2O3
-    inputs2 = {'cif_paths': [cif_files['sio2_path'], cif_files['al2o3_path']]}
+    inputs2 = {'input_data': [cif_files['sio2_path'], cif_files['al2o3_path']]}
     result2 = json.loads(amd_predictor.predict(inputs2))
     
     # Distances should be found in the results
-    dist1 = result1["pairwise_distances"][0]["pdd_emd_distance"]
-    dist2 = result2["pairwise_distances"][0]["pdd_emd_distance"]
+    dist1 = result1["results"][0]["properties"]["pairwise_distances"][0]["pdd_emd_distance"]
+    dist2 = result2["results"][0]["properties"]["pairwise_distances"][0]["pdd_emd_distance"]
     
     # Same comparison should give same result
     assert abs(dist1 - dist2) < 1e-10
@@ -281,28 +301,32 @@ def test_prediction_order_independence(cif_files, amd_predictor):
 # Multiple File Handling Tests
 # ============================================================================
 
+# ============================================================================
+# Multiple File Handling Tests
+# ============================================================================
+
 @pytest.mark.integration
-def test_predict_with_dict_cif_path1_path2(cif_files, amd_predictor):
-    """predict() works with dict containing cif_path1 and cif_path2."""
+def test_predict_with_input_data_list(cif_files, amd_predictor):
+    """predict() works with standard input_data list format."""
     inputs = {
-        'cif_path1': cif_files['al2o3_path'],
-        'cif_path2': cif_files['sio2_path']
+        'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]
     }
     result = json.loads(amd_predictor.predict(inputs))
     
-    assert "pairwise_distances" in result
-    assert result["n_comparisons"] > 0
+    assert result["results"][0]["properties"]["pairwise_distances"] is not None
+    assert result["results"][0]["properties"]["n_comparisons"] > 0
 
 
 @pytest.mark.integration
-def test_predict_with_string_requires_two_files(cif_files, amd_predictor):
-    """predict() with single string path should fail (needs 2+ files)."""
+def test_predict_requires_dict_input(cif_files, amd_predictor):
+    """predict() requires dict input with input_data key."""
+    # Passing string directly should fail
     result_json = amd_predictor.predict(cif_files['al2o3_path'])
     result = json.loads(result_json)
     
-    # Should return error JSON
-    assert "error" in result
-    assert "requires at least 2" in result["error"]
+    # Should return error
+    assert result["results"][0]["status"] == "failed"
+    assert "dictionary" in result["results"][0]["error"] or "input_data" in result["results"][0]["error"]
 
 
 # ============================================================================
@@ -312,10 +336,10 @@ def test_predict_with_string_requires_two_files(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_pdd_emd_and_amd_both_present(cif_files, amd_predictor):
     """Both PDD/EMD and AMD distances are calculated."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    pair = result["pairwise_distances"][0]
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
     assert "pdd_emd_distance" in pair
     assert "amd_distance" in pair
     
@@ -327,10 +351,10 @@ def test_pdd_emd_and_amd_both_present(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_similarity_flags_set_correctly(cif_files, amd_predictor):
     """Similarity flags (identical, very_similar, similar) are set correctly."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    pair = result["pairwise_distances"][0]
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
     
     # Should have the flags
     assert "identical" in pair
@@ -349,10 +373,10 @@ def test_similarity_flags_set_correctly(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_identical_crystals_flagged_correctly(cif_files, amd_predictor):
     """Identical crystals are correctly flagged."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    pair = result["pairwise_distances"][0]
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
     assert pair["identical"] == True
 
 
@@ -364,24 +388,24 @@ def test_identical_crystals_flagged_correctly(cif_files, amd_predictor):
 def test_small_k_sensitivity(cif_files):
     """Small k values are still meaningful."""
     predictor = AMDPredictor(predictor_name="k_test_small", k=5)
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(predictor.predict(inputs))
     
-    assert result["parameters"]["k"] == 5
-    pair = result["pairwise_distances"][0]
-    assert "error" not in pair
+    assert result["results"][0]["properties"]["parameters"]["k"] == 5
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
+    assert pair["pdd_emd_distance"] >= 0.0
 
 
 @pytest.mark.integration
 def test_large_k_sensitivity(cif_files):
     """Large k values capture broader crystal neighborhoods."""
     predictor = AMDPredictor(predictor_name="k_test_large", k=200)
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(predictor.predict(inputs))
     
-    assert result["parameters"]["k"] == 200
-    pair = result["pairwise_distances"][0]
-    assert "error" not in pair
+    assert result["results"][0]["properties"]["parameters"]["k"] == 200
+    pair = result["results"][0]["properties"]["pairwise_distances"][0]
+    assert pair["pdd_emd_distance"] >= 0.0
 
 
 # ============================================================================
@@ -391,13 +415,14 @@ def test_large_k_sensitivity(cif_files):
 @pytest.mark.integration
 def test_predict_invalid_file_graceful_error(cif_files, amd_predictor):
     """predict() handles invalid file gracefully."""
-    inputs = {'cif_paths': [cif_files['invalid_path'], cif_files['al2o3_path']]}
+    inputs = {'input_data': [cif_files['invalid_path'], cif_files['al2o3_path']]}
     
     result_json = amd_predictor.predict(inputs)
     result = json.loads(result_json)
     
-    # Should return error JSON
-    assert "error" in result
+    # Should return error JSON with standardized format
+    assert result["results"][0]["status"] == "failed"
+    assert result["results"][0]["error"] is not None
 
 
 # ============================================================================
@@ -412,18 +437,21 @@ def test_zno_isomer_comparison_integration(cif_files, amd_predictor):
     structurally similar but not identical materials. Both samples are wurtzite ZnO
     but have different lattice parameters (a: 3.237 vs 3.205, c: 5.222 vs 5.517).
     """
-    inputs = {'cif_paths': [cif_files['zno1_path'], cif_files['zno2_path']]}
+    inputs = {'input_data': [cif_files['zno1_path'], cif_files['zno2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    # Validate result structure
-    assert "pairwise_distances" in result
-    assert result["n_comparisons"] > 0
+    assert result["results"][0]["status"] == "success"
+    props = result["results"][0]["properties"]
     
-    pair = result["pairwise_distances"][0]
+    # Validate result structure
+    assert "pairwise_distances" in props
+    assert props["n_comparisons"] > 0
+    
+    pair = props["pairwise_distances"][0]
     
     # Both should be recognized as zinc oxide materials
-    zno1_comp = result["crystal_info"][0]["composition"]
-    zno2_comp = result["crystal_info"][1]["composition"]
+    zno1_comp = props["crystal_info"][0]["composition"]
+    zno2_comp = props["crystal_info"][1]["composition"]
     assert "Zn" in zno1_comp and "O" in zno1_comp
     assert "Zn" in zno2_comp and "O" in zno2_comp
     
@@ -446,38 +474,44 @@ def test_zno_isomer_comparison_integration(cif_files, amd_predictor):
 @pytest.mark.integration
 def test_complete_workflow_two_materials(cif_files, amd_predictor):
     """Complete workflow: load, compare, analyze."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['sio2_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['sio2_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    # Verify all parts work together
-    assert result["n_comparisons"] == 1
-    assert len(result["crystal_info"]) == 2
+    assert result["results"][0]["status"] == "success"
+    props = result["results"][0]["properties"]
     
-    pair = result["pairwise_distances"][0]
+    # Verify all parts work together
+    assert props["n_comparisons"] == 1
+    assert len(props["crystal_info"]) == 2
+    
+    pair = props["pairwise_distances"][0]
     
     # Al2O3 and SiO2 are different materials
     assert pair["identical"] == False
     assert pair["pdd_emd_distance"] > 0.0
     
     # Crystal info should be populated
-    assert result["crystal_info"][0]["n_atoms"] > 0
-    assert result["crystal_info"][1]["n_atoms"] > 0
+    assert props["crystal_info"][0]["n_atoms"] > 0
+    assert props["crystal_info"][1]["n_atoms"] > 0
 
 
 @pytest.mark.integration
 def test_complete_workflow_identical_material(cif_files, amd_predictor):
     """Complete workflow with identical material."""
-    inputs = {'cif_paths': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
+    inputs = {'input_data': [cif_files['al2o3_path'], cif_files['al2o3_path']]}
     result = json.loads(amd_predictor.predict(inputs))
     
-    # Verify all parts work together
-    assert result["n_comparisons"] == 1
+    assert result["results"][0]["status"] == "success"
+    props = result["results"][0]["properties"]
     
-    pair = result["pairwise_distances"][0]
+    # Verify all parts work together
+    assert props["n_comparisons"] == 1
+    
+    pair = props["pairwise_distances"][0]
     
     # Al2O3 compared to itself
     assert pair["identical"] == True
     assert pair["pdd_emd_distance"] < 0.01
     
     # Both should be the same crystal
-    assert result["crystal_info"][0]["composition"] == result["crystal_info"][1]["composition"]
+    assert props["crystal_info"][0]["composition"] == props["crystal_info"][1]["composition"]

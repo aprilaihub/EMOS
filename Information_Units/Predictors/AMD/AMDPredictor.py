@@ -212,94 +212,137 @@ class AMDPredictor(BasePredictor):
             f"Uses: PDD/EMD and AMD distance calculations"
         )
     
-    def predict(self, inputs: Union[str, Dict[str, Any]]) -> str:
+    def predict(self, inputs: Dict[str, Any]) -> str:
         """
         Compare crystal structures and return similarity metrics.
         
-        Supports flexible input formats:
-        - str: path to a single CIF file (will be compared with itself)
-        - dict with 'cif_paths': list of paths to CIF files
-        - dict with 'cif_path1', 'cif_path2': two CIF file paths
-        - dict with 'input_data': dict containing CIF paths
-        
-        Returns a JSON string with:
-        - pairwise_distances: List of distances between crystal pairs
-        - crystal_info: Metadata about each crystal
-        - parameters: AMD calculation parameters used
+        Follows the standardized predictor I/O contract:
+        Input: {"input_data": [list of CIF file paths], "k": int (optional), "metric": str (optional)}
+        Output: JSON string with standardized structure:
+        {
+            "source": "AMD",
+            "results": [
+                {
+                    "index": int,
+                    "status": "success" | "failed",
+                    "properties": dict with pairwise_distances and crystal_info,
+                    "warnings": list of strings,
+                    "error": null | error message string
+                },
+                ...
+            ]
+        }
         
         Args:
-            inputs: Input specification (see above)
+            inputs: Dict with required key 'input_data' (list of CIF file paths)
+                   Optional keys: 'k' (int), 'metric' (str)
             
         Returns:
-            str: JSON string with comparison results
+            str: JSON string with standardized predictor output
             
         Raises:
-            ValueError: If inputs are invalid or insufficient
+            ValueError: If input format is invalid
             FileNotFoundError: If CIF files don't exist
         """
         if self.logger:
             self.logger.log(f"Running AMD prediction", 'info')
         
+        results_list = []
+        
         try:
-            # Extract CIF file paths from inputs
-            cif_paths = self._extract_cif_paths(inputs)
+            # Extract input_data
+            if not isinstance(inputs, dict):
+                raise ValueError("Inputs must be a dictionary with 'input_data' key")
             
-            if len(cif_paths) < 2:
+            input_data = inputs.get('input_data', [])
+            if not isinstance(input_data, list):
+                raise ValueError("'input_data' must be a list of CIF file paths")
+            
+            if len(input_data) < 2:
                 raise ValueError(
-                    f"AMD predictor requires at least 2 CIF files. Got {len(cif_paths)}"
+                    f"AMD predictor requires at least 2 CIF files. Got {len(input_data)}"
                 )
+            
+            # Extract optional parameters
+            k = inputs.get('k', self.k)
+            metric = inputs.get('metric', self.metric)
             
             # Load all crystals from CIF files
             all_crystals = []
-            crystal_sources = []  # Track which crystal came from which file
+            crystal_sources = []
+            warnings = []
             
-            for cif_path in cif_paths:
-                crystals = load_crystals_from_cif(cif_path)
-                for crystal in crystals:
-                    all_crystals.append(crystal)
-                    crystal_sources.append(cif_path)
+            for cif_path in input_data:
+                try:
+                    crystals = load_crystals_from_cif(cif_path)
+                    for crystal in crystals:
+                        all_crystals.append(crystal)
+                        crystal_sources.append(cif_path)
+                except Exception as e:
+                    warnings.append(f"Warning: Failed to load {cif_path}: {str(e)}")
             
             if len(all_crystals) < 2:
                 raise ValueError(
                     f"At least 2 crystal structures needed. Got {len(all_crystals)} "
-                    f"from {len(cif_paths)} file(s)"
+                    f"from {len(input_data)} file(s)"
                 )
             
             # Calculate distances between all pairs
-            results = self._calculate_pairwise_distances(all_crystals, crystal_sources)
+            pairwise_results = self._calculate_pairwise_distances(all_crystals, crystal_sources, k, metric)
             
             # Get crystal metadata
-            results['crystal_info'] = [get_crystal_info(c) for c in all_crystals]
-            results['parameters'] = {
-                'k': self.k,
-                'metric': self.metric,
-                'n_crystals': len(all_crystals),
-                'n_files': len(cif_paths)
-            }
+            crystal_info = [get_crystal_info(c) for c in all_crystals]
             
-            # Return as JSON string (following GBFS convention)
-            return json.dumps(results)
+            # Create standardized result format
+            result_dict = {
+                "index": 0,
+                "status": "success",
+                "properties": {
+                    "pairwise_distances": pairwise_results["pairwise_distances"],
+                    "crystal_info": crystal_info,
+                    "parameters": {
+                        "k": k,
+                        "metric": metric,
+                        "n_crystals": len(all_crystals),
+                        "n_files": len(input_data)
+                    },
+                    "n_comparisons": pairwise_results["n_comparisons"]
+                },
+                "warnings": warnings,
+                "error": None
+            }
+            results_list.append(result_dict)
             
         except Exception as e:
-            error_result = {
-                "error": str(e),
-                "predictor": self.predictor_name,
-                "status": "failed"
+            # Return error in standardized format
+            result_dict = {
+                "index": 0,
+                "status": "failed",
+                "properties": {},
+                "warnings": [],
+                "error": str(e)
             }
-            return json.dumps(error_result)
-    
-    def predict_numpy(self, inputs: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
-        """
-        Compare crystal structures and return similarity metrics as dict.
+            results_list.append(result_dict)
         
-        This is the numpy-compatible version that returns a dict instead of
-        JSON string, useful for programmatic access.
+        # Return standardized output
+        output = {
+            "source": self.predictor_name,
+            "results": results_list
+        }
+        return json.dumps(output)
+    
+    def predict_numpy(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compare crystal structures and return dict output (non-JSON).
+        
+        Useful for programmatic access within Python. Uses same I/O contract
+        as predict() but returns dict instead of JSON string.
         
         Args:
-            inputs: Input specification (see predict() docstring)
+            inputs: Dict with 'input_data' key (list of CIF file paths)
             
         Returns:
-            Dict with comparison results
+            Dict with standardized predictor output
             
         Raises:
             ValueError: If inputs are invalid
@@ -312,66 +355,29 @@ class AMDPredictor(BasePredictor):
     # Private Methods
     # ========================================================================
     
-    def _extract_cif_paths(self, inputs: Union[str, Dict[str, Any]]) -> List[str]:
-        """
-        Extract list of CIF file paths from flexible input formats.
-        
-        Args:
-            inputs: Input in various formats
-            
-        Returns:
-            List[str]: Paths to CIF files
-            
-        Raises:
-            ValueError: If no valid CIF paths found
-        """
-        paths = []
-        
-        if isinstance(inputs, str):
-            # Single file path
-            paths = [inputs]
-        elif isinstance(inputs, dict):
-            # Dictionary with CIF paths
-            if 'cif_paths' in inputs:
-                cif_paths = inputs['cif_paths']
-                if isinstance(cif_paths, list):
-                    paths = cif_paths
-                else:
-                    paths = [cif_paths]
-            elif 'cif_path' in inputs:
-                paths = [inputs['cif_path']]
-            elif 'cif_path1' in inputs and 'cif_path2' in inputs:
-                paths = [inputs['cif_path1'], inputs['cif_path2']]
-            elif 'input_data' in inputs:
-                data = inputs['input_data']
-                if isinstance(data, dict):
-                    if 'cif_paths' in data:
-                        cif_paths = data['cif_paths']
-                        paths = cif_paths if isinstance(cif_paths, list) else [cif_paths]
-                    elif 'cif_path' in data:
-                        paths = [data['cif_path']]
-            else:
-                raise ValueError("No CIF paths found in input dictionary")
-        else:
-            raise ValueError(f"Invalid input type: {type(inputs)}")
-        
-        if not paths:
-            raise ValueError("No CIF file paths provided")
-        
-        return paths
     
     def _calculate_pairwise_distances(self, crystals: List[amd.PeriodicSet],
-                                     crystal_sources: List[str]) -> Dict[str, Any]:
+                                     crystal_sources: List[str], 
+                                     k: int = None, 
+                                     metric: str = None) -> Dict[str, Any]:
         """
         Calculate pairwise distances between all crystal structures.
         
         Args:
             crystals: List of crystal structures
             crystal_sources: List of source file paths for each crystal
+            k: Number of atoms to consider (uses self.k if None)
+            metric: Distance metric to use (uses self.metric if None)
             
         Returns:
             Dict with pairwise distance results
         """
+        # Use provided k and metric, or fall back to instance defaults
+        if k is None:
+            k = self.k
+        if metric is None:
+            metric = self.metric
+            
         pairwise_distances = []
         
         n = len(crystals)
@@ -379,9 +385,9 @@ class AMDPredictor(BasePredictor):
             for j in range(i + 1, n):
                 try:
                     # Calculate both PDD/EMD and AMD distances
-                    pdd_distance = calculate_pdd_distance(crystals[i], crystals[j], self.k)
+                    pdd_distance = calculate_pdd_distance(crystals[i], crystals[j], k)
                     amd_distance = calculate_amd_distance(crystals[i], crystals[j], 
-                                                         self.k, self.metric)
+                                                         k, metric)
                     
                     pair_result = {
                         'crystal_1_index': i,
@@ -417,18 +423,10 @@ class AMDPredictor(BasePredictor):
 if FASTAPI_AVAILABLE:
     
     class PredictRequest(BaseModel):
-        """Request schema for AMD predictor API."""
-        cif_paths: Optional[List[str]] = Field(
-            None, 
+        """Request schema for AMD predictor API (standardized I/O contract)."""
+        input_data: List[str] = Field(
+            ...,
             description="List of CIF file paths to compare"
-        )
-        cif_path1: Optional[str] = Field(
-            None,
-            description="First CIF file path"
-        )
-        cif_path2: Optional[str] = Field(
-            None,
-            description="Second CIF file path"
         )
         k: int = Field(
             100,
@@ -442,7 +440,7 @@ if FASTAPI_AVAILABLE:
         class Config:
             schema_extra = {
                 "example": {
-                    "cif_paths": ["structure1.cif", "structure2.cif"],
+                    "input_data": ["structure1.cif", "structure2.cif"],
                     "k": 100,
                     "metric": "chebyshev"
                 }
@@ -481,37 +479,33 @@ if FASTAPI_AVAILABLE:
             """
             Compare crystal structures and return similarity metrics.
             
-            Accepts either:
-            - cif_paths: list of file paths
-            - cif_path1 and cif_path2: two individual file paths
+            Follows standardized EMOS predictor I/O contract.
+            
+            Args:
+                input_data: List of CIF file paths to compare (minimum 2)
+                k: Optional neighborhood size for descriptors (default: 100)
+                metric: Optional distance metric (default: chebyshev)
+            
+            Returns:
+                JSON with standardized predictor output format
             """
             try:
-                # Prepare inputs for predictor
-                if request.cif_paths:
-                    inputs = {
-                        'cif_paths': request.cif_paths,
-                        'k': request.k,
-                        'metric': request.metric
-                    }
-                elif request.cif_path1 and request.cif_path2:
-                    inputs = {
-                        'cif_path1': request.cif_path1,
-                        'cif_path2': request.cif_path2,
-                        'k': request.k,
-                        'metric': request.metric
-                    }
-                else:
-                    raise ValueError(
-                        "Must provide either 'cif_paths' or both 'cif_path1' and 'cif_path2'"
-                    )
+                inputs = {
+                    'input_data': request.input_data,
+                    'k': request.k,
+                    'metric': request.metric
+                }
                 
                 # Run prediction
                 result_json = amd_predictor.predict(inputs)
                 result = json.loads(result_json)
                 
-                # Check for errors in result
-                if "error" in result:
-                    raise HTTPException(status_code=400, detail=result["error"])
+                # Check for errors using standardized format
+                if result["results"][0]["status"] == "failed":
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"Prediction failed: {result['results'][0]['error']}"
+                    )
                 
                 return JSONResponse(content=result)
                 
