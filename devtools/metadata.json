@@ -169,6 +169,15 @@
         "folder_path": "Information_Units/Predictors/Gbfs",
         "class_name": "GbfsPredictor",
         "file_name": "GbfsPredictor.py"
+      },
+      {
+        "id": "gbfs_2d",
+        "name": "Gbfs2d",
+        "display_name": "GBFS-2D",
+        "description": "Pretrained GBFS workflow predictors specialized for 2D layered materials",
+        "folder_path": "Information_Units/Predictors/Gbfs2d",
+        "class_name": "Gbfs2dPredictor",
+        "file_name": "Gbfs2dPredictor.py"
       }
     ]
   },

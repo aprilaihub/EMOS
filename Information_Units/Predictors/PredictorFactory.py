@@ -7,7 +7,7 @@ predictor_factory = {
     "mattersim": MattersimPredictor,
     "synthnn": SynthnnPredictor,
     "gbfs": GbfsPredictor,
-    "gbfs-2d": Gbfs2dPredictor,
+    "gbfs_2d": Gbfs2dPredictor,
 }
 
 predictor_registry = {}
