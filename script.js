@@ -18,6 +18,31 @@ const iuFeatureModules = {
             file: './Features/IU_Features/Databases/AlexandriaIUFeature.js',
             id: 1001,
         },
+        mathub3d: {
+            className: 'Mathub3dIUFeature',
+            file: './Features/IU_Features/Databases/Mathub3dIUFeature.js',
+            id: 1002,
+        },
+        cod: {
+            className: 'CodIUFeature',
+            file: './Features/IU_Features/Databases/CodIUFeature.js',
+            id: 1003,
+        },
+        materialsproject: {
+            className: 'MaterialsprojectIUFeature',
+            file: './Features/IU_Features/Databases/MaterialsprojectIUFeature.js',
+            id: 1004,
+        },
+        jarvisdft: {
+            className: 'JarvisdftIUFeature',
+            file: './Features/IU_Features/Databases/JarvisdftIUFeature.js',
+            id: 1005,
+        },
+        aflow: {
+            className: 'AflowIUFeature',
+            file: './Features/IU_Features/Databases/AflowIUFeature.js',
+            id: 1006,
+        },
     },
 };
 
