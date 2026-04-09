@@ -208,6 +208,81 @@ def process_feature(feature_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/process/iu/<iu_type>/<iu_id>', methods=['POST', 'OPTIONS'])
+def process_information_unit(iu_type, iu_id):
+    """Execute a single Information Unit with predefined contract semantics."""
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        logger.clear_logs()
+        inputs = request.json or {}
+
+        if iu_type == 'database':
+            cls = database_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown database IU: {iu_id}'}), 404
+
+            # Reuse active instance if toggled on; otherwise instantiate transiently.
+            instance = database_registry.get(iu_id)
+            if instance is None:
+                instance = cls(iu_id, logger)
+
+            results = instance.retrieve(inputs)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        if iu_type == 'generator':
+            cls = generator_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown generator IU: {iu_id}'}), 404
+
+            instance = generator_registry.get(iu_id)
+            if instance is None:
+                instance = cls(iu_id, logger)
+
+            if not hasattr(instance, 'generate'):
+                return jsonify({'error': f'Generator IU {iu_id} does not expose generate()'}), 400
+
+            results = instance.generate(inputs)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        if iu_type == 'predictor':
+            cls = predictor_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown predictor IU: {iu_id}'}), 404
+
+            instance = predictor_registry.get(iu_id)
+            if instance is None:
+                instance = cls(iu_id, logger)
+
+            if not hasattr(instance, 'predict'):
+                return jsonify({'error': f'Predictor IU {iu_id} does not expose predict()'}), 400
+
+            results = instance.predict(inputs)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        return jsonify({'error': f'Unsupported iu_type: {iu_type}'}), 400
+
+    except Exception as e:
+        print(f"Error in process_information_unit ({iu_type}/{iu_id}): {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
 # ── Active feature instances for cancel support ─────────────────────
 # Keyed by feature_id (str), stores the feature object during streaming
 # so the cancel endpoint can call its cancel() method.

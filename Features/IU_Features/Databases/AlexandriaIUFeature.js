@@ -1,0 +1,388 @@
+// Alexandria IU Feature (feature-style UI for database Information Unit)
+class AlexandriaIUFeature extends BaseFeature {
+    constructor(featureId, iuMeta = {}) {
+        super(
+            featureId,
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'Alexandria IU Feature',
+            iuMeta.iuDesc || 'Run Alexandria database retrieval with predefined IU contracts.'
+        );
+        this.iuType = iuMeta.iuType || 'database';
+        this.iuId = iuMeta.iuId || 'alexandria';
+        this._abortController = null;
+        this._propertyDefs = [];
+        this._downloadUrl = null;
+    }
+
+    _toDisplayLabel(propertyKey) {
+        const tokenMap = {
+            dos: 'DOS',
+            ef: 'EF',
+            xc: 'XC',
+            id: 'ID',
+            scan: 'SCAN',
+        };
+
+        return String(propertyKey)
+            .split('_')
+            .map((token) => {
+                const lower = token.toLowerCase();
+                if (tokenMap[lower]) return tokenMap[lower];
+                return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+            })
+            .join(' ');
+    }
+
+    _formatLabelWithUnit(propertyName, unit) {
+        const displayName = this._toDisplayLabel(propertyName);
+        if (!unit) return displayName;
+        return `${displayName} (${unit})`;
+    }
+
+    createInputsHTML() {
+        return `
+            <div class="iu-input-scroll">
+                <div class="input-controls">
+                    <label>Batch Size
+                        <input type="number" id="batch_size_${this.featureId}" min="1" max="1000" step="1">
+                    </label>
+                    <label>Target Compositions
+                        <input type="text" id="target_compositions_${this.featureId}" placeholder="e.g., Fe, Al2O3, GaAs">
+                    </label>
+                </div>
+                <div class="input-controls" id="alexandriaPropertyFilters_${this.featureId}">
+                    <p>Loading property mappings...</p>
+                </div>
+            </div>
+        `;
+    }
+
+    createOutputsHTML() {
+        return `
+            <p>Alexandria IU outputs</p>
+            <div class="output-display" id="outputDisplay_${this.featureId}">
+                <div class="output-item" id="iuStructSelectorRow_${this.featureId}" style="display:none;">
+                    <strong>Structure:</strong>
+                    <select id="iuStructSelector_${this.featureId}"></select>
+                </div>
+
+                <div class="output-item" id="iuCifViewerRow_${this.featureId}" style="display:none;">
+                    <strong>Crystal Structure:</strong>
+                    <div id="iuStructureViewer_${this.featureId}" style="
+                        width:100%; height:400px; position:relative;
+                        background:#ffffff; border-radius:6px; margin-top:6px;
+                    "></div>
+                    <div style="margin-top:6px; text-align:right;">
+                        <button id="iuToggleCifBtn_${this.featureId}" class="btn-secondary" style="
+                            font-size:11px; padding:4px 10px; cursor:pointer;
+                            background:#313244; color:#cdd6f4; border:1px solid #45475a;
+                            border-radius:4px;
+                        ">Show CIF Text</button>
+                    </div>
+                    <pre id="iuCifViewer_${this.featureId}" class="cif-viewer" style="
+                        display:none; max-height:300px; overflow:auto; background:#1e1e2e;
+                        color:#cdd6f4; padding:12px; border-radius:6px;
+                        font-size:12px; white-space:pre-wrap; margin-top:6px;
+                    "></pre>
+                </div>
+
+                <div class="output-item">
+                    <strong>Retrieved Dataset (JSON):</strong>
+                    <span id="iuDataRetrievedStatus_${this.featureId}">Pending...</span>
+                    <a id="iuDataRetrievedDownload_${this.featureId}" style="display:none; margin-left:10px;" download="alexandria_retrieved_dataset.json">Download</a>
+                </div>
+            </div>
+        `;
+    }
+
+    async initializeUI() {
+        const batchInput = document.getElementById(`batch_size_${this.featureId}`);
+        if (batchInput && !batchInput.value) {
+            batchInput.value = '10';
+        }
+        await this._renderPropertyFilters();
+    }
+
+    async _renderPropertyFilters() {
+        const container = document.getElementById(`alexandriaPropertyFilters_${this.featureId}`);
+        if (!container) return;
+
+        try {
+            const [mappingRes, commonRes] = await Promise.all([
+                fetch('./Information_Units/property_mappings/sources/databases/alexandria.json'),
+                fetch('./Information_Units/property_mappings/common_properties.json'),
+            ]);
+            if (!mappingRes.ok) throw new Error(`Alexandria mapping HTTP ${mappingRes.status}`);
+            if (!commonRes.ok) throw new Error(`Common properties HTTP ${commonRes.status}`);
+
+            const mapping = await mappingRes.json();
+            const common = await commonRes.json();
+            const properties = mapping?.properties || {};
+            const commonProperties = common?.properties || {};
+
+            const defs = Object.entries(properties)
+                .map(([name, cfg]) => ({
+                    name,
+                    rangeSupport: !!cfg?.range_support,
+                    retrievable: cfg?.retrievable !== false,
+                    unit: commonProperties?.[name]?.unit || '',
+                }))
+                .filter((p) => p.retrievable);
+
+            this._propertyDefs = defs;
+
+            if (defs.length === 0) {
+                container.innerHTML = '<p>No retrievable properties found in Alexandria mapping.</p>';
+                return;
+            }
+
+            let html = '<div class="iu-property-list">';
+            defs.forEach((prop) => {
+                const labelWithUnit = this._formatLabelWithUnit(prop.name, prop.unit);
+                if (prop.rangeSupport) {
+                    html += `
+                        <div class="iu-property-row">
+                            <label>${labelWithUnit}
+                                <div class="iu-range-inputs">
+                                    <input type="number" step="any" id="alex_prop_${prop.name}_min_${this.featureId}" placeholder="Min" title="${prop.name}">
+                                    <input type="number" step="any" id="alex_prop_${prop.name}_max_${this.featureId}" placeholder="Max" title="${prop.name}">
+                                </div>
+                            </label>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="iu-property-row">
+                            <label>${labelWithUnit}
+                                <input type="text" id="alex_prop_${prop.name}_${this.featureId}" placeholder="Enter Value" title="${prop.name}">
+                            </label>
+                        </div>
+                    `;
+                }
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } catch (error) {
+            container.innerHTML = `<p>Failed to load Alexandria property mappings: ${error.message}</p>`;
+            this.addLog(`Failed to load Alexandria property mappings: ${error.message}`, 'error');
+        }
+    }
+
+    collectInputData() {
+        const targetEl = document.getElementById(`target_compositions_${this.featureId}`);
+        const batchEl = document.getElementById(`batch_size_${this.featureId}`);
+
+        const inputs = {
+            target_compositions: targetEl?.value?.trim() || '',
+            batch_size: parseInt(batchEl?.value || '10', 10),
+        };
+
+        if (!Number.isFinite(inputs.batch_size) || inputs.batch_size <= 0) {
+            inputs.batch_size = 10;
+        }
+
+        this._propertyDefs.forEach((prop) => {
+            if (prop.rangeSupport) {
+                const minEl = document.getElementById(`alex_prop_${prop.name}_min_${this.featureId}`);
+                const maxEl = document.getElementById(`alex_prop_${prop.name}_max_${this.featureId}`);
+                const minRaw = minEl?.value?.trim() || '';
+                const maxRaw = maxEl?.value?.trim() || '';
+
+                if (minRaw === '' && maxRaw === '') return;
+
+                if (minRaw !== '' && maxRaw !== '') {
+                    const minVal = parseFloat(minRaw);
+                    const maxVal = parseFloat(maxRaw);
+                    if (Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                        inputs[prop.name] = minVal <= maxVal ? [minVal, maxVal] : [maxVal, minVal];
+                    }
+                    return;
+                }
+
+                const exactValRaw = minRaw || maxRaw;
+                const exactVal = parseFloat(exactValRaw);
+                if (Number.isFinite(exactVal)) {
+                    inputs[prop.name] = exactVal;
+                }
+            } else {
+                const valEl = document.getElementById(`alex_prop_${prop.name}_${this.featureId}`);
+                const raw = valEl?.value?.trim() || '';
+                if (raw !== '') {
+                    inputs[prop.name] = raw;
+                }
+            }
+        });
+
+        return inputs;
+    }
+
+    async callPythonBackend() {
+        const inputs = this.collectInputData();
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
+
+        this._abortController = new AbortController();
+        this._cancelled = false;
+
+        this.addLog('Sending IU request to EMOS backend...', 'info');
+
+        const response = await fetch(`${backendUrl}/api/process/iu/${this.iuType}/${this.iuId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(inputs),
+            signal: this._abortController.signal,
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errBody}`);
+        }
+
+        const payload = await response.json();
+
+        if (payload.logs && Array.isArray(payload.logs)) {
+            payload.logs.forEach((log) => this.addLog(log.message, log.level || 'info'));
+        }
+
+        return payload.results || payload;
+    }
+
+    async cancelProcessing() {
+        if (!this.isProcessing) return;
+
+        this._cancelled = true;
+        const cancelBtn = document.getElementById(`cancelBtn_${this.featureId}`);
+        if (cancelBtn) {
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = 'Cancelling...';
+        }
+
+        this.addLog('Cancel requested by user.', 'warning');
+
+        if (this._abortController) {
+            this._abortController.abort();
+            this._abortController = null;
+        }
+    }
+
+    async processFeature() {
+        // Fallback when backend is unavailable.
+        return {
+            source: this.iuId,
+            queries: this.collectInputData(),
+            cif_strings: [],
+            status: 'local_fallback',
+        };
+    }
+
+    updateOutputs(results = null) {
+        const data = results || this.results || {};
+
+        if (data.error) {
+            const statusEl = document.getElementById(`iuDataRetrievedStatus_${this.featureId}`);
+            const downloadEl = document.getElementById(`iuDataRetrievedDownload_${this.featureId}`);
+            if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+            if (downloadEl) downloadEl.style.display = 'none';
+            return;
+        }
+
+        const statusEl = document.getElementById(`iuDataRetrievedStatus_${this.featureId}`);
+        const downloadEl = document.getElementById(`iuDataRetrievedDownload_${this.featureId}`);
+
+        if (this._downloadUrl) {
+            URL.revokeObjectURL(this._downloadUrl);
+            this._downloadUrl = null;
+        }
+
+        if (downloadEl) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            this._downloadUrl = URL.createObjectURL(blob);
+            downloadEl.href = this._downloadUrl;
+            downloadEl.download = `alexandria_retrieved_dataset_${Date.now()}.json`;
+            downloadEl.style.display = '';
+        }
+
+        if (statusEl) {
+            statusEl.textContent = 'Ready';
+        }
+
+        const cifList = Array.isArray(data.cif_strings) ? data.cif_strings : [];
+        const structRow = document.getElementById(`iuStructSelectorRow_${this.featureId}`);
+        const structSelector = document.getElementById(`iuStructSelector_${this.featureId}`);
+        const cifRow = document.getElementById(`iuCifViewerRow_${this.featureId}`);
+        const viewerContainer = document.getElementById(`iuStructureViewer_${this.featureId}`);
+        const cifViewer = document.getElementById(`iuCifViewer_${this.featureId}`);
+        const toggleCifBtn = document.getElementById(`iuToggleCifBtn_${this.featureId}`);
+
+        if (!structRow || !structSelector || !cifRow || !viewerContainer || !cifViewer) {
+            return;
+        }
+
+        if (cifList.length === 0) {
+            structRow.style.display = 'none';
+            cifRow.style.display = 'none';
+            return;
+        }
+
+        structSelector.innerHTML = cifList.map((_, i) => {
+            return `<option value="${i}">Structure ${i + 1}</option>`;
+        }).join('');
+
+        structRow.style.display = '';
+        cifRow.style.display = '';
+
+        if (this._3dViewer) {
+            viewerContainer.innerHTML = '';
+            this._3dViewer = null;
+        }
+
+        const showStructure = (idx) => {
+            const cifData = cifList[idx];
+            cifViewer.textContent = cifData || '(no CIF data available)';
+
+            if (!cifData || typeof $3Dmol === 'undefined') {
+                viewerContainer.innerHTML = '<p style="color:#333;padding:20px;">3D viewer unavailable</p>';
+                return;
+            }
+
+            viewerContainer.innerHTML = '';
+            const viewer = $3Dmol.createViewer(viewerContainer, {
+                backgroundColor: '#ffffff',
+            });
+
+            viewer.addModel(cifData, 'cif', { doAssembly: true, duplicateAssemblyAtoms: true });
+            viewer.setStyle({}, {
+                sphere: { radius: 0.4, colorscheme: 'Jmol' },
+                stick: { radius: 0.15, colorscheme: 'Jmol' },
+            });
+            viewer.addUnitCell();
+            viewer.zoomTo();
+            viewer.render();
+
+            this._3dViewer = viewer;
+        };
+
+        showStructure(0);
+
+        if (toggleCifBtn) {
+            const newBtn = toggleCifBtn.cloneNode(true);
+            toggleCifBtn.parentNode.replaceChild(newBtn, toggleCifBtn);
+            newBtn.addEventListener('click', () => {
+                const hidden = cifViewer.style.display === 'none';
+                cifViewer.style.display = hidden ? 'block' : 'none';
+                newBtn.textContent = hidden ? 'Hide CIF Text' : 'Show CIF Text';
+            });
+        }
+
+        const newSelector = structSelector.cloneNode(true);
+        structSelector.parentNode.replaceChild(newSelector, structSelector);
+        newSelector.addEventListener('change', () => showStructure(parseInt(newSelector.value, 10)));
+    }
+
+    destroy() {
+        if (this._downloadUrl) {
+            URL.revokeObjectURL(this._downloadUrl);
+            this._downloadUrl = null;
+        }
+    }
+}
+
+window.AlexandriaIUFeature = AlexandriaIUFeature;
