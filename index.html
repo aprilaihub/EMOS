@@ -240,7 +240,18 @@
                         <div class="info-column">
                             <h3>Generators</h3>
                             <div class="radio-group" id="generatorsList">
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_base_model"> MatterGen: Base Model</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_base_model"> MatterGen: Base Model</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_base_model"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Base Model"
+                                    data-iu-desc="Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
                             <label><input type="checkbox" ui-type="generator" value="mattergen_mp_20_base"> MatterGen: MP-20 Base</label>
                             <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system"> MatterGen: Chemical System</label>
                             <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system_stability"> MatterGen: Chemical System + Stability</label>

@@ -44,6 +44,13 @@ const iuFeatureModules = {
             id: 1006,
         },
     },
+    generator: {
+        mattergen_base_model: {
+            className: 'MattergenBaseModelIUFeature',
+            file: './Features/IU_Features/Generators/MattergenBaseModelIUFeature.js',
+            id: 1101,
+        },
+    },
 };
 
 // Feature class mapping for dynamic loading

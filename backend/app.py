@@ -283,6 +283,94 @@ def process_information_unit(iu_type, iu_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/process/iu/<iu_type>/<iu_id>/stream', methods=['POST', 'OPTIONS'])
+def process_information_unit_stream(iu_type, iu_id):
+    """SSE streaming endpoint for Information Units.
+    
+    Yields SSE events as the IU processes:
+    * ``event: log``     — ``{"message": "...", "level": "info"}``
+    * ``event: progress`` — progress updates from streaming generators
+    * ``event: result``  — final result payload
+    * ``event: done``    — stream end
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        logger.clear_logs()
+        inputs = request.json or {}
+
+        def _generate_sse():
+            """Yield SSE blocks from the IU's streaming processor."""
+            try:
+                if iu_type == 'generator':
+                    cls = generator_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown generator IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = generator_registry.get(iu_id)
+                    if instance is None:
+                        instance = cls(iu_id, logger)
+
+                    # Check if generator supports streaming
+                    if hasattr(instance, 'generate_stream'):
+                        # Use streaming generator
+                        for sse_event in instance.generate_stream(inputs):
+                            event_type = sse_event.get('event', 'log')
+                            yield f"event: {event_type}\ndata: {json.dumps(sse_event)}\n\n"
+                    else:
+                        # Fallback to sync
+                        yield f"event: log\ndata: {json.dumps({'message': 'No streaming support, using synchronous generation...', 'level': 'info'})}\n\n"
+                        results = instance.generate(inputs)
+                        results['event'] = 'result'
+                        yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                elif iu_type == 'database':
+                    cls = database_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown database IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = database_registry.get(iu_id)
+                    if instance is None:
+                        instance = cls(iu_id, logger)
+
+                    # Databases don't typically stream, so sync only
+                    results = instance.retrieve(inputs)
+                    results['event'] = 'result'
+                    yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                else:
+                    yield f"event: error\ndata: {json.dumps({'message': f'Unsupported iu_type: {iu_type}'})}\n\n"
+
+            except Exception as exc:
+                print(f"Error in IU streaming: {exc}")
+                yield f"event: error\ndata: {json.dumps({'message': str(exc), 'iu_type': iu_type, 'iu_id': iu_id})}\n\n"
+
+            finally:
+                yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+
+        return Response(
+            _generate_sse(),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no',
+            },
+        )
+
+    except Exception as e:
+        print(f"Error in process_information_unit_stream ({iu_type}/{iu_id}): {str(e)}")
+        def _err():
+            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+            yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+        return Response(_err(), mimetype='text/event-stream')
+
+
 # ── Active feature instances for cancel support ─────────────────────
 # Keyed by feature_id (str), stores the feature object during streaming
 # so the cancel endpoint can call its cancel() method.

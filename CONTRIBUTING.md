@@ -73,7 +73,7 @@ Add helper files in the same folder if needed.
   Additional database-specific filter keys may be included in `inputs`.
 
 - `generate(inputs: dict) -> dict`  
-  Required input keys: `batch_size` (`int`), `num_batches` (`int`), and one of `pretrained_name` (`str`) or `model_path` (`str`)  
+  Required input keys: `batch_size` (`int`)   
   Required output keys: `status` (`str`), `source` (`str`), `queries` (`dict`), `cif_strings` (`list[str]`)  
   Additional generator-specific keys may be included in `inputs`.
 

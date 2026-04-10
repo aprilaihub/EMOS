@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from typing import Any, Generator, Optional
 
@@ -159,25 +160,7 @@ class MattergenGenerator(BaseGenerator):
                 }
 
         # ---- build request payload ----
-        payload = {
-            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
-            "batch_size": int(inputs.get("batch_size", 64)),
-            "num_batches": int(inputs.get("num_batches", 1)),
-            "record_trajectories": inputs.get("record_trajectories", True),
-        }
-
-        if inputs.get("model_path"):
-            payload["model_path"] = inputs["model_path"]
-            payload["pretrained_name"] = None
-
-        if inputs.get("properties_to_condition_on"):
-            payload["properties_to_condition_on"] = inputs["properties_to_condition_on"]
-
-        if inputs.get("target_compositions"):
-            payload["target_compositions"] = inputs["target_compositions"]
-
-        if inputs.get("diffusion_guidance_factor") is not None:
-            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+        payload = self._build_payload(inputs)
 
         # ---- call the container ----
         try:
@@ -281,22 +264,8 @@ class MattergenGenerator(BaseGenerator):
             yield {"event": "done", "message": "Stream ended"}
             return
 
-        # Build payload (same as generate())
-        payload = {
-            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
-            "batch_size": int(inputs.get("batch_size", 64)),
-            "num_batches": int(inputs.get("num_batches", 1)),
-            "record_trajectories": inputs.get("record_trajectories", True),
-        }
-        if inputs.get("model_path"):
-            payload["model_path"] = inputs["model_path"]
-            payload["pretrained_name"] = None
-        if inputs.get("properties_to_condition_on"):
-            payload["properties_to_condition_on"] = inputs["properties_to_condition_on"]
-        if inputs.get("target_compositions"):
-            payload["target_compositions"] = inputs["target_compositions"]
-        if inputs.get("diffusion_guidance_factor") is not None:
-            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+        # Build payload (same shape as generate())
+        payload = self._build_payload(inputs)
 
         # Call the streaming endpoint
         try:
@@ -368,6 +337,110 @@ class MattergenGenerator(BaseGenerator):
         if not isinstance(inputs, dict):
             return {}
         return {k: v for k, v in inputs.items() if v is not None}
+
+    def _build_payload(self, inputs: Optional[dict]) -> dict[str, Any]:
+        """Translate EMOS IU-style inputs into the MatterGen API request payload."""
+        inputs = inputs or {}
+        payload = {
+            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
+            "batch_size": int(inputs.get("batch_size", 64)),
+            "num_batches": int(inputs.get("num_batches", 1)),
+            "record_trajectories": inputs.get("record_trajectories", True),
+        }
+
+        if inputs.get("model_path"):
+            payload["model_path"] = inputs["model_path"]
+            payload["pretrained_name"] = None
+
+        target_compositions = self._normalise_target_compositions(inputs.get("target_compositions"))
+        if target_compositions:
+            payload["target_compositions"] = target_compositions
+
+        properties = self._normalise_conditioning_properties(inputs)
+        if properties:
+            payload["properties_to_condition_on"] = properties
+
+        if inputs.get("diffusion_guidance_factor") is not None:
+            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+
+        return payload
+
+    def _normalise_conditioning_properties(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        """Collect property-conditioning inputs while excluding transport/meta fields."""
+        explicit = inputs.get("properties_to_condition_on")
+        if isinstance(explicit, dict) and explicit:
+            return explicit
+
+        excluded = {
+            "pretrained_name",
+            "model_path",
+            "batch_size",
+            "num_batches",
+            "record_trajectories",
+            "target_compositions",
+            "diffusion_guidance_factor",
+        }
+        props: dict[str, Any] = {}
+        for key, value in inputs.items():
+            if key in excluded or value is None or value == "":
+                continue
+            props[key] = value
+        return props
+
+    def _normalise_target_compositions(self, raw: Any) -> Optional[list[dict[str, int]]]:
+        """Accept IU contract text input and convert it to MatterGen composition dicts."""
+        if raw is None:
+            return None
+
+        if isinstance(raw, list):
+            # Already in API-native shape.
+            return raw
+
+        if isinstance(raw, str):
+            text = raw.strip()
+            if not text:
+                return None
+
+            parsed: list[dict[str, int]] = []
+            for token in text.split(","):
+                formula = token.strip()
+                if not formula:
+                    continue
+                comp = self._formula_to_count_dict(formula)
+                if comp:
+                    parsed.append(comp)
+                elif self.logger:
+                    self.logger.log(
+                        f"MatterGen: ignoring invalid composition token '{formula}'",
+                        "warning",
+                    )
+
+            return parsed or None
+
+        if self.logger:
+            self.logger.log(
+                "MatterGen: unsupported target_compositions format; expected string or list",
+                "warning",
+            )
+        return None
+
+    def _formula_to_count_dict(self, formula: str) -> Optional[dict[str, int]]:
+        """Parse simple chemical formulas like Fe, Al2O3, GaAs into element counts."""
+        matches = list(re.finditer(r"([A-Z][a-z]?)(\d*)", formula))
+        if not matches:
+            return None
+
+        consumed = "".join(m.group(0) for m in matches)
+        if consumed != formula:
+            return None
+
+        counts: dict[str, int] = {}
+        for match in matches:
+            element = match.group(1)
+            count = int(match.group(2)) if match.group(2) else 1
+            counts[element] = counts.get(element, 0) + count
+
+        return counts or None
 
     def _enrich_result(self, result: Any, queries: dict) -> dict:
         """Attach consistent metadata fields to generation results."""
