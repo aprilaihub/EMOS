@@ -483,13 +483,13 @@ class {class_name} extends BaseFeature {{
 
                 buffer += decoder.decode(value, {{ stream: true }});
 
-                const blocks = buffer.split('\n\n');
+                const blocks = buffer.split('\\n\\n');
                 buffer = blocks.pop() || '';
 
                 for (const block of blocks) {{
                     if (!block.trim()) continue;
 
-                    const lines = block.split('\n');
+                    const lines = block.split('\\n');
                     let eventType = 'log';
                     let eventData = null;
 
@@ -530,7 +530,7 @@ class {class_name} extends BaseFeature {{
             }}
 
             if (buffer.trim()) {{
-                const lines = buffer.split('\n');
+                const lines = buffer.split('\\n');
                 let eventType = 'log';
                 let eventData = null;
 
