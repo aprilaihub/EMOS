@@ -242,25 +242,6 @@ class MattergenBaseModelIUFeature extends BaseFeature {
             const decoder = new TextDecoder();
             let buffer = '';
             let finalResult = null;
-            let lastProgressEl = null;
-
-            const updateProgressLog = (message, level = 'info') => {
-                if (lastProgressEl) {
-                    const msgEl = lastProgressEl.querySelector('.log-message');
-                    if (msgEl) {
-                        msgEl.textContent = message;
-                    } else {
-                        lastProgressEl.textContent = message;
-                    }
-                    return;
-                }
-
-                this.addLog(message, level);
-                const logContent = document.getElementById(`logContent_${this.featureId}`);
-                if (logContent && logContent.lastElementChild) {
-                    lastProgressEl = logContent.lastElementChild;
-                }
-            };
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -299,28 +280,20 @@ class MattergenBaseModelIUFeature extends BaseFeature {
                     if (eventType === 'log') {
                         const msg = eventData.message || '';
                         const level = eventData.level || 'info';
-                        const isDiffusionStep = /^Diffusion step \d+\/\d+/.test(msg);
-                        if (isDiffusionStep) {
-                            updateProgressLog(msg, 'info');
-                        } else {
-                            this.addLog(msg, level);
-                            lastProgressEl = null;
-                        }
+                        this.addLog(msg, level);
                     } else if (eventType === 'progress') {
                         const raw = Number(eventData.progress);
                         const pct = Number.isFinite(raw)
                             ? Math.round(Math.max(0, Math.min(1, raw)) * 100)
                             : null;
                         const msg = eventData.message || (pct !== null ? `Progress: ${pct}%` : 'Progress update');
-                        updateProgressLog(msg, 'info');
+                        this.addLog(msg, 'info');
                     } else if (eventType === 'result') {
                         finalResult = eventData;
-                        lastProgressEl = null;
                         // Log result summary
-                        const numStructs = eventData.num_structures || 0;
+                        const numStructs = Array.isArray(eventData.cif_strings) ? eventData.cif_strings.length : 0;
                         this.addLog(`Generation complete: ${numStructs} structure(s)`, 'success');
                     } else if (eventType === 'error') {
-                        lastProgressEl = null;
                         this.addLog(eventData.message || 'Unknown error', 'error');
                     }
                 }

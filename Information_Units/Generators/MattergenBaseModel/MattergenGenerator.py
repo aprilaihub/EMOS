@@ -314,6 +314,14 @@ class MattergenGenerator(BaseGenerator):
                     data = json.loads(data_str)
                     if current_event == "result" and isinstance(data, dict):
                         data = self._enrich_result(data, queries)
+                    if current_event == "log" and isinstance(data, dict):
+                        progress = self._extract_progress_fraction(data.get("message", ""))
+                        if progress is not None:
+                            yield {
+                                "event": "progress",
+                                "progress": progress,
+                                "message": data.get("message", ""),
+                            }
                     data["event"] = current_event
                     yield data
                 except json.JSONDecodeError:
@@ -327,6 +335,14 @@ class MattergenGenerator(BaseGenerator):
                 data = json.loads(data_str)
                 if current_event == "result" and isinstance(data, dict):
                     data = self._enrich_result(data, queries)
+                if current_event == "log" and isinstance(data, dict):
+                    progress = self._extract_progress_fraction(data.get("message", ""))
+                    if progress is not None:
+                        yield {
+                            "event": "progress",
+                            "progress": progress,
+                            "message": data.get("message", ""),
+                        }
                 data["event"] = current_event
                 yield data
             except json.JSONDecodeError:
@@ -337,6 +353,31 @@ class MattergenGenerator(BaseGenerator):
         if not isinstance(inputs, dict):
             return {}
         return {k: v for k, v in inputs.items() if v is not None}
+
+    def _extract_progress_fraction(self, message: str) -> Optional[float]:
+        """Parse MatterGen diffusion-step logs into a progress fraction."""
+        if not isinstance(message, str):
+            return None
+
+        percent_match = re.search(r"Diffusion step\s+\d+\s*/\s*\d+\s*\((\d+)%\)", message)
+        if percent_match:
+            try:
+                pct = int(percent_match.group(1))
+                return max(0.0, min(1.0, pct / 100.0))
+            except ValueError:
+                return None
+
+        step_match = re.search(r"Diffusion step\s+(\d+)\s*/\s*(\d+)", message)
+        if step_match:
+            try:
+                step = int(step_match.group(1))
+                total = int(step_match.group(2))
+            except ValueError:
+                return None
+            if total > 0:
+                return max(0.0, min(1.0, step / total))
+
+        return None
 
     def _build_payload(self, inputs: Optional[dict]) -> dict[str, Any]:
         """Translate EMOS IU-style inputs into the MatterGen API request payload."""

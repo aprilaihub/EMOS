@@ -365,7 +365,7 @@ class {class_name} extends BaseFeature {{
             this._propertyDefs = defs;
 
             if (defs.length === 0) {{
-                container.innerHTML = '<p>No generatable properties found in property mapping.</p>';
+                container.innerHTML = '';
                 return;
             }}
 
@@ -456,25 +456,110 @@ class {class_name} extends BaseFeature {{
 
         this.addLog('Sending IU request to EMOS backend...', 'info');
 
-        const response = await fetch(`${{backendUrl}}/api/process/iu/${{this.iuType}}/${{this.iuId}}`, {{
-            method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify(inputs),
-            signal: this._abortController.signal,
-        }});
+        try {{
+            const response = await fetch(
+                `${{backendUrl}}/api/process/iu/${{this.iuType}}/${{this.iuId}}/stream`,
+                {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify(inputs),
+                    signal: this._abortController.signal,
+                }}
+            );
 
-        if (!response.ok) {{
-            const errBody = await response.text();
-            throw new Error(`HTTP ${{response.status}}: ${{errBody}}`);
+            if (!response.ok) {{
+                const errBody = await response.text();
+                throw new Error(`HTTP ${{response.status}}: ${{errBody}}`);
+            }}
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let finalResult = null;
+
+            while (true) {{
+                const {{ done, value }} = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, {{ stream: true }});
+
+                const blocks = buffer.split('\n\n');
+                buffer = blocks.pop() || '';
+
+                for (const block of blocks) {{
+                    if (!block.trim()) continue;
+
+                    const lines = block.split('\n');
+                    let eventType = 'log';
+                    let eventData = null;
+
+                    for (const line of lines) {{
+                        if (line.startsWith('event:')) {{
+                            eventType = line.slice(6).trim();
+                        }} else if (line.startsWith('data:')) {{
+                            const dataStr = line.slice(5).trim();
+                            try {{
+                                eventData = JSON.parse(dataStr);
+                            }} catch (e) {{
+                                eventData = {{ message: dataStr }};
+                            }}
+                        }}
+                    }}
+
+                    if (!eventData) continue;
+
+                    if (eventType === 'log') {{
+                        const msg = eventData.message || '';
+                        const level = eventData.level || 'info';
+                        this.addLog(msg, level);
+                    }} else if (eventType === 'progress') {{
+                        const raw = Number(eventData.progress);
+                        const pct = Number.isFinite(raw)
+                            ? Math.round(Math.max(0, Math.min(1, raw)) * 100)
+                            : null;
+                        const msg = eventData.message || (pct !== null ? `Progress: ${{pct}}%` : 'Progress update');
+                        this.addLog(msg, 'info');
+                    }} else if (eventType === 'result') {{
+                        finalResult = eventData;
+                        const numStructs = Array.isArray(eventData.cif_strings) ? eventData.cif_strings.length : 0;
+                        this.addLog(`Generation complete: ${{numStructs}} structure(s)`, 'success');
+                    }} else if (eventType === 'error') {{
+                        this.addLog(eventData.message || 'Unknown error', 'error');
+                    }}
+                }}
+            }}
+
+            if (buffer.trim()) {{
+                const lines = buffer.split('\n');
+                let eventType = 'log';
+                let eventData = null;
+
+                for (const line of lines) {{
+                    if (line.startsWith('event:')) {{
+                        eventType = line.slice(6).trim();
+                    }} else if (line.startsWith('data:')) {{
+                        const dataStr = line.slice(5).trim();
+                        try {{
+                            eventData = JSON.parse(dataStr);
+                        }} catch (e) {{
+                            eventData = {{ message: dataStr }};
+                        }}
+                    }}
+                }}
+
+                if (eventData && eventType === 'result') {{
+                    finalResult = eventData;
+                }}
+            }}
+
+            return finalResult || {{ status: 'completed', cif_strings: [] }};
+        }} catch (error) {{
+            if (error.name === 'AbortError') {{
+                this.addLog('Request cancelled by user', 'warning');
+                return {{ status: 'cancelled', cif_strings: [] }};
+            }}
+            throw error;
         }}
-
-        const payload = await response.json();
-
-        if (payload.logs && Array.isArray(payload.logs)) {{
-            payload.logs.forEach((log) => this.addLog(log.message, log.level || 'info'));
-        }}
-
-        return payload.results || payload;
     }}
 
     async cancelProcessing() {{
