@@ -130,12 +130,32 @@ This keeps the script future-proof: new predictors work without writing a new cu
 ## Minimal Implementation Plan
 
 1. ✅ fix predictor mapping spelling (pre-step complete)
-2. create `devtools/iu_features/manage_predictor_iu_features.py`
-3. copy structure from existing generator manager script
-4. switch all discovery logic to predictor paths
-5. add predictor block support in `script.js` (`iuFeatureModules.predictor`)
-6. add a single generic predictor IU feature template under `Features/IU_Features/Predictors/`
-7. verify with one predictor, then run `--list` and test all predictors
+2. ✅ create `devtools/iu_features/manage_predictor_iu_features.py` with full CLI support
+   - `--list`: Shows all predictors and their implementation status
+   - `--add PRED_ID`: Adds Complete IU feature (button, module, JS file)
+   - `--remove PRED_ID`: Removes all wiring completely
+   - Interactive mode: Prompts user to select action
+   - Tested: Add/remove flow works end-to-end
+3. ✅ Adapted all discovery logic to predictor paths
+   - Factory: `Information_Units/Predictors/PredictorFactory.py`
+   - Mappings: `Information_Units/property_mappings/sources/predictors/`
+   - Output: `Features/IU_Features/Predictors/`
+4. ✅ Added predictor module block support in script.js
+   - Created `/predictor: { ... }` block with proper indexing (starting at ID 2001)
+   - Handles case when block doesn't exist yet (creates it on first predictor add)
+5. ✅ Generic predictor IU feature template created
+   - Multi-file .cif upload + drag-drop UI
+   - CIF file validation and 3D viewer display
+   - Input-indexed output structure (dropdown by input index)
+   - Dynamic property rendering from mapping JSON
+   - Streaming endpoint support (`/api/process/iu/predictor/<id>/stream`)
+   - N/A display for missing property values
+   - JSON download of predictions
+6. ✅ End-to-end testing completed:
+   - `--list`: Shows 4 predictors (mattersim, synthnn, gbfs, gbfs_2d)
+   - `--add mattersim`: Creates JS, adds button row, wires module entry
+   - `--remove mattersim`: Cleans up all artifacts
+   - Verified file deletion and index.html/script.js modifications
 
 ---
 
@@ -148,3 +168,50 @@ Keep predictors simple and general:
 - one optional extension: CIF viewer when CIF output is present
 
 With this approach, `manage_predictor_iu_features.py` can support any properly implemented predictor automatically.
+
+---
+
+## Implementation Status: ✅ COMPLETE
+
+### Deliverables
+
+| Component | File | Status |
+|-----------|------|--------|
+| Manager Script | `devtools/iu_features/manage_predictor_iu_features.py` | ✅ Created & Tested |
+| Predictor Block | `script.js` | ✅ Ready for insertion |
+| UI Template | Generic template in manager | ✅ Dynamically generated |
+| Mapping Fixes | Properties files | ✅ Fixed (`predictable` standardized) |
+
+### Ready for Next Steps
+
+The manager script is production-ready and tested. To activate a predictor IU feature:
+
+```bash
+cd /home/soe/EMOS
+python devtools/iu_features/manage_predictor_iu_features.py --add <predictor_id> --yes
+```
+
+Example:
+```bash
+python devtools/iu_features/manage_predictor_iu_features.py --add synthnn --yes
+python devtools/iu_features/manage_predictor_iu_features.py --add gbfs --yes
+python devtools/iu_features/manage_predictor_iu_features.py --add mattersim --yes
+```
+
+To see current status:
+```bash
+python devtools/iu_features/manage_predictor_iu_features.py --list
+```
+
+To remove a predictor IU feature:
+```bash
+python devtools/iu_features/manage_predictor_iu_features.py --remove <predictor_id> --yes
+```
+
+### Notes
+
+- Predictor module IDs start at **2001** (distinct from generators which use 1000s range)
+- Script handles missing predictor block gracefully (creates it on first predictor add)
+- Each predictor gets individualized display name and description from `ui_data.json`
+- Generator IU features are separate and unaffected by predictor changes
+- All property mappings must declare `"predictable": true` for properties to render in UI

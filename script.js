@@ -91,6 +91,8 @@ const iuFeatureModules = {
             id: 1118,
         },
     },
+    predictor: {
+    }
 };
 
 // Feature class mapping for dynamic loading
