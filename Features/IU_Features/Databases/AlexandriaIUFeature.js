@@ -1,10 +1,10 @@
-// Alexandria IU Feature (feature-style UI for database Information Unit)
+// Auto-generated IU Feature for database: alexandria
 class AlexandriaIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
             iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'Alexandria IU Feature',
-            iuMeta.iuDesc || 'Run Alexandria database retrieval with predefined IU contracts.'
+            iuMeta.iuDesc || 'Alexandria PBE - DFT database for materials properties'
         );
         this.iuType = iuMeta.iuType || 'database';
         this.iuId = iuMeta.iuId || 'alexandria';
@@ -49,7 +49,7 @@ class AlexandriaIUFeature extends BaseFeature {
                         <input type="text" id="target_compositions_${this.featureId}" placeholder="e.g., Fe, Al2O3, GaAs">
                     </label>
                 </div>
-                <div class="input-controls" id="alexandriaPropertyFilters_${this.featureId}">
+                <div class="input-controls" id="${this.iuId}PropertyFilters_${this.featureId}">
                     <p>Loading property mappings...</p>
                 </div>
             </div>
@@ -58,7 +58,7 @@ class AlexandriaIUFeature extends BaseFeature {
 
     createOutputsHTML() {
         return `
-            <p>Alexandria IU outputs</p>
+            <p>${this.iuId} IU outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item" id="iuStructSelectorRow_${this.featureId}" style="display:none;">
                     <strong>Structure:</strong>
@@ -88,7 +88,7 @@ class AlexandriaIUFeature extends BaseFeature {
                 <div class="output-item">
                     <strong>Retrieved Dataset (JSON):</strong>
                     <span id="iuDataRetrievedStatus_${this.featureId}">Pending...</span>
-                    <a id="iuDataRetrievedDownload_${this.featureId}" style="display:none; margin-left:10px;" download="alexandria_retrieved_dataset.json">Download</a>
+                    <a id="iuDataRetrievedDownload_${this.featureId}" style="display:none; margin-left:10px;" download="${this.iuId}_retrieved_dataset.json">Download</a>
                 </div>
             </div>
         `;
@@ -103,15 +103,15 @@ class AlexandriaIUFeature extends BaseFeature {
     }
 
     async _renderPropertyFilters() {
-        const container = document.getElementById(`alexandriaPropertyFilters_${this.featureId}`);
+        const container = document.getElementById(`${this.iuId}PropertyFilters_${this.featureId}`);
         if (!container) return;
 
         try {
             const [mappingRes, commonRes] = await Promise.all([
-                fetch('./Information_Units/property_mappings/sources/databases/alexandria.json'),
+                fetch(`./Information_Units/property_mappings/sources/databases/${this.iuId}.json`),
                 fetch('./Information_Units/property_mappings/common_properties.json'),
             ]);
-            if (!mappingRes.ok) throw new Error(`Alexandria mapping HTTP ${mappingRes.status}`);
+            if (!mappingRes.ok) throw new Error(`${this.iuId} mapping HTTP ${mappingRes.status}`);
             if (!commonRes.ok) throw new Error(`Common properties HTTP ${commonRes.status}`);
 
             const mapping = await mappingRes.json();
@@ -121,7 +121,8 @@ class AlexandriaIUFeature extends BaseFeature {
 
             const defs = Object.entries(properties)
                 .map(([name, cfg]) => ({
-                    name,
+                    uiKey: name,
+                    sourceKey: (typeof cfg?.name === 'string' && cfg.name.trim()) ? cfg.name.trim() : name,
                     rangeSupport: !!cfg?.range_support,
                     retrievable: cfg?.retrievable !== false,
                     unit: commonProperties?.[name]?.unit || '',
@@ -131,20 +132,20 @@ class AlexandriaIUFeature extends BaseFeature {
             this._propertyDefs = defs;
 
             if (defs.length === 0) {
-                container.innerHTML = '<p>No retrievable properties found in Alexandria mapping.</p>';
+                container.innerHTML = '<p>No retrievable properties found in property mapping.</p>';
                 return;
             }
 
             let html = '<div class="iu-property-list">';
             defs.forEach((prop) => {
-                const labelWithUnit = this._formatLabelWithUnit(prop.name, prop.unit);
+                const labelWithUnit = this._formatLabelWithUnit(prop.uiKey, prop.unit);
                 if (prop.rangeSupport) {
                     html += `
                         <div class="iu-property-row">
                             <label>${labelWithUnit}
                                 <div class="iu-range-inputs">
-                                    <input type="number" step="any" id="alex_prop_${prop.name}_min_${this.featureId}" placeholder="Min" title="${prop.name}">
-                                    <input type="number" step="any" id="alex_prop_${prop.name}_max_${this.featureId}" placeholder="Max" title="${prop.name}">
+                                    <input type="number" step="any" id="iu_prop_${prop.uiKey}_min_${this.featureId}" placeholder="Min" title="${prop.uiKey}">
+                                    <input type="number" step="any" id="iu_prop_${prop.uiKey}_max_${this.featureId}" placeholder="Max" title="${prop.uiKey}">
                                 </div>
                             </label>
                         </div>
@@ -153,7 +154,7 @@ class AlexandriaIUFeature extends BaseFeature {
                     html += `
                         <div class="iu-property-row">
                             <label>${labelWithUnit}
-                                <input type="text" id="alex_prop_${prop.name}_${this.featureId}" placeholder="Enter Value" title="${prop.name}">
+                                <input type="text" id="iu_prop_${prop.uiKey}_${this.featureId}" placeholder="Enter Value" title="${prop.uiKey}">
                             </label>
                         </div>
                     `;
@@ -162,8 +163,8 @@ class AlexandriaIUFeature extends BaseFeature {
             html += '</div>';
             container.innerHTML = html;
         } catch (error) {
-            container.innerHTML = `<p>Failed to load Alexandria property mappings: ${error.message}</p>`;
-            this.addLog(`Failed to load Alexandria property mappings: ${error.message}`, 'error');
+            container.innerHTML = `<p>Failed to load property mappings: ${error.message}</p>`;
+            this.addLog(`Failed to load property mappings: ${error.message}`, 'error');
         }
     }
 
@@ -181,9 +182,10 @@ class AlexandriaIUFeature extends BaseFeature {
         }
 
         this._propertyDefs.forEach((prop) => {
+            const payloadKey = prop.sourceKey || prop.uiKey;
             if (prop.rangeSupport) {
-                const minEl = document.getElementById(`alex_prop_${prop.name}_min_${this.featureId}`);
-                const maxEl = document.getElementById(`alex_prop_${prop.name}_max_${this.featureId}`);
+                const minEl = document.getElementById(`iu_prop_${prop.uiKey}_min_${this.featureId}`);
+                const maxEl = document.getElementById(`iu_prop_${prop.uiKey}_max_${this.featureId}`);
                 const minRaw = minEl?.value?.trim() || '';
                 const maxRaw = maxEl?.value?.trim() || '';
 
@@ -193,7 +195,7 @@ class AlexandriaIUFeature extends BaseFeature {
                     const minVal = parseFloat(minRaw);
                     const maxVal = parseFloat(maxRaw);
                     if (Number.isFinite(minVal) && Number.isFinite(maxVal)) {
-                        inputs[prop.name] = minVal <= maxVal ? [minVal, maxVal] : [maxVal, minVal];
+                        inputs[payloadKey] = minVal <= maxVal ? [minVal, maxVal] : [maxVal, minVal];
                     }
                     return;
                 }
@@ -201,13 +203,13 @@ class AlexandriaIUFeature extends BaseFeature {
                 const exactValRaw = minRaw || maxRaw;
                 const exactVal = parseFloat(exactValRaw);
                 if (Number.isFinite(exactVal)) {
-                    inputs[prop.name] = exactVal;
+                    inputs[payloadKey] = exactVal;
                 }
             } else {
-                const valEl = document.getElementById(`alex_prop_${prop.name}_${this.featureId}`);
+                const valEl = document.getElementById(`iu_prop_${prop.uiKey}_${this.featureId}`);
                 const raw = valEl?.value?.trim() || '';
                 if (raw !== '') {
-                    inputs[prop.name] = raw;
+                    inputs[payloadKey] = raw;
                 }
             }
         });
@@ -264,7 +266,6 @@ class AlexandriaIUFeature extends BaseFeature {
     }
 
     async processFeature() {
-        // Fallback when backend is unavailable.
         return {
             source: this.iuId,
             queries: this.collectInputData(),
@@ -296,7 +297,7 @@ class AlexandriaIUFeature extends BaseFeature {
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             this._downloadUrl = URL.createObjectURL(blob);
             downloadEl.href = this._downloadUrl;
-            downloadEl.download = `alexandria_retrieved_dataset_${Date.now()}.json`;
+            downloadEl.download = `${this.iuId}_retrieved_dataset_${Date.now()}.json`;
             downloadEl.style.display = '';
         }
 
@@ -322,9 +323,7 @@ class AlexandriaIUFeature extends BaseFeature {
             return;
         }
 
-        structSelector.innerHTML = cifList.map((_, i) => {
-            return `<option value="${i}">Structure ${i + 1}</option>`;
-        }).join('');
+        structSelector.innerHTML = cifList.map((_, i) => `<option value="${i}">Structure ${i + 1}</option>`).join('');
 
         structRow.style.display = '';
         cifRow.style.display = '';

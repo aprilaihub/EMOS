@@ -121,7 +121,8 @@ class Mathub3dIUFeature extends BaseFeature {
 
             const defs = Object.entries(properties)
                 .map(([name, cfg]) => ({
-                    name,
+                    uiKey: name,
+                    sourceKey: (typeof cfg?.name === 'string' && cfg.name.trim()) ? cfg.name.trim() : name,
                     rangeSupport: !!cfg?.range_support,
                     retrievable: cfg?.retrievable !== false,
                     unit: commonProperties?.[name]?.unit || '',
@@ -137,14 +138,14 @@ class Mathub3dIUFeature extends BaseFeature {
 
             let html = '<div class="iu-property-list">';
             defs.forEach((prop) => {
-                const labelWithUnit = this._formatLabelWithUnit(prop.name, prop.unit);
+                const labelWithUnit = this._formatLabelWithUnit(prop.uiKey, prop.unit);
                 if (prop.rangeSupport) {
                     html += `
                         <div class="iu-property-row">
                             <label>${labelWithUnit}
                                 <div class="iu-range-inputs">
-                                    <input type="number" step="any" id="iu_prop_${prop.name}_min_${this.featureId}" placeholder="Min" title="${prop.name}">
-                                    <input type="number" step="any" id="iu_prop_${prop.name}_max_${this.featureId}" placeholder="Max" title="${prop.name}">
+                                    <input type="number" step="any" id="iu_prop_${prop.uiKey}_min_${this.featureId}" placeholder="Min" title="${prop.uiKey}">
+                                    <input type="number" step="any" id="iu_prop_${prop.uiKey}_max_${this.featureId}" placeholder="Max" title="${prop.uiKey}">
                                 </div>
                             </label>
                         </div>
@@ -153,7 +154,7 @@ class Mathub3dIUFeature extends BaseFeature {
                     html += `
                         <div class="iu-property-row">
                             <label>${labelWithUnit}
-                                <input type="text" id="iu_prop_${prop.name}_${this.featureId}" placeholder="Enter Value" title="${prop.name}">
+                                <input type="text" id="iu_prop_${prop.uiKey}_${this.featureId}" placeholder="Enter Value" title="${prop.uiKey}">
                             </label>
                         </div>
                     `;
@@ -181,9 +182,10 @@ class Mathub3dIUFeature extends BaseFeature {
         }
 
         this._propertyDefs.forEach((prop) => {
+            const payloadKey = prop.sourceKey || prop.uiKey;
             if (prop.rangeSupport) {
-                const minEl = document.getElementById(`iu_prop_${prop.name}_min_${this.featureId}`);
-                const maxEl = document.getElementById(`iu_prop_${prop.name}_max_${this.featureId}`);
+                const minEl = document.getElementById(`iu_prop_${prop.uiKey}_min_${this.featureId}`);
+                const maxEl = document.getElementById(`iu_prop_${prop.uiKey}_max_${this.featureId}`);
                 const minRaw = minEl?.value?.trim() || '';
                 const maxRaw = maxEl?.value?.trim() || '';
 
@@ -193,7 +195,7 @@ class Mathub3dIUFeature extends BaseFeature {
                     const minVal = parseFloat(minRaw);
                     const maxVal = parseFloat(maxRaw);
                     if (Number.isFinite(minVal) && Number.isFinite(maxVal)) {
-                        inputs[prop.name] = minVal <= maxVal ? [minVal, maxVal] : [maxVal, minVal];
+                        inputs[payloadKey] = minVal <= maxVal ? [minVal, maxVal] : [maxVal, minVal];
                     }
                     return;
                 }
@@ -201,13 +203,13 @@ class Mathub3dIUFeature extends BaseFeature {
                 const exactValRaw = minRaw || maxRaw;
                 const exactVal = parseFloat(exactValRaw);
                 if (Number.isFinite(exactVal)) {
-                    inputs[prop.name] = exactVal;
+                    inputs[payloadKey] = exactVal;
                 }
             } else {
-                const valEl = document.getElementById(`iu_prop_${prop.name}_${this.featureId}`);
+                const valEl = document.getElementById(`iu_prop_${prop.uiKey}_${this.featureId}`);
                 const raw = valEl?.value?.trim() || '';
                 if (raw !== '') {
-                    inputs[prop.name] = raw;
+                    inputs[payloadKey] = raw;
                 }
             }
         });
