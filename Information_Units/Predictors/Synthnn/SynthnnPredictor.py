@@ -41,7 +41,7 @@ class SynthnnPredictor(BasePredictor):
 
         mapped = set()
         for prop_name, synthnn_info in source_mapping.items():
-            if isinstance(synthnn_info, dict) and synthnn_info.get('predicatble'):
+            if isinstance(synthnn_info, dict) and synthnn_info.get('predictable'):
                 mapped.add(prop_name)
 
         return mapped

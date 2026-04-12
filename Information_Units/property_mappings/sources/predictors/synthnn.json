@@ -6,12 +6,12 @@
   "properties": {
     "synthesizability_score": {
       "name": "synthesizability_score",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "synthesizable": {
       "name": "synthesizable",
-      "predicatble": true,
+      "predictable": true,
       "range_support": false
     }
   }

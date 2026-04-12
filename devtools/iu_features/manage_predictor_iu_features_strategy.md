@@ -118,15 +118,18 @@ This keeps the script future-proof: new predictors work without writing a new cu
 
 ---
 
-## Pre-Implementation Step
+## Pre-Implementation Step (✅ COMPLETE)
 
 **Fix mapping file spellings:**
-- standardize all `predicatble` → `predictable` in `Information_Units/property_mappings/sources/predictors/*.json`
-- manager script will assume only `predictable` flag exists
+- ✅ Fixed all misspellings: `predicatble` → `predictable` across:
+  - `Information_Units/property_mappings/sources/predictors/synthnn.json` (2 fixes)
+  - `Information_Units/property_mappings/sources/predictors/mattersim.json` (9 fixes)
+  - `Information_Units/Predictors/Synthnn/SynthnnPredictor.py` (1 fix)
+- Manager script will assume only `predictable` flag exists
 
 ## Minimal Implementation Plan
 
-1. fix predictor mapping spelling (see pre-step above)
+1. ✅ fix predictor mapping spelling (pre-step complete)
 2. create `devtools/iu_features/manage_predictor_iu_features.py`
 3. copy structure from existing generator manager script
 4. switch all discovery logic to predictor paths
