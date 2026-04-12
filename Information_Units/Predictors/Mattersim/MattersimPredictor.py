@@ -105,6 +105,7 @@ class MattersimPredictor(BasePredictor):
                 "results": [
                     {
                         "index": 0,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -126,6 +127,7 @@ class MattersimPredictor(BasePredictor):
                 "results": [
                     {
                         "index": idx,
+                        "cif_input": cif_strings[idx] if idx < len(cif_strings) else "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -170,6 +172,7 @@ class MattersimPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_string,
                         "status": result.get("status", "ok"),
                         "properties": properties,
                         "warnings": result.get("warnings", []),
@@ -182,6 +185,7 @@ class MattersimPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_string,
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -194,6 +198,7 @@ class MattersimPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_string,
                         "status": "error",
                         "properties": {},
                         "warnings": [],

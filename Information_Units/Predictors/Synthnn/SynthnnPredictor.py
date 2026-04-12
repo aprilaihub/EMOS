@@ -133,6 +133,7 @@ class SynthnnPredictor(BasePredictor):
                         self.logger.log(f"item[{idx}]: {error_msg}", 'error')
                     item = {
                         "index": idx,
+                        "cif_input": cif_content,
                         **_build_result(status='error', error=error_msg),
                     }
                     results.append(item)
@@ -151,6 +152,7 @@ class SynthnnPredictor(BasePredictor):
                         self.logger.log(f"item[{idx}]: {error_msg}", 'error')
                     item = {
                         "index": idx,
+                        "cif_input": cif_content,
                         **_build_result(status='error', error=error_msg),
                     }
                     results.append(item)
@@ -168,6 +170,7 @@ class SynthnnPredictor(BasePredictor):
                 
                 item = {
                     "index": idx,
+                    "cif_input": cif_content,
                     **_build_result(
                         status='ok',
                         synthesizable=synthesizable,
@@ -190,6 +193,7 @@ class SynthnnPredictor(BasePredictor):
                     self.logger.log(f"item[{idx}]: {error_msg}", 'error')
                 item = {
                     "index": idx,
+                    "cif_input": cif_content,
                     **_build_result(status='error', error=error_msg),
                 }
                 results.append(item)

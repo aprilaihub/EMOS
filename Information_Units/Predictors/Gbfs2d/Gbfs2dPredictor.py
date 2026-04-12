@@ -600,6 +600,7 @@ class Gbfs2dPredictor(BasePredictor):
                 "results": [
                     {
                         "index": 0,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -609,7 +610,7 @@ class Gbfs2dPredictor(BasePredictor):
             }
 
         results = list(parse_errors)
-        for idx, structure in structures_with_index:
+        for idx, structure, cif_str in structures_with_index:
             try:
                 # Check vdW structure
                 is_vdw = check_vdw_layered_structure(structure)
@@ -621,6 +622,7 @@ class Gbfs2dPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "ok",
                         "properties": properties,
                         "warnings": [warning] if warning else [],
@@ -631,6 +633,7 @@ class Gbfs2dPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -682,9 +685,9 @@ class Gbfs2dPredictor(BasePredictor):
                 
         return result
 
-    def _extract_structures_for_predict(self, inputs) -> Tuple[List[Tuple[int, Structure]], List[Dict[str, Any]]]:
+    def _extract_structures_for_predict(self, inputs) -> Tuple[List[Tuple[int, Structure, str]], List[Dict[str, Any]]]:
         """Extract structures and collect per-item parse errors for predict()."""
-        structures_with_index: List[Tuple[int, Structure]] = []
+        structures_with_index: List[Tuple[int, Structure, str]] = []
         errors: List[Dict[str, Any]] = []
 
         if not isinstance(inputs, list):
@@ -695,6 +698,7 @@ class Gbfs2dPredictor(BasePredictor):
                 errors.append(
                     {
                         "index": idx,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -710,6 +714,7 @@ class Gbfs2dPredictor(BasePredictor):
                     errors.append(
                         {
                             "index": idx,
+                            "cif_input": cif_str,
                             "status": "error",
                             "properties": {},
                             "warnings": [],
@@ -717,11 +722,12 @@ class Gbfs2dPredictor(BasePredictor):
                         }
                     )
                     continue
-                structures_with_index.append((idx, parsed[0]))
+                structures_with_index.append((idx, parsed[0], cif_str))
             except Exception as exc:
                 errors.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "error",
                         "properties": {},
                         "warnings": [],

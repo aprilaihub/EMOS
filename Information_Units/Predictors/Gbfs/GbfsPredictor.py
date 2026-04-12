@@ -544,7 +544,8 @@ class GbfsPredictor(BasePredictor):
                                 "probabilities": list[list[float]] (optional)
                             },
                             "warnings": list[str],
-                            "error": str | None
+                            "error": str | None,
+                            "cif_input": str
                         }
                     ]
                 }.
@@ -552,13 +553,14 @@ class GbfsPredictor(BasePredictor):
         if self.logger:
             self.logger.log(f"Running {self.property_name} prediction", 'info')
 
-        structures = self._extract_structures(inputs)
-        if not structures:
+        cif_strings = self._extract_cif_strings(inputs)
+        if not cif_strings:
             return {
                 "source": self.source,
                 "results": [
                     {
                         "index": 0,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -568,12 +570,19 @@ class GbfsPredictor(BasePredictor):
             }
 
         results = []
-        for idx, structure in enumerate(structures):
+        for idx, cif_str in enumerate(cif_strings):
             try:
+                parser = CifParser.from_str(cif_str)
+                parsed = parser.get_structures(primitive=True)
+                if not parsed:
+                    raise ValueError("Failed to parse CIF: No structures extracted")
+                structure = parsed[0]
+                
                 properties = self._predict_structure(structure)
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "ok",
                         "properties": properties,
                         "warnings": [],
@@ -584,6 +593,7 @@ class GbfsPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -647,6 +657,12 @@ class GbfsPredictor(BasePredictor):
                 if parsed:
                     structures.append(parsed[0])
         return structures
+
+    def _extract_cif_strings(self, inputs) -> List[str]:
+        """Extract valid CIF strings from direct list input."""
+        if isinstance(inputs, list):
+            return [s for s in inputs if isinstance(s, str) and s.strip()]
+        return []
     
     def predict_numpy(self, input_data) -> np.ndarray:
         """

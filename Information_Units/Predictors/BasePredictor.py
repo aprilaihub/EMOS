@@ -27,7 +27,8 @@ class BasePredictor:
                         "status": str,
                         "properties": dict[str, Any],
                         "warnings": list[str],
-                        "error": str | None
+                        "error": str | None,
+                        "cif_input": str
                     }]
                 }.
         """

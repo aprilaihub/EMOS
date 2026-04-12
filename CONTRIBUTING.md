@@ -77,11 +77,11 @@ Add helper files in the same folder if needed.
   Required output keys: `status` (`str`), `source` (`str`), `queries` (`dict`), `cif_strings` (`list[str]`)  
   Additional generator-specific keys may be included in `inputs`.
 
-- `predict(input_data: list[str]) -> dict`  
-  Required input: `input_data` as CIF strings (`list[str]`)  
-  Required output keys: `source` (`str`), `results` (`list[dict]`)  
-  Required keys per result item: `index` (`int`), `status` (`str`), `properties` (`dict`), `warnings` (`list[str]`), `error` (`str | None`)  
-  Additional predictor-specific options/properties may be included.
+   `predict(input_data: list[str]) -> dict`  
+    Required input: `input_data` as CIF strings (`list[str]`)  
+    Required output keys: `source` (`str`), `results` (`list[dict]`)  
+    Required keys per result item: `index` (`int`), `status` (`str`), `properties` (`dict`), `warnings` (`list[str]`), `error` (`str | None`), `cif_input` (`str`)  
+    Additional predictor-specific options/properties may be included.
 
 ## Adding a Feature
 
