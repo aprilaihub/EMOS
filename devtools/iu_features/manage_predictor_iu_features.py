@@ -462,19 +462,34 @@ class {class_name} extends BaseFeature {{
         this._abortController = new AbortController();
         this._cancelled = false;
 
-        this.addLog('Uploading CIF files and starting predictions...', 'info');
+        this.addLog('Reading CIF files and starting predictions...', 'info');
 
         try {{
-            const formData = new FormData();
-            this._uploadedFiles.forEach((file, idx) => {{
-                formData.append('files', file);
-            }});
+            // Read CIF files as text strings
+            const cifStrings = [];
+            for (const file of this._uploadedFiles) {{
+                if (file.name.endsWith('.cif')) {{
+                    const text = await file.text();
+                    cifStrings.push(text);
+                }} else if (file.name.endsWith('.zip')) {{
+                    this.addLog('ZIP files require backend extraction support', 'warning');
+                }}
+            }}
+
+            if (cifStrings.length === 0) {{
+                throw new Error('No valid .cif files found in selection');
+            }}
+
+            const payload = {{
+                cif_strings: cifStrings
+            }};
 
             const response = await fetch(
                 `${{backendUrl}}/api/process/iu/${{this.iuType}}/${{this.iuId}}/stream`,
                 {{
                     method: 'POST',
-                    body: formData,
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify(payload),
                     signal: this._abortController.signal,
                 }}
             );
@@ -564,7 +579,7 @@ class {class_name} extends BaseFeature {{
                 }}
             }}
 
-            return finalResult || {{ status: 'completed', cif_strings: [], results: [] }};
+            return finalResult || {{ status: 'completed', cif_strings: cifStrings, results: [] }};
         }} catch (error) {{
             if (error.name === 'AbortError') {{
                 this.addLog('Request cancelled by user', 'warning');

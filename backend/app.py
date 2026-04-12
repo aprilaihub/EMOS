@@ -268,7 +268,12 @@ def process_information_unit(iu_type, iu_id):
             if not hasattr(instance, 'predict'):
                 return jsonify({'error': f'Predictor IU {iu_id} does not expose predict()'}), 400
 
-            results = instance.predict(inputs)
+            # Extract CIF strings from input
+            cif_strings = inputs.get('cif_strings', [])
+            if not cif_strings:
+                return jsonify({'error': 'No CIF strings provided for prediction'}), 400
+
+            results = instance.predict(cif_strings)
             return jsonify({
                 'results': results,
                 'logs': logger.get_logs(),
@@ -342,6 +347,37 @@ def process_information_unit_stream(iu_type, iu_id):
                     results = instance.retrieve(inputs)
                     results['event'] = 'result'
                     yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                elif iu_type == 'predictor':
+                    cls = predictor_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown predictor IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = predictor_registry.get(iu_id)
+                    if instance is None:
+                        instance = cls(iu_id, logger)
+
+                    # Extract CIF strings from input
+                    cif_strings = inputs.get('cif_strings', [])
+                    if not cif_strings:
+                        yield f"event: error\ndata: {json.dumps({'message': 'No CIF strings provided for prediction'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    # Predictors can stream or be sync
+                    if hasattr(instance, 'predict_stream'):
+                        # Use streaming predictor
+                        for sse_event in instance.predict_stream(cif_strings):
+                            event_type = sse_event.get('event', 'log')
+                            yield f"event: {event_type}\ndata: {json.dumps(sse_event)}\n\n"
+                    else:
+                        # Fallback to sync
+                        yield f"event: log\ndata: {json.dumps({'message': 'Running predictions...', 'level': 'info'})}\n\n"
+                        results = instance.predict(cif_strings)
+                        results['event'] = 'result'
+                        yield f"event: result\ndata: {json.dumps(results)}\n\n"
 
                 else:
                     yield f"event: error\ndata: {json.dumps({'message': f'Unsupported iu_type: {iu_type}'})}\n\n"
