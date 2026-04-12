@@ -1,13 +1,13 @@
-// Auto-generated IU Feature for generator: mattergen_base_model
-class MattergenBaseModelIUFeature extends BaseFeature {
+// Auto-generated IU Feature for generator: mattergen_dft_band_gap
+class MattergenDftBandGapIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
-            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Base Model IU Feature',
-            iuMeta.iuDesc || 'Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)'
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: DFT Band Gap IU Feature',
+            iuMeta.iuDesc || 'Property-conditioned model for generating structures with a target DFT band gap (dft_band_gap)'
         );
         this.iuType = iuMeta.iuType || 'generator';
-        this.iuId = iuMeta.iuId || 'mattergen_base_model';
+        this.iuId = iuMeta.iuId || 'mattergen_dft_band_gap';
         this._abortController = null;
         this._propertyDefs = [];
         this._downloadUrl = null;
@@ -467,4 +467,4 @@ class MattergenBaseModelIUFeature extends BaseFeature {
     }
 }
 
-window.MattergenBaseModelIUFeature = MattergenBaseModelIUFeature;
+window.MattergenDftBandGapIUFeature = MattergenDftBandGapIUFeature;

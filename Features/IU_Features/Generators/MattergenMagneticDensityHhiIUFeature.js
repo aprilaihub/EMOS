@@ -1,13 +1,13 @@
-// Auto-generated IU Feature for generator: mattergen_base_model
-class MattergenBaseModelIUFeature extends BaseFeature {
+// Auto-generated IU Feature for generator: mattergen_magnetic_density_hhi
+class MattergenMagneticDensityHhiIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
-            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Base Model IU Feature',
-            iuMeta.iuDesc || 'Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)'
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Magnetic Density + HHI IU Feature',
+            iuMeta.iuDesc || 'Multi-property-conditioned model targeting magnetic density and Herfindahl-Hirschman elemental scarcity index (dft_mag_density_hhi_score)'
         );
         this.iuType = iuMeta.iuType || 'generator';
-        this.iuId = iuMeta.iuId || 'mattergen_base_model';
+        this.iuId = iuMeta.iuId || 'mattergen_magnetic_density_hhi';
         this._abortController = null;
         this._propertyDefs = [];
         this._downloadUrl = null;
@@ -467,4 +467,4 @@ class MattergenBaseModelIUFeature extends BaseFeature {
     }
 }
 
-window.MattergenBaseModelIUFeature = MattergenBaseModelIUFeature;
+window.MattergenMagneticDensityHhiIUFeature = MattergenMagneticDensityHhiIUFeature;

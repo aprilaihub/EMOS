@@ -1,13 +1,13 @@
-// Auto-generated IU Feature for generator: mattergen_base_model
-class MattergenBaseModelIUFeature extends BaseFeature {
+// Auto-generated IU Feature for generator: mattergen_chemical_system_stability
+class MattergenChemicalSystemStabilityIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
-            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Base Model IU Feature',
-            iuMeta.iuDesc || 'Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)'
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Chemical System + Stability IU Feature',
+            iuMeta.iuDesc || 'Conditional model for generating structures within a chemical system with target energy above hull (chemical_system_energy_above_hull)'
         );
         this.iuType = iuMeta.iuType || 'generator';
-        this.iuId = iuMeta.iuId || 'mattergen_base_model';
+        this.iuId = iuMeta.iuId || 'mattergen_chemical_system_stability';
         this._abortController = null;
         this._propertyDefs = [];
         this._downloadUrl = null;
@@ -467,4 +467,4 @@ class MattergenBaseModelIUFeature extends BaseFeature {
     }
 }
 
-window.MattergenBaseModelIUFeature = MattergenBaseModelIUFeature;
+window.MattergenChemicalSystemStabilityIUFeature = MattergenChemicalSystemStabilityIUFeature;

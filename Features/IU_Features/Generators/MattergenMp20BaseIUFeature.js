@@ -1,13 +1,13 @@
-// Auto-generated IU Feature for generator: mattergen_base_model
-class MattergenBaseModelIUFeature extends BaseFeature {
+// Auto-generated IU Feature for generator: mattergen_mp_20_base
+class MattergenMp20BaseIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
-            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: Base Model IU Feature',
-            iuMeta.iuDesc || 'Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)'
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'MatterGen: MP-20 Base IU Feature',
+            iuMeta.iuDesc || 'Unconditional base model trained on the MP-20 dataset for crystal structure generation (mp_20_base)'
         );
         this.iuType = iuMeta.iuType || 'generator';
-        this.iuId = iuMeta.iuId || 'mattergen_base_model';
+        this.iuId = iuMeta.iuId || 'mattergen_mp_20_base';
         this._abortController = null;
         this._propertyDefs = [];
         this._downloadUrl = null;
@@ -467,4 +467,4 @@ class MattergenBaseModelIUFeature extends BaseFeature {
     }
 }
 
-window.MattergenBaseModelIUFeature = MattergenBaseModelIUFeature;
+window.MattergenMp20BaseIUFeature = MattergenMp20BaseIUFeature;

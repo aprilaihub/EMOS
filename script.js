@@ -45,10 +45,50 @@ const iuFeatureModules = {
         },
     },
     generator: {
+        mattergen_dft_band_gap: {
+            className: 'MattergenDftBandGapIUFeature',
+            file: './Features/IU_Features/Generators/MattergenDftBandGapIUFeature.js',
+            id: 1110,
+        },
         mattergen_base_model: {
             className: 'MattergenBaseModelIUFeature',
             file: './Features/IU_Features/Generators/MattergenBaseModelIUFeature.js',
-            id: 1101,
+            id: 1111,
+        },
+        mattergen_mp_20_base: {
+            className: 'MattergenMp20BaseIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMp20BaseIUFeature.js',
+            id: 1112,
+        },
+        mattergen_chemical_system: {
+            className: 'MattergenChemicalSystemIUFeature',
+            file: './Features/IU_Features/Generators/MattergenChemicalSystemIUFeature.js',
+            id: 1113,
+        },
+        mattergen_chemical_system_stability: {
+            className: 'MattergenChemicalSystemStabilityIUFeature',
+            file: './Features/IU_Features/Generators/MattergenChemicalSystemStabilityIUFeature.js',
+            id: 1114,
+        },
+        mattergen_magnetic_density: {
+            className: 'MattergenMagneticDensityIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMagneticDensityIUFeature.js',
+            id: 1115,
+        },
+        mattergen_magnetic_density_hhi: {
+            className: 'MattergenMagneticDensityHhiIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMagneticDensityHhiIUFeature.js',
+            id: 1116,
+        },
+        mattergen_bulk_modulus: {
+            className: 'MattergenBulkModulusIUFeature',
+            file: './Features/IU_Features/Generators/MattergenBulkModulusIUFeature.js',
+            id: 1117,
+        },
+        mattergen_space_group: {
+            className: 'MattergenSpaceGroupIUFeature',
+            file: './Features/IU_Features/Generators/MattergenSpaceGroupIUFeature.js',
+            id: 1118,
         },
     },
 };
