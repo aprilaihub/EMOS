@@ -407,12 +407,7 @@ class {class_name} extends BaseFeature {{
         const files = Array.from(fileInput.files);
         this._uploadedFiles = files;
 
-        let html = '<ul style="margin:0; padding-left:16px;">';
-        files.forEach((f) => {{
-            html += `<li>${{f.name}} (${{(f.size / 1024).toFixed(2)}} KB)</li>`;
-        }});
-        html += '</ul>';
-        listEl.innerHTML = html;
+        listEl.textContent = `${{files.length}} file(s) selected`;
 
         this.addLog(`Loaded ${{files.length}} file(s)`, 'info');
     }}

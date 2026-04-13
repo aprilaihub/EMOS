@@ -2,12 +2,6 @@
   "description": "Canonical shared property definitions across all information units.",
   "version": "2.0",
   "properties": {
-    "Tc_supercon": {
-      "type": "float",
-      "description": "Superconducting critical temperature",
-      "category": "electronic",
-      "unit": "K"
-    },
     "ael_applied_pressure": {
       "type": "float",
       "description": "Returns the applied pressure for the AEL calculations.",
@@ -217,6 +211,11 @@
       "description": "Returns the vibrational free energy per cell calculated by AGL at 300 K.",
       "category": "thermal",
       "unit": "meV/cell"
+    },
+    "atomic_numbers": {
+      "type": "array",
+      "description": "Atomic numbers for atoms in the structure",
+      "category": "predictor"
     },
     "atoms_per_species": {
       "type": "array",
@@ -568,7 +567,7 @@
       "type": "float",
       "description": "Predicted electron mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
       "category": "electronic",
-      "unit": "cm\u00b2/V\u00b7s"
+      "unit": "cm²/V·s"
     },
     "elements": {
       "type": "array",
@@ -681,15 +680,15 @@
       "category": "structural_scan",
       "unit": "eV/Angstrom"
     },
-    "formation_energy_per_atom": {
-      "type": "float",
-      "description": "Formation energy per atom (PBEsol)",
-      "category": "energetic",
-      "unit": "eV/atom"
-    },
     "formation_energy_gbfs": {
       "type": "float",
       "description": "Predicted formation energy per atom using GBFS LightGBM model",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "formation_energy_per_atom": {
+      "type": "float",
+      "description": "Formation energy per atom (PBEsol)",
       "category": "energetic",
       "unit": "eV/atom"
     },
@@ -720,17 +719,17 @@
       "description": "HII score (?)",
       "unit": "???"
     },
+    "hole_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted hole mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s"
+    },
     "hse_gap": {
       "type": "float",
       "description": "Electronic band gap (HSE functional)",
       "category": "electronic",
       "unit": "eV"
-    },
-    "hole_mobility_gbfs": {
-      "type": "float",
-      "description": "Predicted hole mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
-      "category": "electronic",
-      "unit": "cm\u00b2/V\u00b7s"
     },
     "hull_distance": {
       "type": "float",
@@ -841,6 +840,11 @@
       "category": "electronic",
       "unit": "eV"
     },
+    "mag_density": {
+      "type": "float",
+      "description": "Mag density",
+      "unit": "T"
+    },
     "magnetic_moments": {
       "type": "float",
       "description": "Local magnetic moments (PBEsol)",
@@ -864,11 +868,6 @@
       "description": "Total magnetization (SCAN)",
       "category": "electronic_scan",
       "unit": "muB/unit_cell"
-    },
-    "mag_density": {
-      "type": "float",
-      "description": "Mag density",
-      "unit": "T"
     },
     "mass": {
       "type": "float",
@@ -950,6 +949,11 @@
       "type": "integer",
       "description": "Number of periodic dimensions",
       "category": "structural"
+    },
+    "num_atoms": {
+      "type": "integer",
+      "description": "Number of atoms in the structure",
+      "category": "predictor"
     },
     "p_powerfact": {
       "type": "float",
@@ -1158,6 +1162,29 @@
       "category": "structural",
       "unit": "&Aring;<sup>-3</sup>"
     },
+    "relaxed_cif": {
+      "type": "string",
+      "description": "Path to saved relaxed CIF output from MatterSim",
+      "category": "predictor"
+    },
+    "relaxed_energy": {
+      "type": "float",
+      "description": "Total energy after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV"
+    },
+    "relaxed_forces": {
+      "type": "float",
+      "description": "Forces on atoms after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV/Angstrom"
+    },
+    "relaxed_stress": {
+      "type": "float",
+      "description": "Stress tensor after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "GPa"
+    },
     "repository_version": {
       "type": "string",
       "description": "Returns the version of the AFLOW post-processor which generated the entry in the library.",
@@ -1273,38 +1300,11 @@
       "description": "Predicted SynthNN synthesizability label",
       "category": "predictor"
     },
-    "num_atoms": {
-      "type": "integer",
-      "description": "Number of atoms in the structure",
-      "category": "predictor"
-    },
-    "atomic_numbers": {
-      "type": "array",
-      "description": "Atomic numbers for atoms in the structure",
-      "category": "predictor"
-    },
-    "relaxed_energy": {
+    "Tc_supercon": {
       "type": "float",
-      "description": "Total energy after MatterSim structure relaxation",
-      "category": "predictor",
-      "unit": "eV"
-    },
-    "relaxed_forces": {
-      "type": "float",
-      "description": "Forces on atoms after MatterSim structure relaxation",
-      "category": "predictor",
-      "unit": "eV/Angstrom"
-    },
-    "relaxed_stress": {
-      "type": "float",
-      "description": "Stress tensor after MatterSim structure relaxation",
-      "category": "predictor",
-      "unit": "GPa"
-    },
-    "relaxed_cif": {
-      "type": "string",
-      "description": "Path to saved relaxed CIF output from MatterSim",
-      "category": "predictor"
+      "description": "Superconducting critical temperature",
+      "category": "electronic",
+      "unit": "K"
     },
     "type": {
       "type": "string",

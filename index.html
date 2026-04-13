@@ -354,7 +354,18 @@
                             <h3>Predictors</h3>
                             <div class="radio-group" id="predictorsList">
                             <label><input type="checkbox" ui-type="predictor" value="mattersim"> MatterSim</label>
-                            <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="synthnn"
+                                    data-iu-type="predictor"
+                                    data-iu-name="SynthNN"
+                                    data-iu-desc="Synthesis Neural Network for synthesizability prediction"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
                             <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
                             <label><input type="checkbox" ui-type="predictor" value="gbfs_2d"> GBFS-2D</label>
                             </div>
