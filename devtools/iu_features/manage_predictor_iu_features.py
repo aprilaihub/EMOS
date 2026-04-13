@@ -282,6 +282,7 @@ class {class_name} extends BaseFeature {{
         this.iuId = iuMeta.iuId || '{pred_id}';
         this._abortController = null;
         this._propertyDefs = [];
+        this._propertyUnitByKey = {{}};
         this._downloadUrl = null;
         this._uploadedFiles = [];
     }}
@@ -312,6 +313,31 @@ class {class_name} extends BaseFeature {{
         const displayName = this._toDisplayLabel(propertyName);
         if (!unit) return displayName;
         return `${{displayName}} (${{unit}})`;
+    }}
+
+    _escapeHtml(value) {{
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }}
+
+    _sanitizeDomId(value) {{
+        return String(value).replace(/[^a-zA-Z0-9_-]/g, '_');
+    }}
+
+    _isLikelyCifText(value) {{
+        if (typeof value !== 'string') return false;
+        const text = value.trim();
+        if (!text) return false;
+        return text.startsWith('data_') || text.includes('_cell_') || text.includes('loop_') || text.includes('_atom_site');
+    }}
+
+    _isCifProperty(propertyKey, value) {{
+        if (typeof value !== 'string') return false;
+        return String(propertyKey).toLowerCase().includes('cif') || this._isLikelyCifText(value);
     }}
 
     createInputsHTML() {{
@@ -435,9 +461,15 @@ class {class_name} extends BaseFeature {{
                 .filter((p) => p.predictable);
 
             this._propertyDefs = defs;
+            this._propertyUnitByKey = {{}};
+            defs.forEach((prop) => {{
+                this._propertyUnitByKey[prop.uiKey] = prop.unit || '';
+                this._propertyUnitByKey[prop.sourceKey] = prop.unit || '';
+            }});
         }} catch (error) {{
             this.addLog(`Failed to load property mappings: ${{error.message}}`, 'error');
             this._propertyDefs = [];
+            this._propertyUnitByKey = {{}};
         }}
     }}
 
@@ -644,6 +676,9 @@ class {class_name} extends BaseFeature {{
 
         const inputCifs = Array.isArray(data.cif_strings) ? data.cif_strings : [];
         const predResults = Array.isArray(data.results) ? data.results : [];
+        const selectableResults = predResults
+            .filter((r) => r && Number.isInteger(r.index))
+            .sort((a, b) => a.index - b.index);
 
         const inputSelector = document.getElementById(`iuInputSelector_${{this.featureId}}`);
         const inputRow = document.getElementById(`iuInputSelectorRow_${{this.featureId}}`);
@@ -658,14 +693,20 @@ class {class_name} extends BaseFeature {{
             return;
         }}
 
-        if (inputCifs.length === 0) {{
+        if (selectableResults.length === 0) {{
             inputRow.style.display = 'none';
             cifRow.style.display = 'none';
             propertiesRow.style.display = 'none';
             return;
         }}
 
-        inputSelector.innerHTML = inputCifs.map((_, i) => `<option value="${{i}}">Input ${{i + 1}}</option>`).join('');
+        inputSelector.innerHTML = selectableResults
+            .map((result, i) => {{
+                const idxLabel = Number.isInteger(result.index) ? `Input ${{result.index + 1}}` : `Result ${{i + 1}}`;
+                const statusLabel = result.status === 'error' ? ' (error)' : '';
+                return `<option value="${{i}}">${{idxLabel}}${{statusLabel}}</option>`;
+            }})
+            .join('');
         inputRow.style.display = '';
         cifRow.style.display = '';
         propertiesRow.style.display = '';
@@ -675,8 +716,13 @@ class {class_name} extends BaseFeature {{
             this._3dViewer = null;
         }}
 
-        const showStructure = (idx) => {{
-            const cifData = inputCifs[idx];
+        const showStructure = (selectedPos) => {{
+            const selectedResult = selectableResults[selectedPos];
+            if (!selectedResult) return;
+
+            const cifData = (typeof selectedResult.cif_input === 'string' && selectedResult.cif_input.trim())
+                ? selectedResult.cif_input
+                : (Number.isInteger(selectedResult.index) ? (inputCifs[selectedResult.index] || '') : '');
             cifViewer.textContent = cifData || '(no CIF data available)';
 
             if (!cifData || typeof $3Dmol === 'undefined') {{
@@ -699,7 +745,7 @@ class {class_name} extends BaseFeature {{
                 this._3dViewer = viewer;
             }}
 
-            this._updateProperties(idx, predResults);
+            this._updateProperties(selectedResult);
         }};
 
         showStructure(0);
@@ -719,35 +765,117 @@ class {class_name} extends BaseFeature {{
         newSelector.addEventListener('change', () => showStructure(parseInt(newSelector.value, 10)));
     }}
 
-    _updateProperties(inputIdx, predResults) {{
+    _updateProperties(result) {{
         const propertiesDisplay = document.getElementById(`iuPropertiesDisplay_${{this.featureId}}`);
         if (!propertiesDisplay) return;
 
-        const result = predResults.find((r) => r.index === inputIdx);
         if (!result) {{
-            propertiesDisplay.innerHTML = '<p style="color:#999;">No prediction for this input</p>';
+            propertiesDisplay.innerHTML = '<p style="color:#999;">No prediction result for this input</p>';
+            return;
+        }}
+
+        if (result.status === 'error') {{
+            const errMsg = result.error ? this._escapeHtml(result.error) : 'Unknown prediction error';
+            propertiesDisplay.innerHTML = `<p style="color:#c0392b;">${{errMsg}}</p>`;
             return;
         }}
 
         const properties = result.properties || {{}};
+        const entries = Object.entries(properties);
+        if (entries.length === 0) {{
+            propertiesDisplay.innerHTML = '<p style="color:#999;">No properties returned for this input</p>';
+            return;
+        }}
+
         let html = '<div style="display:grid; gap:8px;">';
+        const cifPropertyViews = [];
 
-        this._propertyDefs.forEach((propDef) => {{
-            const value = properties[propDef.sourceKey];
-            const displayLabel = this._formatLabelWithUnit(propDef.uiKey, propDef.unit);
-            const displayValue = value !== null && value !== undefined ? String(value) : 'N/A';
+        entries.forEach(([propKey, value]) => {{
+            const unit = this._propertyUnitByKey[propKey] || '';
+            const displayLabel = this._formatLabelWithUnit(propKey, unit);
+
+            if (this._isCifProperty(propKey, value)) {{
+                const safeId = this._sanitizeDomId(`${{this.featureId}}_${{result.index}}_${{propKey}}`);
+                const viewerId = `iuPropStructureViewer_${{safeId}}`;
+                const textId = `iuPropCifViewer_${{safeId}}`;
+                const toggleId = `iuPropToggleCifBtn_${{safeId}}`;
+
+                html += `
+                    <div style="padding:8px; background:#f9f9f9; border-radius:4px;">
+                        <strong style="color:#333;">${{this._escapeHtml(displayLabel)}}</strong>
+                        <div id="${{viewerId}}" style="width:100%; height:300px; position:relative; background:#ffffff; border-radius:6px; margin-top:6px;"></div>
+                        <div style="margin-top:6px; text-align:right;">
+                            <button id="${{toggleId}}" class="btn-secondary" style="font-size:11px; padding:4px 10px; cursor:pointer; background:#313244; color:#cdd6f4; border:1px solid #45475a; border-radius:4px;">Show CIF Text</button>
+                        </div>
+                        <pre id="${{textId}}" class="cif-viewer" style="display:none; max-height:240px; overflow:auto; background:#1e1e2e; color:#cdd6f4; padding:12px; border-radius:6px; font-size:12px; white-space:pre-wrap; margin-top:6px;"></pre>
+                    </div>
+                `;
+
+                cifPropertyViews.push({{ viewerId, textId, toggleId, cifData: typeof value === 'string' ? value : '' }});
+                return;
+            }}
+
+            let displayValue = 'N/A';
+            if (value !== null && value !== undefined) {{
+                if (typeof value === 'object') {{
+                    displayValue = JSON.stringify(value);
+                }} else {{
+                    displayValue = String(value);
+                }}
+            }}
+
             const valueColor = displayValue === 'N/A' ? '#999' : '#333';
-
             html += `
-                <div style="display:flex; justify-content:space-between; padding:6px; background:#f9f9f9; border-radius:4px;">
-                    <strong style="color:#333;">${{displayLabel}}</strong>
-                    <span style="color:${{valueColor}}; font-family:monospace;">${{displayValue}}</span>
+                <div style="display:flex; justify-content:space-between; gap:12px; padding:6px; background:#f9f9f9; border-radius:4px; align-items:flex-start;">
+                    <strong style="color:#333;">${{this._escapeHtml(displayLabel)}}</strong>
+                    <span style="color:${{valueColor}}; font-family:monospace; text-align:right; white-space:pre-wrap; word-break:break-word;">${{this._escapeHtml(displayValue)}}</span>
                 </div>
             `;
         }});
 
         html += '</div>';
         propertiesDisplay.innerHTML = html;
+
+        cifPropertyViews.forEach((entry) => {{
+            const viewerContainer = document.getElementById(entry.viewerId);
+            const textEl = document.getElementById(entry.textId);
+            const toggleBtn = document.getElementById(entry.toggleId);
+            const cifData = entry.cifData || '';
+
+            if (textEl) {{
+                textEl.textContent = cifData || '(no CIF data available)';
+            }}
+
+            if (!viewerContainer || !cifData || typeof $3Dmol === 'undefined') {{
+                if (viewerContainer) {{
+                    viewerContainer.innerHTML = '<p style="color:#333;padding:20px;">3D viewer unavailable</p>';
+                }}
+            }} else {{
+                viewerContainer.innerHTML = '';
+                const viewer = $3Dmol.createViewer(viewerContainer, {{
+                    backgroundColor: '#ffffff',
+                }});
+
+                viewer.addModel(cifData, 'cif', {{ doAssembly: true, duplicateAssemblyAtoms: true }});
+                viewer.setStyle({{}}, {{
+                    sphere: {{ radius: 0.4, colorscheme: 'Jmol' }},
+                    stick: {{ radius: 0.15, colorscheme: 'Jmol' }},
+                }});
+                viewer.addUnitCell();
+                viewer.zoomTo();
+                viewer.render();
+            }}
+
+            if (toggleBtn && textEl) {{
+                const newBtn = toggleBtn.cloneNode(true);
+                toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+                newBtn.addEventListener('click', () => {{
+                    const hidden = textEl.style.display === 'none';
+                    textEl.style.display = hidden ? 'block' : 'none';
+                    newBtn.textContent = hidden ? 'Hide CIF Text' : 'Show CIF Text';
+                }});
+            }}
+        }});
     }}
 
     destroy() {{

@@ -92,11 +92,6 @@ const iuFeatureModules = {
         },
     },
     predictor: {
-        synthnn: {
-            className: 'SynthnnIUFeature',
-            file: './Features/IU_Features/Predictors/SynthnnIUFeature.js',
-            id: 2001,
-        },
     }
 };
 
