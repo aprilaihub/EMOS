@@ -393,123 +393,137 @@ class GbfsPredictor(BasePredictor):
     def __init__(self, predictor_name: str, property_name: str = "bandgap", 
                  model_dir: Optional[str] = None, logger: Optional[Any] = None):
         """
-        Initialize GBFS predictor with pre-trained models and scalers.
+        Initialize GBFS predictor with pre-trained models and scalers for ALL properties.
         
         Args:
             predictor_name (str): Name of the predictor instance
-            property_name (str): Name of property to predict
-                Supported: 'bandgap', 'e_form', 'dielectric', 'is_metal', 'mob_n', 'mob_p'
-                Default: 'bandgap'
-            model_dir (str): Optional directory containing models. If None, defaults to 
-                Information_Units/Predictors/Gbfs/{property_name}/
+            property_name (str): Deprecated. Kept for backward compatibility.
+                (All 7 properties are now loaded regardless of this value)
+            model_dir (str): Deprecated. Not used (models loaded from Gbfs parent directory)
             logger: Optional logger instance
             
         Raises:
             FileNotFoundError: If required model files are not found
-            ValueError: If property_name is invalid or files are missing
+            ValueError: If property directories or files are missing
             OSError: If directory structure is malformed
         """
         super().__init__(predictor_name, logger)
         self.source = "gbfs"
         
+        # For backward compatibility
         self.property_name = property_name
         
-        # Determine model directory
-        if model_dir is None:
-            model_dir = os.path.join(
-                os.path.dirname(__file__),
-                property_name
-            )
+        # Get the base directory containing all property folders
+        base_dir = os.path.dirname(__file__)
+        self.model_dir = base_dir
         
-        self.model_dir = model_dir
+        # All 6 supported properties
+        self.all_properties = ['bandgap', 'dielectric', 'e_form', 'is_metal', 'mob_n', 'mob_p']
         
-        # Validate directory exists
-        if not os.path.isdir(model_dir):
-            raise ValueError(
-                f"Model directory not found for property '{property_name}': {model_dir}\n"
-                f"Supported properties: bandgap, e_form, dielectric, is_metal, mob_n, mob_p"
-            )
+        # Initialize storage for models, scalers, and feature lists
+        self.models = {}
+        self.scalers = {}
+        self.feature_lists = {}
         
-        # Expected file paths
-        model_path = os.path.join(model_dir, f"{property_name}_model.pkl")
-        scaler_path = os.path.join(model_dir, f"{property_name}_scaler.pkl")
-        feature_list_path = os.path.join(model_dir, f"{property_name}_features.pkl")
-        
-        # Validate all required files exist
-        missing_files = []
-        for file_path, file_type in [
-            (model_path, "model"),
-            (scaler_path, "scaler"),
-            (feature_list_path, "features")
-        ]:
-            if not os.path.exists(file_path):
-                missing_files.append(f"{file_type}: {file_path}")
-        
-        if missing_files:
-            raise FileNotFoundError(
-                f"Missing required files for property '{property_name}':\n" +
-                "\n".join(f"  - {f}" for f in missing_files)
-            )
-        
-        try:
-            # Load model, scaler, and features
-            self.model = load_joblib(model_path)
-            self.scaler = load_joblib(scaler_path)
+        # Load models for all 7 properties
+        for prop in self.all_properties:
+            prop_dir = os.path.join(base_dir, prop)
             
-            # Load features - handle both list and DataFrame formats
-            features_data = load_joblib(feature_list_path)
-            if isinstance(features_data, pd.DataFrame):
-                # Extract feature names from DataFrame 'feature' column
-                self.feature_list = features_data['feature'].tolist()
-            elif isinstance(features_data, pd.Series):
-                # Convert Series to list
-                self.feature_list = features_data.tolist()
-            elif isinstance(features_data, (list, tuple)):
-                self.feature_list = list(features_data)
-            else:
-                # Try to convert to list (e.g., numpy array)
-                try:
-                    self.feature_list = list(features_data)
-                except Exception as e:
-                    raise TypeError(
-                        f"Unable to convert features data to list. "
-                        f"Expected list/tuple/DataFrame/Series, got {type(features_data)}: {str(e)}"
+            # Validate property directory exists
+            if not os.path.isdir(prop_dir):
+                raise ValueError(
+                    f"Property directory not found for '{prop}': {prop_dir}\n"
+                    f"Available properties: {', '.join(self.all_properties)}"
+                )
+            
+            # Expected file paths
+            model_path = os.path.join(prop_dir, f"{prop}_model.pkl")
+            scaler_path = os.path.join(prop_dir, f"{prop}_scaler.pkl")
+            feature_list_path = os.path.join(prop_dir, f"{prop}_features.pkl")
+            
+            # Validate all required files exist
+            missing_files = []
+            for file_path, file_type in [
+                (model_path, "model"),
+                (scaler_path, "scaler"),
+                (feature_list_path, "features")
+            ]:
+                if not os.path.exists(file_path):
+                    missing_files.append(f"{file_type}: {file_path}")
+            
+            if missing_files:
+                raise FileNotFoundError(
+                    f"Missing required files for property '{prop}':\n" +
+                    "\n".join(f"  - {f}" for f in missing_files)
+                )
+            
+            try:
+                # Load model and scaler
+                self.models[prop] = load_joblib(model_path)
+                self.scalers[prop] = load_joblib(scaler_path)
+                
+                # Load features - handle both list and DataFrame formats
+                features_data = load_joblib(feature_list_path)
+                if isinstance(features_data, pd.DataFrame):
+                    # Extract feature names from DataFrame 'feature' column
+                    self.feature_lists[prop] = features_data['feature'].tolist()
+                elif isinstance(features_data, pd.Series):
+                    # Convert Series to list
+                    self.feature_lists[prop] = features_data.tolist()
+                elif isinstance(features_data, (list, tuple)):
+                    self.feature_lists[prop] = list(features_data)
+                else:
+                    # Try to convert to list (e.g., numpy array)
+                    try:
+                        self.feature_lists[prop] = list(features_data)
+                    except Exception as e:
+                        raise TypeError(
+                            f"Unable to convert features data to list. "
+                            f"Expected list/tuple/DataFrame/Series, got {type(features_data)}: {str(e)}"
+                        )
+                
+                if not self.feature_lists[prop]:
+                    raise ValueError(
+                        f"Feature list is empty for property '{prop}'. "
+                        f"Check feature file: {feature_list_path}"
                     )
-        except (OSError, IOError) as e:
-            raise FileNotFoundError(
-                f"Error loading model files for property '{property_name}': {str(e)}"
-            )
-        except Exception as e:
-            raise RuntimeError(
-                f"Error initializing {property_name} predictor: {str(e)}"
-            )
+                    
+            except (OSError, IOError) as e:
+                raise FileNotFoundError(
+                    f"Error loading model files for property '{prop}': {str(e)}"
+                )
+            except Exception as e:
+                raise RuntimeError(
+                    f"Error initializing {prop} predictor: {str(e)}"
+                )
         
-        if not self.feature_list:
-            raise ValueError(
-                f"Feature list is empty for property '{property_name}'. "
-                f"Check feature file: {feature_list_path}"
-            )
+        # Use the first property's feature list as the base (should be same for all)
+        # In multi-property prediction, we only generate features once
+        self.feature_list = self.feature_lists['bandgap']
+        self.model = self.models['bandgap']
+        self.scaler = self.scalers['bandgap']
         
         if self.logger:
             self.logger.log(
-                f"Initialized {property_name} predictor with {len(self.feature_list)} features",
+                f"Initialized GBFS predictor with all 7 properties using {len(self.feature_list)} features",
                 'info'
             )
 
     def info(self) -> str:
         """Return description of predictor capabilities."""
         return (
-            f"GBFS ({self.property_name}): Light Gradient Boosting Machine (LGBM) "
-            f"predictor for {self.property_name} prediction trained on GBFS workflow data. "
+            f"GBFS (Multi-Property): Light Gradient Boosting Machine (LGBM) "
+            f"predictor for ALL 6 properties: bandgap (eV), dielectric (dimensionless), "
+            f"e_form (eV/atom), is_metal (classification), "
+            f"mob_n (cm²/V·s), mob_p (cm²/V·s). "
             f"Uses matminer composition and structure featurizers to generate "
-            f"{len(self.feature_list)} input features for property prediction. "
-            f"Supported properties: bandgap (eV), e_form (eV/atom), dielectric (dimensionless), "
-            f"is_metal (classification), mob_n (cm²/V·s), mob_p (cm²/V·s)."
+            f"{len(self.feature_list)} input features. Each property has its own "
+            f"pre-trained model and scaler trained on GBFS workflow data."
         )
 
     def predict(self, inputs: list[str]) -> dict[str, Any]:
         """
-        Predict properties from crystal structure data.
+        Predict ALL 6 properties from crystal structure data.
         
         Expects direct list input:
         - list[str] of CIF contents
@@ -520,12 +534,13 @@ class GbfsPredictor(BasePredictor):
         Pipeline:
         1. Load structure from CIF string input
         2. Extract composition from structure
-        3. Generate base features using matminer featurizers
+        3. Generate base features using matminer featurizers (once per structure)
         4. Engineer features by dividing base features (e.g., "feature_a/feature_b")
         5. Maintain strict feature order (LGBM does not check feature names)
-        6. Scale features using pre-trained scaler
-        7. Generate predictions using pre-trained LGBM model
-        8. Apply inverse log10 transformation for mobility predictions
+        6. For each of the 6 properties:
+           a. Scale features using property-specific pre-trained scaler
+           b. Generate prediction using property-specific pre-trained LGBM model
+           c. Apply inverse log10 transformation for mobility predictions
         
         Args:
             inputs (list[str]): CIF string inputs.
@@ -539,19 +554,22 @@ class GbfsPredictor(BasePredictor):
                             "index": int,
                             "status": "ok" | "error",
                             "properties": {
-                                "property": str,
-                                "prediction": list[float],
-                                "probabilities": list[list[float]] (optional)
+                                "bandgap": float,
+                                "dielectric": float,
+                                "e_form": float,
+                                "is_metal": float,  # Probability of metallic class
+                                "mob_n": float,
+                                "mob_p": float
                             },
                             "warnings": list[str],
                             "error": str | None,
                             "cif_input": str
                         }
                     ]
-                }.
+                }
         """
         if self.logger:
-            self.logger.log(f"Running {self.property_name} prediction", 'info')
+            self.logger.log("Running multi-property GBFS prediction", 'info')
 
         cif_strings = self._extract_cif_strings(inputs)
         if not cif_strings:
@@ -578,14 +596,14 @@ class GbfsPredictor(BasePredictor):
                     raise ValueError("Failed to parse CIF: No structures extracted")
                 structure = parsed[0]
                 
-                properties = self._predict_structure(structure)
+                properties, warnings = self._predict_structure(structure)
                 results.append(
                     {
                         "index": idx,
                         "cif_input": cif_str,
                         "status": "ok",
                         "properties": properties,
-                        "warnings": [],
+                        "warnings": warnings,
                         "error": None,
                     }
                 )
@@ -603,46 +621,80 @@ class GbfsPredictor(BasePredictor):
 
         return {"source": self.source, "results": results}
 
-    def _predict_structure(self, structure: Structure) -> Dict[str, Any]:
-        """Run feature generation and prediction for a single structure."""
+    def _predict_structure(self, structure: Structure) -> Tuple[Dict[str, Any], List[str]]:
+        """
+        Run feature generation and prediction for ALL 6 properties for a single structure.
+        
+        Each property uses its own feature list and models, so features are generated
+        per-property to match the specific features each model was trained with.
+        """
         composition = structure_to_composition(structure)
 
-        # Generate base features
-        features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
-
         if self.logger:
-            base_count = sum(1 for f in self.feature_list if '/' not in f)
-            eng_count = sum(1 for f in self.feature_list if '/' in f)
             self.logger.log(
-                f"Generated {base_count} base + {eng_count} engineered features",
+                f"Predicting all 6 properties from structure",
                 'info'
             )
 
-        # Scale features if scaler has transform method
-        if hasattr(self.scaler, 'transform'):
-            scaled = self.scaler.transform(features)
-        else:
-            # If no transform method (e.g., scaler is a model), use features directly
-            scaled = features
-
-        # Predict
-        prediction = self.model.predict(scaled)
-
-        # Apply inverse log10 transformation for mobility predictions
-        if self.property_name in ['mob_n', 'mob_p']:
-            prediction = 10 ** prediction
-
-        result: Dict[str, Any] = {
-            "property": self.property_name,
-            "prediction": prediction.tolist(),
-        }
-        if hasattr(self.model, 'predict_proba'):
+        # Predict for all 6 properties
+        all_properties: Dict[str, Any] = {}
+        warnings: List[str] = []
+        
+        for prop in self.all_properties:
             try:
-                probas = self.model.predict_proba(scaled)
-                result["probabilities"] = probas.tolist()
-            except Exception:
-                pass
-        return result
+                model = self.models[prop]
+                scaler = self.scalers[prop]
+                feature_list = self.feature_lists[prop]
+                
+                # Generate features specific to this property
+                features = generate_features(structure, composition, feature_list, nan_strategy="zero")
+                
+                # Scale features using property-specific scaler
+                if hasattr(scaler, 'transform'):
+                    scaled = scaler.transform(features)
+                else:
+                    # If no transform method (e.g., scaler is a model), use features directly
+                    scaled = features
+
+                if prop == 'is_metal':
+                    all_properties[prop] = self._extract_metal_probability(model, scaled)
+                else:
+                    # Predict using property-specific model
+                    prediction = model.predict(scaled)
+
+                    # Apply inverse log10 transformation for mobility predictions
+                    if prop in ['mob_n', 'mob_p']:
+                        prediction = 10 ** prediction
+
+                    all_properties[prop] = float(np.asarray(prediction).reshape(-1)[0])
+                
+            except Exception as exc:
+                # Keep a flat contract and report per-property issues via warnings
+                all_properties[prop] = None
+                warnings.append(f"{prop}: {str(exc)}")
+
+        return all_properties, warnings
+
+    def _extract_metal_probability(self, model: Any, scaled: np.ndarray) -> float:
+        """Return probability of the structure being metallic (positive class)."""
+        probas = model.predict_proba(scaled)
+        probas_arr = np.asarray(probas)
+        if probas_arr.ndim == 1:
+            return float(probas_arr.reshape(-1)[0])
+
+        if probas_arr.shape[1] == 1:
+            return float(probas_arr[0, 0])
+
+        # Prefer explicit class lookup when available.
+        classes = getattr(model, "classes_", None)
+        if classes is not None:
+            normalized = [str(c).strip().lower() for c in classes]
+            for idx, label in enumerate(normalized):
+                if label in {"1", "true", "metal", "is_metal"}:
+                    return float(probas_arr[0, idx])
+
+        # Fallback: use positive-class probability (common binary classifier layout).
+        return float(probas_arr[0, -1])
 
     def _extract_structures(self, inputs) -> List[Structure]:
         """Extract structures from direct list input."""

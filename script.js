@@ -105,12 +105,12 @@ const iuFeatureModules = {
         gbfs: {
             className: 'GbfsIUFeature',
             file: './Features/IU_Features/Predictors/GbfsIUFeature.js',
-            id: 2003,
+            id: 2005,
         },
         gbfs_2d: {
             className: 'Gbfs2dIUFeature',
             file: './Features/IU_Features/Predictors/Gbfs2dIUFeature.js',
-            id: 2004,
+            id: 2006,
         },
     }
 };
