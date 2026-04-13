@@ -59,6 +59,15 @@ class SimpleLogger:
 logger = SimpleLogger()
 
 
+def _instantiate_iu(cls, iu_name, logger_obj):
+    """Instantiate IU classes with logger passed safely by keyword when supported."""
+    try:
+        return cls(iu_name, logger=logger_obj)
+    except TypeError:
+        # Backward-compatible fallback for constructors that only support positional args
+        return cls(iu_name, logger_obj)
+
+
 @app.route('/api/features/info', methods=['GET'])
 def get_features_info():
     """Get information about available features and their architectures"""
@@ -145,15 +154,15 @@ def toggle_IU():
             # Instantiate and store
             if ui_type=="generator":
                 cls = generator_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 generator_registry[class_name] = instance
             elif ui_type=="database":
                 cls = database_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 database_registry[class_name] = instance
             elif ui_type=="predictor":
                 cls = predictor_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 predictor_registry[class_name] = instance
             else:
                 return jsonify({"message": "Unknown type"}), 400
@@ -226,7 +235,7 @@ def process_information_unit(iu_type, iu_id):
             # Reuse active instance if toggled on; otherwise instantiate transiently.
             instance = database_registry.get(iu_id)
             if instance is None:
-                instance = cls(iu_id, logger)
+                instance = _instantiate_iu(cls, iu_id, logger)
 
             results = instance.retrieve(inputs)
             return jsonify({
@@ -243,7 +252,7 @@ def process_information_unit(iu_type, iu_id):
 
             instance = generator_registry.get(iu_id)
             if instance is None:
-                instance = cls(iu_id, logger)
+                instance = _instantiate_iu(cls, iu_id, logger)
 
             if not hasattr(instance, 'generate'):
                 return jsonify({'error': f'Generator IU {iu_id} does not expose generate()'}), 400
@@ -263,7 +272,7 @@ def process_information_unit(iu_type, iu_id):
 
             instance = predictor_registry.get(iu_id)
             if instance is None:
-                instance = cls(iu_id, logger)
+                instance = _instantiate_iu(cls, iu_id, logger)
 
             if not hasattr(instance, 'predict'):
                 return jsonify({'error': f'Predictor IU {iu_id} does not expose predict()'}), 400
@@ -317,7 +326,7 @@ def process_information_unit_stream(iu_type, iu_id):
 
                     instance = generator_registry.get(iu_id)
                     if instance is None:
-                        instance = cls(iu_id, logger)
+                        instance = _instantiate_iu(cls, iu_id, logger)
 
                     # Check if generator supports streaming
                     if hasattr(instance, 'generate_stream'):
@@ -341,7 +350,7 @@ def process_information_unit_stream(iu_type, iu_id):
 
                     instance = database_registry.get(iu_id)
                     if instance is None:
-                        instance = cls(iu_id, logger)
+                        instance = _instantiate_iu(cls, iu_id, logger)
 
                     # Databases don't typically stream, so sync only
                     results = instance.retrieve(inputs)
@@ -357,7 +366,7 @@ def process_information_unit_stream(iu_type, iu_id):
 
                     instance = predictor_registry.get(iu_id)
                     if instance is None:
-                        instance = cls(iu_id, logger)
+                        instance = _instantiate_iu(cls, iu_id, logger)
 
                     # Extract CIF strings from input
                     cif_strings = inputs.get('cif_strings', [])

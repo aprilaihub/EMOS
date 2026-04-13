@@ -92,6 +92,26 @@ const iuFeatureModules = {
         },
     },
     predictor: {
+        mattersim: {
+            className: 'MattersimIUFeature',
+            file: './Features/IU_Features/Predictors/MattersimIUFeature.js',
+            id: 2001,
+        },
+        synthnn: {
+            className: 'SynthnnIUFeature',
+            file: './Features/IU_Features/Predictors/SynthnnIUFeature.js',
+            id: 2002,
+        },
+        gbfs: {
+            className: 'GbfsIUFeature',
+            file: './Features/IU_Features/Predictors/GbfsIUFeature.js',
+            id: 2003,
+        },
+        gbfs_2d: {
+            className: 'Gbfs2dIUFeature',
+            file: './Features/IU_Features/Predictors/Gbfs2dIUFeature.js',
+            id: 2004,
+        },
     }
 };
 

@@ -353,10 +353,54 @@
                         <div class="info-column">
                             <h3>Predictors</h3>
                             <div class="radio-group" id="predictorsList">
-                            <label><input type="checkbox" ui-type="predictor" value="mattersim"> MatterSim</label>
-                            <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
-                            <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
-                            <label><input type="checkbox" ui-type="predictor" value="gbfs_2d"> GBFS-2D</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="mattersim"> MatterSim</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattersim"
+                                    data-iu-type="predictor"
+                                    data-iu-name="MatterSim"
+                                    data-iu-desc="Universal neural network potential for materials simulation"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="synthnn"
+                                    data-iu-type="predictor"
+                                    data-iu-name="SynthNN"
+                                    data-iu-desc="Synthesis Neural Network for synthesizability prediction"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="gbfs"
+                                    data-iu-type="predictor"
+                                    data-iu-name="GBFS"
+                                    data-iu-desc="Pretrained predictors from GBFS workflow, implemented in Python"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="gbfs_2d"> GBFS-2D</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="gbfs_2d"
+                                    data-iu-type="predictor"
+                                    data-iu-name="GBFS-2D"
+                                    data-iu-desc="Pretrained GBFS workflow predictors specialized for 2D layered materials"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >&#9654;</button>
+                            </div>
                             </div>
                         </div>
                     </div>
