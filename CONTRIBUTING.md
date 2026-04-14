@@ -1,5 +1,7 @@
 # Contributing to EMOS
 
+Typical contributions to EMOS are either Information Units (IUs) or Features. Databases are IUs that retrieve candidate structures and metadata from external or curated sources. Generators are IUs that create new candidate materials, often guided by constraints or property targets. Predictors are IUs that estimate material properties from structure inputs. Materials Exploration features help users search, filter, and compare materials/design candidates across IUs. Electronics Application features focus on device-relevant analysis and property workflows for electronics-oriented use cases.
+
 The EMOS devtools automate UI generation and backend integration. Define your component in `devtools/ui_data.json`, run the contribution tool, and it generates functional templates. Then implement your Python-based algorithms—no frontend knowledge required.
 
 ## Quick Start
@@ -18,7 +20,11 @@ Information units are the building blocks: **Databases**, **Generators**, and **
 
 ### Example: Adding a Database
 
-**1. Edit core metadata** (`devtools/ui_data.json`):
+**1. Add one new database entry in `devtools/ui_data.json`:**
+
+In `information_units -> databases`, add exactly one new key/value line for your database display name and description.
+
+Example (add only the new line shown):
 
 ```json
 {
@@ -44,7 +50,7 @@ This creates:
 - `README.md` and `__init__.py`
 - Updates `DatabaseFactory.py` automatically
 
-**4. Implement the `retrieve()` method:**
+**3. Implement the `retrieve()` method (and property mapping):**
 
 Navigate to the generated file and add your logic:
 
@@ -63,7 +69,30 @@ def retrieve(self, inputs: dict) -> str:
 
 Add helper files in the same folder if needed.
 
-> **Note**: Generators and Predictors follow the same workflow. Implement `generate()` for generators and `predict()` for predictors instead of `retrieve()`.
+Create/update your mapping in:
+
+- `Information_Units/property_mappings/sources/databases/<database_id>.json`
+
+This mapping drives IU input rendering and backend payload keys in the IU panel.
+
+> **Note**: Generators and Predictors follow the same workflow. Implement `generate()` for generators and `predict()` for predictors instead of `retrieve()`, and ensure each implementation follows the input/output requirements in [Required I/O Contracts (Information Units)](#required-io-contracts-information-units).
+
+**4. Add IU feature buttons (IU UI panels):**
+
+Run:
+
+```bash
+python devtools/iu_features/manage_iu_features.py
+```
+
+Then select:
+- IU type: `database`
+- Action: `add`
+- Your new database IU id
+
+This wires the IU panel button in `index.html`, registers the IU panel module in `script.js`, and creates the IU feature JS panel implementation.
+
+See [Adding IU Feature Buttons (IU UI Panels)](#adding-iu-feature-buttons-iu-ui-panels) for full details and non-interactive commands.
 
 ### Required I/O Contracts (Information Units)
 
@@ -82,6 +111,50 @@ Add helper files in the same folder if needed.
     Required output keys: `source` (`str`), `results` (`list[dict]`)  
     Required keys per result item: `index` (`int`), `status` (`str`), `properties` (`dict`), `warnings` (`list[str]`), `error` (`str | None`), `cif_input` (`str`)  
     Additional predictor-specific options/properties may be included.
+
+### Adding IU Feature Buttons (IU UI Panels)
+
+After your IU implementation works (`retrieve`/`generate`/`predict`) and your property mapping is defined, add the IU feature button + panel wiring so users can open the IU-specific UI from the sidebar.
+
+**Prerequisites (required):**
+- Your IU is registered in its factory via `devtools/contribution_tool.py` output.
+- Your IU method is implemented and tested: `retrieve()` for databases, `generate()` for generators, or `predict()` for predictors, following the contract in [Required I/O Contracts (Information Units)](#required-io-contracts-information-units).
+- A mapping file exists in `Information_Units/property_mappings/sources/<iu_type>/<iu_id>.json`:
+  - Databases: `Information_Units/property_mappings/sources/databases/`
+  - Generators: `Information_Units/property_mappings/sources/generators/`
+  - Predictors: `Information_Units/property_mappings/sources/predictors/`
+- Mapping properties are correctly marked for UI behavior (`retrievable`, `generatable`, or `predictable`, plus optional `range_support`).
+
+**Recommended workflow:**
+
+1. **Run unified IU feature manager**
+
+```bash
+python devtools/iu_features/manage_iu_features.py
+```
+
+2. **Choose IU type** (`database`, `generator`, or `predictor`) when prompted.
+3. **Choose action** (`add`) and select your IU from the list.
+
+This updates:
+- `index.html` (adds IU feature button row)
+- `script.js` (adds IU feature module entry)
+- `Features/IU_Features/<IUType>/<GeneratedClassName>.js` (creates IU panel implementation)
+
+**Useful non-interactive commands:**
+
+```bash
+# List IU feature status for all IU types
+python devtools/iu_features/manage_iu_features.py --list
+
+# Add an IU feature directly
+python devtools/iu_features/manage_iu_features.py --type generator --add <generator_id> --yes
+
+# Remove an IU feature directly
+python devtools/iu_features/manage_iu_features.py --type predictor --remove <predictor_id> --yes
+```
+
+> Tip: If the script warns that mapping is missing, add/fix `Information_Units/property_mappings/sources/<iu_type>/<iu_id>.json` first so the generated IU panel can render property-driven inputs correctly.
 
 ## Adding a Feature
 
