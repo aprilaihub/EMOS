@@ -1,0 +1,7 @@
+{
+  "description": "Source-specific mappings for mattergen_mp_20_base (generators).",
+  "version": "2.0",
+  "source_type": "generators",
+  "source": "mattergen_mp_20_base",
+  "properties": {}
+}

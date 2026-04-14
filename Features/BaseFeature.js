@@ -18,6 +18,7 @@ const _mappingSourcePaths = [
     './Information_Units/property_mappings/sources/generators/mattergen_magnetic_density_hhi.json',
     './Information_Units/property_mappings/sources/generators/mattergen_space_group.json',
     './Information_Units/property_mappings/sources/predictors/gbfs.json',
+    './Information_Units/property_mappings/sources/predictors/gbfs2d.json',
     './Information_Units/property_mappings/sources/predictors/mattersim.json',
     './Information_Units/property_mappings/sources/predictors/synthnn.json',
 ];

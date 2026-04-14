@@ -6,47 +6,47 @@
   "properties": {
     "energy": {
       "name": "energy",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "forces": {
       "name": "forces",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "stress_tensor": {
       "name": "stress",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "num_atoms": {
       "name": "num_atoms",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "atomic_numbers": {
       "name": "atomic_numbers",
-      "predicatble": true,
+      "predictable": true,
       "range_support": false
     },
     "relaxed_energy": {
       "name": "relaxed_energy",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "relaxed_forces": {
       "name": "relaxed_forces",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "relaxed_stress": {
       "name": "relaxed_stress",
-      "predicatble": true,
+      "predictable": true,
       "range_support": true
     },
     "relaxed_cif": {
       "name": "relaxed_cif",
-      "predicatble": true,
+      "predictable": true,
       "range_support": false
     }
   }

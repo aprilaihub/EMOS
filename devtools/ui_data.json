@@ -40,7 +40,8 @@
     "predictors": {
       "MatterSim": "Universal neural network potential for materials simulation",
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
-      "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python"
+      "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python",
+      "GBFS-2D": "Pretrained GBFS workflow predictors specialized for 2D layered materials"
     }
   },
   "features": {

@@ -442,129 +442,117 @@ class Gbfs2dPredictor(BasePredictor):
     Each property uses matminer features from composition and structure data.
     """
     
-    def __init__(self, predictor_name: str, property_name: str = "bandgap", 
+    def __init__(self, predictor_name: str, property_name: str = "bandgap_2d",
                  model_dir: Optional[str] = None, logger: Optional[Any] = None):
         """
-        Initialize GBFS-2D predictor with pre-trained models and scalers.
-        
+        Initialize GBFS-2D predictor with pre-trained models and scalers for ALL 3 properties.
+
         Args:
             predictor_name (str): Name of the predictor instance
-            property_name (str): Name of property to predict
-                Supported: 'bandgap', 'is_metal', 'is_stable'
-                Default: 'bandgap'
-            model_dir (str): Optional directory containing models. If None, defaults to 
-                Information_Units/Predictors/Gbfs-2d/{property_name}/
+            property_name (str): Deprecated. Kept for backward compatibility.
+                (All 3 properties are loaded regardless of this value)
+            model_dir (str): Deprecated. Not used.
             logger: Optional logger instance
-            
+
         Raises:
             FileNotFoundError: If required model files are not found
-            ValueError: If property_name is invalid or files are missing
+            ValueError: If property directories or files are missing
         """
         super().__init__(predictor_name, logger)
         self.source = "gbfs-2d"
-        
+
+        # For backward compatibility
         self.property_name = property_name
-        
-        # Validate supported properties
-        supported_properties = ['bandgap', 'is_metal', 'is_stable']
-        if property_name not in supported_properties:
-            raise ValueError(
-                f"Unsupported property: {property_name}. "
-                f"Supported: {', '.join(supported_properties)}"
-            )
-        
-        # Determine model directory
-        if model_dir is None:
-            model_dir = os.path.join(
-                os.path.dirname(__file__),
-                f"{property_name}_2d"
-            )
-        
-        self.model_dir = model_dir
-        
-        # Validate directory exists
-        if not os.path.isdir(model_dir):
-            raise ValueError(
-                f"Model directory not found for property '{property_name}': {model_dir}\n"
-                f"Supported properties: bandgap, is_metal, is_stable"
-            )
-        
-        # Expected file paths (using property_2d naming convention)
-        model_path = os.path.join(model_dir, f"{property_name}_2d_model.pkl")
-        scaler_path = os.path.join(model_dir, f"{property_name}_2d_scaler.pkl")
-        feature_list_path = os.path.join(model_dir, f"{property_name}_2d_features.pkl")
-        
-        # Validate all required files exist
-        missing_files = []
-        for file_path, file_type in [
-            (model_path, "model"),
-            (scaler_path, "scaler"),
-            (feature_list_path, "features")
-        ]:
-            if not os.path.exists(file_path):
-                missing_files.append(f"{file_type}: {file_path}")
-        
-        if missing_files:
-            raise FileNotFoundError(
-                f"Missing required files for property '{property_name}':\n" +
-                "\n".join(f"  - {f}" for f in missing_files)
-            )
-        
-        try:
-            # Load model, scaler, and features
-            self.model = load_joblib(model_path)
-            self.scaler = load_joblib(scaler_path)
-            
-            # Load features - handle both list and DataFrame formats
-            features_data = load_joblib(feature_list_path)
-            if isinstance(features_data, pd.DataFrame):
-                # Extract feature names from DataFrame 'feature' column
-                self.feature_list = features_data['feature'].tolist()
-            elif isinstance(features_data, pd.Series):
-                # Convert Series to list
-                self.feature_list = features_data.tolist()
-            elif isinstance(features_data, (list, tuple)):
-                self.feature_list = list(features_data)
-            else:
-                # Try to convert to list (e.g., numpy array)
-                try:
-                    self.feature_list = list(features_data)
-                except Exception as e:
-                    raise TypeError(
-                        f"Unable to convert features data to list. "
-                        f"Expected list/tuple/DataFrame/Series, got {type(features_data)}: {str(e)}"
-                    )
-        except (OSError, IOError) as e:
-            raise FileNotFoundError(
-                f"Error loading model files for property '{property_name}': {str(e)}"
-            )
-        except Exception as e:
-            raise RuntimeError(
-                f"Error initializing {property_name} predictor: {str(e)}"
-            )
-        
-        if not self.feature_list:
-            raise ValueError(
-                f"Feature list is empty for property '{property_name}'. "
-                f"Check feature file: {feature_list_path}"
-            )
-        
+
+        base_dir = os.path.dirname(__file__)
+        self.model_dir = base_dir
+
+        # All 3 supported properties (directory / file naming uses the full _2d suffix)
+        self.all_properties = ['bandgap_2d', 'is_metal_2d', 'is_stable_2d']
+
+        self.models: Dict[str, Any] = {}
+        self.scalers: Dict[str, Any] = {}
+        self.feature_lists: Dict[str, List[str]] = {}
+
+        for prop in self.all_properties:
+            prop_dir = os.path.join(base_dir, prop)
+
+            if not os.path.isdir(prop_dir):
+                raise ValueError(
+                    f"Property directory not found for '{prop}': {prop_dir}"
+                )
+
+            model_path = os.path.join(prop_dir, f"{prop}_model.pkl")
+            scaler_path = os.path.join(prop_dir, f"{prop}_scaler.pkl")
+            feature_list_path = os.path.join(prop_dir, f"{prop}_features.pkl")
+
+            missing_files = []
+            for file_path, file_type in [
+                (model_path, "model"),
+                (scaler_path, "scaler"),
+                (feature_list_path, "features"),
+            ]:
+                if not os.path.exists(file_path):
+                    missing_files.append(f"{file_type}: {file_path}")
+
+            if missing_files:
+                raise FileNotFoundError(
+                    f"Missing required files for property '{prop}':\n" +
+                    "\n".join(f"  - {f}" for f in missing_files)
+                )
+
+            try:
+                self.models[prop] = load_joblib(model_path)
+                self.scalers[prop] = load_joblib(scaler_path)
+
+                features_data = load_joblib(feature_list_path)
+                if isinstance(features_data, pd.DataFrame):
+                    self.feature_lists[prop] = features_data['feature'].tolist()
+                elif isinstance(features_data, pd.Series):
+                    self.feature_lists[prop] = features_data.tolist()
+                elif isinstance(features_data, (list, tuple)):
+                    self.feature_lists[prop] = list(features_data)
+                else:
+                    try:
+                        self.feature_lists[prop] = list(features_data)
+                    except Exception as e:
+                        raise TypeError(
+                            f"Unable to convert features data to list for '{prop}': {str(e)}"
+                        )
+
+                if not self.feature_lists[prop]:
+                    raise ValueError(f"Feature list is empty for property '{prop}'.")
+
+            except (OSError, IOError) as e:
+                raise FileNotFoundError(
+                    f"Error loading model files for property '{prop}': {str(e)}"
+                )
+            except Exception as e:
+                raise RuntimeError(
+                    f"Error initializing {prop} predictor: {str(e)}"
+                )
+
+        # Expose bandgap_2d model/scaler/feature_list as defaults for backward compat
+        self.model = self.models['bandgap_2d']
+        self.scaler = self.scalers['bandgap_2d']
+        self.feature_list = self.feature_lists['bandgap_2d']
+
         if self.logger:
             self.logger.log(
-                f"Initialized {property_name} predictor with {len(self.feature_list)} features",
+                "Initialized GBFS-2D predictor with all 3 properties "
+                f"(bandgap_2d, is_metal_2d, is_stable_2d)",
                 'info'
             )
 
     def info(self) -> str:
         """Return description of predictor capabilities."""
         return (
-            f"GBFS-2D ({self.property_name}): Property predictor for 2D layered materials "
-            f"using LightGBM models trained on van der Waals materials. "
-            f"Detects structures from specific space groups (P6/mmc, R-3m, C2/m, etc.). "
-            f"Uses matminer composition and structure featurizers to generate "
-            f"{len(self.feature_list)} input features for property prediction. "
-            f"Supported properties: bandgap (eV), is_metal (classification), "
-            f"is_stable (classification)."
+            "GBFS-2D (Multi-Property): Property predictor for 2D layered (vdW) materials "
+            "using LightGBM models. Predicts all 3 properties: "
+            "bandgap_2d (eV, regression), is_metal_2d (P(metal), classification), "
+            "is_stable_2d (P(stable), classification). "
+            "Detects structures from specific space groups (P6/mmc, R-3m, C2/m, etc.). "
+            "Each property uses its own matminer feature set and pre-trained model."
         )
 
     def predict(self, input_data) -> dict:  # type: ignore
@@ -600,6 +588,7 @@ class Gbfs2dPredictor(BasePredictor):
                 "results": [
                     {
                         "index": 0,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -609,21 +598,25 @@ class Gbfs2dPredictor(BasePredictor):
             }
 
         results = list(parse_errors)
-        for idx, structure in structures_with_index:
+        for idx, structure, cif_str in structures_with_index:
             try:
                 # Check vdW structure
                 is_vdw = check_vdw_layered_structure(structure)
-                warning = None if is_vdw else "Structure may not be van der Waals layered"
-                
-                properties = self._predict_structure(structure)
+
+                properties, prop_warnings = self._predict_structure(structure)
                 properties['is_vdw_layered'] = is_vdw
-                
+
+                warnings: List[str] = prop_warnings
+                if not is_vdw:
+                    warnings = ["Structure may not be van der Waals layered"] + warnings
+
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "ok",
                         "properties": properties,
-                        "warnings": [warning] if warning else [],
+                        "warnings": warnings,
                         "error": None,
                     }
                 )
@@ -631,6 +624,7 @@ class Gbfs2dPredictor(BasePredictor):
                 results.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -642,49 +636,65 @@ class Gbfs2dPredictor(BasePredictor):
         results.sort(key=lambda r: r["index"])
         return {"source": self.source, "results": results}
 
-    def _predict_structure(self, structure: Structure) -> Dict[str, Any]:
-        """Run feature generation and prediction for a single structure."""
+    def _predict_structure(self, structure: Structure) -> Tuple[Dict[str, Any], List[str]]:
+        """
+        Run feature generation and prediction for ALL 3 properties for a single structure.
+
+        Each property uses its own feature list. Classifiers (is_metal_2d, is_stable_2d)
+        return P(True) as a scalar float. Returns (properties_dict, warnings_list).
+        """
         composition = structure_to_composition(structure)
 
-        # Generate base features
-        features = generate_features(structure, composition, self.feature_list, nan_strategy="zero")
-
         if self.logger:
-            base_count = sum(1 for f in self.feature_list if '/' not in f)
-            eng_count = sum(1 for f in self.feature_list if '/' in f)
-            self.logger.log(
-                f"Generated {base_count} base + {eng_count} engineered features",
-                'info'
-            )
+            self.logger.log("Predicting all 3 GBFS-2D properties from structure", 'info')
 
-        # Scale features if scaler has transform method
-        if hasattr(self.scaler, 'transform'):
-            scaled = self.scaler.transform(features)
-        else:
-            # If no transform method (e.g., scaler is a model), use features directly
-            scaled = features
+        all_properties: Dict[str, Any] = {}
+        warnings: List[str] = []
 
-        # Predict
-        prediction = self.model.predict(scaled)
-
-        result: Dict[str, Any] = {
-            "property": self.property_name,
-            "prediction": prediction.tolist(),
-        }
-        
-        # Add probabilities for classifiers
-        if hasattr(self.model, 'predict_proba'):
+        for prop in self.all_properties:
             try:
-                probas = self.model.predict_proba(scaled)
-                result["probabilities"] = probas.tolist()
-            except Exception:
-                pass
-                
-        return result
+                model = self.models[prop]
+                scaler = self.scalers[prop]
+                feature_list = self.feature_lists[prop]
 
-    def _extract_structures_for_predict(self, inputs) -> Tuple[List[Tuple[int, Structure]], List[Dict[str, Any]]]:
+                features = generate_features(
+                    structure, composition, feature_list, nan_strategy="zero"
+                )
+
+                if hasattr(scaler, 'transform'):
+                    scaled = scaler.transform(features)
+                else:
+                    scaled = features
+
+                if getattr(model, 'classes_', None) is not None:
+                    # Classifier — emit P(positive class)
+                    all_properties[prop] = self._extract_positive_class_probability(model, scaled)
+                else:
+                    prediction = model.predict(scaled)
+                    all_properties[prop] = float(np.asarray(prediction).reshape(-1)[0])
+
+            except Exception as exc:
+                all_properties[prop] = None
+                warnings.append(f"{prop}: {str(exc)}")
+
+        return all_properties, warnings
+
+    def _extract_positive_class_probability(self, model: Any, scaled: np.ndarray) -> float:
+        """Return P(True/positive class) for a binary classifier."""
+        probas = np.asarray(model.predict_proba(scaled))
+        if probas.ndim == 1 or probas.shape[1] == 1:
+            return float(probas.reshape(-1)[0])
+        classes = getattr(model, 'classes_', None)
+        if classes is not None:
+            for idx, label in enumerate([str(c).strip().lower() for c in classes]):
+                if label in {'1', 'true', 'metal', 'stable', 'is_metal', 'is_stable'}:
+                    return float(probas[0, idx])
+        # Fallback: last column is positive class in sklearn convention
+        return float(probas[0, -1])
+
+    def _extract_structures_for_predict(self, inputs) -> Tuple[List[Tuple[int, Structure, str]], List[Dict[str, Any]]]:
         """Extract structures and collect per-item parse errors for predict()."""
-        structures_with_index: List[Tuple[int, Structure]] = []
+        structures_with_index: List[Tuple[int, Structure, str]] = []
         errors: List[Dict[str, Any]] = []
 
         if not isinstance(inputs, list):
@@ -695,6 +705,7 @@ class Gbfs2dPredictor(BasePredictor):
                 errors.append(
                     {
                         "index": idx,
+                        "cif_input": "",
                         "status": "error",
                         "properties": {},
                         "warnings": [],
@@ -710,6 +721,7 @@ class Gbfs2dPredictor(BasePredictor):
                     errors.append(
                         {
                             "index": idx,
+                            "cif_input": cif_str,
                             "status": "error",
                             "properties": {},
                             "warnings": [],
@@ -717,11 +729,12 @@ class Gbfs2dPredictor(BasePredictor):
                         }
                     )
                     continue
-                structures_with_index.append((idx, parsed[0]))
+                structures_with_index.append((idx, parsed[0], cif_str))
             except Exception as exc:
                 errors.append(
                     {
                         "index": idx,
+                        "cif_input": cif_str,
                         "status": "error",
                         "properties": {},
                         "warnings": [],

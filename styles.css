@@ -129,6 +129,38 @@ header p {
     gap: 8px;
 }
 
+.iu-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.iu-option-row label {
+    margin: 0;
+    flex: 1;
+}
+
+.iu-feature-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1;
+    font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.iu-feature-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
 /* Fixed height for databases section to accommodate future additions */
 .info-column:first-child .radio-group {
     max-height: 120px;
@@ -441,6 +473,76 @@ header p {
     border: 1px solid #ced4da;
     border-radius: 5px;
     font-size: 0.9rem;
+    font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.iu-input-scroll {
+    max-height: 460px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.iu-input-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.iu-input-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.iu-input-scroll::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 3px;
+}
+
+.iu-property-section {
+    margin-top: 20px;
+}
+
+.iu-property-section h4 {
+    margin: 0 0 6px 0;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.iu-property-section p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.iu-property-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.iu-property-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.iu-property-row label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.iu-range-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.iu-range-inputs input,
+.iu-property-row > input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 0.85rem;
     font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

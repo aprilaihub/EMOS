@@ -3,12 +3,117 @@ const operatingArea = document.getElementById('operatingArea');
 const featureView = document.getElementById('featureView');
 const llmView = document.getElementById('llmView');
 const featureButtons = document.querySelectorAll('.feature-btn');
+const iuFeatureButtons = document.querySelectorAll('.iu-feature-btn');
 const llmButton = document.getElementById('llmBtn');
 const closeChat = document.getElementById('closeChat');
 const closeFeature = document.getElementById('closeFeature');
 const chatInput = document.getElementById('chatInput');
 const sendMessage = document.getElementById('sendMessage');
 const chatMessages = document.getElementById('chatMessages');
+
+const iuFeatureModules = {
+    database: {
+        alexandria: {
+            className: 'AlexandriaIUFeature',
+            file: './Features/IU_Features/Databases/AlexandriaIUFeature.js',
+            id: 1007,
+        },
+        cod: {
+            className: 'CodIUFeature',
+            file: './Features/IU_Features/Databases/CodIUFeature.js',
+            id: 1008,
+        },
+        materialsproject: {
+            className: 'MaterialsprojectIUFeature',
+            file: './Features/IU_Features/Databases/MaterialsprojectIUFeature.js',
+            id: 1009,
+        },
+        mathub3d: {
+            className: 'Mathub3dIUFeature',
+            file: './Features/IU_Features/Databases/Mathub3dIUFeature.js',
+            id: 1010,
+        },
+        jarvisdft: {
+            className: 'JarvisdftIUFeature',
+            file: './Features/IU_Features/Databases/JarvisdftIUFeature.js',
+            id: 1011,
+        },
+        aflow: {
+            className: 'AflowIUFeature',
+            file: './Features/IU_Features/Databases/AflowIUFeature.js',
+            id: 1012,
+        },
+    },
+    generator: {
+        mattergen_dft_band_gap: {
+            className: 'MattergenDftBandGapIUFeature',
+            file: './Features/IU_Features/Generators/MattergenDftBandGapIUFeature.js',
+            id: 1110,
+        },
+        mattergen_base_model: {
+            className: 'MattergenBaseModelIUFeature',
+            file: './Features/IU_Features/Generators/MattergenBaseModelIUFeature.js',
+            id: 1111,
+        },
+        mattergen_mp_20_base: {
+            className: 'MattergenMp20BaseIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMp20BaseIUFeature.js',
+            id: 1112,
+        },
+        mattergen_chemical_system: {
+            className: 'MattergenChemicalSystemIUFeature',
+            file: './Features/IU_Features/Generators/MattergenChemicalSystemIUFeature.js',
+            id: 1113,
+        },
+        mattergen_chemical_system_stability: {
+            className: 'MattergenChemicalSystemStabilityIUFeature',
+            file: './Features/IU_Features/Generators/MattergenChemicalSystemStabilityIUFeature.js',
+            id: 1114,
+        },
+        mattergen_magnetic_density: {
+            className: 'MattergenMagneticDensityIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMagneticDensityIUFeature.js',
+            id: 1115,
+        },
+        mattergen_magnetic_density_hhi: {
+            className: 'MattergenMagneticDensityHhiIUFeature',
+            file: './Features/IU_Features/Generators/MattergenMagneticDensityHhiIUFeature.js',
+            id: 1116,
+        },
+        mattergen_bulk_modulus: {
+            className: 'MattergenBulkModulusIUFeature',
+            file: './Features/IU_Features/Generators/MattergenBulkModulusIUFeature.js',
+            id: 1117,
+        },
+        mattergen_space_group: {
+            className: 'MattergenSpaceGroupIUFeature',
+            file: './Features/IU_Features/Generators/MattergenSpaceGroupIUFeature.js',
+            id: 1118,
+        },
+    },
+    predictor: {
+        mattersim: {
+            className: 'MattersimIUFeature',
+            file: './Features/IU_Features/Predictors/MattersimIUFeature.js',
+            id: 2001,
+        },
+        synthnn: {
+            className: 'SynthnnIUFeature',
+            file: './Features/IU_Features/Predictors/SynthnnIUFeature.js',
+            id: 2002,
+        },
+        gbfs: {
+            className: 'GbfsIUFeature',
+            file: './Features/IU_Features/Predictors/GbfsIUFeature.js',
+            id: 2005,
+        },
+        gbfs_2d: {
+            className: 'Gbfs2dIUFeature',
+            file: './Features/IU_Features/Predictors/Gbfs2dIUFeature.js',
+            id: 2006,
+        },
+    }
+};
 
 // Feature class mapping for dynamic loading
 const featureClasses = {
@@ -103,6 +208,50 @@ async function showFeatureView(featureNumber, featureName, featureDesc) {
         setTimeout(() => {
             clickedButton.style.transform = 'scale(1)';
         }, 150);
+    }
+}
+
+async function showIUFeatureView(iuType, iuId, iuName, iuDesc) {
+    const iuModule = iuFeatureModules?.[iuType]?.[iuId];
+
+    // Hide other views and show feature panel area
+    operatingArea.classList.add('hidden');
+    llmView.classList.add('hidden');
+    featureView.classList.remove('hidden');
+
+    if (!iuModule) {
+        featureView.innerHTML = createGenericFeatureView(`${iuName} IU Feature`, iuDesc || 'No IU feature module found.');
+        return;
+    }
+
+    try {
+        if (!window.BaseFeature) {
+            await loadScript('./Features/BaseFeature.js');
+        }
+
+        if (!window[iuModule.className]) {
+            await loadScript(iuModule.file);
+        }
+
+        const IUFeatureClass = window[iuModule.className];
+        const iuFeatureId = iuModule.id;
+
+        currentFeatureInstance = new IUFeatureClass(iuFeatureId, {
+            iuType,
+            iuId,
+            iuName,
+            iuDesc,
+        });
+        window.features[iuFeatureId] = currentFeatureInstance;
+
+        featureView.innerHTML = currentFeatureInstance.createFeatureHTML();
+
+        if (typeof currentFeatureInstance.initializeUI === 'function') {
+            await currentFeatureInstance.initializeUI();
+        }
+    } catch (error) {
+        console.error('Error loading IU feature module:', error);
+        featureView.innerHTML = createGenericFeatureView(`${iuName} IU Feature`, iuDesc || 'Failed to load IU feature module.');
     }
 }
 
@@ -306,6 +455,9 @@ function showWelcomeView() {
     
     // Clean up current feature instance
     if (currentFeatureInstance) {
+        if (typeof currentFeatureInstance.destroy === 'function') {
+            currentFeatureInstance.destroy();
+        }
         currentFeatureInstance = null;
     }
 }
@@ -500,6 +652,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const featureDesc = this.getAttribute('data-feature-desc');
             
             showFeatureView(featureNumber, featureName, featureDesc);
+        });
+    });
+
+    // IU feature button functionality (phase 1: Alexandria)
+    iuFeatureButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const iuId = this.getAttribute('data-iu-feature');
+            const iuType = this.getAttribute('data-iu-type');
+            const iuName = this.getAttribute('data-iu-name');
+            const iuDesc = this.getAttribute('data-iu-desc');
+            await showIUFeatureView(iuType, iuId, iuName, iuDesc);
         });
     });
 
