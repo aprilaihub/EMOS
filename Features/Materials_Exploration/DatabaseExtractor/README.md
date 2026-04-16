@@ -4,7 +4,13 @@ Extract and analyze specific material properties and data from integrated databa
 
 ## Overview
 
-This feature provides database extractor functionality within the EMOS platform.
+This feature retrieves batched data from selected databases using canonical
+property keys defined in `Information_Units/property_mappings/common_properties.json`.
+
+It supports two retrieval modes:
+
+- `strict`: query only databases that can retrieve all selected properties
+- `lenient`: query all selected databases and ignore non-queryable properties
 
 ## Key Methods
 
@@ -12,29 +18,49 @@ This feature provides database extractor functionality within the EMOS platform.
 - `extract_inputs(input_data)`: Extracts and validates input parameters
 - `process_feature(inputs)`: Core feature processing logic
 - `format_outputs(results)`: Formats results to expected output format
-- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
+- `_run_database_extraction(inputs)`: Executes strict/lenient extraction per selected database
 
 
 ## Input Parameters
 
-- **Database Source**: Database source for extraction
-- **Extraction Type**: Type of data to extract
-- **Filter Criteria**: Filter criteria for extraction
-- **Maximum Entries**: Maximum number of entries to extract
-- **Configuration File**: Optional configuration file
-- **Include Metadata**: Include metadata in extraction
+- **selectedProperties / selected_properties**: Property keys to query
+- **batchSize / batch_size**: Number of records to retrieve per database
+- **retrievalMode / retrieval_mode**: `strict` or `lenient`
+- **queryValues / query_values**: Optional property filters (`dict` or JSON string)
+- **targetCompositions / target_compositions**: Optional composition query
+- **active_databases**: Selected database IU entries (`[{"value": "materialsproject", ...}]`)
 
 ## Output Parameters
 
-- **Records Extracted**: Number of records extracted
-- **Data Size**: Total size of extracted data
-- **File Format**: Format of extracted data
-- **Processing Time**: Time taken for extraction
-- **Download Package**: Download extracted data package
+- **recordsExtracted**: Total number of extracted CIF records
+- **databaseCount**: Number of databases queried
+- **skippedDatabaseCount**: Number of databases skipped (strict mode or unavailable)
+- **downloadPackage**: JSON payload availability message
+- **extraction**: Full structured extraction payload with per-database details:
+	- `properties_requested`, `properties_used`, `properties_skipped`
+	- source field mapping (`source_fields_used`)
+	- database payload and record count
 
 ## Usage
 
-See the base class documentation for detailed usage instructions.
+### Example Request
 
-For integration with information units (Databases, Generators, Predictors), 
-the feature automatically processes active units and logs their operations.
+```json
+{
+	"selectedProperties": ["band_gap", "formation_energy_r2scan"],
+	"batchSize": 50,
+	"retrievalMode": "lenient",
+	"queryValues": {
+		"band_gap": [1.0, 3.0]
+	},
+	"active_databases": [
+		{"value": "materialsproject", "name": "Materials Project"},
+		{"value": "aflow", "name": "AFLOW"}
+	]
+}
+```
+
+### Notes
+
+- The extractor uses `property_loader.py` to resolve per-database property mappings.
+- Warning and skip reasons are emitted through processing logs.
