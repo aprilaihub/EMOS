@@ -71,6 +71,7 @@ class DatabaseExtractorFeature(BaseFeature):
         selected_properties = self._normalize_properties(
             raw_selected=inputs.get('selected_properties'),
             feature_input=inputs.get('feature_input'),
+            query_values=inputs.get('query_values', {}),
             common_properties=common_properties,
         )
         invalid_properties = [p for p in selected_properties if p not in common_properties]
@@ -209,7 +210,7 @@ class DatabaseExtractorFeature(BaseFeature):
             'payload': payload,
         }
 
-    def _normalize_properties(self, raw_selected, feature_input, common_properties):
+    def _normalize_properties(self, raw_selected, feature_input, query_values, common_properties):
         if isinstance(raw_selected, list):
             selected = [str(item).strip() for item in raw_selected if str(item).strip()]
         elif isinstance(raw_selected, str):
@@ -227,8 +228,11 @@ class DatabaseExtractorFeature(BaseFeature):
             if isinstance(candidate, list):
                 selected = [str(item).strip() for item in candidate if str(item).strip()]
 
+        if not selected and isinstance(query_values, dict):
+            selected = [str(item).strip() for item in query_values.keys() if str(item).strip()]
+
         if not selected:
-            selected = list(common_properties.keys())
+            selected = []
 
         # Preserve order while de-duplicating.
         return list(dict.fromkeys(selected))

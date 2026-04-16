@@ -9,8 +9,8 @@ property keys defined in `Information_Units/property_mappings/common_properties.
 
 It supports two retrieval modes:
 
-- `strict`: query only databases that can retrieve all selected properties
-- `lenient`: query all selected databases and ignore non-queryable properties
+- `strict`: query only databases that can retrieve all filtered properties
+- `lenient`: query all selected databases and ignore non-queryable filtered properties
 
 ## Key Methods
 
@@ -23,10 +23,9 @@ It supports two retrieval modes:
 
 ## Input Parameters
 
-- **selectedProperties / selected_properties**: Property keys to query
 - **batchSize / batch_size**: Number of records to retrieve per database
 - **retrievalMode / retrieval_mode**: `strict` or `lenient`
-- **queryValues / query_values**: Optional property filters (`dict` or JSON string)
+- **queryValues / query_values**: Optional property filters (`dict`), built from all `common_properties`
 - **targetCompositions / target_compositions**: Optional composition query
 - **active_databases**: Selected database IU entries (`[{"value": "materialsproject", ...}]`)
 
@@ -47,11 +46,11 @@ It supports two retrieval modes:
 
 ```json
 {
-	"selectedProperties": ["band_gap", "formation_energy_r2scan"],
 	"batchSize": 50,
 	"retrievalMode": "lenient",
 	"queryValues": {
-		"band_gap": [1.0, 3.0]
+		"band_gap": [1.0, 3.0],
+		"chemical_system": "Fe-O"
 	},
 	"active_databases": [
 		{"value": "materialsproject", "name": "Materials Project"},
