@@ -47,7 +47,8 @@
   "features": {
     "materials_exploration": {
       "Database Extractor": "Extract and analyze specific material properties and data from integrated databases",
-      "Stability Consensus Analysis": "Analyze and aggregate stability consensus from uploaded CIF structures"
+      "Stability Consensus Analysis": "Analyze and aggregate stability consensus from uploaded CIF structures",
+      "AMD screening": "Screen uploaded CIF structures for AMD-based candidate selection"
     },
     "electronics_application": {
       "Advanced Characterization": "Advanced characterization techniques for electronic materials evaluation"
@@ -77,6 +78,14 @@
       ],
       "outputs": [
         {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing stability consensus analysis results"}
+      ]
+    },
+    "AMD screening": {
+      "inputs": [
+        {"name": "cifFiles", "display_name": "CIF Files", "type": "file", "required": true, "accept": ".cif", "multiple": true, "description": "Browse and upload one or more CIF files for AMD screening"}
+      ],
+      "outputs": [
+        {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing AMD screening results"}
       ]
     },
     "Advanced Characterization": {
