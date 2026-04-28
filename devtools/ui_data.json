@@ -51,7 +51,6 @@
       "AMD screening": "Screen uploaded CIF structures for AMD-based candidate selection"
     },
     "electronics_application": {
-      "Advanced Characterization": "Advanced characterization techniques for electronic materials evaluation",
       "MOSFET evaluator": "Evaluate MOSFET performance from uploaded CIF files and simulation parameters"
     }
   },
@@ -111,19 +110,6 @@
       ],
       "outputs": [
         {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing MOSFET simulation performance for each uploaded CIF file"}
-      ]
-    },
-    "Advanced Characterization": {
-      "inputs": [
-        {"name": "characterizationTech", "display_name": "Characterization Technique", "type": "select", "required": true, "options": [{"value": "xrd", "text": "X-ray Diffraction"}, {"value": "sem", "text": "SEM Imaging"}, {"value": "xps", "text": "XPS Analysis"}, {"value": "afm", "text": "AFM Measurement"}], "default": "xrd", "description": "Characterization technique to use"},
-        {"name": "scanRange", "display_name": "Scan Range", "type": "number", "required": false, "min": 1, "max": 1000, "step": 1, "default": 100, "description": "Measurement scan range parameter"},
-        {"name": "referenceData", "display_name": "Reference Data", "type": "file", "required": false, "accept": ".ref,.std", "description": "Reference data file for comparison"},
-        {"name": "automaticAnalysis", "display_name": "Automatic Analysis", "type": "checkbox", "required": false, "default": true, "description": "Enable automatic data analysis"}
-      ],
-      "outputs": [
-        {"name": "characterizationStatus", "display_name": "Characterization Status", "type": "text", "description": "Status of characterization measurement"},
-        {"name": "materialQuality", "display_name": "Material Quality", "type": "text", "description": "Assessment of material quality"},
-        {"name": "analysisReport", "display_name": "Analysis Report", "type": "text", "description": "Detailed analysis report"}
       ]
     }
   },
