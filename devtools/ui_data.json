@@ -46,7 +46,8 @@
   },
   "features": {
     "materials_exploration": {
-      "Database Extractor": "Extract and analyze specific material properties and data from integrated databases" 
+      "Database Extractor": "Extract and analyze specific material properties and data from integrated databases",
+      "Stability Consensus Analysis": "Analyze and aggregate stability consensus from uploaded CIF structures"
     },
     "electronics_application": {
       "Advanced Characterization": "Advanced characterization techniques for electronic materials evaluation"
@@ -68,6 +69,14 @@
         {"name": "fileFormat", "display_name": "File Format", "type": "text", "description": "Format of extracted data"},
         {"name": "processingTime", "display_name": "Processing Time", "type": "text", "description": "Time taken for extraction"},
         {"name": "downloadPackage", "display_name": "Download Package", "type": "link", "description": "Download extracted data package"}
+      ]
+    },
+    "Stability Consensus Analysis": {
+      "inputs": [
+        {"name": "cifFiles", "display_name": "CIF Files", "type": "file", "required": true, "accept": ".cif", "multiple": true, "description": "Browse and upload one or more CIF files for stability consensus analysis"}
+      ],
+      "outputs": [
+        {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing stability consensus analysis results"}
       ]
     },
     "Advanced Characterization": {

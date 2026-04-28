@@ -317,11 +317,40 @@
             "description": "Download extracted data package"
           }
         ]
+      },
+      {
+        "id": 2,
+        "name": "Stability Consensus Analysis",
+        "display_name": "Stability Consensus Analysis",
+        "description": "Analyze and aggregate stability consensus from uploaded CIF structures",
+        "folder_path": "Features/Materials_Exploration/StabilityConsensusAnalysis",
+        "class_name": "StabilityConsensusAnalysisFeature",
+        "file_name": "StabilityConsensusAnalysisFeature.py",
+        "js_file_name": "StabilityConsensusAnalysis.js",
+        "inputs": [
+          {
+            "name": "cifFiles",
+            "display_name": "CIF Files",
+            "type": "file",
+            "required": true,
+            "accept": ".cif",
+            "multiple": true,
+            "description": "Browse and upload one or more CIF files for stability consensus analysis"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "downloadResultsJson",
+            "display_name": "Download Results (JSON)",
+            "type": "link",
+            "description": "Download JSON file containing stability consensus analysis results"
+          }
+        ]
       }
     ],
     "electronics_application": [
       {
-        "id": 2,
+        "id": 3,
         "name": "Advanced Characterization",
         "display_name": "Advanced Characterization",
         "description": "Advanced characterization techniques for electronic materials evaluation",

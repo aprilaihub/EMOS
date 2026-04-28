@@ -118,13 +118,15 @@ const iuFeatureModules = {
 // Feature class mapping for dynamic loading
 const featureClasses = {
     1: 'DatabaseExtractorFeature',
-    2: 'AdvancedCharacterizationFeature',
+    2: 'StabilityConsensusAnalysisFeature',
+    3: 'AdvancedCharacterizationFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
 const featureFiles = {
     1: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
-    2: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
+    2: './Features/Materials_Exploration/StabilityConsensusAnalysis/StabilityConsensusAnalysis.js',
+    3: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
 };
 
 // Global feature instances storage

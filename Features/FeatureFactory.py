@@ -2,12 +2,14 @@
 
 from Features.Materials_Exploration.DatabaseExtractor.DatabaseExtractorFeature import DatabaseExtractorFeature
 from Features.Electronics_Application.AdvancedCharacterization.AdvancedCharacterizationFeature import AdvancedCharacterizationFeature
+from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import StabilityConsensusAnalysisFeature
 
 
 # Feature registry - simple mapping like Information Units
 feature_factory = {
     "1": DatabaseExtractorFeature,
-    "2": AdvancedCharacterizationFeature
+    "2": StabilityConsensusAnalysisFeature,
+    "3": AdvancedCharacterizationFeature
 
 }
 
