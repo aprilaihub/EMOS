@@ -8,13 +8,6 @@ from Features.Materials_Exploration.DftCalculation.DftCalculationFeature import 
 from Features.Materials_Exploration.CrystallographicAnalysis.CrystallographicAnalysisFeature import CrystallographicAnalysisFeature
 from Features.Materials_Exploration.QuantumMechanics.QuantumMechanicsFeature import QuantumMechanicsFeature
 from Features.Materials_Exploration.TensorAnalysis.TensorAnalysisFeature import TensorAnalysisFeature
-from Features.Electronics_Application.DeviceSynthesizability.DeviceSynthesizabilityFeature import DeviceSynthesizabilityFeature
-from Features.Electronics_Application.InterfaceCalculation.InterfaceCalculationFeature import InterfaceCalculationFeature
-from Features.Electronics_Application.PropertyPrediction.PropertyPredictionFeature import PropertyPredictionFeature
-from Features.Electronics_Application.BandStructure.BandStructureFeature import BandStructureFeature
-from Features.Electronics_Application.ThermalManagement.ThermalManagementFeature import ThermalManagementFeature
-from Features.Electronics_Application.ReliabilityAssessment.ReliabilityAssessmentFeature import ReliabilityAssessmentFeature
-from Features.Electronics_Application.ProcessIntegration.ProcessIntegrationFeature import ProcessIntegrationFeature
 from Features.Electronics_Application.AdvancedCharacterization.AdvancedCharacterizationFeature import AdvancedCharacterizationFeature
 
 
@@ -28,14 +21,7 @@ feature_factory = {
     "6": CrystallographicAnalysisFeature,
     "7": QuantumMechanicsFeature,
     "8": TensorAnalysisFeature,
-    "9": DeviceSynthesizabilityFeature,
-    "10": InterfaceCalculationFeature,
-    "11": PropertyPredictionFeature,
-    "12": BandStructureFeature,
-    "13": ThermalManagementFeature,
-    "14": ReliabilityAssessmentFeature,
-    "15": ProcessIntegrationFeature,
-    "16": AdvancedCharacterizationFeature
+    "9": AdvancedCharacterizationFeature
 
 }
 

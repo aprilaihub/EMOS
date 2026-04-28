@@ -125,14 +125,7 @@ const featureClasses = {
     6: 'CrystallographicAnalysisFeature',
     7: 'QuantumMechanicsFeature',
     8: 'TensorAnalysisFeature',
-    9: 'DeviceSynthesizabilityFeature',
-    10: 'InterfaceCalculationFeature',
-    11: 'PropertyPredictionFeature',
-    12: 'BandStructureFeature',
-    13: 'ThermalManagementFeature',
-    14: 'ReliabilityAssessmentFeature',
-    15: 'ProcessIntegrationFeature',
-    16: 'AdvancedCharacterizationFeature',
+    9: 'AdvancedCharacterizationFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
@@ -145,14 +138,7 @@ const featureFiles = {
     6: './Features/Materials_Exploration/CrystallographicAnalysis/CrystallographicAnalysis.js',
     7: './Features/Materials_Exploration/QuantumMechanics/QuantumMechanics.js',
     8: './Features/Materials_Exploration/TensorAnalysis/TensorAnalysis.js',
-    9: './Features/Electronics_Application/DeviceSynthesizability/DeviceSynthesizability.js',
-    10: './Features/Electronics_Application/InterfaceCalculation/InterfaceCalculation.js',
-    11: './Features/Electronics_Application/PropertyPrediction/PropertyPrediction.js',
-    12: './Features/Electronics_Application/BandStructure/BandStructure.js',
-    13: './Features/Electronics_Application/ThermalManagement/ThermalManagement.js',
-    14: './Features/Electronics_Application/ReliabilityAssessment/ReliabilityAssessment.js',
-    15: './Features/Electronics_Application/ProcessIntegration/ProcessIntegration.js',
-    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
+    9: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
 };
 
 // Global feature instances storage

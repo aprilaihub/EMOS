@@ -1,6 +1,7 @@
 """Methods for managing Information Units (Databases, Generators, Predictors)"""
 
 import re
+from html import escape
 from .templates.information_unit_templates import (
     generate_readme,
     generate_init_file,
@@ -53,16 +54,103 @@ class InformationUnitMethods:
         
         return metadata
 
-    def build_information_unit_ui_labels(self, unit_type):
-        """Render checkbox label rows for the given unit type using metadata.json"""
-        indent = " " * 28
-        labels = []
+    def build_information_unit_ui_rows(self, unit_type):
+        """Render IU option rows (checkbox + IU panel button) from metadata.json."""
+        indent_row = " " * 28
+        indent_label = " " * 32
+        indent_button = " " * 32
+        indent_attr = " " * 36
+
+        rows = []
+        singular = unit_type[:-1]
+
         for item in self.metadata['information_units'][unit_type]:
             value = item['id']
             label = item.get('display_name', item.get('name', value))
-            singular = unit_type[:-1]
-            labels.append(f"{indent}<label><input type=\"checkbox\" ui-type=\"{singular}\" value=\"{value}\"> {label}</label>")
-        return "\n".join(labels)
+            description = item.get('description', '')
+
+            # Escape metadata text because it is injected into HTML attributes.
+            value_esc = escape(str(value), quote=True)
+            label_esc = escape(str(label), quote=True)
+            desc_esc = escape(str(description), quote=True)
+
+            rows.append(
+                f"{indent_row}<div class=\"iu-option-row\">\n"
+                f"{indent_label}<label><input type=\"checkbox\" ui-type=\"{singular}\" value=\"{value_esc}\"> {label_esc}</label>\n"
+                f"{indent_button}<button\n"
+                f"{indent_attr}class=\"iu-feature-btn\"\n"
+                f"{indent_attr}data-iu-feature=\"{value_esc}\"\n"
+                f"{indent_attr}data-iu-type=\"{singular}\"\n"
+                f"{indent_attr}data-iu-name=\"{label_esc}\"\n"
+                f"{indent_attr}data-iu-desc=\"{desc_esc}\"\n"
+                f"{indent_attr}title=\"Open IU panel\"\n"
+                f"{indent_attr}aria-label=\"Open IU panel\"\n"
+                f"{indent_button}>\u25b6</button>\n"
+                f"{indent_row}</div>"
+            )
+
+        return "\n".join(rows)
+
+    def _replace_div_inner(self, content, open_tag, new_inner):
+        """Replace inner HTML of a div identified by an exact opening tag string."""
+        start = content.find(open_tag)
+        if start == -1:
+            return content, 0
+
+        inner_start = start + len(open_tag)
+        token_pattern = re.compile(r'<div\b[^>]*>|</div>')
+        depth = 1
+
+        for token in token_pattern.finditer(content, inner_start):
+            token_text = token.group(0)
+            if token_text.startswith('<div'):
+                depth += 1
+            else:
+                depth -= 1
+
+            if depth == 0:
+                inner_end = token.start()
+                return content[:inner_start] + "\n" + new_inner + "\n" + content[inner_end:], 1
+
+        return content, 0
+
+    def _build_information_unit_column(self, unit_type, heading, dom_id):
+        """Render one IU column (Databases/Generators/Predictors)."""
+        indent_col = " " * 24
+        indent_h3 = " " * 28
+        indent_group = " " * 28
+        indent_group_close = " " * 28
+
+        rows = self.build_information_unit_ui_rows(unit_type)
+        return (
+            f"{indent_col}<div class=\"info-column\">\n"
+            f"{indent_h3}<h3>{heading}</h3>\n"
+            f"{indent_group}<div class=\"radio-group\" id=\"{dom_id}\">\n"
+            f"{rows}\n"
+            f"{indent_group_close}</div>\n"
+            f"{indent_col}</div>"
+        )
+
+    def build_information_units_block(self):
+        """Render complete info-units block from metadata to keep index.html stable."""
+        columns = [
+            self._build_information_unit_column('databases', 'Databases', 'databasesList'),
+            self._build_information_unit_column('generators', 'Generators', 'generatorsList'),
+            self._build_information_unit_column('predictors', 'Predictors', 'predictorsList'),
+        ]
+        return "\n".join(columns)
+
+    def build_information_units_section(self):
+        """Render the full Information Units <section> block."""
+        info_units_block = self.build_information_units_block()
+        return (
+            "                <section class=\"control-section\">\n"
+            "                    <h2>Information Units</h2>\n"
+            "                    <div class=\"info-units\">\n"
+            f"{info_units_block}\n"
+            "                    </div>\n"
+            "                </section>\n"
+        )
 
     def update_information_unit_ui_lists(self):
         """Rewrite index.html checkbox lists from metadata so UI matches backend"""
@@ -72,18 +160,11 @@ class InformationUnitMethods:
             return
 
         content = index_path.read_text()
-        replacements = [
-            ('databases', 'databasesList'),
-            ('generators', 'generatorsList'),
-            ('predictors', 'predictorsList'),
-        ]
-
-        for unit_type, dom_id in replacements:
-            pattern = rf'(<div class="radio-group" id="{dom_id}">\n)(.*?)(\n\s*</div>)'
-            new_labels = self.build_information_unit_ui_labels(unit_type)
-            content, count = re.subn(pattern, rf"\1{new_labels}\3", content, flags=re.S)
-            if count == 0:
-                print(f"  ⚠ Could not update {dom_id} in index.html; please verify markup")
+        section_pattern = r'(<!-- Information Units Section -->\s*)(.*?)(\s*<!-- Features Section -->)'
+        new_section = self.build_information_units_section()
+        content, count = re.subn(section_pattern, rf'\1{new_section}\3', content, flags=re.S)
+        if count == 0:
+            print("  ⚠ Could not update Information Units section in index.html; please verify markup")
 
         index_path.write_text(content)
         print("  ✓ Updated UI checkboxes in index.html")
