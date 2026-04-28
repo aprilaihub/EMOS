@@ -121,6 +121,7 @@ const featureClasses = {
     2: 'StabilityConsensusAnalysisFeature',
     3: 'AmdScreeningFeature',
     4: 'AdvancedCharacterizationFeature',
+    5: 'MosfetEvaluatorFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
@@ -129,6 +130,7 @@ const featureFiles = {
     2: './Features/Materials_Exploration/StabilityConsensusAnalysis/StabilityConsensusAnalysis.js',
     3: './Features/Materials_Exploration/AmdScreening/AmdScreening.js',
     4: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
+    5: './Features/Electronics_Application/MosfetEvaluator/MosfetEvaluator.js',
 };
 
 // Global feature instances storage

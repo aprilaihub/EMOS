@@ -462,6 +462,206 @@
             "description": "Detailed analysis report"
           }
         ]
+      },
+      {
+        "id": 5,
+        "name": "MOSFET evaluator",
+        "display_name": "MOSFET evaluator",
+        "description": "Evaluate MOSFET performance from uploaded CIF files and simulation parameters",
+        "folder_path": "Features/Electronics_Application/MosfetEvaluator",
+        "class_name": "MosfetEvaluatorFeature",
+        "file_name": "MosfetEvaluatorFeature.py",
+        "js_file_name": "MosfetEvaluator.js",
+        "inputs": [
+          {
+            "name": "cifFiles",
+            "display_name": "CIF Files",
+            "type": "file",
+            "required": true,
+            "accept": ".cif",
+            "multiple": true,
+            "description": "Browse and upload one or more CIF files for MOSFET evaluation"
+          },
+          {
+            "name": "deviceType",
+            "display_name": "Device Type",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "nmos",
+                "text": "NMOS"
+              },
+              {
+                "value": "pmos",
+                "text": "PMOS"
+              }
+            ],
+            "default": "nmos",
+            "description": "MOSFET device polarity"
+          },
+          {
+            "name": "channelLengthNm",
+            "display_name": "Channel Length (nm)",
+            "type": "number",
+            "required": true,
+            "min": 1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 45,
+            "description": "Channel length for simulation"
+          },
+          {
+            "name": "channelWidthNm",
+            "display_name": "Channel Width (nm)",
+            "type": "number",
+            "required": true,
+            "min": 1,
+            "max": 100000,
+            "step": 0.1,
+            "default": 1000,
+            "description": "Channel width for simulation"
+          },
+          {
+            "name": "oxideThicknessNm",
+            "display_name": "Oxide Thickness (nm)",
+            "type": "number",
+            "required": true,
+            "min": 0.1,
+            "max": 100,
+            "step": 0.1,
+            "default": 1.5,
+            "description": "Gate oxide thickness"
+          },
+          {
+            "name": "supplyVoltageVdd",
+            "display_name": "Supply Voltage VDD (V)",
+            "type": "number",
+            "required": true,
+            "min": 0.1,
+            "max": 5,
+            "step": 0.01,
+            "default": 1.0,
+            "description": "Supply voltage"
+          },
+          {
+            "name": "gateWorkFunctionEv",
+            "display_name": "Gate Work Function (eV)",
+            "type": "number",
+            "required": false,
+            "min": 3,
+            "max": 6,
+            "step": 0.01,
+            "default": 4.5,
+            "description": "Gate work function"
+          },
+          {
+            "name": "sourceDrainDopingCm3",
+            "display_name": "Source/Drain Doping (cm^-3)",
+            "type": "number",
+            "required": true,
+            "min": 1000000000000000,
+            "max": 1e+22,
+            "step": 1000000000000000,
+            "default": 1e+20,
+            "description": "Source and drain doping concentration"
+          },
+          {
+            "name": "temperatureK",
+            "display_name": "Temperature (K)",
+            "type": "number",
+            "required": true,
+            "min": 77,
+            "max": 1000,
+            "step": 1,
+            "default": 300,
+            "description": "Simulation temperature"
+          },
+          {
+            "name": "drainVoltageVd",
+            "display_name": "Drain Voltage VD (V)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 5,
+            "step": 0.01,
+            "default": 1.0,
+            "description": "Drain voltage"
+          },
+          {
+            "name": "gateVoltageSweepStartV",
+            "display_name": "Gate Sweep Start (V)",
+            "type": "number",
+            "required": true,
+            "min": -5,
+            "max": 5,
+            "step": 0.01,
+            "default": 0.0,
+            "description": "Start voltage for gate sweep"
+          },
+          {
+            "name": "gateVoltageSweepStopV",
+            "display_name": "Gate Sweep Stop (V)",
+            "type": "number",
+            "required": true,
+            "min": -5,
+            "max": 5,
+            "step": 0.01,
+            "default": 1.5,
+            "description": "Stop voltage for gate sweep"
+          },
+          {
+            "name": "gateVoltageSweepStepV",
+            "display_name": "Gate Sweep Step (V)",
+            "type": "number",
+            "required": true,
+            "min": 0.001,
+            "max": 1,
+            "step": 0.001,
+            "default": 0.05,
+            "description": "Step size for gate sweep"
+          },
+          {
+            "name": "validateBandGap",
+            "display_name": "Validate Band Gap from CIF",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Validate band gap using uploaded CIF files"
+          },
+          {
+            "name": "validateElectronMobility",
+            "display_name": "Validate Electron Mobility from CIF",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Validate electron mobility using uploaded CIF files"
+          },
+          {
+            "name": "validateHoleMobility",
+            "display_name": "Validate Hole Mobility from CIF",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Validate hole mobility using uploaded CIF files"
+          },
+          {
+            "name": "validateDielectricConstant",
+            "display_name": "Validate Dielectric Constant from CIF",
+            "type": "checkbox",
+            "required": false,
+            "default": true,
+            "description": "Validate dielectric constant using uploaded CIF files"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "downloadResultsJson",
+            "display_name": "Download Results (JSON)",
+            "type": "link",
+            "description": "Download JSON file containing MOSFET simulation performance for each uploaded CIF file"
+          }
+        ]
       }
     ]
   },
