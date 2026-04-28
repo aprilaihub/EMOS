@@ -13,9 +13,10 @@ body {
 }
 
 .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 20px clamp(14px, 2.5vw, 34px);
     min-height: 100vh;
 }
 
@@ -65,11 +66,12 @@ header p {
     display: flex;
     gap: 30px;
     height: calc(100vh - 200px);
+    width: 100%;
 }
 
 /* Left Panel */
 .left-panel {
-    flex: 0 0 400px;
+    flex: 0 1 clamp(320px, 30vw, 440px);
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     padding: 25px;
@@ -319,6 +321,7 @@ header p {
 /* Right Panel */
 .right-panel {
     flex: 1;
+    min-width: 0;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     padding: 30px;
@@ -877,6 +880,10 @@ header p {
 
 /* Responsive design */
 @media (max-width: 768px) {
+    .container {
+        padding: 14px;
+    }
+
     .main-content {
         flex-direction: column;
         height: auto;
