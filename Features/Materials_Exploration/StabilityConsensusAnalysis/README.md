@@ -1,10 +1,10 @@
-# Thermal Management
+# Stability Consensus Analysis
 
-Thermal management analysis for electronic device performance optimization
+Analyze and aggregate stability consensus from uploaded CIF structures
 
 ## Overview
 
-This feature provides thermal management functionality within the EMOS platform.
+This feature provides stability consensus analysis functionality within the EMOS platform.
 
 ## Key Methods
 
@@ -17,16 +17,11 @@ This feature provides thermal management functionality within the EMOS platform.
 
 ## Input Parameters
 
-- **Thermal Property**: Thermal property to analyze
-- **Operating Power (W)**: Operating power
-- **Ambient Temperature (°C)**: Ambient temperature
-- **Include Convection**: Include convection effects
+- **CIF Files**: Browse and upload one or more CIF files for stability consensus analysis
 
 ## Output Parameters
 
-- **Optimization Status**: Thermal optimization status
-- **Maximum Temperature**: Maximum temperature reached
-- **Cooling Solution**: Recommended cooling solution
+- **Download Results (JSON)**: Download JSON file containing stability consensus analysis results
 
 ## Usage
 

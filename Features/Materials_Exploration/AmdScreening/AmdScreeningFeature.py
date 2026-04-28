@@ -4,19 +4,16 @@ from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
 
 
-class PropertyPredictionFeature(BaseFeature):
+class AmdScreeningFeature(BaseFeature):
     def __init__(self, logger=None):
-        super().__init__("Property Prediction", logger)
+        super().__init__("AMD screening", logger)
     
     def info(self):
-        return "Property Prediction: Electronic property prediction and optimization for semiconductor applications"
+        return "AMD screening: Screen uploaded CIF structures for AMD-based candidate selection"
     
     def extract_inputs(self, input_data):
         return {
-            'materialSystem': input_data.get('materialSystem', ''),
-            'propertyPrediction': input_data.get('propertyToPredict', 'bandgap'),
-            'temperature': input_data.get('temperature(k)', '300'),
-            'includeDefects': input_data.get('includeDefects', 'False'),
+            'cifFiles': input_data.get('cifFiles', ''),
             'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
@@ -25,24 +22,22 @@ class PropertyPredictionFeature(BaseFeature):
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing Property Prediction...', 'info')
+            self.logger.log('Initializing AMD screening...', 'info')
         
         # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Property Prediction processing completed', 'info')
+            self.logger.log('AMD screening processing completed', 'info')
         
         return {
             'status': 'completed',
-            'message': 'Property Prediction feature executed successfully'
+            'message': 'AMD screening feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'predictionStatus': 'placeholder text value',
-            'bandGap': 'placeholder text value',
-            'carrierMobility': 'placeholder text value',
+            'downloadResultsJson': 'placeholder link value',
         }
     
     def _process_information_units(self, inputs):

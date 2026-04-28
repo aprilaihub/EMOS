@@ -1,10 +1,10 @@
-# Quantum Mechanics
+# AMD screening
 
-Advanced computational methods for materials discovery and design
+Screen uploaded CIF structures for AMD-based candidate selection
 
 ## Overview
 
-This feature provides quantum mechanics functionality within the EMOS platform.
+This feature provides amd screening functionality within the EMOS platform.
 
 ## Key Methods
 
@@ -17,16 +17,11 @@ This feature provides quantum mechanics functionality within the EMOS platform.
 
 ## Input Parameters
 
-- **Computation Method**: Computation method to use
-- **Precision Level**: Precision level for computation
-- **Boundary Conditions**: Boundary conditions for calculation
-- **Parallel Processing**: Enable parallel processing
+- **CIF Files**: Browse and upload one or more CIF files for AMD screening
 
 ## Output Parameters
 
-- **Computation Status**: Status of computation
-- **Discovery Potential**: Discovery potential of results
-- **Database Export**: Database export status
+- **Download Results (JSON)**: Download JSON file containing AMD screening results
 
 ## Usage
 

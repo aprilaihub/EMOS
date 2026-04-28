@@ -117,42 +117,18 @@ const iuFeatureModules = {
 
 // Feature class mapping for dynamic loading
 const featureClasses = {
-    1: 'MaterialSearchFeature',
-    2: 'MaterialGenerationFeature',
-    3: 'DatabaseExtractorFeature',
-    4: 'MaterialCharacterizationFeature',
-    5: 'DftCalculationFeature',
-    6: 'CrystallographicAnalysisFeature',
-    7: 'QuantumMechanicsFeature',
-    8: 'TensorAnalysisFeature',
-    9: 'DeviceSynthesizabilityFeature',
-    10: 'InterfaceCalculationFeature',
-    11: 'PropertyPredictionFeature',
-    12: 'BandStructureFeature',
-    13: 'ThermalManagementFeature',
-    14: 'ReliabilityAssessmentFeature',
-    15: 'ProcessIntegrationFeature',
-    16: 'AdvancedCharacterizationFeature',
+    1: 'DatabaseExtractorFeature',
+    2: 'StabilityConsensusAnalysisFeature',
+    3: 'AmdScreeningFeature',
+    4: 'MosfetEvaluatorFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
 const featureFiles = {
-    1: './Features/Materials_Exploration/MaterialSearch/MaterialSearch.js',
-    2: './Features/Materials_Exploration/MaterialGeneration/MaterialGeneration.js',
-    3: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
-    4: './Features/Materials_Exploration/MaterialCharacterization/MaterialCharacterization.js',
-    5: './Features/Materials_Exploration/DftCalculation/DftCalculation.js',
-    6: './Features/Materials_Exploration/CrystallographicAnalysis/CrystallographicAnalysis.js',
-    7: './Features/Materials_Exploration/QuantumMechanics/QuantumMechanics.js',
-    8: './Features/Materials_Exploration/TensorAnalysis/TensorAnalysis.js',
-    9: './Features/Electronics_Application/DeviceSynthesizability/DeviceSynthesizability.js',
-    10: './Features/Electronics_Application/InterfaceCalculation/InterfaceCalculation.js',
-    11: './Features/Electronics_Application/PropertyPrediction/PropertyPrediction.js',
-    12: './Features/Electronics_Application/BandStructure/BandStructure.js',
-    13: './Features/Electronics_Application/ThermalManagement/ThermalManagement.js',
-    14: './Features/Electronics_Application/ReliabilityAssessment/ReliabilityAssessment.js',
-    15: './Features/Electronics_Application/ProcessIntegration/ProcessIntegration.js',
-    16: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
+    1: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
+    2: './Features/Materials_Exploration/StabilityConsensusAnalysis/StabilityConsensusAnalysis.js',
+    3: './Features/Materials_Exploration/AmdScreening/AmdScreening.js',
+    4: './Features/Electronics_Application/MosfetEvaluator/MosfetEvaluator.js',
 };
 
 // Global feature instances storage

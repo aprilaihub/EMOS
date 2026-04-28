@@ -4,19 +4,16 @@ from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
 
 
-class ReliabilityAssessmentFeature(BaseFeature):
+class StabilityConsensusAnalysisFeature(BaseFeature):
     def __init__(self, logger=None):
-        super().__init__("Reliability Assessment", logger)
+        super().__init__("Stability Consensus Analysis", logger)
     
     def info(self):
-        return "Reliability Assessment: Reliability assessment and failure analysis for electronic materials"
+        return "Stability Consensus Analysis: Analyze and aggregate stability consensus from uploaded CIF structures"
     
     def extract_inputs(self, input_data):
         return {
-            'reliabilityTest': input_data.get('reliabilityTest', 'thermal_cycling'),
-            'testDuration': input_data.get('testDuration(hours)', '1000'),
-            'failureCriteria': input_data.get('failureCriteria(%)', '10'),
-            'acceleratedTest': input_data.get('acceleratedTesting', 'False'),
+            'cifFiles': input_data.get('cifFiles', ''),
             'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
@@ -25,24 +22,22 @@ class ReliabilityAssessmentFeature(BaseFeature):
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing Reliability Assessment...', 'info')
+            self.logger.log('Initializing Stability Consensus Analysis...', 'info')
         
         # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Reliability Assessment processing completed', 'info')
+            self.logger.log('Stability Consensus Analysis processing completed', 'info')
         
         return {
             'status': 'completed',
-            'message': 'Reliability Assessment feature executed successfully'
+            'message': 'Stability Consensus Analysis feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'assessmentStatus': 'placeholder text value',
-            'mttfValue': 'placeholder text value',
-            'failureAnalysis': 'placeholder text value',
+            'downloadResultsJson': 'placeholder link value',
         }
     
     def _process_information_units(self, inputs):

@@ -208,10 +208,8 @@ header p {
 /* Feature Grid */
 .feature-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 10px;
-    min-width: 500px;
 }
 
 /* Feature container with horizontal scroll */
@@ -898,8 +896,7 @@ header p {
     }
     
     .feature-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(6, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
     
     .header-content {

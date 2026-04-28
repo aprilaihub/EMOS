@@ -4,19 +4,32 @@ from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
 
 
-class ProcessIntegrationFeature(BaseFeature):
+class MosfetEvaluatorFeature(BaseFeature):
     def __init__(self, logger=None):
-        super().__init__("Process Integration", logger)
+        super().__init__("MOSFET evaluator", logger)
     
     def info(self):
-        return "Process Integration: Process integration workflows for electronic device manufacturing"
+        return "MOSFET evaluator: Evaluate MOSFET performance from uploaded CIF files and simulation parameters"
     
     def extract_inputs(self, input_data):
         return {
-            'processStep': input_data.get('processStep', 'deposition'),
-            'processTemp': input_data.get('processTemperature(°c)', '600'),
-            'gasFlow': input_data.get('gasFlowRates', ''),
-            'inSituMonitoring': input_data.get('in-situMonitoring', 'True'),
+            'cifFiles': input_data.get('cifFiles', ''),
+            'deviceType': input_data.get('deviceType', 'nmos'),
+            'channelLengthNm': input_data.get('channelLength(nm)', '45'),
+            'channelWidthNm': input_data.get('channelWidth(nm)', '1000'),
+            'oxideThicknessNm': input_data.get('oxideThickness(nm)', '1.5'),
+            'supplyVoltageVdd': input_data.get('supplyVoltageVdd(v)', '1.0'),
+            'gateWorkFunctionEv': input_data.get('gateWorkFunction(ev)', '4.5'),
+            'sourceDrainDopingCm3': input_data.get('source/drainDoping(cm^-3)', '1e+20'),
+            'temperatureK': input_data.get('temperature(k)', '300'),
+            'drainVoltageVd': input_data.get('drainVoltageVd(v)', '1.0'),
+            'gateVoltageSweepStartV': input_data.get('gateSweepStart(v)', '0.0'),
+            'gateVoltageSweepStopV': input_data.get('gateSweepStop(v)', '1.5'),
+            'gateVoltageSweepStepV': input_data.get('gateSweepStep(v)', '0.05'),
+            'validateBandGap': input_data.get('validateBandGapFromCif', 'True'),
+            'validateElectronMobility': input_data.get('validateElectronMobilityFromCif', 'True'),
+            'validateHoleMobility': input_data.get('validateHoleMobilityFromCif', 'True'),
+            'validateDielectricConstant': input_data.get('validateDielectricConstantFromCif', 'True'),
             'feature_input': input_data.get('featureInput', ''),
             'active_databases': input_data.get('active_databases', []),
             'active_generators': input_data.get('active_generators', []),
@@ -25,24 +38,22 @@ class ProcessIntegrationFeature(BaseFeature):
     
     def process_feature(self, inputs):
         if self.logger:
-            self.logger.log('Initializing Process Integration...', 'info')
+            self.logger.log('Initializing MOSFET evaluator...', 'info')
         
         # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
         
         if self.logger:
-            self.logger.log('Process Integration processing completed', 'info')
+            self.logger.log('MOSFET evaluator processing completed', 'info')
         
         return {
             'status': 'completed',
-            'message': 'Process Integration feature executed successfully'
+            'message': 'MOSFET evaluator feature executed successfully'
         }
     
     def format_outputs(self, results):
         return {
-            'integrationStatus': 'placeholder text value',
-            'yieldPrediction': 'placeholder text value',
-            'recipeParameters': 'placeholder text value',
+            'downloadResultsJson': 'placeholder link value',
         }
     
     def _process_information_units(self, inputs):
