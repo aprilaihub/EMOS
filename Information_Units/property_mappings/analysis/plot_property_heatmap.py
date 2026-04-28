@@ -151,8 +151,8 @@ def plot(matrix, row_labels, section_boundaries):
     n_rows, n_cols = matrix.shape            # n_rows=11 props, n_cols=19 IUs
 
     fig, ax = plt.subplots(figsize=(16, 8))
-    fig.patch.set_facecolor("#0d1117")
-    ax.set_facecolor("#0d1117")
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
 
     # Discrete colormap with steps of 5, fixed range 0–25
     step = 5
@@ -185,12 +185,12 @@ def plot(matrix, row_labels, section_boundaries):
     ax.set_xticks(range(n_cols))
     ax.xaxis.tick_bottom()
     ax.xaxis.set_label_position("bottom")
-    ax.set_xticklabels(row_labels, rotation=90, ha="center", fontsize=8.5 * FONT_SCALE, color="white")
+    ax.set_xticklabels(row_labels, rotation=90, ha="center", fontsize=8.5 * FONT_SCALE, color="black")
 
     # Y-axis: property groups (rows)
     ax.set_yticks(range(n_rows))
-    ax.set_yticklabels(COLUMNS, fontsize=9 * FONT_SCALE, color="white")
-    ax.tick_params(colors="white", length=0)
+    ax.set_yticklabels(COLUMNS, fontsize=9 * FONT_SCALE, color="black")
+    ax.tick_params(colors="black", length=0)
 
     for spine in ax.spines.values():
         spine.set_visible(False)
@@ -213,7 +213,7 @@ def plot(matrix, row_labels, section_boundaries):
 
         # Vertical divider left of section (skip first)
         if start_col > 0:
-            ax.axvline(start_col - 0.5, color="#333333", linewidth=1.2, zorder=3)
+            ax.axvline(start_col - 0.5, color="#777777", linewidth=1.2, zorder=3)
 
         # Coloured bar above the heatmap with a clear label for the IU section.
         bar = plt.Rectangle((start_col - 0.5, 1.01),
@@ -231,21 +231,21 @@ def plot(matrix, row_labels, section_boundaries):
 
     # ── Grid lines ────────────────────────────────────────────────────────────
     for c in range(n_cols + 1):
-        ax.axvline(c - 0.5, color="#1e2b36", linewidth=0.6, zorder=2)
+        ax.axvline(c - 0.5, color="#d6d6d6", linewidth=0.6, zorder=2)
     for r in range(n_rows + 1):
-        ax.axhline(r - 0.5, color="#1e2b36", linewidth=0.4, zorder=2)
+        ax.axhline(r - 0.5, color="#d6d6d6", linewidth=0.4, zorder=2)
 
     # ── Colorbar ─────────────────────────────────────────────────────────────
     cbar = fig.colorbar(im, ax=ax, fraction=0.015, pad=0.02,
                         ticks=color_bounds, spacing="uniform", extend="min")
-    cbar.set_label("Number of properties", color="white", fontsize=8 * FONT_SCALE)
-    cbar.ax.set_yticklabels([str(b) for b in color_bounds], color="white", fontsize=7 * FONT_SCALE)
-    cbar.ax.yaxis.set_tick_params(color="white")
-    cbar.outline.set_edgecolor("#333333")
+    cbar.set_label("Number of properties", color="black", fontsize=8 * FONT_SCALE)
+    cbar.ax.set_yticklabels([str(b) for b in color_bounds], color="black", fontsize=7 * FONT_SCALE)
+    cbar.ax.yaxis.set_tick_params(color="black")
+    cbar.outline.set_edgecolor("#666666")
 
     # ── Title ─────────────────────────────────────────────────────────────────
     ax.set_title("EMOS Property Coverage — All Information Units",
-                 color="white", fontsize=13 * FONT_SCALE, fontweight="bold", pad=62)
+                 color="black", fontsize=13 * FONT_SCALE, fontweight="bold", pad=62)
 
     plt.tight_layout()
     plt.savefig(OUTPUT_FILE, dpi=160, bbox_inches="tight",
