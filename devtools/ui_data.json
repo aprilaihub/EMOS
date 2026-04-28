@@ -46,52 +46,13 @@
   },
   "features": {
     "materials_exploration": {
-      "Material Search": "Search and explore materials from comprehensive databases using various criteria",
-      "Material Generation": "Generate new material compositions using AI-powered algorithms and predictive models",
-      "Database Extractor": "Extract and analyze specific material properties and data from integrated databases", 
-      "Material Characterization": "Advanced materials analysis and characterization tools for comprehensive evaluation",
-      "DFT Calculation": "Materials optimization workflows for enhanced performance characteristics",
-      "Crystallographic Analysis": "Simulation and modeling tools for predicting material behavior under various conditions",
-      "Quantum Mechanics": "Advanced computational methods for materials discovery and design",
-      "Tensor Analysis": "Comprehensive analysis tools for understanding material structure-property relationships"
+      "Database Extractor": "Extract and analyze specific material properties and data from integrated databases" 
     },
     "electronics_application": {
       "Advanced Characterization": "Advanced characterization techniques for electronic materials evaluation"
     }
   },
   "feature_inputs_outputs": {
-    "Material Search": {
-      "inputs": [
-        {"name": "materialName", "display_name": "Material Name/Formula", "type": "text", "required": false, "default": "", "placeholder": "e.g., Al2O3, Silicon, etc.", "description": "Material name or chemical formula for search"},
-        {"name": "propertyType", "display_name": "Property Type", "type": "select", "required": false, "options": [{"value": "", "text": "Select Property"}, {"value": "mechanical", "text": "Mechanical Properties"}, {"value": "thermal", "text": "Thermal Properties"}, {"value": "electrical", "text": "Electrical Properties"}, {"value": "optical", "text": "Optical Properties"}], "default": "", "description": "Type of material property to search by"},
-        {"name": "minValue", "display_name": "Minimum Value", "type": "number", "required": false, "min": 0, "max": 10000, "step": 0.1, "default": 0, "description": "Minimum property value for filtering"},
-        {"name": "maxValue", "display_name": "Maximum Value", "type": "number", "required": false, "min": 0, "max": 10000, "step": 0.1, "default": 0, "description": "Maximum property value for filtering"},
-        {"name": "includeComposites", "display_name": "Include Composite Materials", "type": "checkbox", "required": false, "default": true, "description": "Include composite materials in search results"}
-      ],
-      "outputs": [
-        {"name": "materialsCount", "display_name": "Materials Found", "type": "text", "description": "Number of materials found matching search criteria"},
-        {"name": "topMatch", "display_name": "Top Match", "type": "text", "description": "Best matching material from search results"}, 
-        {"name": "propertyRange", "display_name": "Property Range", "type": "text", "description": "Range of property values in search results"},
-        {"name": "downloadLink", "display_name": "Download", "type": "link", "description": "Download link for complete search results"}
-      ]
-    },
-    "Material Generation": {
-      "inputs": [
-        {"name": "targetProperty", "display_name": "Target Property", "type": "select", "required": true, "options": [{"value": "high_strength", "text": "High Mechanical Strength"}, {"value": "thermal_conductivity", "text": "High Thermal Conductivity"}, {"value": "electrical_insulator", "text": "Electrical Insulator"}, {"value": "semiconductor", "text": "Semiconductor"}, {"value": "superconductor", "text": "Superconductor"}], "default": "high_strength", "description": "Target property for material generation"},
-        {"name": "baseElements", "display_name": "Base Element Group", "type": "select", "required": true, "options": [{"value": "metals", "text": "Metals (Fe, Al, Ti, etc.)"}, {"value": "ceramics", "text": "Ceramics (Si, O, N, etc.)"}, {"value": "polymers", "text": "Polymers (C, H, O, etc.)"}, {"value": "composites", "text": "Composite Materials"}], "default": "metals", "description": "Base element group for generation"},
-        {"name": "numCompositions", "display_name": "Number of Compositions", "type": "number", "required": true, "min": 1, "max": 100, "step": 1, "default": 10, "description": "Number of material compositions to generate"},
-        {"name": "targetValue", "display_name": "Target Property Value", "type": "number", "required": false, "min": 0, "max": 1000, "step": 0.1, "default": 0, "description": "Target property value"},
-        {"name": "includeRareElements", "display_name": "Include Rare Earth Elements", "type": "checkbox", "required": false, "default": false, "description": "Include rare earth elements in generation"},
-        {"name": "optimizeForCost", "display_name": "Optimize for Cost-Effectiveness", "type": "checkbox", "required": false, "default": true, "description": "Optimize for cost-effectiveness"}
-      ],
-      "outputs": [
-        {"name": "generatedCount", "display_name": "Generated Compositions", "type": "text", "description": "Number of compositions generated"},
-        {"name": "bestCandidate", "display_name": "Best Candidate", "type": "text", "description": "Best material candidate"},
-        {"name": "predictedPerformance", "display_name": "Predicted Performance", "type": "text", "description": "Performance prediction"},
-        {"name": "synthesisDifficulty", "display_name": "Synthesis Difficulty", "type": "text", "description": "Difficulty level for synthesis"},
-        {"name": "exportData", "display_name": "Export Data", "type": "link", "description": "Export generated compositions"}
-      ]
-    },
     "Database Extractor": {
       "inputs": [
         {"name": "databaseSource", "display_name": "Database Source", "type": "select", "required": true, "options": [{"value": "all", "text": "All Databases"}, {"value": "materialsproject", "text": "Materials Project"}, {"value": "oqmd", "text": "OQMD"}, {"value": "aflow", "text": "AFLOW"}, {"value": "crystallography", "text": "Crystallography DB"}], "default": "all", "description": "Database source for extraction"},
@@ -107,71 +68,6 @@
         {"name": "fileFormat", "display_name": "File Format", "type": "text", "description": "Format of extracted data"},
         {"name": "processingTime", "display_name": "Processing Time", "type": "text", "description": "Time taken for extraction"},
         {"name": "downloadPackage", "display_name": "Download Package", "type": "link", "description": "Download extracted data package"}
-      ]
-    },
-    "Material Characterization": {
-      "inputs": [
-        {"name": "materialFormula", "display_name": "Material Formula", "type": "text", "required": true, "placeholder": "e.g., Al2O3, SiC", "description": "Material formula for characterization"},
-        {"name": "analysisType", "display_name": "Analysis Type", "type": "select", "required": true, "options": [{"value": "basic", "text": "Basic Analysis"}, {"value": "advanced", "text": "Advanced Analysis"}, {"value": "comprehensive", "text": "Comprehensive Analysis"}], "default": "basic", "description": "Type of analysis to perform"},
-        {"name": "threshold", "display_name": "Threshold Value", "type": "number", "required": false, "min": 0, "max": 100, "step": 0.1, "default": 50, "description": "Threshold value for analysis"},
-        {"name": "exportResults", "display_name": "Export Results", "type": "checkbox", "required": false, "default": true, "description": "Export analysis results"}
-      ],
-      "outputs": [
-        {"name": "analysisStatus", "display_name": "Analysis Status", "type": "text", "description": "Status of the analysis"},
-        {"name": "materialProperties", "display_name": "Material Properties", "type": "text", "description": "Calculated material properties"},
-        {"name": "reportGeneration", "display_name": "Report Generation", "type": "text", "description": "Report generation status"}
-      ]
-    },
-    "DFT Calculation": {
-      "inputs": [
-        {"name": "optimizationTarget", "display_name": "Optimization Target", "type": "select", "required": true, "options": [{"value": "performance", "text": "Performance"}, {"value": "cost", "text": "Cost"}, {"value": "efficiency", "text": "Efficiency"}], "default": "performance", "description": "Optimization target for DFT calculation"},
-        {"name": "iterations", "display_name": "Iterations", "type": "number", "required": false, "min": 10, "max": 1000, "step": 10, "default": 100, "description": "Number of optimization iterations"},
-        {"name": "configFile", "display_name": "Configuration File", "type": "file", "required": false, "accept": ".json,.xml", "description": "Configuration file for DFT"},
-        {"name": "verboseOutput", "display_name": "Verbose Output", "type": "checkbox", "required": false, "default": false, "description": "Enable verbose output"}
-      ],
-      "outputs": [
-        {"name": "convergenceStatus", "display_name": "Convergence Status", "type": "text", "description": "Convergence status of optimization"},
-        {"name": "performanceImprovement", "display_name": "Performance Improvement", "type": "text", "description": "Performance improvement achieved"},
-        {"name": "configurationStatus", "display_name": "Configuration", "type": "text", "description": "Final configuration status"}
-      ]
-    },
-    "Crystallographic Analysis": {
-      "inputs": [
-        {"name": "inputData", "display_name": "Input Data", "type": "text", "required": true, "placeholder": "Enter data or formula", "description": "Input data or material formula"},
-        {"name": "modelType", "display_name": "Model Type", "type": "select", "required": true, "options": [{"value": "linear", "text": "Linear Model"}, {"value": "nonlinear", "text": "Non-linear Model"}, {"value": "ml", "text": "Machine Learning"}], "default": "linear", "description": "Type of analysis model"},
-        {"name": "accuracy", "display_name": "Required Accuracy (%)", "type": "number", "required": false, "min": 50, "max": 99, "step": 1, "default": 90, "description": "Required accuracy level"},
-        {"name": "realTimeUpdate", "display_name": "Real-time Updates", "type": "checkbox", "required": false, "default": true, "description": "Enable real-time updates"}
-      ],
-      "outputs": [
-        {"name": "simulationStatus", "display_name": "Simulation Status", "type": "text", "description": "Status of simulation"},
-        {"name": "modelValidation", "display_name": "Model Validation", "type": "text", "description": "Model validation results"},
-        {"name": "predictions", "display_name": "Predictions", "type": "text", "description": "Structural predictions"}
-      ]
-    },
-    "Quantum Mechanics": {
-      "inputs": [
-        {"name": "computationMethod", "display_name": "Computation Method", "type": "select", "required": true, "options": [{"value": "quantum", "text": "Quantum Mechanical"}, {"value": "classical", "text": "Classical Methods"}, {"value": "hybrid", "text": "Hybrid Approach"}], "default": "quantum", "description": "Computation method to use"},
-        {"name": "precision", "display_name": "Precision Level", "type": "number", "required": false, "min": 1, "max": 10, "step": 1, "default": 5, "description": "Precision level for computation"},
-        {"name": "boundary", "display_name": "Boundary Conditions", "type": "text", "required": false, "placeholder": "Specify conditions", "description": "Boundary conditions for calculation"},
-        {"name": "parallelProcessing", "display_name": "Parallel Processing", "type": "checkbox", "required": false, "default": true, "description": "Enable parallel processing"}
-      ],
-      "outputs": [
-        {"name": "computationStatus", "display_name": "Computation Status", "type": "text", "description": "Status of computation"},
-        {"name": "discoveryPotential", "display_name": "Discovery Potential", "type": "text", "description": "Discovery potential of results"},
-        {"name": "databaseExport", "display_name": "Database Export", "type": "text", "description": "Database export status"}
-      ]
-    },
-    "Tensor Analysis": {
-      "inputs": [
-        {"name": "sampleId", "display_name": "Sample ID", "type": "text", "required": true, "placeholder": "Enter sample identifier", "description": "Sample identifier"},
-        {"name": "characterizationType", "display_name": "Characterization Type", "type": "select", "required": true, "options": [{"value": "structural", "text": "Structural Analysis"}, {"value": "compositional", "text": "Compositional Analysis"}, {"value": "property", "text": "Property Analysis"}], "default": "structural", "description": "Type of characterization"},
-        {"name": "resolution", "display_name": "Resolution (nm)", "type": "number", "required": false, "min": 0.1, "max": 1000, "step": 0.1, "default": 1, "description": "Resolution for analysis"},
-        {"name": "sampleData", "display_name": "Sample Data File", "type": "file", "required": false, "accept": ".dat,.csv", "description": "Sample data file for analysis"}
-      ],
-      "outputs": [
-        {"name": "analysisComplete", "display_name": "Analysis Status", "type": "text", "description": "Analysis completion status"},
-        {"name": "correlationValue", "display_name": "Structure-Property Correlation", "type": "text", "description": "Structure-property correlation value"},
-        {"name": "visualizationData", "display_name": "Visualization Data", "type": "text", "description": "Visualization data availability"}
       ]
     },
     "Advanced Characterization": {

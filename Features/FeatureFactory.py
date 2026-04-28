@@ -1,27 +1,13 @@
 # Import all feature classes
 
-from Features.Materials_Exploration.MaterialSearch.MaterialSearchFeature import MaterialSearchFeature
-from Features.Materials_Exploration.MaterialGeneration.MaterialGenerationFeature import MaterialGenerationFeature
 from Features.Materials_Exploration.DatabaseExtractor.DatabaseExtractorFeature import DatabaseExtractorFeature
-from Features.Materials_Exploration.MaterialCharacterization.MaterialCharacterizationFeature import MaterialCharacterizationFeature
-from Features.Materials_Exploration.DftCalculation.DftCalculationFeature import DftCalculationFeature
-from Features.Materials_Exploration.CrystallographicAnalysis.CrystallographicAnalysisFeature import CrystallographicAnalysisFeature
-from Features.Materials_Exploration.QuantumMechanics.QuantumMechanicsFeature import QuantumMechanicsFeature
-from Features.Materials_Exploration.TensorAnalysis.TensorAnalysisFeature import TensorAnalysisFeature
 from Features.Electronics_Application.AdvancedCharacterization.AdvancedCharacterizationFeature import AdvancedCharacterizationFeature
 
 
 # Feature registry - simple mapping like Information Units
 feature_factory = {
-    "1": MaterialSearchFeature,
-    "2": MaterialGenerationFeature,
-    "3": DatabaseExtractorFeature,
-    "4": MaterialCharacterizationFeature,
-    "5": DftCalculationFeature,
-    "6": CrystallographicAnalysisFeature,
-    "7": QuantumMechanicsFeature,
-    "8": TensorAnalysisFeature,
-    "9": AdvancedCharacterizationFeature
+    "1": DatabaseExtractorFeature,
+    "2": AdvancedCharacterizationFeature
 
 }
 

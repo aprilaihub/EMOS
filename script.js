@@ -117,28 +117,14 @@ const iuFeatureModules = {
 
 // Feature class mapping for dynamic loading
 const featureClasses = {
-    1: 'MaterialSearchFeature',
-    2: 'MaterialGenerationFeature',
-    3: 'DatabaseExtractorFeature',
-    4: 'MaterialCharacterizationFeature',
-    5: 'DftCalculationFeature',
-    6: 'CrystallographicAnalysisFeature',
-    7: 'QuantumMechanicsFeature',
-    8: 'TensorAnalysisFeature',
-    9: 'AdvancedCharacterizationFeature',
+    1: 'DatabaseExtractorFeature',
+    2: 'AdvancedCharacterizationFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
 const featureFiles = {
-    1: './Features/Materials_Exploration/MaterialSearch/MaterialSearch.js',
-    2: './Features/Materials_Exploration/MaterialGeneration/MaterialGeneration.js',
-    3: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
-    4: './Features/Materials_Exploration/MaterialCharacterization/MaterialCharacterization.js',
-    5: './Features/Materials_Exploration/DftCalculation/DftCalculation.js',
-    6: './Features/Materials_Exploration/CrystallographicAnalysis/CrystallographicAnalysis.js',
-    7: './Features/Materials_Exploration/QuantumMechanics/QuantumMechanics.js',
-    8: './Features/Materials_Exploration/TensorAnalysis/TensorAnalysis.js',
-    9: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
+    1: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
+    2: './Features/Electronics_Application/AdvancedCharacterization/AdvancedCharacterization.js',
 };
 
 // Global feature instances storage
