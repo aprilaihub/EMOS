@@ -1,0 +1,1393 @@
+{
+  "description": "Canonical shared property definitions across all information units.",
+  "version": "2.0",
+  "properties": {
+    "ael_applied_pressure": {
+      "type": "float",
+      "description": "Returns the applied pressure for the AEL calculations.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_average_external_pressure": {
+      "type": "float",
+      "description": "Returns the average external pressure for the AEL calculations.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_bulk_modulus_reuss": {
+      "type": "float",
+      "description": "Returns the bulk modulus calculated, using the Reuss method, by AEL.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_bulk_modulus_voigt": {
+      "type": "float",
+      "description": "Returns the bulk modulus calculated, using the Voigt method, by AEL.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_compliance_tensor": {
+      "type": "array",
+      "description": "Returns the compliance tensor calculated by AEL.",
+      "category": "mechanical",
+      "unit": "GPa<sup>-1</sup>"
+    },
+    "ael_debye_temperature": {
+      "type": "float",
+      "description": "Returns the Debye temperature calculated by AEL.",
+      "category": "mechanical",
+      "unit": "K"
+    },
+    "ael_elastic_anisotropy": {
+      "type": "string",
+      "description": "Returns the elastic anisotropy calculated by AEL.",
+      "category": "mechanical"
+    },
+    "ael_pughs_modulus_ratio": {
+      "type": "string",
+      "description": "Returns the Pugh's modulus ratio calculated by AEL.",
+      "category": "mechanical"
+    },
+    "ael_shear_modulus_reuss": {
+      "type": "float",
+      "description": "Returns the shear modulus calculated, using the Reuss method, by AEL.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_shear_modulus_voigt": {
+      "type": "float",
+      "description": "Returns the shear modulus calculated, using the Voigt method, by AEL.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_speed_sound_average": {
+      "type": "float",
+      "description": "Returns the average speed of sound calculated by AEL",
+      "category": "mechanical",
+      "unit": "m/s"
+    },
+    "ael_speed_sound_longitudinal": {
+      "type": "float",
+      "description": "Returns the longitudinal speed of sound calculated by AEL",
+      "category": "mechanical",
+      "unit": "m/s"
+    },
+    "ael_speed_sound_transverse": {
+      "type": "float",
+      "description": "Returns the transverse speed of sound calculated by AEL",
+      "category": "mechanical",
+      "unit": "m/s"
+    },
+    "ael_stiffness_tensor": {
+      "type": "array",
+      "description": "Returns the stiffness tensor calculated by AEL",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "ael_youngs_modulus_vrh": {
+      "type": "float",
+      "description": "Returns the Young modulus calculated, using the Voigt-Reuss-Hill average, by AEL.",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "aflow_prototype_label_orig": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype label for the unrelaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_label_relax": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype label for the relaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_parameters_orig": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter labels and values for the unrelaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_parameters_relax": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter labels and values for the relaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_params_list_orig": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter labels for the unrelaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_params_list_relax": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter labels for the relaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_params_values_orig": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter values for the unrelaxed structure.",
+      "category": "metadata"
+    },
+    "aflow_prototype_params_values_relax": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype parameter values for the relaxed structure.",
+      "category": "metadata"
+    },
+    "agl_acoustic_debye": {
+      "type": "float",
+      "description": "Returns the acoustic Debye temperature calculated by AGL.",
+      "category": "thermal",
+      "unit": "K"
+    },
+    "agl_bulk_modulus_isothermal_300_k": {
+      "type": "float",
+      "description": "Returns the isothermal bulk modulus calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "GPa"
+    },
+    "agl_bulk_modulus_static_300_k": {
+      "type": "float",
+      "description": "Returns the static bulk modulus calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "GPa"
+    },
+    "agl_debye": {
+      "type": "float",
+      "description": "Returns the Debye temperature calculated by AGL.",
+      "category": "thermal",
+      "unit": "K"
+    },
+    "agl_gruneisen": {
+      "type": "string",
+      "description": "Returns the Gr&uuml;neisen parameter calculated by AGL.",
+      "category": "thermal"
+    },
+    "agl_heat_capacity_cp_300_k": {
+      "type": "float",
+      "description": "Returns the heat capacity per cell, at constant pressure, calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "k<sub>B</sub>/cell"
+    },
+    "agl_heat_capacity_cv_300_k": {
+      "type": "float",
+      "description": "Returns the heat capacity per cell, at constant volume, calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "k<sub>B</sub>/cell"
+    },
+    "agl_poisson_ratio_source": {
+      "type": "string",
+      "description": "Returns the source of the Poisson ratio used for AGL calculations.",
+      "category": "thermal"
+    },
+    "agl_thermal_conductivity_300_k": {
+      "type": "float",
+      "description": "Returns the thermal conductivity calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "W m<sup>-1</sup> K<sup>-1</sup>"
+    },
+    "agl_thermal_expansion_300_k": {
+      "type": "float",
+      "description": "Returns the thermal expansion coefficient calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "K<sup>-1</sup>"
+    },
+    "agl_vibrational_entropy_300_k_atom": {
+      "type": "float",
+      "description": "Returns the vibrational entropy per atom calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "meV/(K atom)"
+    },
+    "agl_vibrational_entropy_300_k_cell": {
+      "type": "float",
+      "description": "Returns the vibrational entropy per cell calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "meV/(K cell)"
+    },
+    "agl_vibrational_free_energy_300_k_atom": {
+      "type": "float",
+      "description": "Returns the vibrational free energy per atom calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "meV/atom"
+    },
+    "agl_vibrational_free_energy_300_k_cell": {
+      "type": "float",
+      "description": "Returns the vibrational free energy per cell calculated by AGL at 300 K.",
+      "category": "thermal",
+      "unit": "meV/cell"
+    },
+    "atomic_numbers": {
+      "type": "array",
+      "description": "Atomic numbers for atoms in the structure",
+      "category": "predictor"
+    },
+    "atoms_per_species": {
+      "type": "array",
+      "description": "Returns the number of atoms per type in the simulation cell.",
+      "category": "chemical_composition"
+    },
+    "aurl": {
+      "type": "string",
+      "description": "Returns the AFLOWLIB uniform resource locator (AURL) for the entry.",
+      "category": "metadata"
+    },
+    "authors": {
+      "type": "string",
+      "description": "Returns the name (not necessarily an individual) and affiliation associated with authorship of the data.",
+      "category": "metadata"
+    },
+    "avg_elec_mass": {
+      "type": "float",
+      "description": "Average electron effective mass",
+      "category": "electronic",
+      "unit": "m_e"
+    },
+    "avg_hole_mass": {
+      "type": "float",
+      "description": "Average hole effective mass",
+      "category": "electronic",
+      "unit": "m_e"
+    },
+    "bader_atomic_volumes": {
+      "type": "float",
+      "description": "Returns the volume of each atom calculated by the Atoms in Molecules (AIM) Bader analysis.",
+      "category": "energetic",
+      "unit": "&Aring;<sup>3</sup>"
+    },
+    "bader_net_charges": {
+      "type": "float",
+      "description": "Returns the partial charge of each atom calculated by the Atoms in Molecules (AIM) Bader analysis.",
+      "category": "metadata",
+      "unit": "e<sup>-</sup>"
+    },
+    "band_gap": {
+      "type": "float",
+      "description": "Electronic band gap (PBEsol)",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "band_gap_direct": {
+      "type": "float",
+      "description": "Direct electronic band gap (PBEsol)",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "band_gap_direct_scan": {
+      "type": "float",
+      "description": "Direct electronic band gap (SCAN)",
+      "category": "electronic_scan",
+      "unit": "eV"
+    },
+    "band_gap_gbfs": {
+      "type": "float",
+      "description": "Predicted electronic band gap using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "band_gap_gbfs2d": {
+      "type": "float",
+      "description": "Predicted electronic band gap for 2D layered materials using GBFS-2D LightGBM model with van der Waals detection",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "band_gap_scan": {
+      "type": "float",
+      "description": "Electronic band gap (SCAN)",
+      "category": "electronic_scan",
+      "unit": "eV"
+    },
+    "band_gap_type": {
+      "type": "string",
+      "description": "Returns the electronic band gap type.",
+      "category": "electronic"
+    },
+    "bravais_lattice_lattice_system": {
+      "type": "array",
+      "description": "Returns the Bravais lattice of the lattice system for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_lattice_system_orig": {
+      "type": "array",
+      "description": "Returns the Bravais lattice of the lattice system for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_lattice_type": {
+      "type": "array",
+      "description": "Returns the lattice centering type for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_lattice_type_orig": {
+      "type": "array",
+      "description": "Returns the lattice centering type for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_lattice_variation_type": {
+      "type": "array",
+      "description": "Returns the Bravais lattice variation of the lattice system for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_lattice_variation_type_orig": {
+      "type": "array",
+      "description": "Returns the Bravais lattice variation of the lattice system for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_orig": {
+      "type": "array",
+      "description": "Returns the Bravais lattice of the crystal for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_lattice_relax": {
+      "type": "array",
+      "description": "Returns the Bravais lattice of the crystal for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_system": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice of the lattice system for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_system_orig": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice of the lattice system for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_type": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice centering type for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_type_orig": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice centering type for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_variation_type": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice variation of the lattice system for the relaxed structure.",
+      "category": "structural"
+    },
+    "bravais_superlattice_lattice_variation_type_orig": {
+      "type": "array",
+      "description": "Returns the Bravais superlattice variation of the lattice system for the unrelaxed structure",
+      "category": "structural"
+    },
+    "bulk_modulus": {
+      "type": "float",
+      "description": "Bulk modulus",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "calculation_code": {
+      "type": "string",
+      "description": "Returns the software name and version used to perform the calculation.",
+      "category": "metadata"
+    },
+    "calculation_cores": {
+      "type": "integer",
+      "description": "Returns the number of CPUs used by the calculation.",
+      "category": "metadata"
+    },
+    "calculation_memory": {
+      "type": "float",
+      "description": "Returns the maximum RAM used by the calculation.",
+      "category": "metadata",
+      "unit": "MB"
+    },
+    "calculation_time": {
+      "type": "float",
+      "description": "Returns the total time taken by the calculation.",
+      "category": "metadata",
+      "unit": "seconds"
+    },
+    "cbm": {
+      "type": "float",
+      "description": "Conduction band minimum",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "charges": {
+      "type": "float",
+      "description": "Atomic charges (PBEsol)",
+      "category": "electronic"
+    },
+    "charges_scan": {
+      "type": "float",
+      "description": "Atomic charges (SCAN)",
+      "category": "electronic_scan"
+    },
+    "chemical_formula_descriptive": {
+      "type": "string",
+      "description": "Descriptive chemical formula",
+      "category": "chemical_composition"
+    },
+    "chemical_system": {
+      "type": "string",
+      "description": "Chemical system identifier (e.g., 'Si', 'Fe-O', 'Al-Si-O')",
+      "category": "composition"
+    },
+    "corresponding_contact": {
+      "type": "string",
+      "description": "Returns the name (not necessarily an individual) and affiliation associated with the data origin concerning correspondence about data.",
+      "category": "metadata"
+    },
+    "crystal_class": {
+      "type": "array",
+      "description": "Returns the crystal class for the relaxed structure.",
+      "category": "structural"
+    },
+    "crystal_class_orig": {
+      "type": "array",
+      "description": "Returns the crystal class for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "crystal_family": {
+      "type": "array",
+      "description": "Returns the crystal family for the relaxed structure.",
+      "category": "structural"
+    },
+    "crystal_family_orig": {
+      "type": "array",
+      "description": "Returns the crystal family for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "crystal_system": {
+      "type": "array",
+      "description": "Returns the crystal system for the relaxed structure.",
+      "category": "structural"
+    },
+    "crystal_system_orig": {
+      "type": "array",
+      "description": "Returns the crystal system for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "data_api": {
+      "type": "string",
+      "description": "Returns the REST API version for the entry.",
+      "category": "metadata"
+    },
+    "data_language": {
+      "type": "string",
+      "description": "Gives the language of the data in AFLOWLIB.",
+      "category": "metadata"
+    },
+    "data_source": {
+      "type": "string",
+      "description": "Returns the data source for the entry.",
+      "category": "metadata"
+    },
+    "database_catalog": {
+      "type": "string",
+      "description": "Returns the database name for the calculation.",
+      "category": "metadata"
+    },
+    "decomposition": {
+      "type": "string",
+      "description": "Most likely decomposition channel (PBEsol)",
+      "category": "energetic"
+    },
+    "decomposition_scan": {
+      "type": "string",
+      "description": "Most likely decomposition channel (SCAN)",
+      "category": "energetic_scan"
+    },
+    "deformation_potential_n": {
+      "type": "float",
+      "description": "n-type deformation potential",
+      "category": "transport",
+      "unit": "eV"
+    },
+    "deformation_potential_p": {
+      "type": "float",
+      "description": "p-type deformation potential",
+      "category": "transport",
+      "unit": "eV"
+    },
+    "delta_electronic_energy_convergence": {
+      "type": "float",
+      "description": "Returns the change in total energy from the last step of the self-consistent field (SCF) iteration.",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "delta_electronic_energy_threshold": {
+      "type": "float",
+      "description": "Returns the threshold for the self-consistent field (SCF) convergence.",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "density": {
+      "type": "float",
+      "description": "Mass density",
+      "category": "structural",
+      "unit": "g/cm3"
+    },
+    "dfpt_piezo_max_dij": {
+      "type": "float",
+      "description": "Maximum piezoelectric strain coefficient",
+      "category": "piezoelectric",
+      "unit": "C/N"
+    },
+    "dft_type": {
+      "type": "string",
+      "description": "Returns the level of theory used in the calculation, i.e., pseudopotential type, exchange-correlation functional used, and use of GW.",
+      "category": "metadata"
+    },
+    "dielectric_constant_gbfs": {
+      "type": "float",
+      "description": "Predicted dielectric constant using GBFS LightGBM model",
+      "category": "electronic",
+      "unit": "dimensionless"
+    },
+    "dos_ef": {
+      "type": "float",
+      "description": "Density of states at Fermi level (PBEsol)",
+      "category": "electronic",
+      "unit": "states/(eV*unit_cell)"
+    },
+    "dos_ef_scan": {
+      "type": "float",
+      "description": "Density of states at Fermi level (SCAN)",
+      "category": "electronic_scan",
+      "unit": "states/(eV*unit_cell)"
+    },
+    "eentropy_atom": {
+      "type": "float",
+      "description": "Returns the electronic entropy per atom used to converge the calculation.",
+      "category": "electronic",
+      "unit": "eV/atom"
+    },
+    "eentropy_cell": {
+      "type": "float",
+      "description": "Returns the electronic entropy per cell used to converge the calculation.",
+      "category": "electronic",
+      "unit": "eV/cell"
+    },
+    "efermi": {
+      "type": "float",
+      "description": "Fermi energy",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "electron_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted electron mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s"
+    },
+    "elements": {
+      "type": "array",
+      "description": "List of unique chemical elements present",
+      "category": "structural"
+    },
+    "energy": {
+      "type": "float",
+      "description": "Total energy (PBEsol)",
+      "category": "energetic",
+      "unit": "eV"
+    },
+    "energy_above_hull_r2scan": {
+      "type": "float",
+      "description": "Distance from convex hull using r2SCAN functional",
+      "category": "thermodynamic",
+      "unit": "eV/atom"
+    },
+    "energy_cell": {
+      "type": "float",
+      "description": "Returns the total ab initio energy per cell.",
+      "category": "energetic",
+      "unit": "eV/cell"
+    },
+    "energy_corrected": {
+      "type": "float",
+      "description": "Total energy with pymatgen corrections (PBEsol)",
+      "category": "energetic",
+      "unit": "eV"
+    },
+    "energy_corrected_scan": {
+      "type": "float",
+      "description": "Total energy with pymatgen corrections (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV"
+    },
+    "energy_cutoff": {
+      "type": "float",
+      "description": "Return the plane-wave energy cut-off used for the calculation.",
+      "category": "energetic",
+      "unit": "eV"
+    },
+    "energy_per_atom": {
+      "type": "float",
+      "description": "Total DFT energy per atom",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "energy_scan": {
+      "type": "float",
+      "description": "Total energy (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV"
+    },
+    "enthalpy_atom": {
+      "type": "float",
+      "description": "Returns the enthalpy per atom.",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "enthalpy_cell": {
+      "type": "float",
+      "description": "Returns the enthalpy per cell.",
+      "category": "energetic",
+      "unit": "eV/cell"
+    },
+    "enthalpy_formation_atom": {
+      "type": "float",
+      "description": "Returns the formation enthalpy per atom.",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "enthalpy_formation_cell": {
+      "type": "float",
+      "description": "Returns the formation enthalpy per cell.",
+      "category": "energetic",
+      "unit": "eV/cell"
+    },
+    "entropic_temperature": {
+      "type": "float",
+      "description": "Returns the entropic temperature.",
+      "category": "energetic",
+      "unit": "K"
+    },
+    "epsx": {
+      "type": "float",
+      "description": "Dielectric constant (x-direction, electronic)",
+      "category": "dielectric"
+    },
+    "exfoliation_energy": {
+      "type": "float",
+      "description": "Exfoliation energy for 2D materials",
+      "category": "energetic",
+      "unit": "meV/atom"
+    },
+    "files": {
+      "type": "array",
+      "description": "Returns the input and output files used in the simulation.",
+      "category": "metadata"
+    },
+    "forces": {
+      "type": "float",
+      "description": "Forces on atoms (PBEsol)",
+      "category": "structural",
+      "unit": "eV/Angstrom"
+    },
+    "forces_scan": {
+      "type": "float",
+      "description": "Forces on atoms (SCAN)",
+      "category": "structural_scan",
+      "unit": "eV/Angstrom"
+    },
+    "formation_energy_gbfs": {
+      "type": "float",
+      "description": "Predicted formation energy per atom using GBFS LightGBM model",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "formation_energy_per_atom": {
+      "type": "float",
+      "description": "Formation energy per atom (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "formation_energy_per_atom_scan": {
+      "type": "float",
+      "description": "Formation energy per atom (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom"
+    },
+    "formation_energy_r2scan": {
+      "type": "float",
+      "description": "Formation energy per atom using r2SCAN functional",
+      "category": "thermodynamic",
+      "unit": "eV/atom"
+    },
+    "geometry": {
+      "type": "array",
+      "description": "Returns the lattice parameters of the relaxed simulation cell.",
+      "category": "structural"
+    },
+    "geometry_orig": {
+      "type": "array",
+      "description": "Returns the lattice parameters of the unrelaxed simulation cell.",
+      "category": "structural"
+    },
+    "hhi_score": {
+      "type": "float",
+      "description": "HII score (?)",
+      "unit": "???"
+    },
+    "hole_mobility_gbfs": {
+      "type": "float",
+      "description": "Predicted hole mobility using GBFS LightGBM model (log10 scaled internally, returned as actual value)",
+      "category": "electronic",
+      "unit": "cm²/V·s"
+    },
+    "hse_gap": {
+      "type": "float",
+      "description": "Electronic band gap (HSE functional)",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "hull_distance": {
+      "type": "float",
+      "description": "Distance from convex hull (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "hull_distance_scan": {
+      "type": "float",
+      "description": "Distance from convex hull (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom"
+    },
+    "icsd_number": {
+      "type": "integer",
+      "description": "Returns the ICSD entry number",
+      "category": "metadata"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique structure ID",
+      "category": "identifier"
+    },
+    "is_magnetic": {
+      "type": "boolean",
+      "description": "Whether the material is magnetic",
+      "category": "magnetic"
+    },
+    "is_metal_gbfs": {
+      "type": "boolean",
+      "description": "Predicted metal/non-metal classification using GBFS LightGBM classifier",
+      "category": "electronic"
+    },
+    "is_metal_gbfs2d": {
+      "type": "boolean",
+      "description": "Predicted metal/non-metal classification for 2D layered materials using GBFS-2D LightGBM classifier with van der Waals detection",
+      "category": "electronic"
+    },
+    "is_stable_gbfs2d": {
+      "type": "boolean",
+      "description": "Predicted structural stability for 2D layered materials using GBFS-2D LightGBM classifier with van der Waals detection",
+      "category": "structural"
+    },
+    "kpoints_bands_nkpts": {
+      "type": "array",
+      "description": "Returns the number of points, between the high-symmetry k-points, used for the band structure calculation.",
+      "category": "electronic"
+    },
+    "kpoints_bands_path": {
+      "type": "array",
+      "description": "Returns the high-symmetry k-point path used for the band structure calculation.",
+      "category": "electronic"
+    },
+    "kpoints_relax": {
+      "type": "array",
+      "description": "Returns the k-point grid used for the structural relaxation calculation.",
+      "category": "electronic"
+    },
+    "kpoints_static": {
+      "type": "array",
+      "description": "Returns the k-point grid used for the static calculation.",
+      "category": "electronic"
+    },
+    "last_modified": {
+      "type": "string",
+      "description": "Last modification timestamp",
+      "category": "metadata"
+    },
+    "lattice_system_orig": {
+      "type": "string",
+      "description": "Returns the lattice system for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "lattice_system_relax": {
+      "type": "string",
+      "description": "Returns the lattice system for the relaxed structure.",
+      "category": "structural"
+    },
+    "lattice_variation_orig": {
+      "type": "string",
+      "description": "Returns the lattice variation for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "lattice_variation_relax": {
+      "type": "string",
+      "description": "Returns the lattice variation for the relaxed structure.",
+      "category": "structural"
+    },
+    "ldau_j": {
+      "type": "array",
+      "description": "Returns the J parameters of the DFT+U calculation.",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "ldau_l": {
+      "type": "array",
+      "description": "Returns The orbitals of the DFT+U calculation.",
+      "category": "electronic"
+    },
+    "ldau_type": {
+      "type": "array",
+      "description": "Returns the type of DFT+U calculation performed.",
+      "category": "electronic"
+    },
+    "ldau_u": {
+      "type": "array",
+      "description": "Returns the U parameters of the DFT+U calculation.",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "mag_density": {
+      "type": "float",
+      "description": "Mag density",
+      "unit": "T"
+    },
+    "magnetic_moments": {
+      "type": "float",
+      "description": "Local magnetic moments (PBEsol)",
+      "category": "electronic",
+      "unit": "muB"
+    },
+    "magnetic_moments_scan": {
+      "type": "float",
+      "description": "Local magnetic moments (SCAN)",
+      "category": "electronic_scan",
+      "unit": "muB"
+    },
+    "magnetization": {
+      "type": "float",
+      "description": "Total magnetization (PBEsol)",
+      "category": "electronic",
+      "unit": "muB/unit_cell"
+    },
+    "magnetization_scan": {
+      "type": "float",
+      "description": "Total magnetization (SCAN)",
+      "category": "electronic_scan",
+      "unit": "muB/unit_cell"
+    },
+    "mass": {
+      "type": "float",
+      "description": "Unit cell mass",
+      "category": "structural",
+      "unit": "amu"
+    },
+    "matching_entries": {
+      "type": "string",
+      "description": "Returns the AFLOWLIB entries that matched the search criterion.",
+      "category": "metadata"
+    },
+    "matching_entries_count": {
+      "type": "integer",
+      "description": "Returns the number AFLOWLIB entries that matched the search criterion.",
+      "category": "metadata"
+    },
+    "mbj_bandgap": {
+      "type": "float",
+      "description": "Electronic band gap (MBJ functional)",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "mepsx": {
+      "type": "float",
+      "description": "Dielectric constant (x-direction, ionic+electronic)",
+      "category": "dielectric"
+    },
+    "n_powerfact": {
+      "type": "float",
+      "description": "n-type thermoelectric power factor",
+      "category": "transport"
+    },
+    "n_seebeck": {
+      "type": "float",
+      "description": "n-type Seebeck coefficient",
+      "category": "transport",
+      "unit": "muV/K"
+    },
+    "natoms": {
+      "type": "integer",
+      "description": "Number of atoms in unit cell",
+      "category": "structural"
+    },
+    "nbondxx": {
+      "type": "float",
+      "description": "Returns the nearest neighbors distances for the relaxed structure.",
+      "category": "metadata",
+      "unit": "&Aring;"
+    },
+    "nelements": {
+      "type": "integer",
+      "description": "Number of unique chemical elements",
+      "category": "structural"
+    },
+    "node_c_p_u_cores": {
+      "type": "integer",
+      "description": "Returns information about the number of CPUs on the node/cluster where the calculation was performed.",
+      "category": "metadata"
+    },
+    "node_c_p_u_m_hz": {
+      "type": "float",
+      "description": "Returns information about the speed of CPUs on the node/cluster where the calculation was performed.",
+      "category": "metadata",
+      "unit": "MHz"
+    },
+    "node_c_p_u_model": {
+      "type": "string",
+      "description": "Returns information about the model of CPUs on the node/cluster where the calculation was performed.",
+      "category": "metadata"
+    },
+    "node_r_a_m_g_b": {
+      "type": "float",
+      "description": "Returns information about the RAM on the node/cluster where the calculation was performed.",
+      "category": "metadata",
+      "unit": "Gb"
+    },
+    "nperiodic_dimensions": {
+      "type": "integer",
+      "description": "Number of periodic dimensions",
+      "category": "structural"
+    },
+    "num_atoms": {
+      "type": "integer",
+      "description": "Number of atoms in the structure",
+      "category": "predictor"
+    },
+    "p_powerfact": {
+      "type": "float",
+      "description": "p-type thermoelectric power factor",
+      "category": "transport"
+    },
+    "p_seebeck": {
+      "type": "float",
+      "description": "p-type Seebeck coefficient",
+      "category": "transport",
+      "unit": "muV/K"
+    },
+    "p_v_atom": {
+      "type": "float",
+      "description": "Returns the pressure multiplied by volume per atom for the relaxed structure.",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "p_v_cell": {
+      "type": "float",
+      "description": "Returns the pressure multiplied by volume per atom for the relaxed structure.",
+      "category": "energetic",
+      "unit": "eV/cell"
+    },
+    "pearson_symbol_orig": {
+      "type": "string",
+      "description": "Returns the Pearson symbol for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "pearson_symbol_relax": {
+      "type": "string",
+      "description": "Returns the Pearson symbol for the relaxed structure.",
+      "category": "structural"
+    },
+    "pearson_symbol_superlattice": {
+      "type": "string",
+      "description": "Returns the Pearson symbol of the superlattice for the relaxed structure.",
+      "category": "structural"
+    },
+    "pearson_symbol_superlattice_orig": {
+      "type": "string",
+      "description": "Returns the Pearson symbol of the superlattice for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "phase_separation_energy": {
+      "type": "float",
+      "description": "Phase separation energy (PBEsol)",
+      "category": "energetic",
+      "unit": "eV/atom"
+    },
+    "phase_separation_energy_scan": {
+      "type": "float",
+      "description": "Phase separation energy (SCAN)",
+      "category": "energetic_scan",
+      "unit": "eV/atom"
+    },
+    "point_group_hermann_mauguin": {
+      "type": "array",
+      "description": "Returns the point group, in Hermann-Mauguin notation, for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_hermann_mauguin_orig": {
+      "type": "array",
+      "description": "Returns the point group, in Hermann-Mauguin notation, for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "point_group_orbifold": {
+      "type": "array",
+      "description": "Returns the point group orbifold for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_orbifold_orig": {
+      "type": "array",
+      "description": "Returns the point group orbifold for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "point_group_order": {
+      "type": "array",
+      "description": "Returns the point group order for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_order_orig": {
+      "type": "array",
+      "description": "Returns the point group order for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "point_group_schoenflies": {
+      "type": "array",
+      "description": "Returns the point group, in Schoenflies notation, for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_schoenflies_orig": {
+      "type": "array",
+      "description": "Returns the point group, in Schoenflies notation, for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "point_group_structure": {
+      "type": "array",
+      "description": "Returns the point group structure for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_structure_orig": {
+      "type": "array",
+      "description": "Returns the point group structure for the unrelaxed structure",
+      "category": "structural"
+    },
+    "point_group_type": {
+      "type": "array",
+      "description": "Returns the point group type for the relaxed structure.",
+      "category": "structural"
+    },
+    "point_group_type_orig": {
+      "type": "array",
+      "description": "Returns the point group type for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "poisson_ratio": {
+      "type": "float",
+      "description": "Poisson ratio",
+      "category": "mechanical"
+    },
+    "positions_cartesian": {
+      "type": "array",
+      "description": "Returns the Cartesian coordinates of the atoms for the relaxed structure.",
+      "category": "structural",
+      "unit": "&Aring;"
+    },
+    "positions_fractional": {
+      "type": "array",
+      "description": "Returns the fractional coordinates of the atoms for the relaxed structure.",
+      "category": "structural"
+    },
+    "postprocessing_loop": {
+      "type": "string",
+      "description": "Returns information about the type of post-processing that was performed.",
+      "category": "metadata"
+    },
+    "pressure": {
+      "type": "float",
+      "description": "Returns the hydrostatic pressure on the simulation cell for the unrelaxed structure.",
+      "category": "energetic",
+      "unit": "kbar"
+    },
+    "pressure_final": {
+      "type": "float",
+      "description": "Returns the hydrostatic pressure on the simulation cell for the relaxed structure.",
+      "category": "energetic",
+      "unit": "kbar"
+    },
+    "pressure_residual": {
+      "type": "float",
+      "description": "Returns the hydrostatic pressure, corrected by the Pulay stress, on the simulation cell for the relaxed structure.",
+      "category": "energetic",
+      "unit": "kbar"
+    },
+    "prototype": {
+      "type": "string",
+      "description": "Returns the AFLOW prototype for the unrelaxed structure.",
+      "category": "metadata"
+    },
+    "pulay_stress": {
+      "type": "float",
+      "description": "Returns the Pulay stress correcton for the calculation.",
+      "category": "metadata",
+      "unit": "kbar"
+    },
+    "reciprocal_geometry": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice parameters of the relaxed simulation cell.",
+      "category": "structural"
+    },
+    "reciprocal_geometry_orig": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice parameters of the unrelaxed simulation cell.",
+      "category": "structural"
+    },
+    "reciprocal_lattice_type": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice centering type for the relaxed structure.",
+      "category": "structural"
+    },
+    "reciprocal_lattice_type_orig": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice centering type for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "reciprocal_lattice_variation_type": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice centering type variation for the relaxed structure.",
+      "category": "structural"
+    },
+    "reciprocal_lattice_variation_type_orig": {
+      "type": "array",
+      "description": "Returns the reciprocal lattice centering type variation for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "reciprocal_volume_cell": {
+      "type": "array",
+      "description": "Returns the volume of the reciprocal cell for the relaxed structure.",
+      "category": "structural",
+      "unit": "&Aring;<sup>-3</sup>"
+    },
+    "reciprocal_volume_cell_orig": {
+      "type": "array",
+      "description": "Returns the volume of the reciprocal cell for the unrelaxed structure.",
+      "category": "structural",
+      "unit": "&Aring;<sup>-3</sup>"
+    },
+    "relaxed_cif": {
+      "type": "string",
+      "description": "Path to saved relaxed CIF output from MatterSim",
+      "category": "predictor"
+    },
+    "relaxed_energy": {
+      "type": "float",
+      "description": "Total energy after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV"
+    },
+    "relaxed_forces": {
+      "type": "float",
+      "description": "Forces on atoms after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "eV/Angstrom"
+    },
+    "relaxed_stress": {
+      "type": "float",
+      "description": "Stress tensor after MatterSim structure relaxation",
+      "category": "predictor",
+      "unit": "GPa"
+    },
+    "repository_version": {
+      "type": "string",
+      "description": "Returns the version of the AFLOW post-processor which generated the entry in the library.",
+      "category": "metadata"
+    },
+    "scintillation_attenuation_length": {
+      "type": "float",
+      "description": "Returns the scintillation attenuation length.",
+      "category": "metadata",
+      "unit": "cm"
+    },
+    "sg": {
+      "type": "string",
+      "description": "Returns the space groups for the structure, before the first relaxation step (unrelaxed), after the first relaxation step and after the last relaxation step (relaxed), using a loose tolerance.",
+      "category": "metadata"
+    },
+    "sg2": {
+      "type": "string",
+      "description": "Returns the space groups for the structure, before the first relaxation step (unrelaxed), after the first relaxation step and after the last relaxation step (relaxed), using a tight (default) tolerance.",
+      "category": "metadata"
+    },
+    "shear_modulus": {
+      "type": "float",
+      "description": "Shear modulus (Voigt)",
+      "category": "mechanical",
+      "unit": "GPa"
+    },
+    "slme": {
+      "type": "float",
+      "description": "Spectroscopic Limited Maximum Efficiency for solar cells",
+      "category": "solar",
+      "unit": "%"
+    },
+    "space_group": {
+      "type": "integer",
+      "description": "Space group number (PBEsol)",
+      "category": "structural"
+    },
+    "spacegroup_orig": {
+      "type": "string",
+      "description": "Returns the space group for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "species_pp": {
+      "type": "array",
+      "description": "Returns the pseudopotential of the species.",
+      "category": "chemical_composition"
+    },
+    "species_pp_version": {
+      "type": "array",
+      "description": "Returns the pseudopotential version of the species.",
+      "category": "chemical_composition"
+    },
+    "species_pp_z_v_a_l": {
+      "type": "array",
+      "description": "Returns the number of valence electrons of the species.",
+      "category": "chemical_composition",
+      "unit": "e<sup>-</sup>"
+    },
+    "spillage": {
+      "type": "float",
+      "description": "Spillage value for topological material screening",
+      "category": "electronic"
+    },
+    "spin_atom": {
+      "type": "float",
+      "description": "Returns the magnetization of the simulation cell per atom",
+      "category": "electronic",
+      "unit": "&mu;<sub>B</sub>/atom"
+    },
+    "spin_d": {
+      "type": "float",
+      "description": "Returns the magnetic moment on each atom.",
+      "category": "electronic",
+      "unit": "&mu;<sub>B</sub>"
+    },
+    "spin_d_magmom_orig": {
+      "type": "float",
+      "description": "Returns the magnetic moment on each atom of the unrelaxed structure.",
+      "category": "electronic",
+      "unit": "&mu;<sub>B</sub>"
+    },
+    "spin_f": {
+      "type": "float",
+      "description": "Returns the magnetization of the simulation cell, at the Fermi energy.",
+      "category": "electronic",
+      "unit": "&mu;<sub>B</sub>/cell"
+    },
+    "sponsors": {
+      "type": "string",
+      "description": "Returns information about funding agencies and other sponsors for the entry.",
+      "category": "metadata"
+    },
+    "stoichiometry": {
+      "type": "array",
+      "description": "Returns the normalized composition of the structure.",
+      "category": "chemical_composition"
+    },
+    "stress_tensor": {
+      "type": "float",
+      "description": "Stress tensor (PBEsol)",
+      "category": "structural",
+      "unit": "kbar"
+    },
+    "synthesizability_score": {
+      "type": "float",
+      "description": "Predicted SynthNN synthesizability score",
+      "category": "predictor",
+      "unit": "probability"
+    },
+    "synthesizable": {
+      "type": "boolean",
+      "description": "Predicted SynthNN synthesizability label",
+      "category": "predictor"
+    },
+    "Tc_supercon": {
+      "type": "float",
+      "description": "Superconducting critical temperature",
+      "category": "electronic",
+      "unit": "K"
+    },
+    "type": {
+      "type": "string",
+      "description": "Entry type (always 'structures')",
+      "category": "metadata"
+    },
+    "valence_cell_iupac": {
+      "type": "string",
+      "description": "Returns the sum of the valence electrons, based on IUPAC standards, of the atoms in the simulation cell.",
+      "category": "electronic"
+    },
+    "valence_cell_std": {
+      "type": "string",
+      "description": "Returns the sum of the valence electrons, based on the outermost shell(s), of the atoms in the simulation cell.",
+      "category": "electronic"
+    },
+    "vbm": {
+      "type": "float",
+      "description": "Valence band maximum",
+      "category": "electronic",
+      "unit": "eV"
+    },
+    "volume": {
+      "type": "float",
+      "description": "Unit cell volume",
+      "category": "structural",
+      "unit": "Angstrom3"
+    },
+    "volume_atom": {
+      "type": "float",
+      "description": "Returns the volume per atom of the simulation cell for the relaxed structure.",
+      "category": "energetic",
+      "unit": "&Aring;<sup>3</sup>/atom"
+    },
+    "workflow_version": {
+      "type": "integer",
+      "description": "Returns the version number of AFLOW used to perform the calculation.",
+      "category": "metadata"
+    },
+    "wyckoff_letters": {
+      "type": "array",
+      "description": "Returns the Wyckoff letters of each site for the relaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_letters_orig": {
+      "type": "array",
+      "description": "Returns the Wyckoff letters of each site for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_multiplicities": {
+      "type": "array",
+      "description": "Returns the Wyckoff multiplicity of each site for the relaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_multiplicities_orig": {
+      "type": "array",
+      "description": "Returns the Wyckoff multiplicity of each site for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_positions": {
+      "type": "array",
+      "description": "The Wyckoff positions of each site for the relaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_positions_orig": {
+      "type": "array",
+      "description": "The Wyckoff positions of each site for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_site_symmetries": {
+      "type": "array",
+      "description": "Returns the Wyckoff symmetry of each site for the relaxed structure.",
+      "category": "structural"
+    },
+    "wyckoff_site_symmetries_orig": {
+      "type": "array",
+      "description": "Returns the Wyckoff symmetry of each site for the unrelaxed structure.",
+      "category": "structural"
+    },
+    "xc_functional": {
+      "type": "string",
+      "description": "Exchange-correlation functional used",
+      "category": "metadata"
+    }
+  }
+}

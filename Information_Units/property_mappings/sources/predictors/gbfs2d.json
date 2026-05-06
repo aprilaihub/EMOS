@@ -1,0 +1,26 @@
+{
+  "description": "Source-specific mappings for gbfs2d (predictors).",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "gbfs2d",
+  "properties": {
+    "band_gap_gbfs2d": {
+      "name": "bandgap",
+      "predictable": true,
+      "range_support": true,
+      "supports_2d_detection": true
+    },
+    "is_metal_gbfs2d": {
+      "name": "is_metal",
+      "predictable": true,
+      "range_support": false,
+      "supports_2d_detection": true
+    },
+    "is_stable_gbfs2d": {
+      "name": "is_stable",
+      "predictable": true,
+      "range_support": false,
+      "supports_2d_detection": true
+    }
+  }
+}

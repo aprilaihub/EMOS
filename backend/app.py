@@ -63,6 +63,15 @@ class SimpleLogger:
 logger = SimpleLogger()
 
 
+def _instantiate_iu(cls, iu_name, logger_obj):
+    """Instantiate IU classes with logger passed safely by keyword when supported."""
+    try:
+        return cls(iu_name, logger=logger_obj)
+    except TypeError:
+        # Backward-compatible fallback for constructors that only support positional args
+        return cls(iu_name, logger_obj)
+
+
 @app.route('/api/features/info', methods=['GET'])
 def get_features_info():
     """Get information about available features and their architectures"""
@@ -149,15 +158,15 @@ def toggle_IU():
             # Instantiate and store
             if ui_type=="generator":
                 cls = generator_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 generator_registry[class_name] = instance
             elif ui_type=="database":
                 cls = database_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 database_registry[class_name] = instance
             elif ui_type=="predictor":
                 cls = predictor_factory[class_name]
-                instance = cls(class_name, logger)  # will raise if factory mapped to an instance
+                instance = _instantiate_iu(cls, class_name, logger)  # will raise if factory mapped to an instance
                 predictor_registry[class_name] = instance
             else:
                 return jsonify({"message": "Unknown type"}), 400
@@ -210,6 +219,205 @@ def process_feature(feature_id):
     except Exception as e:
         print(f"Error in process_feature: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/process/iu/<iu_type>/<iu_id>', methods=['POST', 'OPTIONS'])
+def process_information_unit(iu_type, iu_id):
+    """Execute a single Information Unit with predefined contract semantics."""
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        logger.clear_logs()
+        inputs = request.json or {}
+
+        if iu_type == 'database':
+            cls = database_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown database IU: {iu_id}'}), 404
+
+            # Reuse active instance if toggled on; otherwise instantiate transiently.
+            instance = database_registry.get(iu_id)
+            if instance is None:
+                instance = _instantiate_iu(cls, iu_id, logger)
+
+            results = instance.retrieve(inputs)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        if iu_type == 'generator':
+            cls = generator_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown generator IU: {iu_id}'}), 404
+
+            instance = generator_registry.get(iu_id)
+            if instance is None:
+                instance = _instantiate_iu(cls, iu_id, logger)
+
+            if not hasattr(instance, 'generate'):
+                return jsonify({'error': f'Generator IU {iu_id} does not expose generate()'}), 400
+
+            results = instance.generate(inputs)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        if iu_type == 'predictor':
+            cls = predictor_factory.get(iu_id)
+            if cls is None:
+                return jsonify({'error': f'Unknown predictor IU: {iu_id}'}), 404
+
+            instance = predictor_registry.get(iu_id)
+            if instance is None:
+                instance = _instantiate_iu(cls, iu_id, logger)
+
+            if not hasattr(instance, 'predict'):
+                return jsonify({'error': f'Predictor IU {iu_id} does not expose predict()'}), 400
+
+            # Extract CIF strings from input
+            cif_strings = inputs.get('cif_strings', [])
+            if not cif_strings:
+                return jsonify({'error': 'No CIF strings provided for prediction'}), 400
+
+            results = instance.predict(cif_strings)
+            return jsonify({
+                'results': results,
+                'logs': logger.get_logs(),
+                'iu_type': iu_type,
+                'iu_id': iu_id,
+            })
+
+        return jsonify({'error': f'Unsupported iu_type: {iu_type}'}), 400
+
+    except Exception as e:
+        print(f"Error in process_information_unit ({iu_type}/{iu_id}): {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/process/iu/<iu_type>/<iu_id>/stream', methods=['POST', 'OPTIONS'])
+def process_information_unit_stream(iu_type, iu_id):
+    """SSE streaming endpoint for Information Units.
+    
+    Yields SSE events as the IU processes:
+    * ``event: log``     — ``{"message": "...", "level": "info"}``
+    * ``event: progress`` — progress updates from streaming generators
+    * ``event: result``  — final result payload
+    * ``event: done``    — stream end
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        logger.clear_logs()
+        inputs = request.json or {}
+
+        def _generate_sse():
+            """Yield SSE blocks from the IU's streaming processor."""
+            try:
+                if iu_type == 'generator':
+                    cls = generator_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown generator IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = generator_registry.get(iu_id)
+                    if instance is None:
+                        instance = _instantiate_iu(cls, iu_id, logger)
+
+                    # Check if generator supports streaming
+                    if hasattr(instance, 'generate_stream'):
+                        # Use streaming generator
+                        for sse_event in instance.generate_stream(inputs):
+                            event_type = sse_event.get('event', 'log')
+                            yield f"event: {event_type}\ndata: {json.dumps(sse_event)}\n\n"
+                    else:
+                        # Fallback to sync
+                        yield f"event: log\ndata: {json.dumps({'message': 'No streaming support, using synchronous generation...', 'level': 'info'})}\n\n"
+                        results = instance.generate(inputs)
+                        results['event'] = 'result'
+                        yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                elif iu_type == 'database':
+                    cls = database_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown database IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = database_registry.get(iu_id)
+                    if instance is None:
+                        instance = _instantiate_iu(cls, iu_id, logger)
+
+                    # Databases don't typically stream, so sync only
+                    results = instance.retrieve(inputs)
+                    results['event'] = 'result'
+                    yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                elif iu_type == 'predictor':
+                    cls = predictor_factory.get(iu_id)
+                    if cls is None:
+                        yield f"event: error\ndata: {json.dumps({'message': f'Unknown predictor IU: {iu_id}'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    instance = predictor_registry.get(iu_id)
+                    if instance is None:
+                        instance = _instantiate_iu(cls, iu_id, logger)
+
+                    # Extract CIF strings from input
+                    cif_strings = inputs.get('cif_strings', [])
+                    if not cif_strings:
+                        yield f"event: error\ndata: {json.dumps({'message': 'No CIF strings provided for prediction'})}\n\n"
+                        yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+                        return
+
+                    # Predictors can stream or be sync
+                    if hasattr(instance, 'predict_stream'):
+                        # Use streaming predictor
+                        for sse_event in instance.predict_stream(cif_strings):
+                            event_type = sse_event.get('event', 'log')
+                            yield f"event: {event_type}\ndata: {json.dumps(sse_event)}\n\n"
+                    else:
+                        # Fallback to sync
+                        yield f"event: log\ndata: {json.dumps({'message': 'Running predictions...', 'level': 'info'})}\n\n"
+                        results = instance.predict(cif_strings)
+                        results['event'] = 'result'
+                        yield f"event: result\ndata: {json.dumps(results)}\n\n"
+
+                else:
+                    yield f"event: error\ndata: {json.dumps({'message': f'Unsupported iu_type: {iu_type}'})}\n\n"
+
+            except Exception as exc:
+                print(f"Error in IU streaming: {exc}")
+                yield f"event: error\ndata: {json.dumps({'message': str(exc), 'iu_type': iu_type, 'iu_id': iu_id})}\n\n"
+
+            finally:
+                yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+
+        return Response(
+            _generate_sse(),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no',
+            },
+        )
+
+    except Exception as e:
+        print(f"Error in process_information_unit_stream ({iu_type}/{iu_id}): {str(e)}")
+        def _err():
+            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+            yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
+        return Response(_err(), mimetype='text/event-stream')
 
 
 # ── Active feature instances for cancel support ─────────────────────

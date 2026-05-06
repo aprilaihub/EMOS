@@ -22,3 +22,6 @@ Thumbs.db
 # Temporary
 .tmp
 temp/
+
+# Local model/cache artifacts (generated, not source)
+data/mattergen/hf_cache/

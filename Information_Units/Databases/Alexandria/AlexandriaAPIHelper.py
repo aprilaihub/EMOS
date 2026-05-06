@@ -1,11 +1,10 @@
 """Helper functions for Alexandria database API interaction and data conversion."""
 
-import os
 import re
-import json
 import time
 import requests
 from pymatgen.core import Structure, Lattice, Composition
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class AlexandriaAPIHelper:
@@ -26,24 +25,15 @@ class AlexandriaAPIHelper:
 
     def _load_property_mapping(self) -> dict:
         """
-        Load property mapping from property_mappings.json.
+        Load property mapping from modular source mapping files.
 
         Returns:
             dict: Mapping with structure {prop_name: {name: alexandria_name, ...}} for retrievable properties
         """
         try:
-            mapping_file = os.path.join(
-                os.path.dirname(__file__),
-                '..',
-                '..',
-                'property_mappings.json'
-            )
-            with open(mapping_file, 'r') as f:
-                data = json.load(f)
-
             mapping = {}
-            for prop_name, prop_details in data.get('properties', {}).items():
-                alexandria_info = prop_details.get('alexandria', {})
+            source_mapping = load_source_property_mapping(source='alexandria', source_type='databases')
+            for prop_name, alexandria_info in source_mapping.items():
                 if alexandria_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': alexandria_info.get('name'),

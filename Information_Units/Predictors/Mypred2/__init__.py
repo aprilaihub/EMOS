@@ -1,1 +1,0 @@
-# MyPred2 Predictor Implementation

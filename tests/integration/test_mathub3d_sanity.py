@@ -11,9 +11,8 @@ Skip network tests: pytest -m "not network"
 
 import pytest
 import time
-from pathlib import Path
 from .conftest import (
-    validate_cif_file,
+    validate_cif_string,
     extract_formula_from_cif,
     extract_nelements_from_cif,
 )
@@ -89,18 +88,19 @@ def test_mathub3d_retrieve_structures(query, expected_elements, filters):
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase()
-    retrieve_params = {'query': query, 'limit': 2}
+    retrieve_params = {'target_compositions': query, 'batch_size': 2}
     retrieve_params.update(filters)
-    results = db.retrieve(retrieve_params)
+    payload = db.retrieve(retrieve_params)
+    assert isinstance(payload, dict)
+    assert payload.get("source") == "mathub3d"
+    assert isinstance(payload.get("queries"), dict)
+    results = payload.get("cif_strings", [])
 
     assert isinstance(results, list) and len(results) > 0, \
         f"No structures found for {query} with filters {filters}"
 
-    for path in results:
-        assert Path(path).exists(), f"CIF file not found: {path}"
-        assert path.endswith('.cif')
-
-        content = validate_cif_file(path)
+    for content in results:
+        content = validate_cif_string(content)
 
         formula = extract_formula_from_cif(content)
         if formula:
@@ -118,7 +118,10 @@ def test_mathub3d_retrieve_performance(benchmark, limit):
     from Information_Units.Databases.Mathub3d.Mathub3dDatabase import Mathub3dDatabase
 
     db = Mathub3dDatabase()
-    result = benchmark(db.retrieve, {'query': 'Fe2O3', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Fe2O3', 'batch_size': limit})
 
-    assert isinstance(result, list)
-    assert len(result) <= limit
+    assert isinstance(result, dict)
+    assert result.get("source") == "mathub3d"
+    assert isinstance(result.get("queries"), dict)
+    assert isinstance(result.get("cif_strings"), list)
+    assert len(result.get("cif_strings", [])) <= limit

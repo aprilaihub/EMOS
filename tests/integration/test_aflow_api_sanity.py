@@ -8,7 +8,6 @@ These tests mirror the Alexandria integration style:
 """
 
 import time
-from pathlib import Path
 
 import pytest
 
@@ -16,7 +15,7 @@ from .conftest import (
     extract_formula_from_cif,
     extract_nelements_from_cif,
     extract_nperiodic_dimensions_from_cif,
-    validate_cif_file,
+    validate_cif_string,
 )
 
 
@@ -88,19 +87,20 @@ def test_aflow_retrieve_structures(
 
     # End-to-end through database retrieve() and CIF write.
     db = AflowDatabase()
-    params = {"query": query, "limit": 3}
+    params = {"target_compositions": query, "batch_size": 3}
     params.update(filters)
-    results = db.retrieve(params)
+    payload = db.retrieve(params)
+    assert isinstance(payload, dict)
+    assert payload.get("source") == "aflow"
+    assert isinstance(payload.get("queries"), dict)
+    results = payload.get("cif_strings", [])
 
     assert isinstance(results, list) and len(results) > 0
 
-    for path in results:
-        assert Path(path).exists()
-        assert path.endswith(".cif")
-
-        content = validate_cif_file(path)
+    for i, content in enumerate(results):
+        content = validate_cif_string(content)
         for elem in expected_elements:
-            assert elem in content, f"{elem} not present in CIF content"
+            assert elem in content, f"{elem} not present in CIF result #{i + 1}"
 
         formula = extract_formula_from_cif(content)
         if formula:
@@ -108,8 +108,8 @@ def test_aflow_retrieve_structures(
                 assert elem in formula, f"{elem} not present in formula {formula}"
 
     if expected_nperiodic_dimensions is not None or expected_nelements_range is not None:
-        for path in results:
-            content = validate_cif_file(path)
+        for content in results:
+            content = validate_cif_string(content)
 
             if expected_nelements_range is not None:
                 min_nelements, max_nelements = expected_nelements_range
@@ -133,9 +133,11 @@ def test_aflow_broad_element_smoke():
     from Information_Units.Databases.Aflow.AflowDatabase import AflowDatabase
 
     db = AflowDatabase()
-    results = db.retrieve({"query": "Fe", "limit": 1})
-    assert isinstance(results, list)
-    assert len(results) <= 1
+    payload = db.retrieve({"target_compositions": "Fe", "batch_size": 1})
+    assert isinstance(payload, dict)
+    assert payload.get("source") == "aflow"
+    assert isinstance(payload.get("cif_strings"), list)
+    assert len(payload.get("cif_strings", [])) <= 1
 
 
 @pytest.mark.integration
@@ -146,7 +148,10 @@ def test_aflow_retrieve_performance(benchmark, limit):
     from Information_Units.Databases.Aflow.AflowDatabase import AflowDatabase
 
     db = AflowDatabase()
-    result = benchmark(db.retrieve, {"query": "Al2O3", "limit": limit})
+    result = benchmark(db.retrieve, {"target_compositions": "Al2O3", "batch_size": limit})
 
-    assert isinstance(result, list)
-    assert len(result) <= limit
+    assert isinstance(result, dict)
+    assert result.get("source") == "aflow"
+    assert isinstance(result.get("queries"), dict)
+    assert isinstance(result.get("cif_strings"), list)
+    assert len(result.get("cif_strings", [])) <= limit

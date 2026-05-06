@@ -116,10 +116,10 @@ def test_info_returns_non_empty_description(mock_logger):
 
 
 @pytest.mark.unit
-def test_predict_empty_input_returns_empty_dict(mock_logger):
-    """predict({}) always returns an empty dict, never raises."""
+def test_predict_empty_input_returns_standardized_empty_results(mock_logger):
+    """predict() returns standardized empty output for empty list input."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    assert predictor.predict({}) == {}
+    assert predictor.predict([]) == {"source": "synthnn", "results": []}
 
 
 @pytest.mark.unit
@@ -130,10 +130,12 @@ def test_predict_empty_input_returns_empty_dict(mock_logger):
 def test_predict_valid_cif_returns_ok_envelope(cif_files, mock_logger, mock_model_helper, cif_key, expected_elements):
     """Valid CIF input yields a well-formed 'ok' envelope."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    results = predictor.predict({'material.cif': cif_files[cif_key]})
+    cif_text = Path(cif_files[cif_key]).read_text()
+    output = predictor.predict([cif_text])
 
-    assert 'material.cif' in results
-    r = results['material.cif']
+    assert output["source"] == "synthnn"
+    assert len(output["results"]) == 1
+    r = output["results"][0]
     assert_prediction_envelope(r)
     assert r['status'] == 'ok'
     assert r['properties']['synthesizable'] is not None
@@ -142,55 +144,52 @@ def test_predict_valid_cif_returns_ok_envelope(cif_files, mock_logger, mock_mode
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize('label,path_key,expected_error_fragment', [
-    ('missing.cif', None,           'File not found'),
-    ('invalid.cif', 'invalid_path', None),
-    ('empty.cif',   'empty_path',   None),
+@pytest.mark.parametrize('path_key,expected_error_fragment', [
+    ('invalid_path', "Failed to parse CIF"),
 ])
-def test_predict_error_cases_return_error_envelope(cif_files, mock_logger, mock_model_helper, label, path_key, expected_error_fragment):
-    """Files that cannot be parsed produce an 'error' envelope."""
+def test_predict_error_cases_return_error_envelope(cif_files, mock_logger, mock_model_helper, path_key, expected_error_fragment):
+    """CIF strings that cannot be parsed produce an 'error' envelope."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    path = '/nonexistent/missing.cif' if path_key is None else cif_files[path_key]
-    results = predictor.predict({label: path})
+    cif_text = Path(cif_files[path_key]).read_text()
+    output = predictor.predict([cif_text])
 
-    r = results[label]
+    r = output["results"][0]
     assert_prediction_envelope(r)
     assert r['status'] == 'error'
     assert r['properties']['synthesizable'] is None
     assert r['properties']['synthesizability_score'] is None
     assert r['error'] is not None
-    if expected_error_fragment:
-        assert expected_error_fragment in r['error']
+    assert expected_error_fragment in r['error']
 
 
 @pytest.mark.unit
 def test_predict_batch_preserves_all_keys(cif_files, mock_logger, mock_model_helper):
-    """Every input key appears in the output dict, including failed files."""
+    """Batch output preserves item count and status ordering."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    input_data = {
-        'Al2O3.cif':   cif_files['al2o3_path'],
-        'SiO2.cif':    cif_files['sio2_path'],
-        'invalid.cif': cif_files['invalid_path'],
-    }
-    results = predictor.predict(input_data)
+    output = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['sio2_path']).read_text(),
+        Path(cif_files['invalid_path']).read_text(),
+    ])
 
-    assert set(results.keys()) == set(input_data.keys())
-    for r in results.values():
+    assert output["source"] == "synthnn"
+    assert len(output["results"]) == 3
+    for r in output["results"]:
         assert_prediction_envelope(r)
-    assert results['Al2O3.cif']['status'] == 'ok'
-    assert results['SiO2.cif']['status'] == 'ok'
-    assert results['invalid.cif']['status'] == 'error'
+    assert output["results"][0]["status"] == 'ok'
+    assert output["results"][1]["status"] == 'ok'
+    assert output["results"][2]["status"] == 'error'
 
 
 @pytest.mark.unit
 def test_predict_output_is_json_serializable(cif_files, mock_logger, mock_model_helper):
     """Output can be serialized to JSON and deserialized without data loss."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    results = predictor.predict({
-        'Al2O3.cif':   cif_files['al2o3_path'],
-        'invalid.cif': cif_files['invalid_path'],
-    })
-    serialized = json.dumps(results)
+    output = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['invalid_path']).read_text(),
+    ])
+    serialized = json.dumps(output)
     assert isinstance(json.loads(serialized), dict)
 
 
@@ -289,7 +288,7 @@ def test_mock_score_ranges(mock_logger, mock_model_helper, compositions, thresho
 
 @pytest.mark.unit
 def test_output_properties_are_registered_in_property_mappings(mock_logger, mock_model_helper):
-    """All SynthNN output properties must be declared in property_mappings.json."""
+    """All SynthNN output properties must be declared in modular property mappings."""
     predictor = SynthnnPredictor(logger=mock_logger)
 
     assert set(predictor.OUTPUT_PROPERTIES).issubset(predictor._mapped_output_properties)
@@ -300,7 +299,7 @@ def test_checker_rejects_unmapped_output_properties(mock_logger, mock_model_help
     """Checker raises if predictor output contains a property not in mapping."""
     predictor = SynthnnPredictor(logger=mock_logger)
 
-    with pytest.raises(ValueError, match="missing in property_mappings.json"):
+    with pytest.raises(ValueError, match="missing in modular property mappings"):
         predictor._check_output_properties_in_mapping({'not_in_mapping': 1})
 
 
@@ -308,12 +307,12 @@ def test_checker_rejects_unmapped_output_properties(mock_logger, mock_model_help
 def test_synthesizable_flag_follows_threshold(cif_files, mock_logger, mock_model_helper):
     """synthesizable is True iff synthesizability_score ≥ 0.70."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    results = predictor.predict({
-        'Al2O3.cif': cif_files['al2o3_path'],
-        'SiO2.cif':  cif_files['sio2_path'],
-    })
+    output = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['sio2_path']).read_text(),
+    ])
 
-    for result in results.values():
+    for result in output["results"]:
         if result['status'] == 'ok':
             score = result['properties']['synthesizability_score']
             assert result['properties']['synthesizable'] is (score >= 0.70)
@@ -323,10 +322,20 @@ def test_synthesizable_flag_follows_threshold(cif_files, mock_logger, mock_model
 def test_score_is_float_with_bounded_precision(cif_files, mock_logger, mock_model_helper):
     """Score is a float rounded to at most 4 decimal places."""
     predictor = SynthnnPredictor(logger=mock_logger)
-    results = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
+    output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
 
-    score = results['Al2O3.cif']['properties']['synthesizability_score']
+    score = output["results"][0]['properties']['synthesizability_score']
     assert isinstance(score, float)
     decimal_part = str(score).split('.')[-1] if '.' in str(score) else ''
     assert len(decimal_part) <= 4
 
+
+@pytest.mark.unit
+def test_predict_with_list_input_returns_standardized_output(cif_files, mock_logger, mock_model_helper):
+    predictor = SynthnnPredictor(logger=mock_logger)
+    cif_text = Path(cif_files["al2o3_path"]).read_text()
+    result = predictor.predict([cif_text])
+
+    assert result["source"] == "synthnn"
+    assert isinstance(result["results"], list)
+    assert result["results"][0]["status"] == "ok"

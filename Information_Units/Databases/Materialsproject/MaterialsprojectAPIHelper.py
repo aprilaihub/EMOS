@@ -1,11 +1,10 @@
 """Helper functions for Materials Project database API interaction and data conversion."""
 
-import os
 import re
-import json
 import time
 import requests
 from pymatgen.core import Structure, Lattice, Composition
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class MaterialsprojectAPIHelper:
@@ -25,25 +24,18 @@ class MaterialsprojectAPIHelper:
 
     def _load_property_mapping(self) -> dict:
         """
-        Load property mapping from property_mappings.json.
+        Load property mapping from modular source mapping files.
         
         Returns:
             dict: Mapping with structure {prop_name: {name: mp_name, ...}} for retrievable properties
         """
         try:
-            mapping_file = os.path.join(
-                os.path.dirname(__file__),
-                '..',
-                '..',
-                'property_mappings.json'
-            )
-            with open(mapping_file, 'r') as f:
-                data = json.load(f)
-            
-            # Create mapping with full property details from materialsproject block
             mapping = {}
-            for prop_name, prop_details in data.get('properties', {}).items():
-                mp_info = prop_details.get('materialsproject', {})
+            source_mapping = load_source_property_mapping(
+                source='materialsproject',
+                source_type='databases',
+            )
+            for prop_name, mp_info in source_mapping.items():
                 if mp_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': mp_info.get('name'),

@@ -75,47 +75,50 @@ def assert_error_prediction(result):
 
 def test_predict_valid_input_returns_ok_envelope(cif_files, predictor):
     """A valid input file produces a successful, well-formed result."""
-    results = predictor.predict({'material.cif': cif_files['al2o3_path']})
+    results = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
 
-    assert 'material.cif' in results
-    assert_ok_prediction(results['material.cif'])
+    assert results["source"] == "synthnn"
+    assert len(results["results"]) == 1
+    assert_ok_prediction(results["results"][0])
 
 
 def test_predict_invalid_input_returns_error_envelope(cif_files, predictor):
     """An invalid input file produces a structured error result."""
-    results = predictor.predict({'invalid.cif': cif_files['invalid_path']})
+    results = predictor.predict([Path(cif_files['invalid_path']).read_text()])
 
-    assert 'invalid.cif' in results
-    assert_error_prediction(results['invalid.cif'])
+    assert results["source"] == "synthnn"
+    assert len(results["results"]) == 1
+    assert_error_prediction(results["results"][0])
 
 
 def test_predict_mixed_batch_preserves_successes_and_failures(cif_files, predictor):
     """A bad file does not prevent valid files in the same batch from succeeding."""
-    input_data = {
-        'Al2O3.cif': cif_files['al2o3_path'],
-        'invalid.cif': cif_files['invalid_path'],
-        'SiO2.cif': cif_files['sio2_path'],
-    }
-    results = predictor.predict(input_data)
+    results = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['invalid_path']).read_text(),
+        Path(cif_files['sio2_path']).read_text(),
+    ])
 
-    assert set(results.keys()) == set(input_data.keys())
-    assert_ok_prediction(results['Al2O3.cif'])
-    assert_ok_prediction(results['SiO2.cif'])
-    assert_error_prediction(results['invalid.cif'])
+    assert results["source"] == "synthnn"
+    assert len(results["results"]) == 3
+    assert_ok_prediction(results["results"][0])
+    assert_error_prediction(results["results"][1])
+    assert_ok_prediction(results["results"][2])
 
 
 def test_predict_output_is_json_serializable(cif_files, predictor):
     """Prediction output can be serialized and deserialized as JSON."""
-    results = predictor.predict({
-        'Al2O3.cif': cif_files['al2o3_path'],
-        'invalid.cif': cif_files['invalid_path'],
-    })
+    results = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['invalid_path']).read_text(),
+    ])
 
     serialized = json.dumps(results)
     deserialized = json.loads(serialized)
 
     assert isinstance(deserialized, dict)
-    assert set(deserialized.keys()) == {'Al2O3.cif', 'invalid.cif'}
+    assert deserialized["source"] == "synthnn"
+    assert len(deserialized["results"]) == 2
 
 
 # ============================================================================
@@ -128,8 +131,8 @@ def test_predict_output_is_json_serializable(cif_files, predictor):
 ])
 def test_known_synthesizable_materials_score_high(cif_files, predictor, cif_key, expected_score_range):
     """Known common oxides should receive high SynthNN synthesizability scores."""
-    results = predictor.predict({'test.cif': cif_files[cif_key]})
-    result = results['test.cif']
+    results = predictor.predict([Path(cif_files[cif_key]).read_text()])
+    result = results["results"][0]
 
     assert_ok_prediction(result)
 
@@ -142,22 +145,34 @@ def test_known_synthesizable_materials_score_high(cif_files, predictor, cif_key,
 
 def test_model_deterministic_predictions(cif_files, predictor):
     """Running the same input twice should produce the same score."""
-    results1 = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
-    results2 = predictor.predict({'Al2O3.cif': cif_files['al2o3_path']})
+    cif_text = Path(cif_files['al2o3_path']).read_text()
+    results1 = predictor.predict([cif_text])
+    results2 = predictor.predict([cif_text])
 
-    score1 = results1['Al2O3.cif']['properties']['synthesizability_score']
-    score2 = results2['Al2O3.cif']['properties']['synthesizability_score']
+    score1 = results1["results"][0]['properties']['synthesizability_score']
+    score2 = results2["results"][0]['properties']['synthesizability_score']
     assert score1 == score2
 
 
 def test_synthesizable_flag_follows_threshold(cif_files, predictor):
     """SynthNN uses the rule synthesizable == (score >= 0.70)."""
-    results = predictor.predict({
-        'Al2O3.cif': cif_files['al2o3_path'],
-        'SiO2.cif': cif_files['sio2_path'],
-    })
+    results = predictor.predict([
+        Path(cif_files['al2o3_path']).read_text(),
+        Path(cif_files['sio2_path']).read_text(),
+    ])
 
-    for result in results.values():
+    for result in results["results"]:
         assert_ok_prediction(result)
         score = result['properties']['synthesizability_score']
         assert result['properties']['synthesizable'] is (score >= 0.70)
+
+
+def test_predict_with_list_input_returns_standardized_output(cif_files, predictor):
+    """New contract: list[str] input returns source/results envelope."""
+    cif_text = Path(cif_files["al2o3_path"]).read_text()
+    result = predictor.predict([cif_text])
+
+    assert result["source"] == "synthnn"
+    assert isinstance(result["results"], list)
+    assert len(result["results"]) == 1
+    assert result["results"][0]["status"] in {"ok", "error"}

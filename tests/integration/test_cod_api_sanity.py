@@ -12,11 +12,9 @@ Note: CIF parsing utilities are imported from conftest.py for code reuse.
 
 import pytest
 import time
-import os
-from pathlib import Path
 from Information_Units.Databases.Cod.CodAPIHelper import CodAPIHelper
 from .conftest import (
-    validate_cif_file,
+    validate_cif_string,
     extract_formula_from_cif,
     extract_nelements_from_cif,
     extract_nperiodic_dimensions_from_cif
@@ -52,22 +50,23 @@ def test_cod_retrieve_structures(
     from Information_Units.Databases.Cod.CodDatabase import CodDatabase
     
     db = CodDatabase()
-    retrieve_params = {'query': query, 'limit': 3}
+    retrieve_params = {'target_compositions': query, 'batch_size': 3}
     retrieve_params.update(filters)
-    results = db.retrieve(retrieve_params)
-    
+    payload = db.retrieve(retrieve_params)
+    assert isinstance(payload, dict)
+    assert payload.get("source") == "cod"
+    assert isinstance(payload.get("queries"), dict)
+    results = payload.get("cif_strings", [])
+
     assert isinstance(results, list) and len(results) > 0, \
         f"No structures found for {query} with filters {filters}"
     
-    for path in results:
-        assert Path(path).exists()
-        assert path.endswith('.cif')
-        
-        content = validate_cif_file(path)
+    for i, content in enumerate(results):
+        content = validate_cif_string(content)
         
         # Verify all expected elements present
         for elem in expected_elements:
-            assert elem in content, f"{elem} not found in {path}"
+            assert elem in content, f"{elem} not found in CIF result #{i + 1}"
         
         # Verify formula contains expected elements
         formula = extract_formula_from_cif(content)
@@ -78,19 +77,19 @@ def test_cod_retrieve_structures(
     # For nperiodic_dimensions cases, verify dimensionality in the CIF files
     # This validates filters without making a second API call (avoiding rate-limiting)
     if expected_nperiodic_dimensions is not None or expected_nelements_range is not None:
-        for path in results:
-            content = validate_cif_file(path)
+        for content in results:
+            content = validate_cif_string(content)
             
             if expected_nelements_range is not None:
                 min_nelements, max_nelements = expected_nelements_range
                 nelements = extract_nelements_from_cif(content)
                 assert nelements >= min_nelements and nelements <= max_nelements, \
-                    f"nelements {nelements} not in range [{min_nelements}, {max_nelements}] for {path}"
+                    f"nelements {nelements} not in range [{min_nelements}, {max_nelements}]"
             
             if expected_nperiodic_dimensions is not None:
                 nperiodic = extract_nperiodic_dimensions_from_cif(content)
                 assert nperiodic == expected_nperiodic_dimensions, \
-                    f"nperiodic_dimensions {nperiodic} != {expected_nperiodic_dimensions} for {path}"
+                    f"nperiodic_dimensions {nperiodic} != {expected_nperiodic_dimensions}"
 
 
 
@@ -105,8 +104,11 @@ def test_cod_retrieve_performance(benchmark, limit):
     db = CodDatabase()
     
     # Measure time to retrieve structures
-    result = benchmark(db.retrieve, {'query': 'Fe', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Fe', 'batch_size': limit})
     
     # Verify results are valid
-    assert isinstance(result, list)
-    assert len(result) <= limit
+    assert isinstance(result, dict)
+    assert result.get("source") == "cod"
+    assert isinstance(result.get("queries"), dict)
+    assert isinstance(result.get("cif_strings"), list)
+    assert len(result.get("cif_strings", [])) <= limit

@@ -4,6 +4,7 @@ import os
 import json
 import zipfile
 from pymatgen.core import Structure, Composition
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class Mathub3dHelper:
@@ -16,17 +17,11 @@ class Mathub3dHelper:
         self.property_mapping = self._load_property_mapping()
 
     def _load_property_mapping(self) -> dict:
-        """Load mathub3d property mapping from property_mappings.json."""
+        """Load MatHub-3d property mapping from modular property files."""
         try:
-            mapping_file = os.path.join(
-                os.path.dirname(__file__), '..', '..', 'property_mappings.json'
-            )
-            with open(mapping_file, 'r') as f:
-                data = json.load(f)
-
             mapping = {}
-            for prop_name, prop_details in data.get('properties', {}).items():
-                mathub3d_info = prop_details.get('mathub3d', {})
+            source_mapping = load_source_property_mapping(source='mathub3d', source_type='databases')
+            for prop_name, mathub3d_info in source_mapping.items():
                 if mathub3d_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': mathub3d_info.get('name'),
@@ -117,7 +112,7 @@ class Mathub3dHelper:
 
     def find_cif_match(self, entry, cod_db, mp_db, output_dir, tolerance=0.05):
         """
-        Query COD + MP by formula, compare lattice params, return best CIF path or None.
+        Query COD + MP by formula, compare lattice params, return best CIF string or None.
 
         Preference: Materials Project first (DFT lattice closer to MatHub-3d), then COD.
         """
@@ -136,10 +131,11 @@ class Mathub3dHelper:
         all_candidates = []
         for source_name, db in [('materialsproject', mp_db), ('cod', cod_db)]:
             try:
-                cif_paths = db.retrieve({'query': formula, 'limit': 10})
-                if cif_paths:
-                    for p in cif_paths:
-                        all_candidates.append((source_name, p))
+                payload = db.retrieve({'target_compositions': formula, 'batch_size': 10})
+                cif_strings = payload.get('cif_strings', []) if isinstance(payload, dict) else []
+                if cif_strings:
+                    for cif_str in cif_strings:
+                        all_candidates.append((source_name, cif_str))
             except Exception as e:
                 if self.logger:
                     self.logger.log(f"Warning: {source_name} lookup failed for {formula}: {str(e)}")
@@ -148,12 +144,12 @@ class Mathub3dHelper:
             return None
 
         # Find best lattice match
-        best_path = None
+        best_cif = None
         best_deviation = float('inf')
 
-        for source, cif_path in all_candidates:
+        for source, cif_str in all_candidates:
             try:
-                structure = Structure.from_file(cif_path)
+                structure = Structure.from_str(cif_str, fmt='cif')
                 lat = structure.lattice
                 dev_a = abs(lat.a - target_a) / target_a
                 dev_b = abs(lat.b - target_b) / target_b
@@ -162,13 +158,13 @@ class Mathub3dHelper:
 
                 if max_dev < tolerance and max_dev < best_deviation:
                     best_deviation = max_dev
-                    best_path = cif_path
+                    best_cif = cif_str
             except Exception:
                 continue
 
-        if best_path:
-            return best_path
+        if best_cif:
+            return best_cif
 
         # Fallback: prefer MP, then COD (no lattice match within tolerance)
-        mp_first = next((p for s, p in all_candidates if s == 'materialsproject'), None)
+        mp_first = next((c for s, c in all_candidates if s == 'materialsproject'), None)
         return mp_first or all_candidates[0][1]

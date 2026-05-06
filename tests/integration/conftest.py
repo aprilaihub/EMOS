@@ -22,6 +22,16 @@ def validate_cif_file(path):
     return content
 
 
+def validate_cif_string(content):
+    """Validate CIF text has correct structure and content."""
+    # Check required CIF format fields
+    assert 'data_' in content, "Missing CIF data block"
+    assert '_cell_length_a' in content, "Missing lattice parameter"
+    assert '_atom_site_label' in content or '_atom_site_type_symbol' in content, \
+        "Missing atomic site information"
+    return content
+
+
 def extract_formula_from_cif(content):
     """Extract chemical formula from CIF file."""
     for line in content.split('\n'):

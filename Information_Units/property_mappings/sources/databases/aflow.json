@@ -1,0 +1,925 @@
+{
+  "description": "Source-specific mappings for aflow (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "aflow",
+  "properties": {
+    "ael_applied_pressure": {
+      "name": "ael_applied_pressure",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_average_external_pressure": {
+      "name": "ael_average_external_pressure",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_bulk_modulus_reuss": {
+      "name": "ael_bulk_modulus_reuss",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_bulk_modulus_voigt": {
+      "name": "ael_bulk_modulus_voigt",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_compliance_tensor": {
+      "name": "ael_compliance_tensor",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ael_debye_temperature": {
+      "name": "ael_debye_temperature",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_elastic_anisotropy": {
+      "name": "ael_elastic_anisotropy",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ael_pughs_modulus_ratio": {
+      "name": "ael_pughs_modulus_ratio",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ael_shear_modulus_reuss": {
+      "name": "ael_shear_modulus_reuss",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_shear_modulus_voigt": {
+      "name": "ael_shear_modulus_voigt",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_speed_sound_average": {
+      "name": "ael_speed_sound_average",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_speed_sound_longitudinal": {
+      "name": "ael_speed_sound_longitudinal",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_speed_sound_transverse": {
+      "name": "ael_speed_sound_transverse",
+      "retrievable": true,
+      "range_support": true
+    },
+    "ael_stiffness_tensor": {
+      "name": "ael_stiffness_tensor",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ael_youngs_modulus_vrh": {
+      "name": "ael_youngs_modulus_vrh",
+      "retrievable": true,
+      "range_support": true
+    },
+    "aflow_prototype_label_orig": {
+      "name": "aflow_prototype_label_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_label_relax": {
+      "name": "aflow_prototype_label_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_parameters_orig": {
+      "name": "aflow_prototype_parameters_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_parameters_relax": {
+      "name": "aflow_prototype_parameters_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_params_list_orig": {
+      "name": "aflow_prototype_params_list_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_params_list_relax": {
+      "name": "aflow_prototype_params_list_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_params_values_orig": {
+      "name": "aflow_prototype_params_values_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aflow_prototype_params_values_relax": {
+      "name": "aflow_prototype_params_values_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "agl_acoustic_debye": {
+      "name": "agl_acoustic_debye",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_bulk_modulus_isothermal_300_k": {
+      "name": "agl_bulk_modulus_isothermal_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_bulk_modulus_static_300_k": {
+      "name": "agl_bulk_modulus_static_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_debye": {
+      "name": "agl_debye",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_gruneisen": {
+      "name": "agl_gruneisen",
+      "retrievable": true,
+      "range_support": false
+    },
+    "agl_heat_capacity_cp_300_k": {
+      "name": "agl_heat_capacity_Cp_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_heat_capacity_cv_300_k": {
+      "name": "agl_heat_capacity_Cv_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_poisson_ratio_source": {
+      "name": "agl_poisson_ratio_source",
+      "retrievable": true,
+      "range_support": false
+    },
+    "agl_thermal_conductivity_300_k": {
+      "name": "agl_thermal_conductivity_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_thermal_expansion_300_k": {
+      "name": "agl_thermal_expansion_300K",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_vibrational_entropy_300_k_atom": {
+      "name": "agl_vibrational_entropy_300K_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_vibrational_entropy_300_k_cell": {
+      "name": "agl_vibrational_entropy_300K_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_vibrational_free_energy_300_k_atom": {
+      "name": "agl_vibrational_free_energy_300K_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "agl_vibrational_free_energy_300_k_cell": {
+      "name": "agl_vibrational_free_energy_300K_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "atoms_per_species": {
+      "name": "composition",
+      "retrievable": true,
+      "range_support": false
+    },
+    "aurl": {
+      "name": "aurl",
+      "retrievable": true,
+      "range_support": false
+    },
+    "authors": {
+      "name": "author",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bader_atomic_volumes": {
+      "name": "bader_atomic_volumes",
+      "retrievable": true,
+      "range_support": true
+    },
+    "bader_net_charges": {
+      "name": "bader_net_charges",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap": {
+      "name": "Egap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap_type": {
+      "name": "Egap_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_system": {
+      "name": "Bravais_lattice_lattice_system",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_system_orig": {
+      "name": "Bravais_lattice_lattice_system_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_type": {
+      "name": "Bravais_lattice_lattice_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_type_orig": {
+      "name": "Bravais_lattice_lattice_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_variation_type": {
+      "name": "Bravais_lattice_lattice_variation_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_lattice_variation_type_orig": {
+      "name": "Bravais_lattice_lattice_variation_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_orig": {
+      "name": "Bravais_lattice_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_lattice_relax": {
+      "name": "Bravais_lattice_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_system": {
+      "name": "Bravais_superlattice_lattice_system",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_system_orig": {
+      "name": "Bravais_superlattice_lattice_system_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_type": {
+      "name": "Bravais_superlattice_lattice_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_type_orig": {
+      "name": "Bravais_superlattice_lattice_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_variation_type": {
+      "name": "Bravais_superlattice_lattice_variation_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bravais_superlattice_lattice_variation_type_orig": {
+      "name": "Bravais_superlattice_lattice_variation_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "bulk_modulus": {
+      "name": "ael_bulk_modulus_vrh",
+      "retrievable": true,
+      "range_support": true
+    },
+    "calculation_code": {
+      "name": "code",
+      "retrievable": true,
+      "range_support": false
+    },
+    "calculation_cores": {
+      "name": "calculation_cores",
+      "retrievable": true,
+      "range_support": true
+    },
+    "calculation_memory": {
+      "name": "calculation_memory",
+      "retrievable": true,
+      "range_support": true
+    },
+    "calculation_time": {
+      "name": "calculation_time",
+      "retrievable": true,
+      "range_support": true
+    },
+    "chemical_formula_descriptive": {
+      "name": "compound",
+      "retrievable": true
+    },
+    "corresponding_contact": {
+      "name": "corresponding",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_class": {
+      "name": "crystal_class",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_class_orig": {
+      "name": "crystal_class_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_family": {
+      "name": "crystal_family",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_family_orig": {
+      "name": "crystal_family_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_system": {
+      "name": "crystal_system",
+      "retrievable": true,
+      "range_support": false
+    },
+    "crystal_system_orig": {
+      "name": "crystal_system_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "data_api": {
+      "name": "data_api",
+      "retrievable": true,
+      "range_support": false
+    },
+    "data_language": {
+      "name": "data_language",
+      "retrievable": true,
+      "range_support": false
+    },
+    "data_source": {
+      "name": "data_source",
+      "retrievable": true,
+      "range_support": false
+    },
+    "database_catalog": {
+      "name": "catalog",
+      "retrievable": true,
+      "range_support": false
+    },
+    "delta_electronic_energy_convergence": {
+      "name": "delta_electronic_energy_convergence",
+      "retrievable": true,
+      "range_support": true
+    },
+    "delta_electronic_energy_threshold": {
+      "name": "delta_electronic_energy_threshold",
+      "retrievable": true,
+      "range_support": true
+    },
+    "density": {
+      "name": "density",
+      "retrievable": true,
+      "range_support": true
+    },
+    "dft_type": {
+      "name": "dft_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "eentropy_atom": {
+      "name": "eentropy_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "eentropy_cell": {
+      "name": "eentropy_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "elements": {
+      "name": "species",
+      "retrievable": true,
+      "range_support": false
+    },
+    "energy_cell": {
+      "name": "energy_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_cutoff": {
+      "name": "energy_cutoff",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_per_atom": {
+      "name": "energy_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "enthalpy_atom": {
+      "name": "enthalpy_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "enthalpy_cell": {
+      "name": "enthalpy_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "enthalpy_formation_atom": {
+      "name": "enthalpy_formation_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "enthalpy_formation_cell": {
+      "name": "enthalpy_formation_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "entropic_temperature": {
+      "name": "entropic_temperature",
+      "retrievable": true,
+      "range_support": true
+    },
+    "files": {
+      "name": "files",
+      "retrievable": true,
+      "range_support": false
+    },
+    "forces": {
+      "name": "forces",
+      "retrievable": true,
+      "range_support": true
+    },
+    "geometry": {
+      "name": "geometry",
+      "retrievable": true,
+      "range_support": false
+    },
+    "geometry_orig": {
+      "name": "geometry_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "icsd_number": {
+      "name": "icsd_number",
+      "retrievable": true,
+      "range_support": true
+    },
+    "id": {
+      "name": "auid",
+      "retrievable": true
+    },
+    "kpoints_bands_nkpts": {
+      "name": "kpoints_bands_nkpts",
+      "retrievable": true,
+      "range_support": false
+    },
+    "kpoints_bands_path": {
+      "name": "kpoints_bands_path",
+      "retrievable": true,
+      "range_support": false
+    },
+    "kpoints_relax": {
+      "name": "kpoints_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "kpoints_static": {
+      "name": "kpoints_static",
+      "retrievable": true,
+      "range_support": false
+    },
+    "last_modified": {
+      "name": "aflowlib_date",
+      "retrievable": true
+    },
+    "lattice_system_orig": {
+      "name": "lattice_system_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "lattice_system_relax": {
+      "name": "lattice_system_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "lattice_variation_orig": {
+      "name": "lattice_variation_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "lattice_variation_relax": {
+      "name": "lattice_variation_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ldau_j": {
+      "name": "ldau_j",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ldau_l": {
+      "name": "ldau_l",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ldau_type": {
+      "name": "ldau_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "ldau_u": {
+      "name": "ldau_u",
+      "retrievable": true,
+      "range_support": false
+    },
+    "magnetization": {
+      "name": "spin_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "matching_entries": {
+      "name": "aflowlib_entries",
+      "retrievable": true,
+      "range_support": false
+    },
+    "matching_entries_count": {
+      "name": "aflowlib_entries_number",
+      "retrievable": true,
+      "range_support": true
+    },
+    "natoms": {
+      "name": "natoms",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nbondxx": {
+      "name": "nbondxx",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nelements": {
+      "name": "nspecies",
+      "retrievable": true,
+      "range_support": true
+    },
+    "node_c_p_u_cores": {
+      "name": "node_CPU_Cores",
+      "retrievable": true,
+      "range_support": true
+    },
+    "node_c_p_u_m_hz": {
+      "name": "node_CPU_MHz",
+      "retrievable": true,
+      "range_support": true
+    },
+    "node_c_p_u_model": {
+      "name": "node_CPU_Model",
+      "retrievable": true,
+      "range_support": false
+    },
+    "node_r_a_m_g_b": {
+      "name": "node_RAM_GB",
+      "retrievable": true,
+      "range_support": true
+    },
+    "p_v_atom": {
+      "name": "PV_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "p_v_cell": {
+      "name": "PV_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "pearson_symbol_orig": {
+      "name": "Pearson_symbol_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "pearson_symbol_relax": {
+      "name": "Pearson_symbol_relax",
+      "retrievable": true,
+      "range_support": false
+    },
+    "pearson_symbol_superlattice": {
+      "name": "Pearson_symbol_superlattice",
+      "retrievable": true,
+      "range_support": false
+    },
+    "pearson_symbol_superlattice_orig": {
+      "name": "Pearson_symbol_superlattice_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_hermann_mauguin": {
+      "name": "point_group_Hermann_Mauguin",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_hermann_mauguin_orig": {
+      "name": "point_group_Hermann_Mauguin_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_orbifold": {
+      "name": "point_group_orbifold",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_orbifold_orig": {
+      "name": "point_group_orbifold_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_order": {
+      "name": "point_group_order",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_order_orig": {
+      "name": "point_group_order_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_schoenflies": {
+      "name": "point_group_Schoenflies",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_schoenflies_orig": {
+      "name": "point_group_Schoenflies_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_structure": {
+      "name": "point_group_structure",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_structure_orig": {
+      "name": "point_group_structure_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_type": {
+      "name": "point_group_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "point_group_type_orig": {
+      "name": "point_group_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "poisson_ratio": {
+      "name": "ael_poisson_ratio",
+      "retrievable": true,
+      "range_support": true
+    },
+    "positions_cartesian": {
+      "name": "positions_cartesian",
+      "retrievable": true,
+      "range_support": false
+    },
+    "positions_fractional": {
+      "name": "positions_fractional",
+      "retrievable": true,
+      "range_support": false
+    },
+    "postprocessing_loop": {
+      "name": "loop",
+      "retrievable": true,
+      "range_support": false
+    },
+    "pressure": {
+      "name": "pressure",
+      "retrievable": true,
+      "range_support": true
+    },
+    "pressure_final": {
+      "name": "pressure_final",
+      "retrievable": true,
+      "range_support": true
+    },
+    "pressure_residual": {
+      "name": "pressure_residual",
+      "retrievable": true,
+      "range_support": true
+    },
+    "prototype": {
+      "name": "prototype",
+      "retrievable": true,
+      "range_support": false
+    },
+    "pulay_stress": {
+      "name": "Pulay_stress",
+      "retrievable": true,
+      "range_support": true
+    },
+    "reciprocal_geometry": {
+      "name": "reciprocal_geometry",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_geometry_orig": {
+      "name": "reciprocal_geometry_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_lattice_type": {
+      "name": "reciprocal_lattice_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_lattice_type_orig": {
+      "name": "reciprocal_lattice_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_lattice_variation_type": {
+      "name": "reciprocal_lattice_variation_type",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_lattice_variation_type_orig": {
+      "name": "reciprocal_lattice_variation_type_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_volume_cell": {
+      "name": "reciprocal_volume_cell",
+      "retrievable": true,
+      "range_support": false
+    },
+    "reciprocal_volume_cell_orig": {
+      "name": "reciprocal_volume_cell_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "repository_version": {
+      "name": "aflowlib_version",
+      "retrievable": true,
+      "range_support": false
+    },
+    "scintillation_attenuation_length": {
+      "name": "scintillation_attenuation_length",
+      "retrievable": true,
+      "range_support": true
+    },
+    "sg": {
+      "name": "sg",
+      "retrievable": true,
+      "range_support": false
+    },
+    "sg2": {
+      "name": "sg2",
+      "retrievable": true,
+      "range_support": false
+    },
+    "shear_modulus": {
+      "name": "ael_shear_modulus_vrh",
+      "retrievable": true,
+      "range_support": true
+    },
+    "space_group": {
+      "name": "spacegroup_relax",
+      "retrievable": true,
+      "range_support": true
+    },
+    "spacegroup_orig": {
+      "name": "spacegroup_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "species_pp": {
+      "name": "species_pp",
+      "retrievable": true,
+      "range_support": false
+    },
+    "species_pp_version": {
+      "name": "species_pp_version",
+      "retrievable": true,
+      "range_support": false
+    },
+    "species_pp_z_v_a_l": {
+      "name": "species_pp_ZVAL",
+      "retrievable": true,
+      "range_support": false
+    },
+    "spin_atom": {
+      "name": "spin_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "spin_d": {
+      "name": "spinD",
+      "retrievable": true,
+      "range_support": true
+    },
+    "spin_d_magmom_orig": {
+      "name": "spinD_magmom_orig",
+      "retrievable": true,
+      "range_support": true
+    },
+    "spin_f": {
+      "name": "spinF",
+      "retrievable": true,
+      "range_support": true
+    },
+    "sponsors": {
+      "name": "sponsor",
+      "retrievable": true,
+      "range_support": false
+    },
+    "stoichiometry": {
+      "name": "stoichiometry",
+      "retrievable": true,
+      "range_support": false
+    },
+    "stress_tensor": {
+      "name": "stress_tensor",
+      "retrievable": true,
+      "range_support": true
+    },
+    "valence_cell_iupac": {
+      "name": "valence_cell_iupac",
+      "retrievable": true,
+      "range_support": false
+    },
+    "valence_cell_std": {
+      "name": "valence_cell_std",
+      "retrievable": true,
+      "range_support": false
+    },
+    "volume": {
+      "name": "volume_cell",
+      "retrievable": true,
+      "range_support": true
+    },
+    "volume_atom": {
+      "name": "volume_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "workflow_version": {
+      "name": "aflow_version",
+      "retrievable": true,
+      "range_support": true
+    },
+    "wyckoff_letters": {
+      "name": "Wyckoff_letters",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_letters_orig": {
+      "name": "Wyckoff_letters_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_multiplicities": {
+      "name": "Wyckoff_multiplicities",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_multiplicities_orig": {
+      "name": "Wyckoff_multiplicities_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_positions": {
+      "name": "Wyckoff_positions",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_positions_orig": {
+      "name": "Wyckoff_positions_orig",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_site_symmetries": {
+      "name": "Wyckoff_site_symmetries",
+      "retrievable": true,
+      "range_support": false
+    },
+    "wyckoff_site_symmetries_orig": {
+      "name": "Wyckoff_site_symmetries_orig",
+      "retrievable": true,
+      "range_support": false
+    }
+  }
+}

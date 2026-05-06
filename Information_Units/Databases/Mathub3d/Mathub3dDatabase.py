@@ -1,4 +1,5 @@
 import tempfile
+from typing import Any
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Mathub3d.Mathub3dHelper import Mathub3dHelper
 from Information_Units.Databases.Cod.CodDatabase import CodDatabase
@@ -22,26 +23,35 @@ class Mathub3dDatabase(BaseDatabase):
             "CIF files retrieved via COD/Materials Project cross-referencing."
         )
 
-    def retrieve(self, inputs: dict) -> list:
+    def retrieve(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Filter MatHub-3d dataset and retrieve CIF files via COD/MP cross-referencing.
 
         Args:
-            inputs (dict): Query parameters with standard property names
-                - query: Material query (e.g., 'Fe', 'Al2O3')
-                - limit: Max number of CIF results (default: 10)
+            inputs (dict[str, Any]): Query parameters with standard property names
+                - target_compositions: Material query (e.g., 'Fe', 'Al2O3')
+                - batch_size: Max number of CIF results (default: 10)
                 - Additional keys are treated as standard property filters:
                   band_gap, energy_per_atom, bulk_modulus, density, volume,
                   space_group, magnetization, is_magnetic, nelements, etc.
 
         Returns:
-            list: Paths to CIF files matched from COD/Materials Project
+            dict[str, Any]: {"source": "mathub3d", "queries": dict, "cif_strings": list[str]}
         """
+        queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+        result = {
+            "source": "mathub3d",
+            "queries": queries,
+            "cif_strings": [],
+        }
         try:
-            query = inputs.get('query', '')
-            limit = inputs.get('limit', 10)
+            query = inputs.get('target_compositions', '')
+            limit = inputs.get('batch_size', 10)
 
-            properties = {k: v for k, v in inputs.items() if k not in ['query', 'limit']}
+            properties = {
+                k: v for k, v in inputs.items()
+                if k not in ['target_compositions', 'batch_size']
+            }
             filters = self.helper.map_properties(properties) if properties else {}
 
             if self.logger:
@@ -58,27 +68,28 @@ class Mathub3dDatabase(BaseDatabase):
                 self.logger.log(f"MatHub-3d filtered: {len(results)} candidates")
 
             if not results:
-                return []
+                return result
 
             # Cross-reference with COD/MP to get CIF files
-            cif_paths = []
+            cif_strings = []
             for entry in results:
-                if len(cif_paths) >= limit:
+                if len(cif_strings) >= limit:
                     break
-                cif_path = self.helper.find_cif_match(
+                cif_str = self.helper.find_cif_match(
                     entry, self.cod_db, self.mp_db, self.output_dir
                 )
-                if cif_path:
-                    cif_paths.append(cif_path)
+                if cif_str:
+                    cif_strings.append(cif_str)
                     if self.logger:
-                        self.logger.log(f"CIF match: {entry.get('formula')} -> {cif_path}")
+                        self.logger.log(f"CIF match for formula: {entry.get('formula')}")
 
             if self.logger:
-                self.logger.log(f"Total CIF files retrieved: {len(cif_paths)}")
+                self.logger.log(f"Total CIF strings retrieved: {len(cif_strings)}")
 
-            return cif_paths
+            result["cif_strings"] = cif_strings
+            return result
 
         except Exception as e:
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
-            return []
+            return result

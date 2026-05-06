@@ -1,10 +1,3 @@
-from Information_Units.Generators.Gnome.GnomeGenerator import GnomeGenerator
-from Information_Units.Generators.Imatgen.ImatgenGenerator import ImatgenGenerator
-from Information_Units.Generators.Matgan.MatganGenerator import MatganGenerator
-from Information_Units.Generators.Molgan.MolganGenerator import MolganGenerator
-from Information_Units.Generators.Conddfcvae.ConddfcvaeGenerator import ConddfcvaeGenerator
-from Information_Units.Generators.Mygen1.Mygen1Generator import Mygen1Generator
-from Information_Units.Generators.Mygen2.Mygen2Generator import Mygen2Generator
 from Information_Units.Generators.MattergenBaseModel.MattergenBaseModelGenerator import MattergenBaseModelGenerator
 from Information_Units.Generators.MattergenMp20Base.MattergenMp20BaseGenerator import MattergenMp20BaseGenerator
 from Information_Units.Generators.MattergenChemicalSystem.MattergenChemicalSystemGenerator import MattergenChemicalSystemGenerator
@@ -16,13 +9,6 @@ from Information_Units.Generators.MattergenBulkModulus.MattergenBulkModulusGener
 from Information_Units.Generators.MattergenSpaceGroup.MattergenSpaceGroupGenerator import MattergenSpaceGroupGenerator
 
 generator_factory = {
-    "gnome": GnomeGenerator,
-    "imatgen": ImatgenGenerator,
-    "matgan": MatganGenerator,
-    "molgan": MolganGenerator,
-    "conddfcvae": ConddfcvaeGenerator,
-    "mygen1": Mygen1Generator,
-    "mygen2": Mygen2Generator,
     "mattergen_base_model": MattergenBaseModelGenerator,
     "mattergen_mp_20_base": MattergenMp20BaseGenerator,
     "mattergen_chemical_system": MattergenChemicalSystemGenerator,
