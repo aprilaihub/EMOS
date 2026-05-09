@@ -1,0 +1,58 @@
+{
+  "description": "Source-specific mappings for chgnet (predictors).",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "chgnet",
+  "properties": {
+    "energy": {
+      "name": "energy",
+      "predictable": true,
+      "range_support": true
+    },
+    "forces": {
+      "name": "forces",
+      "predictable": true,
+      "range_support": true
+    },
+    "stress": {
+      "name": "stress",
+      "predictable": true,
+      "range_support": true
+    },
+    "num_atoms": {
+      "name": "num_atoms",
+      "predictable": true,
+      "range_support": true
+    },
+    "relaxed_energy": {
+      "name": "relaxed_energy",
+      "predictable": true,
+      "range_support": true
+    },
+    "relaxed_forces": {
+      "name": "relaxed_forces",
+      "predictable": true,
+      "range_support": true
+    },
+    "relaxed_stress": {
+      "name": "relaxed_stress",
+      "predictable": true,
+      "range_support": true
+    },
+    "relaxed_cif": {
+      "name": "relaxed_cif",
+      "predictable": true,
+      "range_support": false
+    },
+    "relaxed_structure": {
+      "name": "relaxed_structure",
+      "predictable": true,
+      "range_support": false
+    },
+    "relaxed_cell": {
+      "name": "relaxed_cell",
+      "predictable": true,
+      "range_support": false
+    }
+  }
+}

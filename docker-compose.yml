@@ -89,6 +89,35 @@ services:
 
 
   # -----------------------------------------------------------------------
+  # CHGNet — charge-informed interatomic potential predictor
+  # -----------------------------------------------------------------------
+  chgnet:
+    build:
+      context: ./Information_Units/Predictors/Chgnet/docker
+      dockerfile: Dockerfile
+    container_name: emos-chgnet
+    ports:
+      - "${CHGNET_PORT:-8400}:8000"
+    environment:
+      - CHGNET_LOG_LEVEL=${CHGNET_LOG_LEVEL:-DEBUG}
+      - CHGNET_MODEL_NAME=${CHGNET_MODEL_NAME:-0.3.0}
+      - CHGNET_DEVICE=${CHGNET_DEVICE:-}
+
+  chgnet-gpu:
+    extends:
+      service: chgnet
+    container_name: emos-chgnet-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+
+  # -----------------------------------------------------------------------
   # GBFS — material-property predictor (LightGBM + matminer)
   # -----------------------------------------------------------------------
   # Exposes a FastAPI server for predicting material properties from CIF data.

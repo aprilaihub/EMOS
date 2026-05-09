@@ -1164,7 +1164,7 @@
     },
     "relaxed_cif": {
       "type": "string",
-      "description": "Path to saved relaxed CIF output from MatterSim",
+      "description": "Relaxed CIF output from MatterSim, returned either as CIF contents or as a saved local file path when output_dir is provided",
       "category": "predictor"
     },
     "relaxed_energy": {
