@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_file
 from flask_cors import CORS
 import os
 import sys
@@ -522,6 +522,37 @@ def process_feature_stream(feature_id):
             yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
             yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
         return Response(_err(), mimetype='text/event-stream')
+
+
+@app.route('/api/download/<filename>', methods=['GET'])
+def download_file(filename):
+    """Download JSON results file"""
+    try:
+        import tempfile
+        from pathlib import Path
+        from io import BytesIO
+        
+        # Ensure filename is safe (no path traversal)
+        if '/' in filename or '\\' in filename or '..' in filename:
+            return jsonify({'error': 'Invalid filename'}), 400
+        
+        # Look for the file in temp directory
+        temp_dir = Path(tempfile.gettempdir()) / 'emos_mosfet_results'
+        file_path = temp_dir / filename
+        
+        if not file_path.exists():
+            return jsonify({'error': 'File not found'}), 404
+        
+        # Send file for download
+        return send_file(
+            str(file_path),
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     print("Starting Flask server for all EMOS features...")
