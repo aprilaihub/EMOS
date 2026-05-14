@@ -2,7 +2,7 @@ from Features.BaseFeature import BaseFeature
 from Information_Units.Generators.GeneratorFactory import generator_factory
 from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
-from Features.Electronics_Application.MosfetEvaluator.pdd_solver.MosfetSolver import run as run_mosfet_solver
+from Features.Electronics_Application.MosfetEvaluator.pdd_solver_python.MosfetSolver import run as run_mosfet_solver
 
 
 class MosfetEvaluatorFeature(BaseFeature):
@@ -66,9 +66,9 @@ class MosfetEvaluatorFeature(BaseFeature):
         # Process information units (databases, generators, predictors)
         self._process_information_units(inputs)
 
-        # ── Run the 2D PDD MATLAB solver ──────────────────────────────────────
+        # ── Run the 2D PDD Python solver ──────────────────────────────────────
         if self.logger:
-            self.logger.log('Launching MATLAB 2D drift-diffusion solver...', 'info')
+            self.logger.log('Launching Python 2D drift-diffusion solver...', 'info')
 
         Vgs_start = float(inputs.get('gateVoltageSweepStartV', 0.0))
         Vgs_stop = float(inputs.get('gateVoltageSweepStopV', 0.7))
@@ -129,10 +129,10 @@ class MosfetEvaluatorFeature(BaseFeature):
                 insulator_material=insulator_material,
             )
             if self.logger:
-                self.logger.log('MATLAB solver completed successfully.', 'info')
+                self.logger.log('Python solver completed successfully.', 'info')
         except RuntimeError as exc:
             if self.logger:
-                self.logger.log(f'MATLAB solver error: {exc}', 'error')
+                self.logger.log(f'Python solver error: {exc}', 'error')
             solver_results = None
 
         if self.logger:

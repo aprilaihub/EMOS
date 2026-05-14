@@ -5,6 +5,9 @@ Evaluate MOSFET performance from uploaded CIF files and simulation parameters
 ## Overview
 
 This feature provides mosfet evaluator functionality within the EMOS platform.
+The runtime solver is pure Python (`pdd_solver_python`) with no MATLAB dependency.
+Its physics model is ported from the educational drift-diffusion MATLAB source by
+Chien-Ting Tung (UC Berkeley): http://yrwu-wk.ee.ntu.edu.tw/index.php/teaching-course/
 
 ## Key Methods
 

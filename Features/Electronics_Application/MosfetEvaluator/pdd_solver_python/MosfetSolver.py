@@ -1,4 +1,14 @@
-"""Public entry point for the pure-Python MOSFET PDD solver."""
+"""Public entry point for the pure-Python MOSFET PDD solver.
+
+Model provenance
+----------------
+This solver is a Python port of an educational MATLAB drift-diffusion
+implementation authored by Chien-Ting Tung (UC Berkeley), published via:
+http://yrwu-wk.ee.ntu.edu.tw/index.php/teaching-course/
+
+The Python implementation in this package is now the canonical solver used by
+EMOS. Historical MATLAB files were removed from the runtime path.
+"""
 
 from __future__ import annotations
 
