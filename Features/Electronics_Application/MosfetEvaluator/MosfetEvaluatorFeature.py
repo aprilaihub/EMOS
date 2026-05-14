@@ -3,6 +3,10 @@ from Information_Units.Generators.GeneratorFactory import generator_factory
 from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
 from Features.Electronics_Application.MosfetEvaluator.pdd_solver_python.MosfetSolver import run as run_mosfet_solver
+import json
+import numpy as np
+from datetime import datetime
+from pathlib import Path
 
 
 class MosfetEvaluatorFeature(BaseFeature):
@@ -145,15 +149,76 @@ class MosfetEvaluatorFeature(BaseFeature):
         }
     
     def format_outputs(self, results):
+        import tempfile
+        import os
+        
         solver = results.get('solver_results')
         if solver is None:
-            return {'downloadResultsJson': None, 'error': 'Solver did not produce results.'}
+            return {'error': 'Solver did not produce results.'}
+        
+        # Extract arrays
+        J_arr = np.asarray(solver['J'])  # shape: (Nvg, Nvd)
+        Q_arr = np.asarray(solver['Q'])
+        Vgs_arr = np.asarray(solver['Vgs'])
+        Vds_arr = np.asarray(solver['Vds'])
+        
+        # Calculate key metrics
+        mid_vgs_idx = len(Vgs_arr) // 2
+        mid_vds_idx = len(Vds_arr) * 2 // 3
+        id_on = float(J_arr[mid_vgs_idx, mid_vds_idx])
+        
+        off_vgs_idx = 0
+        id_off = float(J_arr[off_vgs_idx, mid_vds_idx])
+        
+        mid_vds_ref_idx = len(Vds_arr) // 2
+        j_ref_curve = J_arr[:, mid_vds_ref_idx]
+        threshold_idx = np.argmin(np.abs(j_ref_curve - np.nanmean(j_ref_curve)))
+        vth_approx = float(Vgs_arr[threshold_idx])
+        
+        key_metrics = {
+            "Id_on_uA_per_um": id_on,
+            "Id_off_uA_per_um": id_off,
+            "Vth_approx_V": vth_approx,
+            "Ion_Ioff_ratio": float(id_on / max(id_off, 1e-10)),
+        }
+        
+        # Create full results dict for JSON
+        full_results = {
+            "timestamp": datetime.now().isoformat(),
+            "device": {
+                "channel_length_nm": 14,  # Can be extracted from inputs if needed
+            },
+            "bias_conditions": {
+                "Vgs_range_V": [float(Vgs_arr.min()), float(Vgs_arr.max())],
+                "Vds_range_V": [float(Vds_arr.min()), float(Vds_arr.max())],
+            },
+            "key_metrics": key_metrics,
+            "full_data": {
+                "Vgs": Vgs_arr.tolist(),
+                "Vds": Vds_arr.tolist(),
+                "J": J_arr.tolist(),
+                "Q": Q_arr.tolist(),
+            }
+        }
+        
+        # Save to JSON file in temp directory
+        output_dir = Path(tempfile.gettempdir()) / 'emos_mosfet_results'
+        output_dir.mkdir(exist_ok=True)
+        json_filename = f"mosfet_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        json_path = output_dir / json_filename
+        
+        with open(json_path, 'w') as f:
+            json.dump(full_results, f, indent=2)
+        
         return {
-            'downloadResultsJson': 'placeholder link value',
-            'J_A_per_m':  solver['J'].tolist(),
-            'Q_C_per_m':  solver['Q'].tolist(),
-            'Vgs_V':      solver['Vgs'].tolist(),
-            'Vds_V':      solver['Vds'].tolist(),
+            'status': 'success',
+            'key_metrics': key_metrics,
+            'J_uA_per_um': J_arr.tolist(),
+            'Vgs_V': Vgs_arr.tolist(),
+            'Vds_V': Vds_arr.tolist(),
+            'Q_C_per_m': Q_arr.tolist(),
+            'json_filename': json_filename,
+            'json_path': str(json_path),
         }
     
     def _process_information_units(self, inputs):
