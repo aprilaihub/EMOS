@@ -27,6 +27,8 @@ from pathlib import Path
 import numpy as np
 import scipy.io
 
+from ..pdd_solver_python.MosfetSolver import run as _python_run
+
 
 # Default material parameters — Silicon channel / SiO2 insulator
 # (mirror of constant.m; override via the ``channel_material`` /
@@ -230,29 +232,94 @@ def run(
                 cwd=str(_SOLVER_DIR),
             )
         except FileNotFoundError:
-            raise RuntimeError(
-                f"MATLAB executable not found: '{matlab_executable}'. "
-                "Install MATLAB and ensure it is on PATH, or pass the full "
-                "path via the matlab_executable argument."
+            return run_python(
+                channel_length_m=channel_length_m,
+                source_drain_length_m=source_drain_length_m,
+                oxide_thickness_m=oxide_thickness_m,
+                channel_thickness_m=channel_thickness_m,
+                dx=dx,
+                dy=dy,
+                temperature_K=temperature_K,
+                gate_work_function_eV=gate_work_function_eV,
+                sd_work_function_eV=sd_work_function_eV,
+                channel_doping_cm3=channel_doping_cm3,
+                sd_doping_cm3=sd_doping_cm3,
+                Vgs_start=Vgs_start,
+                Vgs_stop=Vgs_stop,
+                Nvg=Nvg,
+                Vds_start=Vds_start,
+                Vds_stop=Vds_stop,
+                Nvd=Nvd,
+                channel_material=channel_material,
+                insulator_material=insulator_material,
             )
         except subprocess.TimeoutExpired:
-            raise RuntimeError(
-                f"MATLAB solver timed out after {timeout_s} s. "
-                "Increase timeout_s or reduce the sweep resolution (Nvg/Nvd)."
+            return run_python(
+                channel_length_m=channel_length_m,
+                source_drain_length_m=source_drain_length_m,
+                oxide_thickness_m=oxide_thickness_m,
+                channel_thickness_m=channel_thickness_m,
+                dx=dx,
+                dy=dy,
+                temperature_K=temperature_K,
+                gate_work_function_eV=gate_work_function_eV,
+                sd_work_function_eV=sd_work_function_eV,
+                channel_doping_cm3=channel_doping_cm3,
+                sd_doping_cm3=sd_doping_cm3,
+                Vgs_start=Vgs_start,
+                Vgs_stop=Vgs_stop,
+                Nvg=Nvg,
+                Vds_start=Vds_start,
+                Vds_stop=Vds_stop,
+                Nvd=Nvd,
+                channel_material=channel_material,
+                insulator_material=insulator_material,
             )
 
         if result.returncode != 0:
-            raise RuntimeError(
-                f"MATLAB solver exited with code {result.returncode}.\n"
-                f"--- stdout ---\n{result.stdout}\n"
-                f"--- stderr ---\n{result.stderr}"
+            return run_python(
+                channel_length_m=channel_length_m,
+                source_drain_length_m=source_drain_length_m,
+                oxide_thickness_m=oxide_thickness_m,
+                channel_thickness_m=channel_thickness_m,
+                dx=dx,
+                dy=dy,
+                temperature_K=temperature_K,
+                gate_work_function_eV=gate_work_function_eV,
+                sd_work_function_eV=sd_work_function_eV,
+                channel_doping_cm3=channel_doping_cm3,
+                sd_doping_cm3=sd_doping_cm3,
+                Vgs_start=Vgs_start,
+                Vgs_stop=Vgs_stop,
+                Nvg=Nvg,
+                Vds_start=Vds_start,
+                Vds_stop=Vds_stop,
+                Nvd=Nvd,
+                channel_material=channel_material,
+                insulator_material=insulator_material,
             )
 
         if not outputs_path.exists():
-            raise RuntimeError(
-                "MATLAB solver did not produce outputs.mat.\n"
-                f"--- stdout ---\n{result.stdout}\n"
-                f"--- stderr ---\n{result.stderr}"
+            return run_python(
+                channel_length_m=channel_length_m,
+                source_drain_length_m=source_drain_length_m,
+                oxide_thickness_m=oxide_thickness_m,
+                channel_thickness_m=channel_thickness_m,
+                dx=dx,
+                dy=dy,
+                temperature_K=temperature_K,
+                gate_work_function_eV=gate_work_function_eV,
+                sd_work_function_eV=sd_work_function_eV,
+                channel_doping_cm3=channel_doping_cm3,
+                sd_doping_cm3=sd_doping_cm3,
+                Vgs_start=Vgs_start,
+                Vgs_stop=Vgs_stop,
+                Nvg=Nvg,
+                Vds_start=Vds_start,
+                Vds_stop=Vds_stop,
+                Nvd=Nvd,
+                channel_material=channel_material,
+                insulator_material=insulator_material,
             )
 
         raw = scipy.io.loadmat(str(outputs_path))
@@ -265,3 +332,53 @@ def run(
         "x":   np.array(raw["x"],   dtype=float).ravel(),
         "y":   np.array(raw["y"],   dtype=float).ravel(),
     }
+
+
+def run_python(
+    # ── Geometry ──────────────────────────────────────────────────────────
+    channel_length_m: float = 14e-9,
+    source_drain_length_m: float = 4e-9,
+    oxide_thickness_m: float = 1e-9,
+    channel_thickness_m: float = 4e-9,
+    dx: float = 5e-10,
+    dy: float = 5e-10,
+    # ── Temperature ───────────────────────────────────────────────────────
+    temperature_K: float = 300.0,
+    # ── Contacts / work functions ─────────────────────────────────────────
+    gate_work_function_eV: float = 3.65,
+    sd_work_function_eV: float = 0.0,
+    # ── Doping ────────────────────────────────────────────────────────────
+    channel_doping_cm3: float = -1e15,
+    sd_doping_cm3: float = 1e20,
+    # ── Bias sweeps ───────────────────────────────────────────────────────
+    Vgs_start: float = 0.0,
+    Vgs_stop: float = 0.7,
+    Nvg: int = 14,
+    Vds_start: float = 0.0,
+    Vds_stop: float = 0.7,
+    Nvd: int = 13,
+    # ── Material parameters ───────────────────────────────────────────────
+    channel_material: dict = None,
+    insulator_material: dict = None,
+) -> dict:
+    return _python_run(
+        channel_length_m=channel_length_m,
+        source_drain_length_m=source_drain_length_m,
+        oxide_thickness_m=oxide_thickness_m,
+        channel_thickness_m=channel_thickness_m,
+        dx=dx,
+        dy=dy,
+        temperature_K=temperature_K,
+        gate_work_function_eV=gate_work_function_eV,
+        sd_work_function_eV=sd_work_function_eV,
+        channel_doping_cm3=channel_doping_cm3,
+        sd_doping_cm3=sd_doping_cm3,
+        Vgs_start=Vgs_start,
+        Vgs_stop=Vgs_stop,
+        Nvg=Nvg,
+        Vds_start=Vds_start,
+        Vds_stop=Vds_stop,
+        Nvd=Nvd,
+        channel_material=channel_material,
+        insulator_material=insulator_material,
+    )
