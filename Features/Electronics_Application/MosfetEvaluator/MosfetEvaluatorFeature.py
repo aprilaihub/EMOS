@@ -14,7 +14,7 @@ class MosfetEvaluatorFeature(BaseFeature):
         super().__init__("MOSFET evaluator", logger)
     
     def info(self):
-        return "MOSFET evaluator: Evaluate MOSFET performance from uploaded CIF files and simulation parameters"
+        return "MOSFET evaluator: 2D Poisson and drift-diffusion solver for MOSFET evaluation from simulation parameters"
     
     def extract_inputs(self, input_data):
         return {

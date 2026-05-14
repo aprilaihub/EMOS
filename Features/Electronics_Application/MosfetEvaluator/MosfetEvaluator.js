@@ -1,12 +1,11 @@
 // MOSFET evaluator Feature
 class MosfetEvaluatorFeature extends BaseFeature {
     constructor(featureId) {
-        super(featureId, 'MOSFET evaluator', 'Evaluate MOSFET performance from uploaded CIF files and simulation parameters');
+        super(featureId, 'MOSFET evaluator', '2D Poisson and drift-diffusion solver for MOSFET evaluation from simulation parameters');
     }
 
     createInputsHTML() {
         return `
-            <p>Configure all non-runtime solver inputs for MOSFET evaluator.</p>
             <div class="input-controls" style="max-height: 560px; overflow: auto; padding-right: 6px;">
                 <p><strong>Geometry Inputs (defaults mirror Python solver)</strong></p>
                 ${this.createNumberInput(`channelLengthNm_${this.featureId}`, 'Channel Length (nm, default 14)', '1', '1000', '0.1', '14')}
