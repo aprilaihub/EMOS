@@ -186,11 +186,22 @@ class BaseFeature {
         `;
     }
 
-    createNumberInput(id, label, min = '', max = '', step = '1', required = false) {
+    createNumberInput(id, label, min = '', max = '', step = '1', defaultValueOrRequired = false, requiredMaybe = false) {
+        let required = false;
+        let defaultValue = '';
+
+        if (typeof defaultValueOrRequired === 'boolean') {
+            required = defaultValueOrRequired;
+        } else {
+            defaultValue = defaultValueOrRequired;
+            required = !!requiredMaybe;
+        }
+
         const req = required ? 'required' : '';
+        const valueAttr = defaultValue !== '' ? `value="${defaultValue}"` : '';
         return `
             <label>${label}: 
-                <input type="number" id="${id}" min="${min}" max="${max}" step="${step}" ${req}>
+                <input type="number" id="${id}" min="${min}" max="${max}" step="${step}" ${valueAttr} ${req}>
             </label>
         `;
     }

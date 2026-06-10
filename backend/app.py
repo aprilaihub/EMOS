@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_file
 from flask_cors import CORS
 import os
 import sys
@@ -528,6 +528,37 @@ def process_feature_stream(feature_id):
         return Response(_err(), mimetype='text/event-stream')
 
 
+
+@app.route('/api/download/<filename>', methods=['GET'])
+def download_file(filename):
+    """Download JSON results file"""
+    try:
+        import tempfile
+        from pathlib import Path
+        from io import BytesIO
+        
+        # Ensure filename is safe (no path traversal)
+        if '/' in filename or '\\' in filename or '..' in filename:
+            return jsonify({'error': 'Invalid filename'}), 400
+        
+        # Look for the file in temp directory
+        temp_dir = Path(tempfile.gettempdir()) / 'emos_mosfet_results'
+        file_path = temp_dir / filename
+        
+        if not file_path.exists():
+            return jsonify({'error': 'File not found'}), 404
+        
+        # Send file for download
+        return send_file(
+            str(file_path),
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ═══════════════════════════════════════════════════════════════════
 # Node Editor endpoint — execute a single Information Unit
 # ═══════════════════════════════════════════════════════════════════
@@ -640,6 +671,11 @@ def node_run():
                 yield from _run_generator(iu_key, inputs, run_entry)
             elif iu_type == 'predictor':
                 yield from _run_predictor(iu_key, inputs, upstream, run_entry)
+            elif iu_type == 'utility':
+                if iu_key == 'lambda':
+                    yield from _run_lambda(inputs, upstream)
+                else:
+                    yield _sse_event('error', {'message': f'Unknown utility node: {iu_key}'})
             else:
                 yield _sse_event('error', {'message': f'Unknown IU type: {iu_type}'})
         except _NodeCancelledError:
@@ -686,10 +722,10 @@ def _run_database(key, inputs):
     db_cls = database_factory[key]
     db = db_cls(key, logger)
 
-    # Build retrieve inputs — query, limit + property filters
+    # Build retrieve inputs — map node-editor field names to the database API keys
     retrieve_inputs = {}
-    retrieve_inputs['query'] = inputs.get('query', '')
-    retrieve_inputs['limit'] = int(inputs.get('limit', 10))
+    retrieve_inputs['target_compositions'] = inputs.get('target_compositions', inputs.get('query', ''))
+    retrieve_inputs['batch_size'] = int(inputs.get('batch_size', inputs.get('limit', 10)))
 
     # Collect property filter fields (prefixed with "filter_")
     for k, v in inputs.items():
@@ -716,24 +752,21 @@ def _run_database(key, inputs):
     yield _sse_event('log', {'message': f'Querying: {retrieve_inputs}', 'level': 'info'})
     yield _sse_event('progress', {'progress': 0.1, 'message': 'Sending query...'})
 
-    file_paths = db.retrieve(retrieve_inputs)
+    raw_result = db.retrieve(retrieve_inputs)
 
-    if not file_paths:
+    # Databases now return a dict: {"source": ..., "queries": ..., "cif_strings": [...]}
+    if isinstance(raw_result, dict):
+        cif_strings = raw_result.get('cif_strings', [])
+    elif isinstance(raw_result, list):
+        # Backward-compat: old implementations returned cif strings directly
+        cif_strings = raw_result
+    else:
+        cif_strings = []
+
+    if not cif_strings:
         yield _sse_event('log', {'message': 'No results returned', 'level': 'warning'})
         yield _sse_event('result', [])
         return
-
-    yield _sse_event('progress', {'progress': 0.7, 'message': f'Reading {len(file_paths)} CIF files...'})
-
-    # Read CIF files into strings, then delete temp files
-    cif_strings = []
-    for fp in file_paths:
-        try:
-            with open(fp, 'r') as f:
-                cif_strings.append(f.read())
-            os.remove(fp)
-        except Exception as e:
-            yield _sse_event('log', {'message': f'Error reading {fp}: {e}', 'level': 'warning'})
 
     yield _sse_event('log', {'message': f'Retrieved {len(cif_strings)} structures', 'level': 'info'})
     yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
@@ -864,85 +897,67 @@ def _run_predictor(key, inputs, upstream, run_entry=None):
         return
 
     yield _sse_event('log', {'message': f'Predicting for {len(cif_array)} structure(s)', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 0.1, 'message': 'Running prediction...'})
 
-    # GBFS: batch-all (predict all 6 properties in a single call per CIF)
-    if key == 'gbfs':
-        yield from _run_gbfs_predictor(cif_array, run_entry)
+    _check_node_cancelled(run_entry)
+
+    # All predictors accept a list[str] of CIF strings in a single batch call
+    pred_cls = predictor_factory[key]
+    pred = pred_cls(key, logger)
+    result = pred.predict(cif_array)
+
+    yield _sse_event('log', {'message': f'Prediction complete for {len(cif_array)} structure(s)', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+    yield _sse_event('result', result)
+    
+
+# ── Lambda runner (utility node) ─────────────────────────────────────
+# NOTE: executes arbitrary user-supplied Python. Intended for local
+# research use only — never expose this endpoint on a public server.
+def _run_lambda(inputs, upstream):
+    code = inputs.get('code', '').strip()
+    if not code:
+        yield _sse_event('error', {'message': 'Lambda node: no code provided'})
         return
 
-    # Other predictors: single predict() call per CIF
-    pred_cls = predictor_factory[key]
+    cif_list = upstream.get('cif_in', [])
+    if not isinstance(cif_list, list):
+        cif_list = []
 
-    all_results = []
-    for i, cif_str in enumerate(cif_array):
-        _check_node_cancelled(run_entry)
-        if i > 0:
-            yield _sse_event('progress', {'progress': i / len(cif_array), 'message': f'Structure {i+1}/{len(cif_array)}'})
+    results = upstream.get('result_in', {})
+    if not isinstance(results, dict):
+        results = {}
 
+    yield _sse_event('log', {'message': f'Lambda: executing on {len(cif_list)} CIF(s)…', 'level': 'info'})
+
+    namespace = {
+        'cif_list':       list(cif_list),
+        'results':        results,
+        'output_cifs':    None,
+        'output_results': None,
+    }
+
+    try:
+        exec(compile(code, '<lambda_node>', 'exec'), namespace)  # noqa: S102
+    except Exception as exc:
+        yield _sse_event('error', {'message': f'Lambda error: {exc}'})
+        return
+
+    output_cifs    = namespace.get('output_cifs')    or namespace.get('cif_list',  [])
+    output_results = namespace.get('output_results') or namespace.get('results',    {})
+
+    if not isinstance(output_cifs, list):
         try:
-            # Write CIF to temp file for predictors that need file paths
-            pred = pred_cls(key, logger)
-            # Try passing CIF string directly via dict
-            pred_input = {'cif_string': cif_str}
-            result = pred.predict(pred_input)
-            all_results.append(json.loads(result) if isinstance(result, str) else result)
-        except Exception as e:
-            yield _sse_event('log', {'message': f'Structure {i+1} prediction failed: {e}', 'level': 'warning'})
-            all_results.append({'error': str(e)})
+            output_cifs = list(output_cifs)
+        except Exception:
+            output_cifs = []
 
-    yield _sse_event('log', {'message': f'Prediction complete for {len(all_results)} structure(s)', 'level': 'info'})
+    if not isinstance(output_results, dict):
+        output_results = {}
+
+    yield _sse_event('log', {'message': f'Lambda produced {len(output_cifs)} CIF(s)', 'level': 'info'})
     yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
-    yield _sse_event('result', all_results)
-
-
-def _run_gbfs_predictor(cif_array, run_entry=None):
-    """Run GBFS predictor: predict all 6 properties for each CIF."""
-    from Information_Units.Predictors.GBFS_Pred.GBFS_PredPredictor import (
-        GBFS_PredPredictor, SUPPORTED_PROPERTIES
-    )
-
-    all_results = []
-    for i, cif_str in enumerate(cif_array):
-        _check_node_cancelled(run_entry)
-        yield _sse_event('progress', {
-            'progress': i / len(cif_array),
-            'message': f'GBFS: structure {i+1}/{len(cif_array)}'
-        })
-
-        struct_results = {}
-        # Parse structure once for all properties
-        try:
-            from pymatgen.core import Structure
-            from pymatgen.io.cif import CifParser
-            import io
-            parser = CifParser(io.StringIO(cif_str))
-            structure = parser.get_structures(primitive=True)[0]
-        except Exception as e:
-            yield _sse_event('log', {'message': f'Structure {i+1} parse failed: {e}', 'level': 'warning'})
-            all_results.append({'error': str(e)})
-            continue
-
-        for prop in SUPPORTED_PROPERTIES:
-            try:
-                pred = GBFS_PredPredictor(predictor_name='gbfs', property_name=prop, logger=logger)
-                result_str = pred.predict({'structure': structure})
-                result_data = json.loads(result_str) if isinstance(result_str, str) else result_str
-                prediction_val = result_data.get('prediction', result_data)
-                if isinstance(prediction_val, list) and len(prediction_val) == 1:
-                    prediction_val = prediction_val[0]
-                struct_results[prop] = prediction_val
-            except Exception as e:
-                yield _sse_event('log', {'message': f'{prop} failed: {e}', 'level': 'warning'})
-                struct_results[prop] = {'error': str(e)}
-
-        all_results.append(struct_results)
-        yield _sse_event('log', {
-            'message': f'Structure {i+1}: {struct_results}',
-            'level': 'info'
-        })
-
-    yield _sse_event('progress', {'progress': 1.0, 'message': 'GBFS complete'})
-    yield _sse_event('result', all_results)
+    yield _sse_event('result', {'cif_out': output_cifs, 'result_out': output_results})
 
 
 if __name__ == '__main__':

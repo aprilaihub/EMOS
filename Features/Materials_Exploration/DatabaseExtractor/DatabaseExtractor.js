@@ -9,9 +9,9 @@ class DatabaseExtractorFeature extends BaseFeature {
         const propertyFiltersHTML = this._buildPropertyFiltersHTML();
 
         return `
-            <p>Configure input parameters for Database Extractor</p>
+            <p>Select the targeted databases from the Information Units panel, then configure the extraction parameters below.</p>
             <div class="input-controls">
-                ${this.createNumberInput(`batchSize_${this.featureId}`, 'Batch Size', '1', '10000', '1')}
+                ${this.createNumberInput(`batchSize_${this.featureId}`, 'Max Batch Size / Database', '1', '10000', '1')}
                 ${this.createSelectInput(`retrievalMode_${this.featureId}`, 'Retrieval Mode', [{value: 'lenient', text: 'Lenient'}, {value: 'strict', text: 'Strict'}])}
                 ${this.createTextInput(`targetCompositions_${this.featureId}`, 'Target Compositions (optional)', 'e.g., Fe, Al2O3')}
                 <div>

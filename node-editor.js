@@ -18,11 +18,15 @@
 
     // Node definitions — ports schema per category
     const NODE_SCHEMAS = {
-        database:  { inputs: [],                                                  outputs: [{ key: 'cif_out', label: 'CIF', type: PORT_TYPES.CIF }] },
-        generator: { inputs: [],                                                  outputs: [{ key: 'cif_out', label: 'CIF', type: PORT_TYPES.CIF }] },
-        predictor: { inputs: [{ key: 'cif_in', label: 'CIF', type: PORT_TYPES.CIF }], outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
-        cif_viewer:  { inputs: [{ key: 'cif_in', label: 'CIF', type: PORT_TYPES.CIF }], outputs: [] },
-        text_viewer: { inputs: [{ key: 'any_in', label: 'Input', type: PORT_TYPES.ANY }], outputs: [] },
+        database:    { inputs: [],                                                                                          outputs: [{ key: 'cif_out',    label: 'CIF',    type: PORT_TYPES.CIF    }] },
+        generator:   { inputs: [],                                                                                          outputs: [{ key: 'cif_out',    label: 'CIF',    type: PORT_TYPES.CIF    }] },
+        predictor:   { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }],                           outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
+        cif_viewer:  { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }], outputs: [] },
+        text_viewer: { inputs: [{ key: 'any_in',    label: 'Input',  type: PORT_TYPES.ANY    }], outputs: [] },
+        filter:      { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
+                       outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
+        lambda:      { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
+                       outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
     };
 
     // ── Factory key mapping ──────────────────────────────────────────
@@ -108,7 +112,7 @@
 
     // Loaded data
     let uiData            = null;
-    let propertyMappings  = null;
+    let predictorPropsMap = {};  // factoryKey → { runtimePropName: displayLabel }
 
     // DOM refs
     let canvasContainer, canvas, wiresSvg, processBtn, cancelBtn, statusText, zoomText, contextMenu;
@@ -127,10 +131,8 @@
         contextMenu     = document.getElementById('neContextMenu');
 
         // Load data
-        [uiData, propertyMappings] = await Promise.all([
-            fetch('./devtools/ui_data.json').then(r => r.json()).catch(() => null),
-            fetch('./Information_Units/property_mappings.json').then(r => r.json()).catch(() => ({ properties: {} })),
-        ]);
+        uiData = await fetch('./devtools/ui_data.json').then(r => r.json()).catch(() => null);
+        predictorPropsMap = await loadPredictorProperties();
 
         populateSidebar();
         bindEvents();
@@ -165,8 +167,8 @@
             predContainer.appendChild(makeSidebarItem('predictor', key, name, desc));
         }
 
-        // Bind drag events on hardcoded viewer sidebar items
-        document.querySelectorAll('.ne-sidebar-item[data-node-type="viewer"]').forEach(el => {
+        // Bind drag events on hardcoded sidebar items (viewers, utility)
+        document.querySelectorAll('.ne-sidebar-item[data-node-type="viewer"], .ne-sidebar-item[data-node-type="utility"]').forEach(el => {
             el.addEventListener('dragstart', (e) => {
                 const data = {
                     type: el.dataset.nodeType,
@@ -177,6 +179,27 @@
                 e.dataTransfer.effectAllowed = 'copy';
             });
         });
+    }
+
+    // ── Load predictor property mappings ────────────────────────
+    async function loadPredictorProperties() {
+        const factoryKeys = [...new Set(Object.values(PREDICTOR_FACTORY_KEYS))];
+        const map = {};
+        await Promise.all(factoryKeys.map(async (key) => {
+            try {
+                const r = await fetch(`./Information_Units/property_mappings/sources/predictors/${key}.json`);
+                if (!r.ok) return;
+                const data = await r.json();
+                const props = {};
+                for (const [uiKey, cfg] of Object.entries(data.properties || {})) {
+                    const runtimeName = cfg.name || uiKey;
+                    // Display label: humanise the ui key
+                    props[runtimeName] = uiKey.replace(/_/g, ' ');
+                }
+                map[key] = props;
+            } catch { /* silently ignore missing files */ }
+        }));
+        return map;
     }
 
     function deriveKey(displayName) {
@@ -425,8 +448,8 @@
     // ═══════════════════════════════════════════════════════════════
     function createNode(type, key, name, x, y) {
         const id = 'node_' + (nextNodeId++);
-        // Determine schema; viewers use their key as schema key
-        const schemaKey = (type === 'viewer') ? key : type;
+        // Determine schema; viewers and utility nodes use their key as schema key
+        const schemaKey = (type === 'viewer' || type === 'utility') ? key : type;
         const schema = NODE_SCHEMAS[schemaKey];
         if (!schema) { console.error('Unknown schema:', schemaKey); return; }
 
@@ -447,6 +470,10 @@
         canvas.appendChild(el);
         positionNodeEl(node);
         selectNode(id);
+        // Populate property fields async after element is in the DOM
+        if (node.type === 'database' || node.type === 'generator') {
+            populateNodePropertyFields(node);
+        }
         return node;
     }
 
@@ -458,12 +485,14 @@
         el.style.width    = node.width + 'px';
 
         // Icon
-        const icons = { database: '📁', generator: '⚙️', predictor: '🔮', viewer: '👁️' };
+        const iconByKey  = { cif_viewer: '👁️', text_viewer: '📝', filter: '⛗️', lambda: 'λ' };
+        const iconByType = { database: '📁', generator: '⚙️', predictor: '🔮', viewer: '👁️', utility: '🔧' };
+        const nodeIcon = iconByKey[node.key] || iconByType[node.type] || '📦';
 
         // Header
         const header = document.createElement('div');
         header.className = 'ne-node-header';
-        header.innerHTML = `<span class="ne-node-icon">${icons[node.type] || '📦'}</span><span class="ne-node-title">${node.name}</span>`;
+        header.innerHTML = `<span class="ne-node-icon">${nodeIcon}</span><span class="ne-node-title">${node.name}</span>`;
         // X close button
         const closeBtn = document.createElement('span');
         closeBtn.className = 'ne-node-close';
@@ -495,6 +524,16 @@
         body.innerHTML = buildNodeBodyHTML(node);
         // Stop mousedown propagation on inputs so node isn't dragged
         body.addEventListener('mousedown', e => e.stopPropagation());
+        // Handle utility button actions inside the node body
+        body.addEventListener('click', e => {
+            const action = e.target.dataset && e.target.dataset.action;
+            if (!action) return;
+            if (action === 'add-filter-rule') {
+                addFilterRule(node.id);
+            } else if (action === 'remove-filter-rule') {
+                e.target.closest('.ne-filter-row').remove();
+            }
+        });
         el.appendChild(body);
 
         // Log area
@@ -573,19 +612,21 @@
     function buildNodeBodyHTML(node) {
         if (node.key === 'cif_viewer')  return buildCIFViewerBody(node);
         if (node.key === 'text_viewer') return buildTextViewerBody(node);
+        if (node.key === 'filter')      return buildFilterBody(node);
+        if (node.key === 'lambda')      return buildLambdaBody(node);
 
         // For IU nodes, auto-generate fields from property_mappings
         let html = '';
 
         if (node.type === 'database') {
-            html += `<label>Query<input type="text" data-field="query" placeholder="e.g. Fe, Al2O3"></label>`;
-            html += `<label>Limit<input type="number" data-field="limit" value="10" min="1" max="100"></label>`;
-            // Auto-generate property filters from property_mappings
-            html += buildPropertyFilterFields(node.key);
+            html += `<label>Query<input type="text" data-field="target_compositions" placeholder="e.g. Fe, Al2O3"></label>`;
+            html += `<label>Batch Size<input type="number" data-field="batch_size" value="10" min="1" max="100"></label>`;
+            // Placeholder populated asynchronously after the node is in the DOM
+            html += `<div id="prop-fields-${node.id}"><p style="color:#666; font-size:10px;">Loading filters…</p></div>`;
         } else if (node.type === 'generator') {
             html += `<label>Batch Size<input type="number" data-field="batch_size" value="10" min="1" max="1000" step="1"></label>`;
-            // Auto-generate conditioning property fields
-            html += buildGeneratorPropertyFields(node.key);
+            // Placeholder populated asynchronously after the node is in the DOM
+            html += `<div id="prop-fields-${node.id}"></div>`;
         } else if (node.type === 'predictor') {
             // Predictors generally need no user input beyond the CIF from wires
             html += `<p style="color:#888; font-size:10px;">Connect a CIF source to predict properties.</p>`;
@@ -594,53 +635,81 @@
         return html;
     }
 
-    function buildPropertyFilterFields(dbKey) {
-        if (!propertyMappings || !propertyMappings.properties) return '';
-        let html = '<details style="margin-top:6px;"><summary style="cursor:pointer; color:#4fc3f7; font-size:10px;">Property Filters</summary><div style="padding-top:4px;">';
-        let count = 0;
+    // Fetch the per-source property mapping + common definitions and inject fields.
+    async function populateNodePropertyFields(node) {
+        const container = document.getElementById(`prop-fields-${node.id}`);
+        if (!container) return;
 
-        for (const [propKey, propDef] of Object.entries(propertyMappings.properties)) {
-            if (!propDef[dbKey]) continue;
-            count++;
-            const name = propDef[dbKey].name || propKey;
-            const unit = propDef.unit ? ` (${propDef.unit})` : '';
-            const desc = propDef.description || propKey;
-            const rangeSupport = propDef[dbKey].range_support;
+        const sourceType = node.type === 'database' ? 'databases' : 'generators';
+        const url = `./Information_Units/property_mappings/sources/${sourceType}/${node.key}.json`;
 
-            if (rangeSupport && (propDef.type === 'float' || propDef.type === 'integer')) {
-                html += `<label title="${desc}">${propKey}${unit}
+        let sourceMapping, commonProperties;
+        try {
+            [sourceMapping, commonProperties] = await Promise.all([
+                fetch(url).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+                fetch('./Information_Units/property_mappings/common_properties.json').then(r => r.json()).catch(() => ({ properties: {} })),
+            ]);
+        } catch (e) {
+            container.innerHTML = `<p style="color:#666; font-size:10px;">No property filters available.</p>`;
+            return;
+        }
+
+        const props  = sourceMapping.properties || {};
+        const common = commonProperties.properties || {};
+
+        if (node.type === 'database') {
+            container.innerHTML = buildPropertyFilterHTML(props, common);
+        } else if (node.type === 'generator') {
+            container.innerHTML = buildGeneratorPropertyHTML(props, common);
+        }
+    }
+
+    function buildPropertyFilterHTML(props, common) {
+        const defs = Object.entries(props).filter(([, cfg]) => cfg.retrievable !== false);
+        if (defs.length === 0) return '';
+
+        let inner = '';
+        for (const [uiKey, cfg] of defs) {
+            const name     = cfg.name || uiKey;
+            const commonDef = common[uiKey] || {};
+            const unit     = commonDef.unit        ? ` (${commonDef.unit})`        : '';
+            const type     = commonDef.type        || 'string';
+            const desc     = commonDef.description || uiKey;
+            const label    = uiKey.replace(/_/g, ' ');
+
+            if (cfg.range_support && (type === 'float' || type === 'integer')) {
+                inner += `<label title="${desc}">${label}${unit}
                     <span style="display:flex; gap:4px;">
                         <input type="number" data-field="filter_${name}_min" placeholder="min" step="any" style="flex:1;">
                         <input type="number" data-field="filter_${name}_max" placeholder="max" step="any" style="flex:1;">
                     </span>
                 </label>`;
-            } else if (propDef.type === 'string') {
-                html += `<label title="${desc}">${propKey}${unit}
+            } else {
+                inner += `<label title="${desc}">${label}${unit}
                     <input type="text" data-field="filter_${name}" placeholder="${name}">
                 </label>`;
             }
         }
-        html += '</div></details>';
-        return count > 0 ? html : '';
+        return `<details style="margin-top:6px;">
+            <summary style="cursor:pointer; color:#4fc3f7; font-size:10px;">Property Filters</summary>
+            <div style="padding-top:4px;">${inner}</div>
+        </details>`;
     }
 
-    function buildGeneratorPropertyFields(genKey) {
-        if (!propertyMappings || !propertyMappings.properties) return '';
+    function buildGeneratorPropertyHTML(props, common) {
         let html = '';
-        let count = 0;
+        for (const [uiKey, cfg] of Object.entries(props)) {
+            const name     = cfg.name || uiKey;
+            const commonDef = common[uiKey] || {};
+            const unit     = commonDef.unit        ? ` (${commonDef.unit})`        : '';
+            const type     = commonDef.type        || 'float';
+            const desc     = commonDef.description || uiKey.replace(/_/g, ' ');
 
-        for (const [propKey, propDef] of Object.entries(propertyMappings.properties)) {
-            if (!propDef[genKey]) continue;
-            count++;
-            const name = propDef[genKey].name || propKey;
-            const unit = propDef.unit ? ` (${propDef.unit})` : '';
-            const desc = propDef.description || propKey;
-
-            if (propDef.type === 'string') {
+            if (type === 'string') {
                 html += `<label title="${desc}">${desc}${unit}
                     <input type="text" data-field="prop_${name}" placeholder="e.g. Si-O">
                 </label>`;
-            } else if (propDef.type === 'integer') {
+            } else if (type === 'integer') {
                 html += `<label title="${desc}">${desc}${unit}
                     <input type="number" data-field="prop_${name}" step="1" min="0">
                 </label>`;
@@ -664,6 +733,106 @@
 
     function buildTextViewerBody(node) {
         return `<div class="ne-text-viewer-content" id="text-viewer-${node.id}">No data yet.</div>`;
+    }
+
+    function buildFilterBody(node) {
+        return `
+            <div class="ne-filter-rules" id="filter-rules-${node.id}">
+                <div class="ne-filter-row">
+                    <select class="ne-filter-prop-select"><option value="">— connect predictor —</option></select>
+                    <select class="ne-filter-op-select">
+                        <option value="=">=</option>
+                        <option value="!=">&ne;</option>
+                        <option value=">">&gt;</option>
+                        <option value="<">&lt;</option>
+                        <option value=">=">&ge;</option>
+                        <option value="<=">&le;</option>
+                    </select>
+                    <input type="text" class="ne-filter-value" placeholder="threshold">
+                    <button class="ne-filter-remove-btn" data-action="remove-filter-rule" title="Remove">&times;</button>
+                </div>
+            </div>
+            <button class="ne-add-filter-btn" data-action="add-filter-rule" data-node-id="${node.id}">+ Add filter</button>
+        `;
+    }
+
+    function addFilterRule(nodeId) {
+        const node = nodes[nodeId];
+        if (!node) return;
+        const container = node.el.querySelector(`#filter-rules-${nodeId}`);
+        if (!container) return;
+        const propOptions = getFilterPropOptions(nodeId);
+        const row = document.createElement('div');
+        row.className = 'ne-filter-row';
+        row.innerHTML = `
+            <select class="ne-filter-prop-select">
+                ${propOptions.length > 0
+                    ? propOptions.map(p => `<option value="${p.name}">${p.label}</option>`).join('')
+                    : '<option value="">— connect predictor —</option>'}
+            </select>
+            <select class="ne-filter-op-select">
+                <option value="=">=</option>
+                <option value="!=">&ne;</option>
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value=">=">&ge;</option>
+                <option value="<=">&le;</option>
+            </select>
+            <input type="text" class="ne-filter-value" placeholder="threshold">
+            <button class="ne-filter-remove-btn" data-action="remove-filter-rule" title="Remove">&times;</button>
+        `;
+        container.appendChild(row);
+    }
+
+    function getFilterPropOptions(nodeId) {
+        const sourceWire = wires.find(w => w.toNode === nodeId && w.toPort === 'result_in');
+        if (!sourceWire) return [];
+        const sourceNode = nodes[sourceWire.fromNode];
+        if (!sourceNode) return [];
+        const props = predictorPropsMap[sourceNode.key] || {};
+        return Object.entries(props).map(([name, label]) => ({ name, label: label || name }));
+    }
+
+    function refreshFilterNodeDropdowns(nodeId) {
+        const node = nodes[nodeId];
+        if (!node || node.key !== 'filter') return;
+        const propOptions = getFilterPropOptions(nodeId);
+        const rows = node.el.querySelectorAll('.ne-filter-row');
+        rows.forEach(row => {
+            const select = row.querySelector('.ne-filter-prop-select');
+            if (!select) return;
+            const currentVal = select.value;
+            if (propOptions.length > 0) {
+                select.innerHTML = propOptions.map(p => `<option value="${p.name}">${p.label}</option>`).join('');
+                if (propOptions.find(p => p.name === currentVal)) select.value = currentVal;
+            } else {
+                select.innerHTML = '<option value="">— connect predictor —</option>';
+            }
+        });
+    }
+
+    function refreshAllFilterNodes() {
+        for (const node of Object.values(nodes)) {
+            if (node.key === 'filter') refreshFilterNodeDropdowns(node.id);
+        }
+    }
+
+    function buildLambdaBody(node) {
+        const defaultCode =
+`# Available variables:
+#   cif_list  - list[str] of CIF strings
+#   results   - predictor result dict {source, results: [...]}
+#
+# Set output variables before the script ends:
+#   output_cifs    - list[str] of CIF strings to pass forward
+#   output_results - results dict to pass forward
+
+output_cifs = cif_list
+output_results = results`;
+        return `
+            <textarea class="ne-lambda-code" data-field="code" spellcheck="false">${defaultCode}</textarea>
+            <p class="ne-lambda-warning">⚠ Code runs on the server. Use responsibly.</p>
+        `;
     }
 
     // ── Position helper ──────────────────────────────────────────
@@ -699,6 +868,7 @@
         delete nodes[id];
         if (selectedNodeId === id) selectedNodeId = null;
         updatePortConnectedStates();
+        refreshAllFilterNodes();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -782,9 +952,11 @@
                 wires = wires.filter(ww => ww.id !== w.id);
                 updateWires();
                 updatePortConnectedStates();
+                refreshAllFilterNodes();
             });
             wiresSvg.appendChild(path);
         }
+        refreshAllFilterNodes();
     }
 
     function getPortWorldPos(nodeId, portKey, isOutput) {
@@ -892,6 +1064,7 @@
         for (const n of Object.values(nodes)) {
             setNodeState(n.id, '');
             n.data = null;
+            n.portData = null;
             clearNodeLog(n.id);
         }
 
@@ -912,10 +1085,30 @@
             const node = nodes[nodeId];
             if (!node) continue;
 
+            // Skip nodes with no wire connections at all
+            const isConnected = wires.some(w => w.fromNode === nodeId || w.toNode === nodeId);
+            if (!isConnected) continue;
+
             // Viewers don't execute on the backend — they just display data from upstream
             if (node.type === 'viewer') {
                 displayViewerData(node);
                 setNodeState(nodeId, 'done');
+                continue;
+            }
+
+            // Filter nodes execute client-side
+            if (node.key === 'filter') {
+                setNodeState(nodeId, 'running');
+                try {
+                    executeFilterNode(node);
+                    setNodeState(nodeId, 'done');
+                    setNodeProgress(nodeId, 100);
+                } catch (err) {
+                    setNodeState(nodeId, 'error');
+                    addNodeLog(nodeId, `Error: ${err.message}`, 'error');
+                    setStatus(`Error at ${node.name}: ${err.message}`);
+                    break;
+                }
                 continue;
             }
 
@@ -939,7 +1132,13 @@
 
                 // Execute via SSE
                 const result = await executeNodeSSE(backendUrl, nodeId, payload);
-                node.data = result;
+
+                // Lambda and other multi-output utility nodes return {cif_out, result_out}
+                if (node.key === 'lambda') {
+                    node.portData = result;
+                } else {
+                    node.data = result;
+                }
                 setNodeState(nodeId, 'done');
                 addNodeLog(nodeId, 'Done ✓', 'success');
                 setNodeProgress(nodeId, 100);
@@ -960,7 +1159,7 @@
         // After pipeline: trigger viewer display for downstream viewers
         for (const nodeId of sorted) {
             const node = nodes[nodeId];
-            if (node && node.type === 'viewer') {
+            if (node && node.type === 'viewer' && wires.some(w => w.toNode === nodeId)) {
                 displayViewerData(node);
             }
         }
@@ -976,8 +1175,13 @@
         for (const w of wires) {
             if (w.toNode === nodeId) {
                 const fromNode = nodes[w.fromNode];
-                if (fromNode && fromNode.data != null) {
-                    data[w.toPort] = fromNode.data;
+                if (fromNode) {
+                    // Multi-output nodes store per-port data in portData
+                    if (fromNode.portData && w.fromPort in fromNode.portData) {
+                        data[w.toPort] = fromNode.portData[w.fromPort];
+                    } else if (fromNode.data != null) {
+                        data[w.toPort] = fromNode.data;
+                    }
                 }
             }
         }
@@ -1062,6 +1266,75 @@
                 reject(err);
             });
         });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // FILTER NODE (client-side execution)
+    // ═══════════════════════════════════════════════════════════════
+    function executeFilterNode(node) {
+        const upstream  = getUpstreamData(node.id);
+        const cifArray  = upstream['cif_in'];
+        const resultData = upstream['result_in'];
+
+        const rules       = collectFilterRules(node);
+        const cifIn       = Array.isArray(cifArray) ? cifArray : [];
+        const resultsList = (resultData && Array.isArray(resultData.results)) ? resultData.results : [];
+
+        const filteredCifs    = [];
+        const filteredResults = [];
+        const total = Math.max(cifIn.length, resultsList.length);
+
+        for (let i = 0; i < total; i++) {
+            const cif  = cifIn[i]  ?? null;
+            const res  = resultsList[i] ?? null;
+            const props = res ? (res.properties || {}) : {};
+
+            if (rules.length === 0 || rules.every(r => evaluateRule(props, r))) {
+                if (cif  !== null) filteredCifs.push(cif);
+                if (res  !== null) filteredResults.push({ ...res, index: filteredCifs.length - 1 });
+            }
+        }
+
+        node.portData = {
+            cif_out:    filteredCifs,
+            result_out: { source: resultData?.source || 'filter', results: filteredResults },
+        };
+
+        const kept = filteredCifs.length;
+        addNodeLog(node.id, `Kept ${kept} / ${total} structure(s)`, kept > 0 ? 'success' : 'warning');
+    }
+
+    function collectFilterRules(node) {
+        const rules = [];
+        node.el.querySelectorAll('.ne-filter-row').forEach(row => {
+            const prop = row.querySelector('.ne-filter-prop-select')?.value;
+            const op   = row.querySelector('.ne-filter-op-select')?.value;
+            const val  = row.querySelector('.ne-filter-value')?.value?.trim();
+            if (prop && op && val !== '' && val !== undefined) {
+                rules.push({ prop, op, val });
+            }
+        });
+        return rules;
+    }
+
+    function evaluateRule(properties, rule) {
+        const raw = properties[rule.prop];
+        if (raw === undefined || raw === null) return false;
+        const numVal   = parseFloat(raw);
+        const numThresh = parseFloat(rule.val);
+        switch (rule.op) {
+            case '=':  return (isFinite(numVal) && isFinite(numThresh))
+                           ? numVal === numThresh
+                           : String(raw) === rule.val;
+            case '!=': return (isFinite(numVal) && isFinite(numThresh))
+                           ? numVal !== numThresh
+                           : String(raw) !== rule.val;
+            case '>':  return isFinite(numVal) && isFinite(numThresh) && numVal > numThresh;
+            case '<':  return isFinite(numVal) && isFinite(numThresh) && numVal < numThresh;
+            case '>=': return isFinite(numVal) && isFinite(numThresh) && numVal >= numThresh;
+            case '<=': return isFinite(numVal) && isFinite(numThresh) && numVal <= numThresh;
+            default:   return false;
+        }
     }
 
     // ── Topological sort (Kahn's algorithm) ──────────────────────
