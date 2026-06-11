@@ -106,7 +106,8 @@ O1 1.0 0.5 0.5 0.5
         mock_db.info.return_value = "Mock Database"
         mock_db.retrieve.return_value = {
             'source': 'materialsproject',
-            'queries': {'energy_above_hull_r2scan': 0.02},
+            'queries': {'energy_above_hull_r2scan': [0.0, 0.05]},
+            'entries': [{'energy_above_hull_r2scan': 0.02}],
             'cif_strings': ['CIF_DATA_1']
         }
         
@@ -185,14 +186,16 @@ class TestDatabaseQueryOrchestration:
         mock_mp = Mock()
         mock_mp.retrieve.return_value = {
             'source': 'materialsproject',
-            'queries': {'energy_above_hull_r2scan': 0.02},
+            'queries': {'energy_above_hull_r2scan': [0.0, 0.05]},
+            'entries': [{'energy_above_hull_r2scan': 0.02}],
             'cif_strings': ['CIF_DATA_1']
         }
         
         mock_alex = Mock()
         mock_alex.retrieve.return_value = {
             'source': 'alexandria',
-            'queries': {'hull_distance': 0.01},
+            'queries': {'hull_distance': [0.0, 0.05]},
+            'entries': [{'hull_distance': 0.01}],
             'cif_strings': ['CIF_DATA_2']
         }
         
@@ -294,8 +297,12 @@ class TestErrorHandling:
         
         result = feature.process_feature(inputs)
         
-        # Should contain error or compose missing
-        assert 'error' in result or result['status'] == 'failed'
+        # Invalid CIF may be returned as a per-file failure in batch_summary
+        assert (
+            'error' in result
+            or result.get('status') == 'failed'
+            or result.get('batch_summary', {}).get('failed_files', 0) >= 1
+        )
     
     def test_process_feature_with_mocked_composition_extraction(self):
         """Test process_feature handles composition extraction correctly."""

@@ -43,7 +43,8 @@ class TestDatabaseStabilityEvaluation:
         
         db_result = {
             'source': 'materialsproject',
-            'queries': {'energy_above_hull_r2scan': 0.02},  # Below 0.05 threshold
+            'queries': {'energy_above_hull_r2scan': [0.0, 0.05]},
+            'entries': [{'energy_above_hull_r2scan': 0.02}],
             'cif_strings': ['CIF_DATA_1']
         }
         
@@ -61,7 +62,8 @@ class TestDatabaseStabilityEvaluation:
         
         db_result = {
             'source': 'materialsproject',
-            'queries': {'energy_above_hull_r2scan': 0.15},  # Above 0.05 threshold
+            'queries': {'energy_above_hull_r2scan': [0.0, 0.05]},
+            'entries': [{'energy_above_hull_r2scan': 0.15}],
             'cif_strings': ['CIF_DATA_1']
         }
         
@@ -77,7 +79,8 @@ class TestDatabaseStabilityEvaluation:
         
         db_result = {
             'source': 'alexandria',
-            'queries': {'hull_distance': 0.03},  # Below 0.05 threshold
+            'queries': {'hull_distance': [0.0, 0.05]},
+            'entries': [{'hull_distance': 0.03}],
             'cif_strings': ['CIF_DATA_1']
         }
         
@@ -101,6 +104,23 @@ class TestDatabaseStabilityEvaluation:
         
         assert result['status'] == 'no_matches'
         assert result['stability'] is None
+
+    def test_evaluate_threshold_filtered_no_matches_reports_not_found(self):
+        """Test threshold-filtered no-match responses are classified as not_found."""
+        feature = StabilityConsensusAnalysisFeature()
+
+        db_result = {
+            'source': 'alexandria',
+            'queries': {'hull_distance': [0.0, 0.05]},
+            'entries': [],
+            'cif_strings': []
+        }
+
+        result = feature._evaluate_database_stability('alexandria', db_result)
+
+        assert result['status'] == 'not_found'
+        assert 'Not found' in result['stability']
+        assert result['num_matches'] == 0
     
     def test_evaluate_metric_unavailable(self):
         """Test evaluation when stability metric is unavailable."""
@@ -122,8 +142,10 @@ class TestPredictorStabilityEvaluation:
     """Test predictor stability evaluation logic."""
     
     def test_evaluate_stable_predictor(self):
-        """Test evaluation of stable structure (predictor - low forces)."""
+        """Test evaluation of stable structure (predictor - negative DeltaHf)."""
         feature = StabilityConsensusAnalysisFeature()
+        element_fractions = {'Li': 0.5, 'O': 0.5}
+        element_order = ['Li', 'O']
         
         pred_result = {
             'source': 'mattersim',
@@ -132,30 +154,44 @@ class TestPredictorStabilityEvaluation:
                     'index': 0,
                     'status': 'success',
                     'properties': {
-                        'energy': -10.5,
-                        'relaxed_energy': -10.45,
-                        'forces': [[0.001, 0.002, 0.001], [0.002, 0.001, 0.002]],
-                        'relaxed_forces': [[0.01, 0.02, 0.015], [0.02, 0.015, 0.025]],
-                        'stress': [[0.1, 0.05, 0.02], [0.05, 0.1, 0.03], [0.02, 0.03, 0.1]],
-                        'relaxed_stress': [[0.05, 0.02, 0.01], [0.02, 0.05, 0.01], [0.01, 0.01, 0.05]],
+                        'relaxed_energy': -8.8,
                         'num_atoms': 4,
-                        'relaxed_cif': 'RELAXED_CIF_DATA'
+                    },
+                    'error': None
+                },
+                {
+                    'index': 1,
+                    'status': 'success',
+                    'properties': {
+                        'relaxed_energy': -4.0,
+                        'num_atoms': 2,
+                    },
+                    'error': None
+                },
+                {
+                    'index': 2,
+                    'status': 'success',
+                    'properties': {
+                        'relaxed_energy': -4.4,
+                        'num_atoms': 2,
                     },
                     'error': None
                 }
             ]
         }
         
-        result = feature._evaluate_predictor_stability('mattersim', pred_result)
+        result = feature._evaluate_predictor_stability('mattersim', pred_result, element_fractions, element_order)
         
         assert result['status'] == 'success'
         assert '✅' in result['stability']
-        assert result['raw_value'] == 0.025  # max force is 0.025, below 0.05
-        assert result['threshold'] == 0.05
+        assert result['raw_value'] == -0.1
+        assert result['threshold'] == 0.0
     
     def test_evaluate_unstable_predictor(self):
-        """Test evaluation of unstable structure (predictor - high forces)."""
+        """Test evaluation of unstable structure (predictor - positive DeltaHf)."""
         feature = StabilityConsensusAnalysisFeature()
+        element_fractions = {'Li': 0.5, 'O': 0.5}
+        element_order = ['Li', 'O']
         
         pred_result = {
             'source': 'chgnet',
@@ -164,29 +200,43 @@ class TestPredictorStabilityEvaluation:
                     'index': 0,
                     'status': 'success',
                     'properties': {
-                        'energy': -15.2,
-                        'relaxed_energy': -14.8,
-                        'forces': [[0.1, 0.15, 0.12]],
-                        'relaxed_forces': [[0.12, 0.18, 0.15]],
-                        'stress': [[0.5, 0.2, 0.1], [0.2, 0.5, 0.15], [0.1, 0.15, 0.5]],
-                        'relaxed_stress': [[0.3, 0.1, 0.05], [0.1, 0.3, 0.08], [0.05, 0.08, 0.3]],
-                        'num_atoms': 8,
-                        'relaxed_cif': 'RELAXED_CIF_DATA'
+                        'relaxed_energy': -7.6,
+                        'num_atoms': 4,
+                    },
+                    'error': None
+                },
+                {
+                    'index': 1,
+                    'status': 'success',
+                    'properties': {
+                        'relaxed_energy': -4.0,
+                        'num_atoms': 2,
+                    },
+                    'error': None
+                },
+                {
+                    'index': 2,
+                    'status': 'success',
+                    'properties': {
+                        'relaxed_energy': -4.4,
+                        'num_atoms': 2,
                     },
                     'error': None
                 }
             ]
         }
         
-        result = feature._evaluate_predictor_stability('chgnet', pred_result)
+        result = feature._evaluate_predictor_stability('chgnet', pred_result, element_fractions, element_order)
         
         assert result['status'] == 'success'
         assert '❌' in result['stability']
-        assert result['raw_value'] == 0.18  # max force is 0.18, above 0.05
+        assert result['raw_value'] == 0.2
     
     def test_evaluate_predictor_error(self):
         """Test evaluation when predictor fails."""
         feature = StabilityConsensusAnalysisFeature()
+        element_fractions = {'Li': 0.5, 'O': 0.5}
+        element_order = ['Li', 'O']
         
         pred_result = {
             'source': 'mattersim',
@@ -200,7 +250,7 @@ class TestPredictorStabilityEvaluation:
             ]
         }
         
-        result = feature._evaluate_predictor_stability('mattersim', pred_result)
+        result = feature._evaluate_predictor_stability('mattersim', pred_result, element_fractions, element_order)
         
         assert result['status'] == 'prediction_error'
         assert result['stability'] is None
@@ -209,20 +259,24 @@ class TestPredictorStabilityEvaluation:
     def test_evaluate_no_results(self):
         """Test evaluation when predictor returns no results."""
         feature = StabilityConsensusAnalysisFeature()
+        element_fractions = {'Li': 0.5, 'O': 0.5}
+        element_order = ['Li', 'O']
         
         pred_result = {
             'source': 'mattersim',
             'results': []
         }
         
-        result = feature._evaluate_predictor_stability('mattersim', pred_result)
+        result = feature._evaluate_predictor_stability('mattersim', pred_result, element_fractions, element_order)
         
         assert result['status'] == 'no_results'
         assert result['stability'] is None
     
     def test_evaluate_metric_unavailable_predictor(self):
-        """Test evaluation when forces unavailable."""
+        """Test evaluation when predictor energy is unavailable."""
         feature = StabilityConsensusAnalysisFeature()
+        element_fractions = {'Li': 0.5, 'O': 0.5}
+        element_order = ['Li', 'O']
         
         pred_result = {
             'source': 'mattersim',
@@ -230,17 +284,13 @@ class TestPredictorStabilityEvaluation:
                 {
                     'index': 0,
                     'status': 'success',
-                    'properties': {
-                        'energy': -10.5,
-                        'relaxed_energy': -10.45,
-                        'relaxed_forces': [],  # Empty forces
-                    },
+                    'properties': {},
                     'error': None
                 }
             ]
         }
         
-        result = feature._evaluate_predictor_stability('mattersim', pred_result)
+        result = feature._evaluate_predictor_stability('mattersim', pred_result, element_fractions, element_order)
         
         assert result['status'] == 'metric_unavailable'
         assert result['stability'] is None
@@ -326,6 +376,27 @@ class TestConsensusSummary:
         
         assert summary['total_sources'] == 0
         assert 'Insufficient data' in summary['consensus']
+
+    def test_plot_data_includes_not_found_as_error_count(self):
+        """Test plot data tracks not_found entries as grey/error segments."""
+        feature = StabilityConsensusAnalysisFeature()
+
+        results_per_cif = [
+            {
+                'sources': {
+                    'materialsproject': {'stability': '✅ Stable'},
+                    'alexandria': {'stability': '⚠️ Not found'},
+                    'mattersim': {'stability': '❌ Unstable'},
+                }
+            }
+        ]
+
+        plot_data = feature._compute_source_plot_data(results_per_cif)
+
+        assert plot_data['materialsproject']['stable_count'] == 1
+        assert plot_data['alexandria']['error_count'] == 1
+        assert plot_data['alexandria']['error_pct'] == 100.0
+        assert plot_data['mattersim']['unstable_count'] == 1
 
 
 class TestInputExtraction:

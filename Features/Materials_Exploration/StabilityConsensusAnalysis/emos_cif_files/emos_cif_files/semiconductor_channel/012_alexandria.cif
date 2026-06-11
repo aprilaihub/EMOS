@@ -1,0 +1,38 @@
+# generated using pymatgen
+data_Rb2LiGaAs2
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   6.36681603
+_cell_length_b   6.38664197
+_cell_length_c   9.02757394
+_cell_angle_alpha   69.28438957
+_cell_angle_beta   69.35163853
+_cell_angle_gamma   90.00000000
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   Rb2LiGaAs2
+_chemical_formula_sum   'Rb4 Li2 Ga2 As4'
+_cell_volume   318.01592403
+_cell_formula_units_Z   2
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  As  As0  1  0.31174770  0.58734653  0.82530594  1
+  As  As1  1  0.86294536  0.08734653  0.82530594  1
+  As  As2  1  0.13705464  0.91265347  0.17469406  1
+  As  As3  1  0.68825230  0.41265347  0.17469406  1
+  Rb  Rb4  1  0.90391768  0.67032725  0.65934550  1
+  Rb  Rb5  1  0.09608232  0.32967275  0.34065450  1
+  Rb  Rb6  1  0.56326318  0.82967275  0.34065450  1
+  Rb  Rb7  1  0.43673682  0.17032725  0.65934550  1
+  Ga  Ga8  1  0.00000000  0.75000000  0.00000000  1
+  Ga  Ga9  1  0.00000000  0.25000000  0.00000000  1
+  Li  Li10  1  0.50000000  0.75000000  0.00000000  1
+  Li  Li11  1  0.50000000  0.25000000  0.00000000  1

@@ -1,0 +1,52 @@
+# generated using pymatgen
+data_Na2Zn2Si2O7
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   5.09958777
+_cell_length_b   5.26912063
+_cell_length_c   13.68053988
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   118.94125377
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   Na2Zn2Si2O7
+_chemical_formula_sum   'Na4 Zn4 Si4 O14'
+_cell_volume   321.69346374
+_cell_formula_units_Z   2
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Na  Na0  1  0.94145486  0.92781884  0.75000000  1
+  Na  Na1  1  0.01363602  0.07218116  0.25000000  1
+  Na  Na2  1  0.99003407  0.00000000  0.50000000  1
+  Na  Na3  1  0.99003407  0.00000000  0.00000000  1
+  Zn  Zn4  1  0.23039663  0.57302145  0.57958013  1
+  Zn  Zn5  1  0.65737517  0.42697855  0.42041987  1
+  Zn  Zn6  1  0.23039663  0.57302145  0.92041987  1
+  Zn  Zn7  1  0.65737517  0.42697855  0.07958013  1
+  Si  Si8  1  0.57321771  0.24389458  0.64030575  1
+  Si  Si9  1  0.32932312  0.75610542  0.35969425  1
+  Si  Si10  1  0.57321771  0.24389458  0.85969425  1
+  Si  Si11  1  0.32932312  0.75610542  0.14030575  1
+  O  O12  1  0.27659940  0.92797012  0.62860942  1
+  O  O13  1  0.34862928  0.07202988  0.37139058  1
+  O  O14  1  0.27659940  0.92797012  0.87139058  1
+  O  O15  1  0.34862928  0.07202988  0.12860942  1
+  O  O16  1  0.55559290  0.47570837  0.56237132  1
+  O  O17  1  0.07988453  0.52429163  0.43762868  1
+  O  O18  1  0.55559290  0.47570837  0.93762868  1
+  O  O19  1  0.07988453  0.52429163  0.06237132  1
+  O  O20  1  0.87994631  0.22617524  0.62704657  1
+  O  O21  1  0.65377106  0.77382476  0.37295343  1
+  O  O22  1  0.87994631  0.22617524  0.87295343  1
+  O  O23  1  0.65377106  0.77382476  0.12704657  1
+  O  O24  1  0.18445524  0.62134172  0.25000000  1
+  O  O25  1  0.56311352  0.37865828  0.75000000  1
