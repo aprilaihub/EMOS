@@ -12,11 +12,9 @@ Note: CIF parsing utilities are imported from conftest.py for code reuse.
 
 import pytest
 import time
-import os
-from pathlib import Path
 from Information_Units.Databases.Materialsproject.MaterialsprojectAPIHelper import MaterialsprojectAPIHelper
 from .conftest import (
-    validate_cif_file,
+    validate_cif_string,
     extract_formula_from_cif,
     extract_nelements_from_cif,
     extract_nperiodic_dimensions_from_cif
@@ -60,23 +58,24 @@ def test_materialsproject_retrieve_structures(
     from Information_Units.Databases.Materialsproject.MaterialsprojectDatabase import MaterialsprojectDatabase
     
     db = MaterialsprojectDatabase()
-    retrieve_params = {'query': query, 'limit': 3}
+    retrieve_params = {'target_compositions': query, 'batch_size': 3}
     retrieve_params.update(filters)
-    results = db.retrieve(retrieve_params)
-    
+    payload = db.retrieve(retrieve_params)
+    assert isinstance(payload, dict)
+    assert payload.get("source") == "materialsproject"
+    assert isinstance(payload.get("queries"), dict)
+    results = payload.get("cif_strings", [])
+
     assert isinstance(results, list) and len(results) > 0, \
         f"No structures found for {query} with filters {filters}"
     
     # Validate CIF files exist and contain expected elements
-    for path in results:
-        assert Path(path).exists(), f"CIF file does not exist: {path}"
-        assert path.endswith('.cif'), f"File is not a CIF: {path}"
-        
-        content = validate_cif_file(path)
+    for i, content in enumerate(results):
+        content = validate_cif_string(content)
         
         # Verify all expected elements present in composition
         for elem in expected_elements:
-            assert elem in content, f"{elem} not found in {path}"
+            assert elem in content, f"{elem} not found in CIF result #{i + 1}"
         
         # Verify formula contains expected elements
         formula = extract_formula_from_cif(content)
@@ -86,19 +85,19 @@ def test_materialsproject_retrieve_structures(
 
     # For structural property filters, verify constraints are met from CIF data
     if expected_nperiodic_dimensions is not None or expected_nelements_range is not None:
-        for path in results:
-            content = validate_cif_file(path)
+        for content in results:
+            content = validate_cif_string(content)
             
             if expected_nelements_range is not None:
                 min_nelements, max_nelements = expected_nelements_range
                 nelements = extract_nelements_from_cif(content)
                 assert nelements >= min_nelements and nelements <= max_nelements, \
-                    f"nelements {nelements} not in range [{min_nelements}, {max_nelements}] for {path}"
+                    f"nelements {nelements} not in range [{min_nelements}, {max_nelements}]"
             
             if expected_nperiodic_dimensions is not None:
                 nperiodic = extract_nperiodic_dimensions_from_cif(content)
                 assert nperiodic == expected_nperiodic_dimensions, \
-                    f"nperiodic_dimensions {nperiodic} != {expected_nperiodic_dimensions} for {path}"
+                    f"nperiodic_dimensions {nperiodic} != {expected_nperiodic_dimensions}"
 
 
 @pytest.mark.integration
@@ -112,9 +111,11 @@ def test_materialsproject_retrieve_performance(benchmark, limit):
     db = MaterialsprojectDatabase()
     
     # Measure time to retrieve structures
-    result = benchmark(db.retrieve, {'query': 'Fe', 'limit': limit})
+    result = benchmark(db.retrieve, {'target_compositions': 'Fe', 'batch_size': limit})
     
     # Verify results are valid
-    assert isinstance(result, list)
-    assert len(result) <= limit
-
+    assert isinstance(result, dict)
+    assert result.get("source") == "materialsproject"
+    assert isinstance(result.get("queries"), dict)
+    assert isinstance(result.get("cif_strings"), list)
+    assert len(result.get("cif_strings", [])) <= limit

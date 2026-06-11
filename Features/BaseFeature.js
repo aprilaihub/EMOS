@@ -1,18 +1,78 @@
 // ── Property-mappings cache ──────────────────────────────────────────
-// Loaded once from property_mappings.json; shared by every BaseFeature
+// Loaded once from modular property-mapping files; shared by every BaseFeature
 // instance via the class-level cache.
 let _propertyMappingsCache = null;
 
+const _mappingSourcePaths = [
+    './Information_Units/property_mappings/sources/databases/aflow.json',
+    './Information_Units/property_mappings/sources/databases/alexandria.json',
+    './Information_Units/property_mappings/sources/databases/cod.json',
+    './Information_Units/property_mappings/sources/databases/jarvisdft.json',
+    './Information_Units/property_mappings/sources/databases/materialsproject.json',
+    './Information_Units/property_mappings/sources/databases/mathub3d.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_bulk_modulus.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_chemical_system.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_chemical_system_stability.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_dft_band_gap.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_magnetic_density.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_magnetic_density_hhi.json',
+    './Information_Units/property_mappings/sources/generators/mattergen_space_group.json',
+    './Information_Units/property_mappings/sources/predictors/gbfs.json',
+    './Information_Units/property_mappings/sources/predictors/gbfs2d.json',
+    './Information_Units/property_mappings/sources/predictors/mattersim.json',
+    './Information_Units/property_mappings/sources/predictors/synthnn.json',
+];
+
+function _mergeModularMappings(commonData, sourceDataList) {
+    const merged = {
+        description: 'Merged view of modular property mappings.',
+        version: commonData?.version || '2.0',
+        properties: {}
+    };
+
+    const commonProperties = commonData?.properties || {};
+    for (const [name, details] of Object.entries(commonProperties)) {
+        merged.properties[name] = { ...details };
+    }
+
+    for (const sourceData of sourceDataList) {
+        const sourceName = sourceData?.source;
+        if (!sourceName) continue;
+        const sourceProperties = sourceData?.properties || {};
+
+        for (const [commonName, sourceConfig] of Object.entries(sourceProperties)) {
+            if (!merged.properties[commonName]) {
+                merged.properties[commonName] = {};
+            }
+            merged.properties[commonName][sourceName] = sourceConfig;
+        }
+    }
+
+    return merged;
+}
+
 async function _loadPropertyMappings() {
     if (_propertyMappingsCache) return _propertyMappingsCache;
+
     try {
-        const resp = await fetch('./Information_Units/property_mappings.json');
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        _propertyMappingsCache = await resp.json();
+        const commonResp = await fetch('./Information_Units/property_mappings/common_properties.json');
+        if (!commonResp.ok) throw new Error(`HTTP ${commonResp.status} for common properties`);
+        const commonData = await commonResp.json();
+
+        const sourceResponses = await Promise.all(
+            _mappingSourcePaths.map(async (path) => {
+                const resp = await fetch(path);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${path}`);
+                return resp.json();
+            })
+        );
+
+        _propertyMappingsCache = _mergeModularMappings(commonData, sourceResponses);
     } catch (err) {
-        console.error('Failed to load property_mappings.json:', err);
+        console.error('Failed to load modular property mappings:', err);
         _propertyMappingsCache = { properties: {} };
     }
+
     return _propertyMappingsCache;
 }
 
@@ -126,11 +186,22 @@ class BaseFeature {
         `;
     }
 
-    createNumberInput(id, label, min = '', max = '', step = '1', required = false) {
+    createNumberInput(id, label, min = '', max = '', step = '1', defaultValueOrRequired = false, requiredMaybe = false) {
+        let required = false;
+        let defaultValue = '';
+
+        if (typeof defaultValueOrRequired === 'boolean') {
+            required = defaultValueOrRequired;
+        } else {
+            defaultValue = defaultValueOrRequired;
+            required = !!requiredMaybe;
+        }
+
         const req = required ? 'required' : '';
+        const valueAttr = defaultValue !== '' ? `value="${defaultValue}"` : '';
         return `
             <label>${label}: 
-                <input type="number" id="${id}" min="${min}" max="${max}" step="${step}" ${req}>
+                <input type="number" id="${id}" min="${min}" max="${max}" step="${step}" ${valueAttr} ${req}>
             </label>
         `;
     }
@@ -371,7 +442,7 @@ class BaseFeature {
     }
 
     /**
-     * Scan property_mappings.json and return, for each requested generator
+    * Scan merged modular property mappings and return, for each requested generator
      * key, the list of properties it conditions on together with their
      * metadata (type, description, unit, etc.).
      *
@@ -408,14 +479,14 @@ class BaseFeature {
     /**
      * Build an HTML string that contains an <h4> section for each checked
      * generator, with input fields for every property the model conditions
-     * on (derived from property_mappings.json).
+    * on (derived from modular property mappings).
      *
      * Generators that have no conditioning properties (unconditional
      * models) get a short hint message instead of input fields.
      *
      * Also renders shared generation parameters (batch_size) per generator.
      *
-     * @param {object} propertyMappings – the loaded property_mappings.json
+    * @param {object} propertyMappings – the merged modular property mappings
      * @returns {string} HTML
      */
     buildGeneratorPropertyInputsHTML(propertyMappings) {

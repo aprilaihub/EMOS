@@ -101,7 +101,7 @@ services:
   gbfs-pred:
     build:
       context: .
-      dockerfile: Information_Units/Predictors/GBFS_Pred/docker/Dockerfile
+      dockerfile: Information_Units/Predictors/Gbfs/docker/Dockerfile
     image: gbfs-pred:latest
     container_name: emos-gbfs-pred
     ports:

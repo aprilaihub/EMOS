@@ -49,7 +49,7 @@ echo "Installing dependencies from requirements.txt..."
 
 # Install dependencies
 "$VENV_DIR/bin/pip" install --upgrade pip setuptools wheel > /dev/null 2>&1
-"$VENV_DIR/bin/pip" install -r requirements.txt
+"$VENV_DIR/bin/pip" install --prefer-binary -r requirements.txt
 
 echo ""
 echo "=================================================="

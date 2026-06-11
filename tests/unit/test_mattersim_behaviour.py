@@ -95,32 +95,34 @@ def test_info_falls_back_when_container_unreachable(mock_logger):
 @pytest.mark.unit
 def test_predict_missing_cif_param_returns_error(mock_logger):
     predictor = MattersimPredictor(logger=mock_logger)
-    result = predictor.predict({})
+    result = predictor.predict([])
 
-    assert_prediction_envelope(result)
-    assert result["status"] == "error"
-    assert "Missing required parameter" in result["error"]
+    assert result["source"] == "mattersim"
+    assert isinstance(result["results"], list)
+    assert result["results"][0]["status"] == "error"
+    assert "Missing required input" in result["results"][0]["error"]
 
 
 @pytest.mark.unit
-def test_predict_missing_file_returns_error(mock_logger):
+def test_predict_empty_input_returns_error(mock_logger):
     predictor = MattersimPredictor(logger=mock_logger)
-    result = predictor.predict({"cif_file": "/nonexistent/file.cif"})
+    result = predictor.predict([])
 
-    assert_prediction_envelope(result)
-    assert result["status"] == "error"
-    assert "File not found" in result["error"]
+    assert result["source"] == "mattersim"
+    assert isinstance(result["results"], list)
+    assert result["results"][0]["status"] == "error"
+    assert "Missing required input" in result["results"][0]["error"]
 
 
 @pytest.mark.unit
 def test_predict_unhealthy_container_returns_error(mock_logger, sample_cif_file):
     predictor = MattersimPredictor(logger=mock_logger)
     with patch.object(MattersimPredictor, "is_healthy", return_value=False):
-        result = predictor.predict({"cif_file": str(sample_cif_file)})
+        result = predictor.predict([sample_cif_file.read_text()])
 
-    assert_prediction_envelope(result)
-    assert result["status"] == "error"
-    assert "not reachable" in result["error"]
+    assert result["source"] == "mattersim"
+    assert result["results"][0]["status"] == "error"
+    assert "not reachable" in result["results"][0]["error"]
 
 
 @pytest.mark.unit
@@ -146,10 +148,10 @@ def test_predict_success_returns_ok_envelope(mock_logger, sample_cif_file):
         "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
         return_value=_mock_response(payload=api_result),
     ) as post_mock:
-        result = predictor.predict({"cif_file": str(sample_cif_file)})
+        result = predictor.predict([sample_cif_file.read_text()])
 
-    assert_prediction_envelope(result)
-    assert result["status"] == "ok"
+    assert result["source"] == "mattersim"
+    assert result["results"][0]["status"] == "ok"
 
     sent_payload = post_mock.call_args.kwargs["json"]
     assert sent_payload["compute_energy"] is True
@@ -175,7 +177,7 @@ def test_predict_output_is_json_serializable(mock_logger, sample_cif_file):
         "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
         return_value=_mock_response(payload=api_result),
     ):
-        result = predictor.predict({"cif_file": str(sample_cif_file)})
+        result = predictor.predict([sample_cif_file.read_text()])
 
     serialized = json.dumps(result)
     assert isinstance(json.loads(serialized), dict)
@@ -193,10 +195,11 @@ def test_predict_timeout_returns_error(mock_logger, sample_cif_file):
         "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
         side_effect=requests.Timeout(),
     ):
-        result = predictor.predict({"cif_file": str(sample_cif_file)})
+        result = predictor.predict([sample_cif_file.read_text()])
 
-    assert result["status"] == "error"
-    assert "timed out" in result["error"]
+    assert result["source"] == "mattersim"
+    assert result["results"][0]["status"] == "error"
+    assert "timed out" in result["results"][0]["error"]
 
 
 @pytest.mark.unit
@@ -207,10 +210,11 @@ def test_predict_http_error_returns_error(mock_logger, sample_cif_file):
         "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
         side_effect=requests.RequestException("boom"),
     ):
-        result = predictor.predict({"cif_file": str(sample_cif_file)})
+        result = predictor.predict([sample_cif_file.read_text()])
 
-    assert result["status"] == "error"
-    assert "HTTP error" in result["error"]
+    assert result["source"] == "mattersim"
+    assert result["results"][0]["status"] == "error"
+    assert "HTTP error" in result["results"][0]["error"]
 
 
 @pytest.mark.unit
@@ -234,15 +238,16 @@ def test_predict_saves_relaxed_cif_when_output_dir_set(mock_logger, sample_cif_f
         "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
         return_value=_mock_response(payload=api_result),
     ):
-        result = predictor.predict({
-            "cif_file": str(sample_cif_file),
-            "output_dir": str(tmp_path),
-        })
+        result = predictor.predict(
+            [sample_cif_file.read_text()],
+            output_dir=str(tmp_path),
+        )
 
-    assert result["status"] == "ok"
-    assert "relaxed_cif" in result["properties"]
-    assert "relaxed_cif_string" not in result["properties"]
-    assert Path(result["properties"]["relaxed_cif"]).exists()
+    first = result["results"][0]
+    assert first["status"] == "ok"
+    assert "relaxed_cif" in first["properties"]
+    assert "relaxed_cif_string" not in first["properties"]
+    assert Path(first["properties"]["relaxed_cif"]).exists()
 
 
 @pytest.mark.unit
@@ -256,3 +261,23 @@ def test_is_healthy_caches_result(mock_logger):
 
     # Second call should use cache and not hit requests.get again.
     assert get_mock.call_count == 1
+
+
+@pytest.mark.unit
+def test_predict_with_list_input_returns_standardized_output(mock_logger):
+    predictor = MattersimPredictor(logger=mock_logger)
+    api_result = {
+        "status": "ok",
+        "properties": {"energy": -1.0},
+        "warnings": [],
+        "error": None,
+    }
+    with patch.object(MattersimPredictor, "is_healthy", return_value=True), patch(
+        "Information_Units.Predictors.Mattersim.MattersimPredictor.requests.post",
+        return_value=_mock_response(payload=api_result),
+    ):
+        result = predictor.predict(["data_test\n_cell_length_a 5.0\n"])
+
+    assert result["source"] == "mattersim"
+    assert isinstance(result["results"], list)
+    assert result["results"][0]["status"] == "ok"

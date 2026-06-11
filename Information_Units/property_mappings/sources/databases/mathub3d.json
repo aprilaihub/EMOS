@@ -1,0 +1,98 @@
+{
+  "description": "Source-specific mappings for mathub3d (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "mathub3d",
+  "properties": {
+    "band_gap": {
+      "name": "gap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "bulk_modulus": {
+      "name": "bulk_modulus",
+      "retrievable": true,
+      "range_support": true
+    },
+    "cbm": {
+      "name": "cbm",
+      "retrievable": true,
+      "range_support": true
+    },
+    "deformation_potential_n": {
+      "name": "dp_n",
+      "retrievable": true,
+      "range_support": true
+    },
+    "deformation_potential_p": {
+      "name": "dp_p",
+      "retrievable": true,
+      "range_support": true
+    },
+    "density": {
+      "name": "density",
+      "retrievable": true,
+      "range_support": true
+    },
+    "efermi": {
+      "name": "efermi",
+      "retrievable": true,
+      "range_support": true
+    },
+    "elements": {
+      "name": "elements",
+      "retrievable": true,
+      "range_support": false
+    },
+    "energy": {
+      "name": "energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy_per_atom": {
+      "name": "energy_per_atom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "is_magnetic": {
+      "name": "is_magnetic",
+      "retrievable": true,
+      "range_support": false
+    },
+    "magnetization": {
+      "name": "total_magnetic_moment",
+      "retrievable": true,
+      "range_support": true
+    },
+    "mass": {
+      "name": "mass",
+      "retrievable": true,
+      "range_support": true
+    },
+    "natoms": {
+      "name": "natoms",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nelements": {
+      "name": "nelements",
+      "retrievable": true,
+      "range_support": true
+    },
+    "space_group": {
+      "name": "spacegroup",
+      "retrievable": true,
+      "range_support": true
+    },
+    "vbm": {
+      "name": "vbm",
+      "retrievable": true,
+      "range_support": true
+    },
+    "volume": {
+      "name": "volume",
+      "retrievable": true,
+      "range_support": true
+    }
+  }
+}

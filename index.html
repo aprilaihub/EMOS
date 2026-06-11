@@ -130,6 +130,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="index.html" class="active">EMOS App</a></li>
+                <li><a href="node-editor.html">Node Editor</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="team.html">Team</a></li>
                 <li><a href="documentation.html">Documentation</a></li>
@@ -157,57 +158,262 @@
             <!-- Left Panel: Controls -->
             <div class="left-panel">
                 <!-- Information Units Section -->
-                <section class="control-section">
+                                                                                                                                                <section class="control-section">
                     <h2>Information Units</h2>
                     <div class="info-units">
                         <div class="info-column">
                             <h3>Databases</h3>
                             <div class="radio-group" id="databasesList">
-                            <label><input type="checkbox" ui-type="database" value="cod"> COD</label>
-                            <label><input type="checkbox" ui-type="database" value="materialsproject"> MaterialsProject</label>
-                            <label><input type="checkbox" ui-type="database" value="alexandria"> Alexandria</label>
-                            <label><input type="checkbox" ui-type="database" value="mathub3d"> Mathub3d</label>
-                            <label><input type="checkbox" ui-type="database" value="jarvisdft"> JarvisDFT</label>
-                            <label><input type="checkbox" ui-type="database" value="aflow"> AFLOW</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="cod"> COD</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="cod"
+                                    data-iu-type="database"
+                                    data-iu-name="COD"
+                                    data-iu-desc="Crystallography Open Database - open-access collection of crystal structures"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="materialsproject"> MaterialsProject</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="materialsproject"
+                                    data-iu-type="database"
+                                    data-iu-name="MaterialsProject"
+                                    data-iu-desc="Materials Project - computational materials database"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="alexandria"> Alexandria</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="alexandria"
+                                    data-iu-type="database"
+                                    data-iu-name="Alexandria"
+                                    data-iu-desc="Alexandria PBE - DFT database for materials properties"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="mathub3d"> Mathub3d</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mathub3d"
+                                    data-iu-type="database"
+                                    data-iu-name="Mathub3d"
+                                    data-iu-desc="MatHub-3d - first-principles materials repository with 3D structures for high-throughput thermoelectric research"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="jarvisdft"> JarvisDFT</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="jarvisdft"
+                                    data-iu-type="database"
+                                    data-iu-name="JarvisDFT"
+                                    data-iu-desc="JARVIS-DFT - NIST computational materials database with electronic, optical, and solar cell properties"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="database" value="aflow"> AFLOW</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="aflow"
+                                    data-iu-type="database"
+                                    data-iu-name="AFLOW"
+                                    data-iu-desc="AFLOW - Automatic FLOW database for computational materials science with rich mechanical, thermal, and electronic properties"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
                             </div>
                         </div>
                         <div class="info-column">
                             <h3>Generators</h3>
                             <div class="radio-group" id="generatorsList">
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_base_model"> MatterGen: Base Model</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_mp_20_base"> MatterGen: MP-20 Base</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system"> MatterGen: Chemical System</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system_stability"> MatterGen: Chemical System + Stability</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_dft_band_gap"> MatterGen: DFT Band Gap</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density"> MatterGen: Magnetic Density</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density_hhi"> MatterGen: Magnetic Density + HHI</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_bulk_modulus"> MatterGen: Bulk Modulus</label>
-                            <label><input type="checkbox" ui-type="generator" value="mattergen_space_group"> MatterGen: Space Group</label>
-                            <label><input type="checkbox" ui-type="generator" value="gnome"> GNoME</label>
-                            <label><input type="checkbox" ui-type="generator" value="imatgen"> iMatGen</label>
-                            <label><input type="checkbox" ui-type="generator" value="matgan"> MatGAN</label>
-                            <label><input type="checkbox" ui-type="generator" value="molgan"> MolGAN</label>
-                            <label><input type="checkbox" ui-type="generator" value="cond_dfc_vae"> Cond-DFC-VAE</label>
-                            <label><input type="checkbox" ui-type="generator" value="mygen1"> MyGen1</label>
-                            <label><input type="checkbox" ui-type="generator" value="mygen2"> MyGen2</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_base_model"> MatterGen: Base Model</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_base_model"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Base Model"
+                                    data-iu-desc="Unconditional diffusion model for general inorganic crystal structure generation (mattergen_base)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_mp_20_base"> MatterGen: MP-20 Base</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_mp_20_base"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: MP-20 Base"
+                                    data-iu-desc="Unconditional base model trained on the MP-20 dataset for crystal structure generation (mp_20_base)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system"> MatterGen: Chemical System</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_chemical_system"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Chemical System"
+                                    data-iu-desc="Conditional model for generating structures within a specified chemical system (chemical_system)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_chemical_system_stability"> MatterGen: Chemical System + Stability</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_chemical_system_stability"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Chemical System + Stability"
+                                    data-iu-desc="Conditional model for generating structures within a chemical system with target energy above hull (chemical_system_energy_above_hull)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_dft_band_gap"> MatterGen: DFT Band Gap</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_dft_band_gap"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: DFT Band Gap"
+                                    data-iu-desc="Property-conditioned model for generating structures with a target DFT band gap (dft_band_gap)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density"> MatterGen: Magnetic Density</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_magnetic_density"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Magnetic Density"
+                                    data-iu-desc="Property-conditioned model for generating structures with a target DFT magnetic density (dft_mag_density)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_magnetic_density_hhi"> MatterGen: Magnetic Density + HHI</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_magnetic_density_hhi"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Magnetic Density + HHI"
+                                    data-iu-desc="Multi-property-conditioned model targeting magnetic density and Herfindahl-Hirschman elemental scarcity index (dft_mag_density_hhi_score)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_bulk_modulus"> MatterGen: Bulk Modulus</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_bulk_modulus"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Bulk Modulus"
+                                    data-iu-desc="Property-conditioned model for generating structures with a target ML-predicted bulk modulus (ml_bulk_modulus)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="generator" value="mattergen_space_group"> MatterGen: Space Group</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattergen_space_group"
+                                    data-iu-type="generator"
+                                    data-iu-name="MatterGen: Space Group"
+                                    data-iu-desc="Symmetry-conditioned model for generating structures in a target crystallographic space group (space_group)"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
                             </div>
                         </div>
                         <div class="info-column">
                             <h3>Predictors</h3>
                             <div class="radio-group" id="predictorsList">
-                            <label><input type="checkbox" ui-type="predictor" value="mattersim"> MatterSim</label>
-                            <label><input type="checkbox" ui-type="predictor" value="m3gnet"> M3GNet</label>
-                            <label><input type="checkbox" ui-type="predictor" value="pfp"> PFP</label>
-                            <label><input type="checkbox" ui-type="predictor" value="deepmd"> DeepMD</label>
-                            <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
-                            <label><input type="checkbox" ui-type="predictor" value="esen"> eSEN</label>
-                            <label><input type="checkbox" ui-type="predictor" value="mypred1"> MyPred1</label>
-                            <label><input type="checkbox" ui-type="predictor" value="mypred2"> MyPred2</label>
-                            <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="mattersim"> MatterSim</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="mattersim"
+                                    data-iu-type="predictor"
+                                    data-iu-name="MatterSim"
+                                    data-iu-desc="Universal neural network potential for materials simulation"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="synthnn"> SynthNN</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="synthnn"
+                                    data-iu-type="predictor"
+                                    data-iu-name="SynthNN"
+                                    data-iu-desc="Synthesis Neural Network for synthesizability prediction"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="gbfs"> GBFS</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="gbfs"
+                                    data-iu-type="predictor"
+                                    data-iu-name="GBFS"
+                                    data-iu-desc="Pretrained predictors from GBFS workflow, implemented in Python"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="gbfs_2d"> GBFS-2D</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="gbfs_2d"
+                                    data-iu-type="predictor"
+                                    data-iu-name="GBFS-2D"
+                                    data-iu-desc="Pretrained GBFS workflow predictors specialized for 2D layered materials"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
                             </div>
                         </div>
                     </div>
                 </section>
+
+
+
+
+
+
+
+
 
                 <!-- Features Section -->
                 <section class="control-section">
@@ -218,14 +424,9 @@
                         <h3>Materials Exploration</h3>
                         <div class="feature-container">
                             <div class="feature-grid">
-                                <button class="feature-btn" data-feature="1" data-feature-name="Material Search" data-feature-desc="Search and explore materials from comprehensive databases using various criteria">Material Search</button>
-                                <button class="feature-btn" data-feature="2" data-feature-name="Material Generation" data-feature-desc="Generate new material compositions using AI-powered algorithms and predictive models">Material Generation</button>
-                                <button class="feature-btn" data-feature="3" data-feature-name="Database Extractor" data-feature-desc="Extract and analyze specific material properties and data from integrated databases">Database Extractor</button>
-                                <button class="feature-btn" data-feature="4" data-feature-name="Material Characterization" data-feature-desc="Advanced materials analysis and characterization tools for comprehensive evaluation">Material Characterization</button>
-                                <button class="feature-btn" data-feature="5" data-feature-name="DFT Calculation" data-feature-desc="Materials optimization workflows for enhanced performance characteristics">DFT Calculation</button>
-                                <button class="feature-btn" data-feature="6" data-feature-name="Crystallographic Analysis" data-feature-desc="Simulation and modeling tools for predicting material behavior under various conditions">Crystallographic Analysis</button>
-                                <button class="feature-btn" data-feature="7" data-feature-name="Quantum Mechanics" data-feature-desc="Advanced computational methods for materials discovery and design">Quantum Mechanics</button>
-                                <button class="feature-btn" data-feature="8" data-feature-name="Tensor Analysis" data-feature-desc="Comprehensive analysis tools for understanding material structure-property relationships">Tensor Analysis</button>
+                                <button class="feature-btn" data-feature="1" data-feature-name="Database Extractor" data-feature-desc="Extract and analyze specific material properties and data from integrated databases">Database Extractor</button>
+                                <button class="feature-btn" data-feature="2" data-feature-name="Stability Consensus Analysis" data-feature-desc="Analyze and aggregate stability consensus from uploaded CIF structures">Stability Consensus Analysis</button>
+                                <button class="feature-btn" data-feature="3" data-feature-name="AMD screening" data-feature-desc="Screen uploaded CIF structures for AMD-based candidate selection">AMD screening</button>
                             </div>
                         </div>
                     </div>
@@ -235,14 +436,7 @@
                         <h3>Electronics Application</h3>
                         <div class="feature-container">
                             <div class="feature-grid">
-                                <button class="feature-btn" data-feature="9" data-feature-name="Device Synthesizability" data-feature-desc="Evaluate the feasibility and methods for synthesizing electronic devices from selected materials">Device Synthesizability</button>
-                                <button class="feature-btn" data-feature="10" data-feature-name="Interface Calculation" data-feature-desc="Calculate and analyze interfaces between different materials in electronic applications">Interface Calculation</button>
-                                <button class="feature-btn" data-feature="11" data-feature-name="Property Prediction" data-feature-desc="Electronic property prediction and optimization for semiconductor applications">Property Prediction</button>
-                                <button class="feature-btn" data-feature="12" data-feature-name="Band Structure" data-feature-desc="Band structure calculations and electronic transport property analysis">Band Structure</button>
-                                <button class="feature-btn" data-feature="13" data-feature-name="Thermal Management" data-feature-desc="Thermal management analysis for electronic device performance optimization">Thermal Management</button>
-                                <button class="feature-btn" data-feature="14" data-feature-name="Reliability Assessment" data-feature-desc="Reliability assessment and failure analysis for electronic materials">Reliability Assessment</button>
-                                <button class="feature-btn" data-feature="15" data-feature-name="Process Integration" data-feature-desc="Process integration workflows for electronic device manufacturing">Process Integration</button>
-                                <button class="feature-btn" data-feature="16" data-feature-name="Advanced Characterization" data-feature-desc="Advanced characterization techniques for electronic materials evaluation">Advanced Characterization</button>
+                                <button class="feature-btn" data-feature="4" data-feature-name="MOSFET evaluator" data-feature-desc="2D Poisson and drift-diffusion solver for MOSFET evaluation from simulation parameters">MOSFET evaluator</button>
                             </div>
                         </div>
                     </div>

@@ -1,13 +1,12 @@
 """Helper functions for AFLOW AFLUX API interaction and data conversion."""
 
-import json
-import os
 import re
 import time
 from urllib.parse import quote
 
 import requests
 from pymatgen.core import Composition, Structure
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class AflowAPIHelper:
@@ -20,20 +19,11 @@ class AflowAPIHelper:
         self.response_fields = self._default_response_fields()
 
     def _load_property_mapping(self) -> dict:
-        """Load AFLOW property mapping from property_mappings.json."""
+        """Load AFLOW property mapping from modular property mappings."""
         try:
-            mapping_file = os.path.join(
-                os.path.dirname(__file__),
-                '..',
-                '..',
-                'property_mappings.json',
-            )
-            with open(mapping_file, 'r') as f:
-                data = json.load(f)
-
             mapping = {}
-            for prop_name, prop_details in data.get('properties', {}).items():
-                aflow_info = prop_details.get('aflow', {})
+            source_mapping = load_source_property_mapping(source='aflow', source_type='databases')
+            for prop_name, aflow_info in source_mapping.items():
                 if aflow_info.get('retrievable'):
                     mapping[prop_name] = {
                         'name': aflow_info.get('name'),

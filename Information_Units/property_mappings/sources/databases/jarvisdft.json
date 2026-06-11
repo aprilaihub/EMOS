@@ -1,0 +1,142 @@
+{
+  "description": "Source-specific mappings for jarvisdft (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "jarvisdft",
+  "properties": {
+    "Tc_supercon": {
+      "name": "_jarvis_Tc_supercon",
+      "retrievable": true,
+      "range_support": true
+    },
+    "avg_elec_mass": {
+      "name": "_jarvis_avg_elec_mass",
+      "retrievable": true,
+      "range_support": true
+    },
+    "avg_hole_mass": {
+      "name": "_jarvis_avg_hole_mass",
+      "retrievable": true,
+      "range_support": true
+    },
+    "band_gap": {
+      "name": "_jarvis_optb88vdw_bandgap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "bulk_modulus": {
+      "name": "_jarvis_bulk_modulus_kv",
+      "retrievable": true,
+      "range_support": true
+    },
+    "density": {
+      "name": "_jarvis_density",
+      "retrievable": true,
+      "range_support": true
+    },
+    "dfpt_piezo_max_dij": {
+      "name": "_jarvis_dfpt_piezo_max_dij",
+      "retrievable": true,
+      "range_support": true
+    },
+    "energy": {
+      "name": "_jarvis_optb88vdw_total_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "epsx": {
+      "name": "_jarvis_epsx",
+      "retrievable": true,
+      "range_support": true
+    },
+    "exfoliation_energy": {
+      "name": "_jarvis_exfoliation_energy",
+      "retrievable": true,
+      "range_support": true
+    },
+    "formation_energy_per_atom": {
+      "name": "_jarvis_formation_energy_peratom",
+      "retrievable": true,
+      "range_support": true
+    },
+    "hse_gap": {
+      "name": "_jarvis_hse_gap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "hull_distance": {
+      "name": "_jarvis_ehull",
+      "retrievable": true,
+      "range_support": true
+    },
+    "magnetization": {
+      "name": "_jarvis_magmom_oszicar",
+      "retrievable": true,
+      "range_support": true
+    },
+    "mbj_bandgap": {
+      "name": "_jarvis_mbj_bandgap",
+      "retrievable": true,
+      "range_support": true
+    },
+    "mepsx": {
+      "name": "_jarvis_mepsx",
+      "retrievable": true,
+      "range_support": true
+    },
+    "n_powerfact": {
+      "name": "_jarvis_n-powerfact",
+      "retrievable": true,
+      "range_support": true
+    },
+    "n_seebeck": {
+      "name": "_jarvis_n-Seebeck",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nelements": {
+      "name": "nelements",
+      "retrievable": true,
+      "range_support": true
+    },
+    "nperiodic_dimensions": {
+      "name": "nperiodic_dimensions",
+      "retrievable": true
+    },
+    "p_powerfact": {
+      "name": "_jarvis_p-powerfact",
+      "retrievable": true,
+      "range_support": true
+    },
+    "p_seebeck": {
+      "name": "_jarvis_p-Seebeck",
+      "retrievable": true,
+      "range_support": true
+    },
+    "poisson_ratio": {
+      "name": "_jarvis_poisson",
+      "retrievable": true,
+      "range_support": true
+    },
+    "shear_modulus": {
+      "name": "_jarvis_shear_modulus_gv",
+      "retrievable": true,
+      "range_support": true
+    },
+    "slme": {
+      "name": "_jarvis_slme",
+      "retrievable": true,
+      "range_support": true
+    },
+    "space_group": {
+      "name": "_jarvis_spg_number",
+      "retrievable": true,
+      "range_support": true
+    },
+    "spillage": {
+      "name": "_jarvis_spillage",
+      "retrievable": true,
+      "range_support": true
+    }
+  }
+}

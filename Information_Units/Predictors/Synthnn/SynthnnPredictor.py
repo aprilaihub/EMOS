@@ -1,18 +1,18 @@
 """SynthNN Predictor - Synthesis Neural Network for predicting synthesizability."""
 
-import json
-from pathlib import Path
+from typing import Any
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.Predictors.Synthnn.composition_helper import CompositionHelper
 from Information_Units.Predictors.Synthnn.synthnn_model_helper import SynthnnModelHelper
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 class SynthnnPredictor(BasePredictor):
     """
     Lightweight wrapper for SynthNN deep learning model predicting synthesizability.
     
-    Input format:  {filename: filepath, ...}
-    Output format: {filename: {status, properties, warnings, error}, ...}
+    Input format:  list[str]
+    Output format: {"source": "synthnn", "results": list[dict]}
     """
 
     OUTPUT_PROPERTIES = ('synthesizable', 'synthesizability_score')
@@ -26,27 +26,22 @@ class SynthnnPredictor(BasePredictor):
             logger: Optional logger instance
         """
         super().__init__(predictor_name, logger)
+        self.source = "synthnn"
         self.model_helper = SynthnnModelHelper(logger=logger)
         self.composition_helper = CompositionHelper()
         self._mapped_output_properties = self._load_mapped_output_properties()
         self._check_output_properties_in_mapping({prop: None for prop in self.OUTPUT_PROPERTIES})
 
     def _load_mapped_output_properties(self) -> set:
-        """Load SynthNN-mapped output properties from property_mappings.json."""
-        mapping_file = Path(__file__).resolve().parents[2] / 'property_mappings.json'
-
+        """Load SynthNN-mapped output properties from modular property files."""
         try:
-            with mapping_file.open('r', encoding='utf-8') as f:
-                data = json.load(f)
+            source_mapping = load_source_property_mapping(source='synthnn', source_type='predictors')
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to load property mappings from {mapping_file}: {str(e)}"
-            ) from e
+            raise RuntimeError(f"Failed to load modular SynthNN property mappings: {str(e)}") from e
 
         mapped = set()
-        for prop_name, prop_details in data.get('properties', {}).items():
-            synthnn_info = prop_details.get('synthnn')
-            if isinstance(synthnn_info, dict) and synthnn_info.get('predicatble'):
+        for prop_name, synthnn_info in source_mapping.items():
+            if isinstance(synthnn_info, dict) and synthnn_info.get('predictable'):
                 mapped.add(prop_name)
 
         return mapped
@@ -56,7 +51,7 @@ class SynthnnPredictor(BasePredictor):
         missing = sorted(set(properties.keys()) - self._mapped_output_properties)
         if missing:
             raise ValueError(
-                "SynthNN output properties missing in property_mappings.json: "
+                "SynthNN output properties missing in modular property mappings: "
                 + ", ".join(missing)
             )
 
@@ -68,68 +63,49 @@ class SynthnnPredictor(BasePredictor):
             "higher values indicate higher likelihood of successful synthesis."
         )
 
-    def predict(self, input_data: dict) -> dict:
+    def predict(self, input_data: list[str]) -> dict[str, Any]:
         """
         Predict synthesizability from CIF files.
         
         Args:
-            input_data (dict): Mapping of filenames to file paths
+            input_data (list[str]): CIF strings.
                 Example:
-                {
-                    'Al2O3.cif': '/path/to/Al2O3.cif',
-                    'FeO.cif': '/path/to/FeO.cif',
-                    'invalid.cif': '/path/to/corrupted.cif'
-                }
+                ["data_...", "data_..."]
         
         Returns:
-            dict: Synthesizability properties for each input file
-                Example:
+            dict[str, Any]: Prediction payload with shape:
                 {
-                    'Al2O3.cif': {
-                        'status': 'ok',
-                        'properties': {
-                            'synthesizable': True,
-                            'synthesizability_score': 0.92
-                        },
-                        'warnings': [],
-                        'error': None
-                    },
-                    'FeO.cif': {
-                        'status': 'ok',
-                        'properties': {
-                            'synthesizable': False,
-                            'synthesizability_score': 0.31
-                        },
-                        'warnings': ['Low synthesizability confidence (score near threshold)'],
-                        'error': None
-                    },
-                    'invalid.cif': {
-                        'status': 'error',
-                        'properties': {
-                            'synthesizable': None,
-                            'synthesizability_score': None
-                        },
-                        'warnings': [],
-                        'error': 'Failed to parse CIF: Invalid syntax'
-                    }
-                }
+                    "source": "synthnn",
+                    "results": [
+                        {
+                            "index": int,
+                            "status": "ok" | "error",
+                            "properties": {
+                                "synthesizable": bool | None,
+                                "synthesizability_score": float | None
+                            },
+                            "warnings": list[str],
+                            "error": str | None
+                        }
+                    ]
+                }.
         
         Notes:
-            - Empty input returns empty dict: {}
-            - Each file result contains: status, properties, warnings, error
+            - Empty or invalid input returns {"source": ..., "results": []}
+            - Each item result contains: status, properties, warnings, error
             - Failed files use status='error' with null properties
             - Non-critical warnings are included in warnings array
             - Synthesizable threshold: score >= 0.70
-            - All files processed independently (one failure doesn't crash batch)
+            - CIF strings are processed independently (one failure doesn't crash batch)
         """
+        cif_strings = self._extract_cif_strings(input_data)
         if self.logger:
-            self.logger.log(f"SynthNN prediction starting for {len(input_data)} files", 'info')
-        
-        # Handle empty input
-        if not input_data:
-            return {}
-        
-        results = {}
+            self.logger.log(f"SynthNN prediction starting for {len(cif_strings)} CIF strings", 'info')
+
+        if not cif_strings:
+            return {"source": self.source, "results": []}
+
+        results = []
 
         def _build_result(status, synthesizable=None, score=None, warnings=None, error=None):
             output_properties = {
@@ -145,33 +121,22 @@ class SynthnnPredictor(BasePredictor):
                 'error': error
             }
         
-        # Process each file
-        for filename, filepath in input_data.items():
+        # Process each CIF string
+        for idx, cif_content in enumerate(cif_strings):
             try:
-                # Read CIF file
-                try:
-                    cif_content = Path(filepath).read_text()
-                except FileNotFoundError:
-                    error_msg = f"File not found: {filepath}"
-                    if self.logger:
-                        self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = _build_result(status='error', error=error_msg)
-                    continue
-                except Exception as e:
-                    error_msg = f"Failed to read file: {str(e)}"
-                    if self.logger:
-                        self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = _build_result(status='error', error=error_msg)
-                    continue
-                
                 # Extract composition from CIF
                 formula, success = self.composition_helper.extract_from_cif(cif_content)
                 
                 if not success or formula is None:
                     error_msg = "Failed to parse CIF: Invalid syntax or missing structure data"
                     if self.logger:
-                        self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = _build_result(status='error', error=error_msg)
+                        self.logger.log(f"item[{idx}]: {error_msg}", 'error')
+                    item = {
+                        "index": idx,
+                        "cif_input": cif_content,
+                        **_build_result(status='error', error=error_msg),
+                    }
+                    results.append(item)
                     continue
                 
                 # Normalize composition
@@ -184,8 +149,13 @@ class SynthnnPredictor(BasePredictor):
                 if score is None:
                     error_msg = f"Model prediction failed for composition: {normalized_formula}"
                     if self.logger:
-                        self.logger.log(f"{filename}: {error_msg}", 'error')
-                    results[filename] = _build_result(status='error', error=error_msg)
+                        self.logger.log(f"item[{idx}]: {error_msg}", 'error')
+                    item = {
+                        "index": idx,
+                        "cif_input": cif_content,
+                        **_build_result(status='error', error=error_msg),
+                    }
+                    results.append(item)
                     continue
                 
                 # Determine if synthesizable (threshold: 0.70)
@@ -198,16 +168,21 @@ class SynthnnPredictor(BasePredictor):
                 if 0.65 <= score < 0.70:
                     warnings.append('Low synthesizability confidence (score near threshold)')
                 
-                results[filename] = _build_result(
-                    status='ok',
-                    synthesizable=synthesizable,
-                    score=round(score, 4),
-                    warnings=warnings
-                )
+                item = {
+                    "index": idx,
+                    "cif_input": cif_content,
+                    **_build_result(
+                        status='ok',
+                        synthesizable=synthesizable,
+                        score=round(score, 4),
+                        warnings=warnings
+                    ),
+                }
+                results.append(item)
                 
                 if self.logger:
                     self.logger.log(
-                        f"{filename}: synthesizable={synthesizable}, score={score:.4f}",
+                        f"item[{idx}]: synthesizable={synthesizable}, score={score:.4f}",
                         'info'
                     )
                     
@@ -215,14 +190,25 @@ class SynthnnPredictor(BasePredictor):
                 # Catch any unexpected errors
                 error_msg = f"Unexpected error during prediction: {str(e)}"
                 if self.logger:
-                    self.logger.log(f"{filename}: {error_msg}", 'error')
-                results[filename] = _build_result(status='error', error=error_msg)
+                    self.logger.log(f"item[{idx}]: {error_msg}", 'error')
+                item = {
+                    "index": idx,
+                    "cif_input": cif_content,
+                    **_build_result(status='error', error=error_msg),
+                }
+                results.append(item)
         
         if self.logger:
-            successful = sum(1 for r in results.values() if r['status'] == 'ok')
+            successful = sum(1 for r in results if r['status'] == 'ok')
             self.logger.log(
                 f"SynthNN prediction complete: {successful}/{len(results)} successful",
                 'info'
             )
-        
-        return results
+
+        return {"source": self.source, "results": results}
+
+    def _extract_cif_strings(self, input_data):
+        """Extract valid CIF strings from direct list input."""
+        if isinstance(input_data, list):
+            return [s for s in input_data if isinstance(s, str) and s.strip()]
+        return []

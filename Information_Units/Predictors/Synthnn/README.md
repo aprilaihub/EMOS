@@ -96,7 +96,7 @@ Uses a threshold rule:
 ## Notes
 
 - Predictions based on real SynthNN model from [antoniuk1/SynthNN](https://github.com/antoniuk1/SynthNN)
-- Output properties are registered in `property_mappings.json`
+- Output properties are registered in modular files under `property_mappings/`
 - All properties validated at initialization
 
 ## Related Documentation

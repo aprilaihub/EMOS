@@ -1,1 +1,0 @@
-# MatGAN Generator Implementation

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from typing import Any, Generator, Optional
 
@@ -80,13 +81,13 @@ class MattergenGenerator(BaseGenerator):
                 f"crystal structures (container unreachable: {exc})."
             )
 
-    def generate(self, inputs: dict) -> dict:
+    def generate(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Generate crystal structures by calling the MatterGen container.
 
         Parameters
         ----------
-        inputs : dict
+        inputs : dict[str, Any]
             Accepted keys (all optional except that at least one of
             ``pretrained_name`` / ``model_path`` must be set):
 
@@ -105,12 +106,13 @@ class MattergenGenerator(BaseGenerator):
 
         Returns
         -------
-        dict
+        dict[str, Any]
             ``{"job_id": ..., "status": ..., "message": ...,
             "num_structures": ..., "structures": [...]}``
         """
         if self.logger:
             self.logger.log("MatterGen: sending generation request to container", "info")
+        queries = self._normalise_queries(inputs)
 
         # ---- check health first ----
         if not self.is_healthy():
@@ -120,7 +122,13 @@ class MattergenGenerator(BaseGenerator):
             )
             if self.logger:
                 self.logger.log(msg, "error")
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
         # ---- demo shortcut: call /demo/generate, skip payload build ----
         if inputs.get("pretrained_name") == "demo":
@@ -132,7 +140,7 @@ class MattergenGenerator(BaseGenerator):
                     timeout=30,
                 )
                 resp.raise_for_status()
-                result = resp.json()
+                result = self._enrich_result(resp.json(), queries)
                 if self.logger:
                     self.logger.log(
                         f"MatterGen demo: {result.get('num_structures', 0)} structure(s)",
@@ -143,28 +151,16 @@ class MattergenGenerator(BaseGenerator):
                 msg = f"MatterGen demo: HTTP error — {exc}"
                 if self.logger:
                     self.logger.log(msg, "error")
-                return {"status": "error", "message": msg}
+                return {
+                    "status": "error",
+                    "message": msg,
+                    "source": self.generator_name,
+                    "queries": queries,
+                    "cif_strings": [],
+                }
 
         # ---- build request payload ----
-        payload = {
-            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
-            "batch_size": int(inputs.get("batch_size", 64)),
-            "num_batches": int(inputs.get("num_batches", 1)),
-            "record_trajectories": inputs.get("record_trajectories", True),
-        }
-
-        if inputs.get("model_path"):
-            payload["model_path"] = inputs["model_path"]
-            payload["pretrained_name"] = None
-
-        if inputs.get("properties_to_condition_on"):
-            payload["properties_to_condition_on"] = inputs["properties_to_condition_on"]
-
-        if inputs.get("target_compositions"):
-            payload["target_compositions"] = inputs["target_compositions"]
-
-        if inputs.get("diffusion_guidance_factor") is not None:
-            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+        payload = self._build_payload(inputs)
 
         # ---- call the container ----
         try:
@@ -174,9 +170,7 @@ class MattergenGenerator(BaseGenerator):
                 timeout=self.timeout,
             )
             resp.raise_for_status()
-            result = resp.json()
-
-            print(resp)
+            result = self._enrich_result(resp.json(), queries)
 
 
             if self.logger:
@@ -192,7 +186,13 @@ class MattergenGenerator(BaseGenerator):
                 self.logger.log(msg, "error")
             # Invalidate health cache so next call re-checks
             MattergenGenerator._health_cache["healthy"] = None
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
         except requests.RequestException as exc:
             msg = f"MatterGen: HTTP error — {exc}"
@@ -200,7 +200,13 @@ class MattergenGenerator(BaseGenerator):
                 self.logger.log(msg, "error")
             # Invalidate health cache so next call re-checks
             MattergenGenerator._health_cache["healthy"] = None
-            return {"status": "error", "message": msg}
+            return {
+                "status": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+                "cif_strings": [],
+            }
 
     # ------------------------------------------------------------------
     # Streaming generation — SSE bridge
@@ -218,6 +224,7 @@ class MattergenGenerator(BaseGenerator):
         """
         if self.logger:
             self.logger.log("MatterGen: sending streaming generation request", "info")
+        queries = self._normalise_queries(inputs)
 
         # Health check
         if not self.is_healthy():
@@ -227,7 +234,12 @@ class MattergenGenerator(BaseGenerator):
             )
             if self.logger:
                 self.logger.log(msg, "error")
-            yield {"event": "error", "message": msg}
+            yield {
+                "event": "error",
+                "message": msg,
+                "source": self.generator_name,
+                "queries": queries,
+            }
             yield {"event": "done", "message": "Stream ended"}
             return
 
@@ -239,30 +251,21 @@ class MattergenGenerator(BaseGenerator):
             try:
                 resp = requests.post(f"{self.api_url}/demo/generate", timeout=30)
                 resp.raise_for_status()
-                result = resp.json()
+                result = self._enrich_result(resp.json(), queries)
                 result["event"] = "result"
                 yield result
             except requests.RequestException as exc:
-                yield {"event": "error", "message": f"MatterGen demo: HTTP error — {exc}"}
+                yield {
+                    "event": "error",
+                    "message": f"MatterGen demo: HTTP error — {exc}",
+                    "source": self.generator_name,
+                    "queries": queries,
+                }
             yield {"event": "done", "message": "Stream ended"}
             return
 
-        # Build payload (same as generate())
-        payload = {
-            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
-            "batch_size": int(inputs.get("batch_size", 64)),
-            "num_batches": int(inputs.get("num_batches", 1)),
-            "record_trajectories": inputs.get("record_trajectories", True),
-        }
-        if inputs.get("model_path"):
-            payload["model_path"] = inputs["model_path"]
-            payload["pretrained_name"] = None
-        if inputs.get("properties_to_condition_on"):
-            payload["properties_to_condition_on"] = inputs["properties_to_condition_on"]
-        if inputs.get("target_compositions"):
-            payload["target_compositions"] = inputs["target_compositions"]
-        if inputs.get("diffusion_guidance_factor") is not None:
-            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+        # Build payload (same shape as generate())
+        payload = self._build_payload(inputs)
 
         # Call the streaming endpoint
         try:
@@ -277,7 +280,12 @@ class MattergenGenerator(BaseGenerator):
             if self.logger:
                 self.logger.log(f"MatterGen: stream request failed — {exc}", "error")
             MattergenGenerator._health_cache["healthy"] = None
-            yield {"event": "error", "message": f"MatterGen stream request failed: {exc}"}
+            yield {
+                "event": "error",
+                "message": f"MatterGen stream request failed: {exc}",
+                "source": self.generator_name,
+                "queries": queries,
+            }
             yield {"event": "done", "message": "Stream ended"}
             return
 
@@ -304,6 +312,16 @@ class MattergenGenerator(BaseGenerator):
                 current_data_lines = []
                 try:
                     data = json.loads(data_str)
+                    if current_event == "result" and isinstance(data, dict):
+                        data = self._enrich_result(data, queries)
+                    if current_event == "log" and isinstance(data, dict):
+                        progress = self._extract_progress_fraction(data.get("message", ""))
+                        if progress is not None:
+                            yield {
+                                "event": "progress",
+                                "progress": progress,
+                                "message": data.get("message", ""),
+                            }
                     data["event"] = current_event
                     yield data
                 except json.JSONDecodeError:
@@ -315,10 +333,167 @@ class MattergenGenerator(BaseGenerator):
             data_str = "\n".join(current_data_lines)
             try:
                 data = json.loads(data_str)
+                if current_event == "result" and isinstance(data, dict):
+                    data = self._enrich_result(data, queries)
+                if current_event == "log" and isinstance(data, dict):
+                    progress = self._extract_progress_fraction(data.get("message", ""))
+                    if progress is not None:
+                        yield {
+                            "event": "progress",
+                            "progress": progress,
+                            "message": data.get("message", ""),
+                        }
                 data["event"] = current_event
                 yield data
             except json.JSONDecodeError:
                 yield {"event": "log", "message": data_str, "level": "warning"}
+
+    def _normalise_queries(self, inputs: Optional[dict]) -> dict:
+        """Return caller-provided generation inputs in a stable dict shape."""
+        if not isinstance(inputs, dict):
+            return {}
+        return {k: v for k, v in inputs.items() if v is not None}
+
+    def _extract_progress_fraction(self, message: str) -> Optional[float]:
+        """Parse MatterGen diffusion-step logs into a progress fraction."""
+        if not isinstance(message, str):
+            return None
+
+        percent_match = re.search(r"Diffusion step\s+\d+\s*/\s*\d+\s*\((\d+)%\)", message)
+        if percent_match:
+            try:
+                pct = int(percent_match.group(1))
+                return max(0.0, min(1.0, pct / 100.0))
+            except ValueError:
+                return None
+
+        step_match = re.search(r"Diffusion step\s+(\d+)\s*/\s*(\d+)", message)
+        if step_match:
+            try:
+                step = int(step_match.group(1))
+                total = int(step_match.group(2))
+            except ValueError:
+                return None
+            if total > 0:
+                return max(0.0, min(1.0, step / total))
+
+        return None
+
+    def _build_payload(self, inputs: Optional[dict]) -> dict[str, Any]:
+        """Translate EMOS IU-style inputs into the MatterGen API request payload."""
+        inputs = inputs or {}
+        payload = {
+            "pretrained_name": inputs.get("pretrained_name", "mattergen_base"),
+            "batch_size": int(inputs.get("batch_size", 64)),
+            "num_batches": int(inputs.get("num_batches", 1)),
+            "record_trajectories": inputs.get("record_trajectories", True),
+        }
+
+        if inputs.get("model_path"):
+            payload["model_path"] = inputs["model_path"]
+            payload["pretrained_name"] = None
+
+        target_compositions = self._normalise_target_compositions(inputs.get("target_compositions"))
+        if target_compositions:
+            payload["target_compositions"] = target_compositions
+
+        properties = self._normalise_conditioning_properties(inputs)
+        if properties:
+            payload["properties_to_condition_on"] = properties
+
+        if inputs.get("diffusion_guidance_factor") is not None:
+            payload["diffusion_guidance_factor"] = float(inputs["diffusion_guidance_factor"])
+
+        return payload
+
+    def _normalise_conditioning_properties(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        """Collect property-conditioning inputs while excluding transport/meta fields."""
+        explicit = inputs.get("properties_to_condition_on")
+        if isinstance(explicit, dict) and explicit:
+            return explicit
+
+        excluded = {
+            "pretrained_name",
+            "model_path",
+            "batch_size",
+            "num_batches",
+            "record_trajectories",
+            "target_compositions",
+            "diffusion_guidance_factor",
+        }
+        props: dict[str, Any] = {}
+        for key, value in inputs.items():
+            if key in excluded or value is None or value == "":
+                continue
+            props[key] = value
+        return props
+
+    def _normalise_target_compositions(self, raw: Any) -> Optional[list[dict[str, int]]]:
+        """Accept IU contract text input and convert it to MatterGen composition dicts."""
+        if raw is None:
+            return None
+
+        if isinstance(raw, list):
+            # Already in API-native shape.
+            return raw
+
+        if isinstance(raw, str):
+            text = raw.strip()
+            if not text:
+                return None
+
+            parsed: list[dict[str, int]] = []
+            for token in text.split(","):
+                formula = token.strip()
+                if not formula:
+                    continue
+                comp = self._formula_to_count_dict(formula)
+                if comp:
+                    parsed.append(comp)
+                elif self.logger:
+                    self.logger.log(
+                        f"MatterGen: ignoring invalid composition token '{formula}'",
+                        "warning",
+                    )
+
+            return parsed or None
+
+        if self.logger:
+            self.logger.log(
+                "MatterGen: unsupported target_compositions format; expected string or list",
+                "warning",
+            )
+        return None
+
+    def _formula_to_count_dict(self, formula: str) -> Optional[dict[str, int]]:
+        """Parse simple chemical formulas like Fe, Al2O3, GaAs into element counts."""
+        matches = list(re.finditer(r"([A-Z][a-z]?)(\d*)", formula))
+        if not matches:
+            return None
+
+        consumed = "".join(m.group(0) for m in matches)
+        if consumed != formula:
+            return None
+
+        counts: dict[str, int] = {}
+        for match in matches:
+            element = match.group(1)
+            count = int(match.group(2)) if match.group(2) else 1
+            counts[element] = counts.get(element, 0) + count
+
+        return counts or None
+
+    def _enrich_result(self, result: Any, queries: dict) -> dict:
+        """Attach consistent metadata fields to generation results."""
+        if not isinstance(result, dict):
+            result = {"status": "error", "message": "Invalid generator response type"}
+        if "source" not in result:
+            result["source"] = self.generator_name
+        if "queries" not in result or not isinstance(result.get("queries"), dict):
+            result["queries"] = dict(queries)
+        if "cif_strings" not in result or not isinstance(result.get("cif_strings"), list):
+            result["cif_strings"] = []
+        return result
 
     # ------------------------------------------------------------------
     # Extra helpers (not part of BaseGenerator but useful for the UI)
