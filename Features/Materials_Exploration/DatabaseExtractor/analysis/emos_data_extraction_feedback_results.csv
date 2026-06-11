@@ -1,0 +1,6 @@
+Application Scenario,Chosen Databases,Target Compositions,Chosen Properties,Retrieval Mode,Number of Candidate Materials Extracted,Time Consumed (s)
+Wide-bandgap materials discovery,AFLOW + JARVIS-DFT + Alexandria,AlN,band_gap: 2.0 to 6.5; nelements: 2 to 2,lenient,44,62.12
+Semiconductor channel material pre-screening,JARVIS-DFT + Alexandria,GaAs,band_gap: 0.8 to 2.2; hull_distance: 0.0 to 0.2,lenient,28,17.98
+Thermal/mechanical materials shortlist,AFLOW + JARVIS-DFT + MatHub3D + Alexandria,SiC,band_gap: 2.0 to 8.0; bulk_modulus: 100 to 500,lenient,96,125.37
+Photocatalytic oxide screening (strict),AFLOW + JARVIS-DFT,TiO2,band_gap: 0.0 to 6.0; nelements: 2 to 2,strict,152,160.56
+UV photodetector semiconductor (strict),JARVIS-DFT + Alexandria,ZnO,band_gap: 0.0 to 5.0; formation_energy_per_atom: -5.0 to 0.0,strict,160,19.49

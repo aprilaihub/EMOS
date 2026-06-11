@@ -1,10 +1,13 @@
 # MOSFET evaluator
 
-Evaluate MOSFET performance from uploaded CIF files and simulation parameters
+2D Poisson and drift-diffusion solver for MOSFET evaluation from simulation parameters
 
 ## Overview
 
 This feature provides mosfet evaluator functionality within the EMOS platform.
+The runtime solver is pure Python (`pdd_solver_python`) with no MATLAB dependency.
+Its physics model is ported from the educational drift-diffusion MATLAB source by
+Chien-Ting Tung (UC Berkeley): http://yrwu-wk.ee.ntu.edu.tw/index.php/teaching-course/
 
 ## Key Methods
 
@@ -17,27 +20,28 @@ This feature provides mosfet evaluator functionality within the EMOS platform.
 
 ## Input Parameters
 
-- **CIF Files**: Browse and upload one or more CIF files for MOSFET evaluation
-- **Device Type**: MOSFET device polarity
 - **Channel Length (nm)**: Channel length for simulation
-- **Channel Width (nm)**: Channel width for simulation
+- **Source/Drain Length (nm)**: Source and drain extension length
 - **Oxide Thickness (nm)**: Gate oxide thickness
-- **Supply Voltage VDD (V)**: Supply voltage
+- **Channel Thickness (nm)**: Channel thickness
 - **Gate Work Function (eV)**: Gate work function
+- **Source/Drain Work Function (eV)**: Source/drain work function
+- **Channel Doping (cm^-3)**: Channel doping concentration
 - **Source/Drain Doping (cm^-3)**: Source and drain doping concentration
 - **Temperature (K)**: Simulation temperature
-- **Drain Voltage VD (V)**: Drain voltage
+- **Mesh dx, dy (m)**: Spatial discretization steps
 - **Gate Sweep Start (V)**: Start voltage for gate sweep
 - **Gate Sweep Stop (V)**: Stop voltage for gate sweep
-- **Gate Sweep Step (V)**: Step size for gate sweep
-- **Validate Band Gap from CIF**: Validate band gap using uploaded CIF files
-- **Validate Electron Mobility from CIF**: Validate electron mobility using uploaded CIF files
-- **Validate Hole Mobility from CIF**: Validate hole mobility using uploaded CIF files
-- **Validate Dielectric Constant from CIF**: Validate dielectric constant using uploaded CIF files
+- **Gate Sweep Points (Nvg)**: Number of gate sweep points
+- **Drain Sweep Start/Stop (V)**: Drain sweep range
+- **Drain Sweep Points (Nvd)**: Number of drain sweep points
+- **Channel and Insulator Material Parameters**: Nc, Nv, permittivity, mobilities, affinity, bandgap, saturation velocity
 
 ## Output Parameters
 
-- **Download Results (JSON)**: Download JSON file containing MOSFET simulation performance for each uploaded CIF file
+- **Key Metrics**: Id(on), Id(off), Vth (approx), Ion/Ioff ratio
+- **Characteristic Curve**: Id/W vs Vd at representative Vgs values
+- **Download Results (JSON)**: Exhaustive simulation output for detailed analysis
 
 ## Usage
 
