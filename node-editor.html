@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMOS - Node Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="images/logo_dark.svg" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="navigation.css">
+    <link rel="stylesheet" href="node-editor.css">
+    <!-- 3Dmol.js for CIF viewer nodes -->
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <script>
+    // EMOS Intelligent Backend Detection System (same as index.html)
+    (async function() {
+        const BACKENDS = {
+            local: 'http://localhost:5001',
+            render: 'https://emos-backend.onrender.com'
+        };
+
+        let selectedBackend = 'render';
+        let detectionMethod = 'default';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const backendParam = urlParams.get('backend');
+
+        if (backendParam && BACKENDS[backendParam]) {
+            selectedBackend = backendParam;
+            detectionMethod = 'url_parameter';
+            localStorage.setItem('emos_backend_preference', backendParam);
+        } else {
+            const savedPreference = localStorage.getItem('emos_backend_preference');
+            if (savedPreference && BACKENDS[savedPreference]) {
+                selectedBackend = savedPreference;
+                detectionMethod = 'saved_preference';
+            }
+        }
+
+        if (detectionMethod === 'default' || detectionMethod === 'saved_preference') {
+            try {
+                const response = await fetch(BACKENDS.local + '/api/health', {
+                    method: 'GET',
+                    mode: 'cors',
+                    signal: AbortSignal.timeout(2000)
+                });
+                if (response.ok) {
+                    selectedBackend = 'local';
+                    detectionMethod = detectionMethod === 'default' ? 'auto_detected' : 'saved_preference_verified';
+                }
+            } catch (error) {
+                if (detectionMethod === 'saved_preference' && selectedBackend === 'local') {
+                    selectedBackend = 'render';
+                    detectionMethod = 'auto_fallback';
+                }
+            }
+        }
+
+        window.EMOS_BACKEND_BASE_URL = BACKENDS[selectedBackend];
+        console.log(`🔌 Backend: ${selectedBackend} (${BACKENDS[selectedBackend]}) [${detectionMethod}]`);
+    })();
+    </script>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="nav-menu" id="navMenu">
+        <div class="nav-header">
+            <img src="images/logo.svg" width="40" height="40" alt="EMOS Logo">
+            <span>EMOS</span>
+            <button class="nav-close" id="navClose">&times;</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">EMOS App</a></li>
+            <li><a href="node-editor.html" class="active">Node Editor</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="team.html">Team</a></li>
+            <li><a href="documentation.html">Documentation</a></li>
+        </ul>
+    </nav>
+
+    <!-- Menu Toggle Button -->
+    <button class="nav-toggle" id="navToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Main Layout -->
+    <div class="node-editor-layout">
+        <!-- Sidebar -->
+        <aside class="ne-sidebar" id="neSidebar">
+            <div class="ne-sidebar-header">
+                <h2>Information Units</h2>
+            </div>
+            <div class="ne-sidebar-section" data-category="databases">
+                <h3>📁 Databases</h3>
+                <div class="ne-sidebar-items" id="sidebarDatabases"></div>
+            </div>
+            <div class="ne-sidebar-section" data-category="generators">
+                <h3>⚙️ Generators</h3>
+                <div class="ne-sidebar-items" id="sidebarGenerators"></div>
+            </div>
+            <div class="ne-sidebar-section" data-category="predictors">
+                <h3>🔮 Predictors</h3>
+                <div class="ne-sidebar-items" id="sidebarPredictors"></div>
+            </div>
+            <div class="ne-sidebar-section" data-category="viewers">
+                <h3>👁️ Viewers</h3>
+                <div class="ne-sidebar-items">
+                    <div class="ne-sidebar-item" draggable="true"
+                         data-node-type="viewer" data-node-key="cif_viewer"
+                         title="3D crystal structure viewer using 3Dmol.js">
+                        CIF Viewer
+                    </div>
+                    <div class="ne-sidebar-item" draggable="true"
+                         data-node-type="viewer" data-node-key="text_viewer"
+                         title="Display any output as formatted text">
+                        Text Viewer
+                    </div>
+                </div>
+            </div>
+            <div class="ne-sidebar-section" data-category="utility">
+                <h3>🔧 Utility</h3>
+                <div class="ne-sidebar-items">
+                    <div class="ne-sidebar-item" draggable="true"
+                         data-node-type="utility" data-node-key="filter"
+                         title="Filter structures by predicted property values">
+                        Filter
+                    </div>
+                    <div class="ne-sidebar-item" draggable="true"
+                         data-node-type="utility" data-node-key="lambda"
+                         title="Custom Python transform — runs on the server">
+                        Lambda
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <main class="ne-canvas-container" id="neCanvasContainer">
+            <!-- SVG layer for wires -->
+            <svg class="ne-wires-svg" id="neWiresSvg"></svg>
+            <!-- Nodes are appended here dynamically -->
+            <div class="ne-canvas" id="neCanvas"></div>
+
+            <!-- Bottom Toolbar -->
+            <div class="ne-toolbar" id="neToolbar">
+                <button class="ne-toolbar-btn ne-process-btn" id="neProcessBtn" title="Execute pipeline">
+                    ▶ Process
+                </button>
+                <button class="ne-toolbar-btn ne-cancel-btn" id="neCancelBtn" title="Cancel execution" style="display:none;">
+                    ✕ Cancel
+                </button>
+                <span class="ne-toolbar-status" id="neStatusText">Ready</span>
+                <span class="ne-toolbar-zoom" id="neZoomText">100%</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Context Menu (right-click) -->
+    <div class="ne-context-menu" id="neContextMenu" style="display:none;">
+        <div class="ne-context-item" data-action="delete">🗑 Delete Node</div>
+    </div>
+
+    <script src="navigation.js"></script>
+    <script src="node-editor.js"></script>
+</body>
+</html>

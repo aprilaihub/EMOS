@@ -187,6 +187,14 @@
         "folder_path": "Information_Units/Predictors/Gbfs2d",
         "class_name": "Gbfs2dPredictor",
         "file_name": "Gbfs2dPredictor.py"
+      },
+      {
+        "id": "amd",
+        "name": "AMD",
+        "display_name": "AMD",
+        "description": "AMD predictor",
+        "folder_path": "Information_Units/Predictors/AMD",
+        "class_name": "AMDPredictor"
       }
     ]
   },
