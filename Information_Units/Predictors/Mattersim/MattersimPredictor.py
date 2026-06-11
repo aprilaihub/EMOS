@@ -27,6 +27,7 @@ from typing import Any, Dict, List
 import requests
 
 from Information_Units.Predictors.BasePredictor import BasePredictor
+from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
 # ---------------------------------------------------------------------------
@@ -39,6 +40,14 @@ _DEFAULT_TIMEOUT = 600  # seconds
 class MattersimPredictor(BasePredictor):
     """Client-side interface to the containerised MatterSim service."""
 
+    # All possible output properties that MatterSim can produce
+    OUTPUT_PROPERTIES = (
+        'energy', 'forces', 'stress',
+        'num_atoms',
+        'relaxed_energy', 'relaxed_forces', 'relaxed_stress', 'relaxed_cif',
+        'relaxed_structure', 'relaxed_cell'
+    )
+
     # Class-level health cache shared across instances
     _health_cache: dict = {"healthy": None, "checked_at": 0.0}
     _HEALTH_CACHE_TTL = 120  # seconds — only re-check health every 2 minutes
@@ -48,10 +57,16 @@ class MattersimPredictor(BasePredictor):
         self.source = "mattersim"
         self.api_url = os.getenv("MATTERSIM_API_URL", _DEFAULT_API_URL).rstrip("/")
         self.timeout = int(os.getenv("MATTERSIM_TIMEOUT", _DEFAULT_TIMEOUT))
-
-    # ------------------------------------------------------------------
-    # BasePredictor interface
-    # ------------------------------------------------------------------
+        
+        # Load and validate property mappings
+        self._mapped_output_properties = self._load_mapped_output_properties()
+        self._check_output_properties_in_mapping({prop: None for prop in self.OUTPUT_PROPERTIES})
+        
+        if self.logger:
+            self.logger.log(
+                f"Initialized MatterSim predictor with {len(self.OUTPUT_PROPERTIES)} possible output properties",
+                'info'
+            )
 
     def info(self) -> str:
         """Return model metadata from the container, or a fallback string."""
@@ -70,6 +85,47 @@ class MattersimPredictor(BasePredictor):
                 "forces, stress calculations and structure relaxation. "
                 f"(container unreachable: {exc})"
             )
+
+    # ------------------------------------------------------------------
+    # Property Mapping Validation
+    # ------------------------------------------------------------------
+
+    def _load_mapped_output_properties(self) -> set:
+        """Load MatterSim output properties from modular property mapping files."""
+        try:
+            source_mapping = load_source_property_mapping(source='mattersim', source_type='predictors')
+        except Exception as e:
+            raise RuntimeError(f"Failed to load modular MatterSim property mappings: {str(e)}") from e
+
+        mapped = set()
+        for prop_name, ms_info in source_mapping.items():
+            if isinstance(ms_info, dict) and ms_info.get('predictable'):
+                mapped.add(prop_name)
+
+        return mapped
+
+    def _check_output_properties_in_mapping(self, properties: dict) -> None:
+        """Ensure all declared OUTPUT_PROPERTIES are in the MatterSim mapping."""
+        missing = sorted(set(properties.keys()) - self._mapped_output_properties)
+        if missing:
+            raise ValueError(
+                "MatterSim output properties missing in modular property mappings: "
+                + ", ".join(missing)
+            )
+
+    def _validate_and_filter_properties(self, properties: dict) -> dict:
+        """Validate that all properties in result are declared, then return filtered dict."""
+        undeclared = sorted(set(properties.keys()) - self._mapped_output_properties)
+        if undeclared:
+            raise ValueError(
+                "MatterSim result contains undeclared properties: " + ", ".join(undeclared)
+            )
+        return properties
+
+    # ------------------------------------------------------------------
+    # BasePredictor interface
+    # ------------------------------------------------------------------
+
 
     def predict(self, input_data: list[str], **options: Any) -> Dict[str, Any]:
         """
@@ -159,22 +215,14 @@ class MattersimPredictor(BasePredictor):
                 result = resp.json()
 
                 properties = result.get("properties", {}) if isinstance(result, dict) else {}
-                output_dir = options.get("output_dir")
-                if output_dir and properties.get("relaxed_cif_string"):
-                    relaxed_cif_path = self._save_relaxed_cif(
-                        cif_string=properties["relaxed_cif_string"],
-                        cif_filename=f"structure_{idx}.cif",
-                        output_dir=output_dir,
-                    )
-                    properties["relaxed_cif"] = relaxed_cif_path
-                    properties.pop("relaxed_cif_string", None)
+                properties = self._normalize_properties(properties, idx, output_dir=options.get("output_dir"))
 
                 results.append(
                     {
                         "index": idx,
                         "cif_input": cif_string,
                         "status": result.get("status", "ok"),
-                        "properties": properties,
+                        "properties": self._validate_and_filter_properties(properties),
                         "warnings": result.get("warnings", []),
                         "error": result.get("error"),
                     }
@@ -213,6 +261,26 @@ class MattersimPredictor(BasePredictor):
         if isinstance(input_data, list):
             return [s for s in input_data if isinstance(s, str) and s.strip()]
         return []
+
+    def _normalize_properties(self, properties: dict, index: int, output_dir: str | None = None) -> dict:
+        """Normalize transport-only MatterSim fields into the public predictor schema."""
+        normalized = dict(properties)
+        normalized.pop("cell", None)
+        normalized.pop("positions", None)
+        normalized.pop("atomic_numbers", None)
+        relaxed_cif_string = normalized.pop("relaxed_cif_string", None)
+
+        if relaxed_cif_string:
+            if output_dir:
+                normalized["relaxed_cif"] = self._save_relaxed_cif(
+                    cif_string=relaxed_cif_string,
+                    cif_filename=f"structure_{index}.cif",
+                    output_dir=output_dir,
+                )
+            else:
+                normalized.setdefault("relaxed_cif", relaxed_cif_string)
+
+        return normalized
 
     # ------------------------------------------------------------------
     # Health check

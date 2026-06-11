@@ -1,0 +1,46 @@
+# generated using pymatgen
+data_MgTi4MnZnNiO12
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   5.05116093
+_cell_length_b   5.45006217
+_cell_length_c   8.75649431
+_cell_angle_alpha   105.48620423
+_cell_angle_beta   90.00749408
+_cell_angle_gamma   117.48339720
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   MgTi4MnZnNiO12
+_chemical_formula_sum   'Mg1 Ti4 Mn1 Zn1 Ni1 O12'
+_cell_volume   203.93356599
+_cell_formula_units_Z   1
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Mg  Mg0  1  0.53205093  0.06193999  0.18071980  1
+  Ti  Ti1  1  0.71516434  0.43941790  0.57210716  1
+  Ti  Ti2  1  0.22158325  0.43418457  0.07324409  1
+  Ti  Ti3  1  0.78432368  0.56529278  0.93124639  1
+  Ti  Ti4  1  0.28080333  0.56515709  0.42378316  1
+  Mn  Mn5  1  0.46327903  0.92819662  0.82026510  1
+  Zn  Zn6  1  0.04039294  0.08093644  0.67680580  1
+  Ni  Ni7  1  0.97704646  0.95290562  0.32572179  1
+  O  O8  1  0.51730942  0.73917891  0.28050818  1
+  O  O9  1  0.00518149  0.73528293  0.78045183  1
+  O  O10  1  0.03095665  0.73749703  0.46977446  1
+  O  O11  1  0.53543378  0.73853623  0.97655629  1
+  O  O12  1  0.06375213  0.73982547  0.11880818  1
+  O  O13  1  0.55798606  0.73520083  0.61207270  1
+  O  O14  1  0.99275961  0.25523764  0.21896088  1
+  O  O15  1  0.49194158  0.26127374  0.71944840  1
+  O  O16  1  0.46518721  0.25822764  0.02495809  1
+  O  O17  1  0.95782640  0.25603927  0.52122131  1
+  O  O18  1  0.42876690  0.25384782  0.38688195  1
+  O  O19  1  0.93825981  0.26182248  0.88646345  1

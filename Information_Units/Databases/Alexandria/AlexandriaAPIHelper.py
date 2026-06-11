@@ -71,6 +71,13 @@ class AlexandriaAPIHelper:
             'fractional_site_positions',
             'species',
         ]
+        mapped_fields = sorted(
+            {
+                prop.get('name')
+                for prop in self.property_mapping.values()
+                if prop.get('name')
+            }
+        )
 
         try:
             response = requests.get(
@@ -108,6 +115,7 @@ class AlexandriaAPIHelper:
 
             response_fields = [field for field in baseline_fields if field in supported_fields]
             response_fields.extend([field for field in optional_fields if field in supported_fields])
+            response_fields.extend([field for field in mapped_fields if field in supported_fields])
 
             if not response_fields:
                 response_fields = baseline_fields
@@ -319,7 +327,8 @@ class AlexandriaAPIHelper:
             if elements:
                 if len(elements) == 1:
                     return f'elements HAS "{elements[0]}"'
-                return "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
+                elements_filter = "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
+                return f'{elements_filter} AND nelements = {len(elements)}'
         except Exception:
             pass
 

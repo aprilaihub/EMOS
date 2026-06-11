@@ -1,0 +1,46 @@
+# generated using pymatgen
+data_NaCaScZn(SiO3)4
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   5.30561439
+_cell_length_b   6.66389061
+_cell_length_c   6.66389060
+_cell_angle_alpha   84.65841396
+_cell_angle_beta   78.08278995
+_cell_angle_gamma   78.08278990
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   NaCaScZn(SiO3)4
+_chemical_formula_sum   'Na1 Ca1 Sc1 Zn1 Si4 O12'
+_cell_volume   225.24860934
+_cell_formula_units_Z   1
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Na  Na0  1  0.50000000  0.30145564  0.69854436  1
+  Ca  Ca1  1  -0.00000000  0.69834682  0.30165318  1
+  Sc  Sc2  1  0.00000000  0.09900169  0.90099831  1
+  Zn  Zn3  1  0.50000000  0.90193627  0.09806373  1
+  Si  Si4  1  0.51341932  0.37997813  0.19723527  1
+  Si  Si5  1  0.48658068  0.80276473  0.62002187  1
+  Si  Si6  1  0.98878603  0.62056372  0.80220822  1
+  Si  Si7  1  0.01121397  0.19779178  0.37943628  1
+  O  O8  1  0.74675696  0.36922001  0.33477171  1
+  O  O9  1  0.25324304  0.66522829  0.63077999  1
+  O  O10  1  0.75993370  0.63819654  0.66121839  1
+  O  O11  1  0.24006630  0.33878161  0.36180346  1
+  O  O12  1  0.42617202  0.61206293  0.11191812  1
+  O  O13  1  0.57382798  0.88808188  0.38793707  1
+  O  O14  1  0.06220795  0.38909923  0.89293943  1
+  O  O15  1  0.93779205  0.10706057  0.61090077  1
+  O  O16  1  0.60673702  0.20017492  0.03448555  1
+  O  O17  1  0.39326298  0.96551445  0.79982508  1
+  O  O18  1  0.90131960  0.79576121  0.97101943  1
+  O  O19  1  0.09868040  0.02898057  0.20423879  1

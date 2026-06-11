@@ -21,6 +21,39 @@ class MaterialsprojectAPIHelper:
         self.base_url = base_url
         self.logger = logger
         self.property_mapping = self._load_property_mapping()
+        self.response_fields = self._build_response_fields()
+
+    def _build_response_fields(self) -> str:
+        """Build response_fields including mapped retrievable properties."""
+        baseline_fields = [
+            'id',
+            'lattice_vectors',
+            'cartesian_site_positions',
+            'species_at_sites',
+            'species',
+            'chemical_formula_reduced',
+            'nelements',
+            'nperiodic_dimensions',
+            'elements',
+            'last_modified',
+            'type',
+        ]
+
+        mapped_fields = []
+        for prop in self.property_mapping.values():
+            name = prop.get('name')
+            if not name:
+                continue
+            # OPTIMADE response_fields only accepts top-level attribute keys.
+            # For dotted mapped paths (e.g. _mp_stability.r2scan.energy_above_hull),
+            # request the top-level object and extract nested values later.
+            top_level_name = name.split('.', 1)[0]
+            if top_level_name and top_level_name not in baseline_fields:
+                mapped_fields.append(top_level_name)
+
+        # Keep deterministic ordering and avoid duplicates.
+        all_fields = baseline_fields + sorted(set(mapped_fields))
+        return ','.join(all_fields)
 
     def _load_property_mapping(self) -> dict:
         """
@@ -104,15 +137,7 @@ class MaterialsprojectAPIHelper:
                 params = {
                     'page_limit': page_limit,
                     'page_offset': page_offset,
-                    'response_fields': (
-                        'lattice_vectors,'
-                        'cartesian_site_positions,'
-                        'species_at_sites,'
-                        'species,'
-                        'chemical_formula_reduced,'
-                        'nelements,'
-                        'nperiodic_dimensions'
-                    )
+                    'response_fields': self.response_fields,
                 }
                 if optimade_filter:
                     params['filter'] = optimade_filter
@@ -227,7 +252,8 @@ class MaterialsprojectAPIHelper:
             if elements:
                 if len(elements) == 1:
                     return f'elements HAS "{elements[0]}"'
-                return "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
+                elements_filter = "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
+                return f'{elements_filter} AND nelements = {len(elements)}'
         except Exception:
             pass
 

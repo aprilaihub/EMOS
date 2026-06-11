@@ -1,27 +1,361 @@
 // Stability Consensus Analysis Feature
 class StabilityConsensusAnalysisFeature extends BaseFeature {
     constructor(featureId) {
-        super(featureId, 'Stability Consensus Analysis', 'Analyze and aggregate stability consensus from uploaded CIF structures');
+        super(featureId, 'Stability Consensus Analysis', 'Query materials databases and run predictors to evaluate multi-source stability');
+        this.uploadedCifFiles = [];
+        this.pendingFileReads = 0;
+        this.selectedCifCount = 0;
     }
 
     createInputsHTML() {
         return `
-            <p>Configure input parameters for Stability Consensus Analysis</p>
             <div class="input-controls">
-                ${this.createFileInput(`cifFiles_${this.featureId}`, 'CIF Files', '.cif')}
+                <div class="form-group">
+                    <label for="cifFile_${this.featureId}">Upload CIF File(s):</label>
+                    <input type="file" id="cifFile_${this.featureId}" accept=".cif" class="file-input" multiple>
+                    <small>Upload one or more crystal structure CIF files</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Databases:</label>
+                    <div id="dbCheckboxes_${this.featureId}" class="checkbox-group">
+                        <label><input type="checkbox" name="database" value="materialsproject"> Materials Project</label>
+                        <label><input type="checkbox" name="database" value="alexandria"> Alexandria</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Predictors:</label>
+                    <div id="predCheckboxes_${this.featureId}" class="checkbox-group">
+                        <label><input type="checkbox" name="predictor" value="mattersim"> MatterSim</label>
+                        <label><input type="checkbox" name="predictor" value="chgnet"> CHGNet</label>
+                    </div>
+                </div>
             </div>
         `;
     }
 
     createOutputsHTML() {
         return `
-            <p>Stability Consensus Analysis results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
-                <div class="output-item">
-                    <strong>Download Results (JSON):</strong> <span id="downloadResultsJson_${this.featureId}">Pending...</span>
+                <div id="resultsTable_${this.featureId}" style="display:none;">
+                    <h3>Stability Consensus Results</h3>
+                    
+                    <div class="consensus-summary" id="consensusSummary_${this.featureId}">
+                        <!-- Summary will be populated here -->
+                    </div>
+
+                    <div id="stabilityPlot_${this.featureId}" style="margin: 14px 0 18px 0;">
+                        <!-- Stacked stability bars will be populated here -->
+                    </div>
+                    
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Stability</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody_${this.featureId}">
+                            <!-- Results rows will be populated here -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="output-controls" style="margin-top: 20px;">
+                        <button class="download-btn" id="downloadJson_${this.featureId}">
+                            📥 Download Results (JSON)
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="pendingMessage_${this.featureId}" style="text-align:center; color:#666;">
+                    <p>Awaiting analysis...</p>
                 </div>
             </div>
         `;
+    }
+
+    attachEventListeners() {
+        // CIF file upload handler
+        const cifInput = document.getElementById(`cifFile_${this.featureId}`);
+        if (cifInput) {
+            cifInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files || []);
+                if (files.length > 0) {
+                    this.uploadedCifFiles = [];
+                    this.selectedCifCount = files.length;
+                    this.pendingFileReads = files.length;
+                    const processBtn = document.getElementById(`processBtn_${this.featureId}`);
+                    if (processBtn) processBtn.disabled = true;
+                    this.addLog(`Loading ${files.length} CIF file(s)...`, 'info');
+                    files.forEach((file) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            this.uploadedCifFiles.push({
+                                name: file.name,
+                                content: event.target.result,
+                            });
+                            this.pendingFileReads -= 1;
+                            this.addLog(`CIF file loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'success');
+                            if (this.pendingFileReads === 0) {
+                                this.addLog(`All ${this.selectedCifCount} CIF file(s) loaded. Ready to process.`, 'success');
+                                if (processBtn) processBtn.disabled = false;
+                            }
+                        };
+                        reader.readAsText(file);
+                    });
+                }
+            });
+        }
+        
+        // Download JSON handler
+        const downloadBtn = document.getElementById(`downloadJson_${this.featureId}`);
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const jsonData = this.results?.downloadResultsJson;
+                if (jsonData) {
+                    const blob = new Blob([jsonData], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'stability-consensus-results.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.addLog('Results downloaded', 'success');
+                }
+            });
+        }
+    }
+
+    async processFeature() {
+        throw new Error('Local fallback is not supported for this feature. Please start the Python backend.');
+    }
+
+    collectInputData() {
+        const inputs = super.collectInputData();
+
+        if (this.pendingFileReads > 0) {
+            throw new Error(`Please wait for all CIF files to finish loading (${this.pendingFileReads} remaining)`);
+        }
+
+        // Inject uploaded CIF file payloads.
+        inputs.cif_files = this.uploadedCifFiles;
+        // Keep backward compatibility for backend paths expecting a single CIF.
+        inputs.cif_file = this.uploadedCifFiles[0]?.content || '';
+
+        const selectedDbs = Array.from(
+            document.querySelectorAll(`#dbCheckboxes_${this.featureId} input[type="checkbox"]:checked`)
+        ).map(cb => ({ value: cb.value, name: cb.parentElement.textContent.trim() }));
+
+        const selectedPreds = Array.from(
+            document.querySelectorAll(`#predCheckboxes_${this.featureId} input[type="checkbox"]:checked`)
+        ).map(cb => ({ value: cb.value, name: cb.parentElement.textContent.trim() }));
+
+        if (selectedDbs.length > 0 || selectedPreds.length > 0) {
+            inputs.active_databases = selectedDbs;
+            inputs.active_predictors = selectedPreds;
+        }
+
+        return inputs;
+    }
+
+    updateOutputs(results = null) {
+        const finalResults = results || this.results;
+        
+        const resultsTable = document.getElementById(`resultsTable_${this.featureId}`);
+        const pendingMsg = document.getElementById(`pendingMessage_${this.featureId}`);
+        const plotDiv = document.getElementById(`stabilityPlot_${this.featureId}`);
+
+        const sourceDisplayNames = {
+            mattersim: 'MatterSim',
+            chgnet: 'CHGNet',
+            materialsproject: 'Materials Project',
+            alexandria: 'Alexandria'
+        };
+
+        const applyStabilityRowColor = (row, stability, status) => {
+            const stabilityText = String(stability || '');
+            const statusText = String(status || '').toLowerCase();
+
+            if (stabilityText.includes('✅')) {
+                row.style.backgroundColor = '#e8f5e9';
+                return;
+            }
+
+            if (statusText === 'not_found' || stabilityText.includes('⚠️') || stabilityText.toLowerCase().includes('not found')) {
+                row.style.backgroundColor = '#eceff1';
+                row.style.color = '#455a64';
+                return;
+            }
+
+            if (stabilityText.includes('❌')) {
+                row.style.backgroundColor = '#ffebee';
+            }
+        };
+
+        const renderStackedPlot = (plotData = {}) => {
+            if (!plotDiv) return;
+            const entries = Object.entries(plotData || {});
+            if (entries.length === 0) {
+                plotDiv.innerHTML = '';
+                return;
+            }
+
+            const rows = entries.map(([source, stats]) => {
+                const stableCount = Number(stats.stable_count || 0);
+                const unstableCount = Number(stats.unstable_count || 0);
+                const errorCount = Number(stats.error_count || 0);
+                const stablePct = Number(stats.stable_pct || 0);
+                const unstablePct = Number(stats.unstable_pct || 0);
+                const errorPct = Number(stats.error_pct || 0);
+                const sourceName = sourceDisplayNames[source] || source;
+                const stableSegment = (stableCount > 0 && stablePct > 0)
+                    ? `
+                            <div style="width:${stablePct}%; background:#2e7d32; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; white-space:nowrap;">
+                                ${stableCount} (${stablePct}%)
+                            </div>
+                        `
+                    : '';
+                const unstableSegment = (unstableCount > 0 && unstablePct > 0)
+                    ? `
+                            <div style="width:${unstablePct}%; background:#c62828; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; white-space:nowrap;">
+                                ${unstableCount} (${unstablePct}%)
+                            </div>
+                        `
+                    : '';
+                const errorSegment = (errorCount > 0 && errorPct > 0)
+                    ? `
+                            <div style="width:${errorPct}%; background:#90a4ae; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; white-space:nowrap;">
+                                ${errorCount} (${errorPct}%)
+                            </div>
+                        `
+                    : '';
+
+                return `
+                    <div style="display:flex; align-items:center; gap:10px; margin:8px 0;">
+                        <div style="min-width:160px; font-weight:600;">${sourceName}</div>
+                        <div style="display:flex; width:100%; max-width:620px; height:28px; border-radius:6px; overflow:hidden; border:1px solid #c8ced8; background:#fff;">
+                            ${stableSegment}
+                            ${unstableSegment}
+                            ${errorSegment}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            plotDiv.innerHTML = `
+                <div style="margin-bottom:6px; font-weight:700;">Stable vs Unstable by Source</div>
+                <div style="font-size:12px; color:#5f6b7a; margin-bottom:8px;">Green = stable, Red = unstable, Grey = not found / error</div>
+                ${rows}
+            `;
+        };
+        
+        if (finalResults.error) {
+            this.addLog(`Error: ${finalResults.error}`, 'error');
+            if (resultsTable) resultsTable.style.display = 'none';
+            if (pendingMsg) pendingMsg.textContent = `Error: ${finalResults.error}`;
+            if (plotDiv) plotDiv.innerHTML = '';
+            return;
+        }
+
+        // Batch mode: render each CIF result as its own grouped section.
+        if (Array.isArray(finalResults.results_per_cif) && finalResults.results_per_cif.length > 0) {
+            if (resultsTable) resultsTable.style.display = 'block';
+            if (pendingMsg) pendingMsg.style.display = 'none';
+
+            const batchSummary = finalResults.batch_summary || {};
+            const summaryDiv = document.getElementById(`consensusSummary_${this.featureId}`);
+            if (summaryDiv) {
+                summaryDiv.innerHTML = `
+                    <div class="summary-box">
+                        <p><strong>Batch Summary:</strong> ${batchSummary.processed_files || 0}/${batchSummary.total_files || 0} processed, ${batchSummary.failed_files || 0} failed</p>
+                        <p><strong>Votes:</strong> ${batchSummary.stable_votes || 0} stable, ${batchSummary.unstable_votes || 0} unstable</p>
+                    </div>
+                `;
+            }
+
+            renderStackedPlot(finalResults.plot_data || {});
+
+            const resultsBody = document.getElementById(`resultsBody_${this.featureId}`);
+            if (resultsBody) {
+                resultsBody.innerHTML = '';
+
+                finalResults.results_per_cif.forEach((entry) => {
+                    const headerRow = document.createElement('tr');
+                    const headerText = entry.error
+                        ? `${entry.cif_name}: Error (${entry.error})`
+                        : `${entry.cif_name} (${entry.composition || 'Unknown composition'})`;
+                    headerRow.innerHTML = `<td style="font-weight:700; background:#f2f4f8;">${headerText}</td>`;
+                    resultsBody.appendChild(headerRow);
+
+                    if (!entry.error) {
+                        Object.entries(entry.sources || {}).forEach(([source, data]) => {
+                            const row = document.createElement('tr');
+                            const stability = data.stability || 'N/A';
+                            const displayName = sourceDisplayNames[source] || source;
+                            const sourceLabel = data.num_matches !== undefined
+                                ? `${displayName} (${data.num_matches} matches)`
+                                : displayName;
+                            row.innerHTML = `<td style="font-weight:bold; font-size:1.05em;">${sourceLabel}: ${stability}</td>`;
+
+                            applyStabilityRowColor(row, stability, data.status);
+                            resultsBody.appendChild(row);
+                        });
+                    }
+                });
+            }
+
+            this.addLog('Batch results displayed', 'success');
+            return;
+        }
+        
+        if (!finalResults.sources) {
+            if (pendingMsg) pendingMsg.textContent = 'No results available';
+            return;
+        }
+        
+        // Display results table
+        if (resultsTable) resultsTable.style.display = 'block';
+        if (pendingMsg) pendingMsg.style.display = 'none';
+        
+        // Populate consensus summary
+        const summary = finalResults.summary || {};
+        const summaryDiv = document.getElementById(`consensusSummary_${this.featureId}`);
+        if (summaryDiv) {
+            summaryDiv.innerHTML = `
+                <div class="summary-box">
+                    <p><strong>Overall Consensus:</strong> ${summary.consensus || 'N/A'}</p>
+                    <p><strong>Sources:</strong> ${summary.stable_count || 0} stable, ${summary.unstable_count || 0} unstable out of ${summary.total_sources || 0}</p>
+                </div>
+            `;
+        }
+
+        renderStackedPlot(finalResults.plot_data || {});
+        
+        // Populate results table
+        const resultsBody = document.getElementById(`resultsBody_${this.featureId}`);
+        if (resultsBody) {
+            resultsBody.innerHTML = '';
+            
+            Object.entries(finalResults.sources).forEach(([source, data]) => {
+                const row = document.createElement('tr');
+                
+                const stability = data.stability || 'N/A';
+                const displayName = sourceDisplayNames[source] || source;
+                const sourceLabel = data.num_matches !== undefined
+                    ? `${displayName} (${data.num_matches} matches)`
+                    : displayName;
+                
+                row.innerHTML = `
+                    <td style="font-weight:bold; font-size:1.1em;">${sourceLabel}: ${stability}</td>
+                `;
+
+                applyStabilityRowColor(row, stability, data.status);
+                
+                resultsBody.appendChild(row);
+            });
+        }
+        
+        this.addLog('Results displayed', 'success');
     }
 
     async cancelProcessing() {
@@ -52,26 +386,6 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             }
         } catch (err) {
             this.addLog(`Cancel request failed: ${err.message}`, 'error');
-        }
-    }
-
-    async processFeature() {
-        // Placeholder processing logic for Stability Consensus Analysis
-        return {
-            downloadResultsJson: 'Download Results (JSON) - placeholder',
-        };
-    }
-
-    updateOutputs(results = null) {
-        const finalResults = results || this.results;
-        
-        if (finalResults.error) {
-            document.getElementById(`downloadResultsJson_${this.featureId}`).textContent = `Error: ${finalResults.error}`;
-            return;
-        }
-        
-        if (finalResults.downloadResultsJson) {
-            document.getElementById(`downloadResultsJson_${this.featureId}`).textContent = finalResults.downloadResultsJson;
         }
     }
 }
