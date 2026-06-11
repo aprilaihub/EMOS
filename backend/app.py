@@ -4,7 +4,11 @@ import os
 import sys
 import pathlib
 import json
+import tempfile
+import traceback
 import requests
+import uuid
+import threading
 
 # Get absolute paths regardless of where the script is run from
 BACKEND_DIR = pathlib.Path(__file__).parent.resolve()  # /home/soe/EMOS/backend
@@ -524,6 +528,7 @@ def process_feature_stream(feature_id):
         return Response(_err(), mimetype='text/event-stream')
 
 
+
 @app.route('/api/download/<filename>', methods=['GET'])
 def download_file(filename):
     """Download JSON results file"""
@@ -552,6 +557,407 @@ def download_file(filename):
         )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Node Editor endpoint — execute a single Information Unit
+# ═══════════════════════════════════════════════════════════════════
+
+def _sse_event(event, data):
+    """Format a single SSE event string."""
+    return f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+
+# ── Active node-run tracking for cancellation ────────────────────────
+# Keyed by run_id (str).  Each entry holds:
+#   generator : the MattergenGenerator instance (if applicable)
+#   job_id    : the MatterGen Docker job_id (populated once the stream starts)
+#   cancelled : threading.Event — set when the user requests cancellation
+_active_node_runs: dict = {}
+_node_runs_lock = threading.Lock()
+
+
+@app.route('/api/node/cancel/<run_id>', methods=['POST', 'OPTIONS'])
+def node_cancel(run_id):
+    """Cancel a running node-editor IU execution.
+
+    For MatterGen generators this forwards the cancel to the Docker
+    container via ``cancel_generation(job_id)``.  For all IU types the
+    ``cancelled`` event is set so the SSE generator can break early.
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    with _node_runs_lock:
+        entry = _active_node_runs.get(run_id)
+
+    if entry is None:
+        return jsonify({'status': 'not_found', 'message': f'No active run {run_id}'}), 404
+
+    # Signal the SSE generator to stop
+    entry['cancelled'].set()
+
+    # Forward cancel to MatterGen Docker container if we have a job_id
+    gen = entry.get('generator')
+    job_id = entry.get('job_id')
+    if gen and job_id and hasattr(gen, 'cancel_generation'):
+        try:
+            result = gen.cancel_generation(job_id)
+            print(f"[node/cancel] Cancelled MatterGen job {job_id}: {result}")
+            return jsonify({'status': 'cancelled', 'job_id': job_id, 'detail': result})
+        except Exception as e:
+            print(f"[node/cancel] Error cancelling job {job_id}: {e}")
+            return jsonify({'status': 'cancel_sent', 'message': str(e)})
+
+    return jsonify({'status': 'cancelled', 'message': f'Run {run_id} cancelled'})
+
+
+@app.route('/api/node/run', methods=['POST', 'OPTIONS'])
+def node_run():
+    """Execute a single Information Unit (database/generator/predictor) and
+    stream the results back as SSE events.
+
+    Expected JSON body:
+        {
+            "type": "database" | "generator" | "predictor",
+            "key":  "<factory key, e.g. cod, mattergen_base_model, gbfs>",
+            "inputs": { <user-provided fields from the node UI> },
+            "upstream": { <port_key: data_from_upstream_node> }
+        }
+
+    SSE events emitted:
+        event: run_id   — { run_id }  (first event — used for cancellation)
+        event: log      — { message, level }
+        event: progress — { progress (0-1), message }
+        event: result   — the final output payload
+        event: error    — { message }
+        event: done     — stream end
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    try:
+        body     = request.get_json(force=True) or {}
+        iu_type  = body.get('type', '')
+        iu_key   = body.get('key', '')
+        inputs   = body.get('inputs', {})
+        upstream = body.get('upstream', {})
+    except Exception as e:
+        return Response(
+            _sse_event('error', {'message': f'Bad request: {e}'}) +
+            _sse_event('done', {'message': 'Stream ended'}),
+            mimetype='text/event-stream',
+        )
+
+    # Create a run entry for cancel support
+    run_id = uuid.uuid4().hex[:12]
+    cancel_event = threading.Event()
+    run_entry = {
+        'generator': None,
+        'job_id': None,
+        'cancelled': cancel_event,
+    }
+    with _node_runs_lock:
+        _active_node_runs[run_id] = run_entry
+
+    def _generate():
+        try:
+            # First event: tell the client our run_id so it can cancel us
+            yield _sse_event('run_id', {'run_id': run_id})
+
+            if iu_type == 'database':
+                yield from _run_database(iu_key, inputs)
+            elif iu_type == 'generator':
+                yield from _run_generator(iu_key, inputs, run_entry)
+            elif iu_type == 'predictor':
+                yield from _run_predictor(iu_key, inputs, upstream, run_entry)
+            elif iu_type == 'utility':
+                if iu_key == 'lambda':
+                    yield from _run_lambda(inputs, upstream)
+                else:
+                    yield _sse_event('error', {'message': f'Unknown utility node: {iu_key}'})
+            else:
+                yield _sse_event('error', {'message': f'Unknown IU type: {iu_type}'})
+        except _NodeCancelledError:
+            print(f"[node/run] Run {run_id} cancelled")
+            yield _sse_event('error', {'message': 'Cancelled by user'})
+        except Exception as exc:
+            print(f"[node/run] Error: {exc}\n{traceback.format_exc()}")
+            yield _sse_event('error', {'message': str(exc)})
+        finally:
+            with _node_runs_lock:
+                _active_node_runs.pop(run_id, None)
+        yield _sse_event('done', {'message': 'Stream ended'})
+
+    return Response(
+        _generate(),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'X-Accel-Buffering': 'no',
+        },
+    )
+
+
+class _NodeCancelledError(Exception):
+    """Raised inside a node-run generator when the user cancels."""
+    pass
+
+
+def _check_node_cancelled(run_entry):
+    """Raise _NodeCancelledError if this run has been cancelled."""
+    if run_entry and run_entry['cancelled'].is_set():
+        raise _NodeCancelledError("Cancelled by user")
+
+
+# ── Database runner ──────────────────────────────────────────────────
+def _run_database(key, inputs):
+    yield _sse_event('log', {'message': f'Instantiating database: {key}', 'level': 'info'})
+
+    if key not in database_factory:
+        yield _sse_event('error', {'message': f'Database "{key}" not found in factory'})
+        return
+
+    db_cls = database_factory[key]
+    db = db_cls(key, logger)
+
+    # Build retrieve inputs — map node-editor field names to the database API keys
+    retrieve_inputs = {}
+    retrieve_inputs['target_compositions'] = inputs.get('target_compositions', inputs.get('query', ''))
+    retrieve_inputs['batch_size'] = int(inputs.get('batch_size', inputs.get('limit', 10)))
+
+    # Collect property filter fields (prefixed with "filter_")
+    for k, v in inputs.items():
+        if k.startswith('filter_') and v not in (None, '', []):
+            prop_name = k[7:]  # strip "filter_"
+            # Range fields end with _min or _max
+            if prop_name.endswith('_min'):
+                base = prop_name[:-4]
+                if base not in retrieve_inputs:
+                    retrieve_inputs[base] = [None, None]
+                elif not isinstance(retrieve_inputs[base], list):
+                    retrieve_inputs[base] = [None, None]
+                retrieve_inputs[base][0] = v
+            elif prop_name.endswith('_max'):
+                base = prop_name[:-4]
+                if base not in retrieve_inputs:
+                    retrieve_inputs[base] = [None, None]
+                elif not isinstance(retrieve_inputs[base], list):
+                    retrieve_inputs[base] = [None, None]
+                retrieve_inputs[base][1] = v
+            else:
+                retrieve_inputs[prop_name] = v
+
+    yield _sse_event('log', {'message': f'Querying: {retrieve_inputs}', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 0.1, 'message': 'Sending query...'})
+
+    raw_result = db.retrieve(retrieve_inputs)
+
+    # Databases now return a dict: {"source": ..., "queries": ..., "cif_strings": [...]}
+    if isinstance(raw_result, dict):
+        cif_strings = raw_result.get('cif_strings', [])
+    elif isinstance(raw_result, list):
+        # Backward-compat: old implementations returned cif strings directly
+        cif_strings = raw_result
+    else:
+        cif_strings = []
+
+    if not cif_strings:
+        yield _sse_event('log', {'message': 'No results returned', 'level': 'warning'})
+        yield _sse_event('result', [])
+        return
+
+    yield _sse_event('log', {'message': f'Retrieved {len(cif_strings)} structures', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+    yield _sse_event('result', cif_strings)
+
+
+# ── Generator runner ─────────────────────────────────────────────────
+def _run_generator(key, inputs, run_entry=None):
+    yield _sse_event('log', {'message': f'Instantiating generator: {key}', 'level': 'info'})
+
+    if key not in generator_factory:
+        yield _sse_event('error', {'message': f'Generator "{key}" not found in factory'})
+        return
+
+    gen_cls = generator_factory[key]
+    gen = gen_cls(key, logger)
+
+    # Store generator instance in the run entry so cancel can reach it
+    if run_entry is not None:
+        run_entry['generator'] = gen
+
+    # Build generation inputs
+    gen_inputs = {}
+    gen_inputs['batch_size'] = int(inputs.get('batch_size', 10))
+
+    # For MatterGen generators: set pretrained_name from the key
+    # and collect properties_to_condition_on from prop_ fields
+    if 'mattergen' in key:
+        gen_inputs['pretrained_name'] = key
+        props = {}
+        for k, v in inputs.items():
+            if k.startswith('prop_') and v not in (None, ''):
+                prop_name = k[5:]  # strip "prop_"
+                try:
+                    props[prop_name] = float(v)
+                except (ValueError, TypeError):
+                    props[prop_name] = v
+        if props:
+            gen_inputs['properties_to_condition_on'] = props
+
+    yield _sse_event('progress', {'progress': 0.05, 'message': 'Starting generation...'})
+
+    # Prefer streaming if available
+    if hasattr(gen, 'generate_stream'):
+        yield _sse_event('log', {'message': 'Using streaming generation', 'level': 'info'})
+        cif_strings = []
+        for event_dict in gen.generate_stream(gen_inputs):
+            # Check cancellation between each streamed event
+            _check_node_cancelled(run_entry)
+
+            ev = event_dict.get('event', 'log')
+
+            # Capture MatterGen job_id so we can cancel it later
+            if ev == 'job_id' and run_entry is not None:
+                run_entry['job_id'] = event_dict.get('job_id')
+                yield _sse_event('log', {'message': f'Generation job started: {run_entry["job_id"]}', 'level': 'info'})
+                continue
+
+            if ev == 'log':
+                yield _sse_event('log', {'message': event_dict.get('message', ''), 'level': event_dict.get('level', 'info')})
+            elif ev == 'progress':
+                yield _sse_event('progress', {'progress': event_dict.get('progress', 0), 'message': event_dict.get('message', '')})
+            elif ev == 'result':
+                # Extract CIF strings from the result
+                cif_strings = _extract_cif_strings(event_dict)
+                yield _sse_event('log', {'message': f'Generated {len(cif_strings)} structures', 'level': 'info'})
+            elif ev == 'cancelled':
+                yield _sse_event('log', {'message': 'Generation cancelled by user', 'level': 'warning'})
+                raise _NodeCancelledError("Cancelled by user")
+            elif ev == 'error':
+                yield _sse_event('error', {'message': event_dict.get('message', 'Generation error')})
+                return
+        yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+        yield _sse_event('result', cif_strings)
+    else:
+        yield _sse_event('log', {'message': 'Using synchronous generation', 'level': 'info'})
+        result = gen.generate(gen_inputs)
+        cif_strings = _extract_cif_strings(result)
+        yield _sse_event('log', {'message': f'Generated {len(cif_strings)} structures', 'level': 'info'})
+        yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+        yield _sse_event('result', cif_strings)
+
+
+def _extract_cif_strings(result):
+    """Normalise generator output to a list of CIF strings."""
+    if isinstance(result, dict):
+        # MatterGen format: result may have 'cif_strings' key
+        if 'cif_strings' in result:
+            return result['cif_strings']
+        # Or 'structures' with pymatgen dict — convert
+        if 'structures' in result:
+            cifs = []
+            for s in result['structures']:
+                try:
+                    from pymatgen.core import Structure as PmgStructure
+                    struct = PmgStructure.from_dict(s) if isinstance(s, dict) else s
+                    cifs.append(struct.to(fmt='cif'))
+                except Exception:
+                    cifs.append(str(s))
+            return cifs
+        return [json.dumps(result)]
+    elif isinstance(result, str):
+        return [result]
+    elif isinstance(result, list):
+        return result
+    return [str(result)]
+
+
+# ── Predictor runner ─────────────────────────────────────────────────
+def _run_predictor(key, inputs, upstream, run_entry=None):
+    yield _sse_event('log', {'message': f'Preparing predictor: {key}', 'level': 'info'})
+
+    if key not in predictor_factory:
+        yield _sse_event('error', {'message': f'Predictor "{key}" not found in factory'})
+        return
+
+    # Get CIF data from upstream
+    cif_data = upstream.get('cif_in')
+    if cif_data is None:
+        yield _sse_event('error', {'message': 'No CIF data connected to predictor input'})
+        return
+
+    cif_array = cif_data if isinstance(cif_data, list) else [cif_data]
+    cif_array = [c for c in cif_array if isinstance(c, str) and c.strip()]
+
+    if not cif_array:
+        yield _sse_event('error', {'message': 'No valid CIF strings in upstream data'})
+        return
+
+    yield _sse_event('log', {'message': f'Predicting for {len(cif_array)} structure(s)', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 0.1, 'message': 'Running prediction...'})
+
+    _check_node_cancelled(run_entry)
+
+    # All predictors accept a list[str] of CIF strings in a single batch call
+    pred_cls = predictor_factory[key]
+    pred = pred_cls(key, logger)
+    result = pred.predict(cif_array)
+
+    yield _sse_event('log', {'message': f'Prediction complete for {len(cif_array)} structure(s)', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+    yield _sse_event('result', result)
+    
+
+# ── Lambda runner (utility node) ─────────────────────────────────────
+# NOTE: executes arbitrary user-supplied Python. Intended for local
+# research use only — never expose this endpoint on a public server.
+def _run_lambda(inputs, upstream):
+    code = inputs.get('code', '').strip()
+    if not code:
+        yield _sse_event('error', {'message': 'Lambda node: no code provided'})
+        return
+
+    cif_list = upstream.get('cif_in', [])
+    if not isinstance(cif_list, list):
+        cif_list = []
+
+    results = upstream.get('result_in', {})
+    if not isinstance(results, dict):
+        results = {}
+
+    yield _sse_event('log', {'message': f'Lambda: executing on {len(cif_list)} CIF(s)…', 'level': 'info'})
+
+    namespace = {
+        'cif_list':       list(cif_list),
+        'results':        results,
+        'output_cifs':    None,
+        'output_results': None,
+    }
+
+    try:
+        exec(compile(code, '<lambda_node>', 'exec'), namespace)  # noqa: S102
+    except Exception as exc:
+        yield _sse_event('error', {'message': f'Lambda error: {exc}'})
+        return
+
+    output_cifs    = namespace.get('output_cifs')    or namespace.get('cif_list',  [])
+    output_results = namespace.get('output_results') or namespace.get('results',    {})
+
+    if not isinstance(output_cifs, list):
+        try:
+            output_cifs = list(output_cifs)
+        except Exception:
+            output_cifs = []
+
+    if not isinstance(output_results, dict):
+        output_results = {}
+
+    yield _sse_event('log', {'message': f'Lambda produced {len(output_cifs)} CIF(s)', 'level': 'info'})
+    yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})
+    yield _sse_event('result', {'cif_out': output_cifs, 'result_out': output_results})
 
 
 if __name__ == '__main__':
