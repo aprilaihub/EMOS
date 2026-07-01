@@ -112,6 +112,11 @@ const iuFeatureModules = {
             file: './Features/IU_Features/Predictors/Gbfs2dIUFeature.js',
             id: 2006,
         },
+        amd: {
+            className: 'AmdIUFeature',
+            file: './Features/IU_Features/Predictors/AmdIUFeature.js',
+            id: 2007,
+        },
     }
 };
 

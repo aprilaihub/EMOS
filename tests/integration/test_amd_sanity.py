@@ -319,14 +319,14 @@ def test_predict_with_input_data_list(cif_files, amd_predictor):
 
 @pytest.mark.integration
 def test_predict_requires_dict_input(cif_files, amd_predictor):
-    """predict() requires dict input with input_data key."""
+    """predict() requires a list or dict input; passing a bare string should fail."""
     # Passing string directly should fail
     result_json = amd_predictor.predict(cif_files['al2o3_path'])
     result = json.loads(result_json)
     
     # Should return error
     assert result["results"][0]["status"] == "failed"
-    assert "dictionary" in result["results"][0]["error"] or "input_data" in result["results"][0]["error"]
+    assert any(kw in result["results"][0]["error"] for kw in ("list", "dict", "dictionary", "input_data"))
 
 
 # ============================================================================

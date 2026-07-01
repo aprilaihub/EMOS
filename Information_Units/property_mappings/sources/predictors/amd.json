@@ -1,0 +1,18 @@
+{
+  "description": "Source-specific mappings for amd (predictors).",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "amd",
+  "properties": {
+    "pdd_emd_distance_amd": {
+      "name": "pdd_emd_distance",
+      "predictable": true,
+      "range_support": true
+    },
+    "amd_distance_amd": {
+      "name": "amd_distance",
+      "predictable": true,
+      "range_support": true
+    }
+  }
+}
