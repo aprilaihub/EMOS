@@ -1,0 +1,23 @@
+{
+  "description": "Source-specific mappings for pdd (predictors). PDD computes geometric descriptors from crystal structures: the PDD matrix (per-atom k-nearest-neighbour distances), the AMD vector (mean of PDD rows), and a pairwise EMD distance matrix across input structures.",
+  "version": "2.0",
+  "source_type": "predictors",
+  "source": "pdd",
+  "properties": {
+    "pdd_vector": {
+      "name": "pdd_vector",
+      "predictable": true,
+      "range_support": false
+    },
+    "pdd_matrix": {
+      "name": "pdd_matrix",
+      "predictable": true,
+      "range_support": false
+    },
+    "pdd_emd_matrix": {
+      "name": "pdd_emd_matrix",
+      "predictable": true,
+      "range_support": false
+    }
+  }
+}

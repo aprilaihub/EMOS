@@ -42,7 +42,7 @@
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
       "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python",
       "GBFS-2D": "Pretrained GBFS workflow predictors specialized for 2D layered materials",
-      "AMD": "Average Minimum Distance predictor for crystal structure similarity analysis using PDD/EMD and AMD metrics"
+      "PDD": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures"
     }
   },
   "features": {
@@ -83,10 +83,12 @@
     },
     "AMD screening": {
       "inputs": [
-        {"name": "cifFiles", "display_name": "CIF Files", "type": "file", "required": true, "accept": ".cif", "multiple": true, "description": "Browse and upload one or more CIF files for AMD screening"}
+        {"name": "cifFiles", "display_name": "CIF Files", "type": "file", "required": true, "accept": ".cif", "multiple": true, "description": "Browse and upload two or more CIF files for AMD similarity screening"},
+        {"name": "k", "display_name": "Neighbourhood size k", "type": "number", "required": false, "min": 1, "max": 500, "step": 1, "default": 100, "description": "Number of nearest neighbours for AMD descriptor (default 100)"}
       ],
       "outputs": [
-        {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing AMD screening results"}
+        {"name": "downloadResultsJson", "display_name": "Download Results (JSON)", "type": "link", "description": "Download JSON file containing AMD matrix and labels"},
+        {"name": "heatmapDendrogram", "display_name": "Heatmap & Dendrogram", "type": "image", "description": "AMD cross-correlation heatmap with Ward-linkage dendrogram"}
       ]
     },
     "MOSFET evaluator": {

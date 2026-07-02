@@ -180,12 +180,13 @@
         "file_name": "Gbfs2dPredictor.py"
       },
       {
-        "id": "amd",
-        "name": "AMD",
-        "display_name": "AMD",
-        "description": "AMD predictor",
-        "folder_path": "Information_Units/Predictors/AMD",
-        "class_name": "AMDPredictor"
+        "id": "pdd",
+        "name": "PDD",
+        "display_name": "PDD",
+        "description": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures",
+        "folder_path": "Information_Units/Predictors/PDD",
+        "class_name": "PDDPredictor",
+        "file_name": "PDDPredictor.py"
       }
     ]
   },

@@ -1,13 +1,13 @@
-// Auto-generated IU Feature for predictor: amd
-class AmdIUFeature extends BaseFeature {
+// Auto-generated IU Feature for predictor: pdd
+class PddIUFeature extends BaseFeature {
     constructor(featureId, iuMeta = {}) {
         super(
             featureId,
-            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'AMD IU Feature',
-            iuMeta.iuDesc || 'Average Minimum Distance predictor for crystal structure similarity analysis using PDD/EMD and AMD metrics'
+            iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'PDD IU Feature',
+            iuMeta.iuDesc || 'Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures'
         );
         this.iuType = iuMeta.iuType || 'predictor';
-        this.iuId = iuMeta.iuId || 'amd';
+        this.iuId = iuMeta.iuId || 'pdd';
         this._abortController = null;
         this._propertyDefs = [];
         this._propertyUnitByKey = {};
@@ -75,9 +75,14 @@ class AmdIUFeature extends BaseFeature {
                     <label>CIF Files
                         <div style="margin-top:6px; padding:12px; background:#f5f5f5; border-radius:4px; border:2px dashed #ccc;">
                             <input type="file" id="cifUpload_${this.featureId}" multiple accept=".cif,.zip" style="display:block; margin-bottom:8px;">
-                            <small style="color:#666;">Select .cif files or .zip archive. Drag & drop supported.</small>
+                            <small style="color:#666;">Select one or more .cif files or a .zip archive.</small>
                             <div id="fileList_${this.featureId}" style="margin-top:8px; font-size:12px; color:#333;"></div>
                         </div>
+                    </label>
+                    <label style="margin-top:10px; display:block;">Neighbourhood size k
+                        <input type="number" id="pddK_${this.featureId}" value="100" min="1" max="500" step="1"
+                               style="width:90px; margin-left:8px;">
+                        <small style="color:#666; margin-left:6px;">Number of nearest neighbours for PDD descriptor (default 100)</small>
                     </label>
                 </div>
             </div>
@@ -217,15 +222,13 @@ class AmdIUFeature extends BaseFeature {
         this._abortController = new AbortController();
         this._cancelled = false;
 
-        this.addLog('Reading CIF files and starting predictions...', 'info');
+        this.addLog('Reading CIF files and starting PDD predictions...', 'info');
 
         try {
-            // Read CIF files as text strings
             const cifStrings = [];
             for (const file of this._uploadedFiles) {
                 if (file.name.endsWith('.cif')) {
-                    const text = await file.text();
-                    cifStrings.push(text);
+                    cifStrings.push(await file.text());
                 } else if (file.name.endsWith('.zip')) {
                     this.addLog('ZIP files require backend extraction support', 'warning');
                 }
@@ -235,9 +238,11 @@ class AmdIUFeature extends BaseFeature {
                 throw new Error('No valid .cif files found in selection');
             }
 
-            const payload = {
-                cif_strings: cifStrings
-            };
+            const kEl = document.getElementById(`pddK_${this.featureId}`);
+            const kValue = kEl ? Math.max(1, parseInt(kEl.value, 10) || 100) : 100;
+            this.addLog(`k = ${kValue}, processing ${cifStrings.length} structure(s)…`, 'info');
+
+            const payload = { cif_strings: cifStrings, k: kValue };
 
             const response = await fetch(
                 `${backendUrl}/api/process/iu/${this.iuType}/${this.iuId}/stream`,
@@ -264,73 +269,38 @@ class AmdIUFeature extends BaseFeature {
                 if (done) break;
 
                 buffer += decoder.decode(value, { stream: true });
-
                 const blocks = buffer.split('\n\n');
                 buffer = blocks.pop() || '';
 
                 for (const block of blocks) {
                     if (!block.trim()) continue;
-
                     const lines = block.split('\n');
                     let eventType = 'log';
                     let eventData = null;
 
                     for (const line of lines) {
-                        if (line.startsWith('event:')) {
-                            eventType = line.slice(6).trim();
-                        } else if (line.startsWith('data:')) {
-                            const dataStr = line.slice(5).trim();
-                            try {
-                                eventData = JSON.parse(dataStr);
-                            } catch (e) {
-                                eventData = { message: dataStr };
-                            }
+                        if (line.startsWith('event:')) eventType = line.slice(6).trim();
+                        else if (line.startsWith('data:')) {
+                            try { eventData = JSON.parse(line.slice(5).trim()); }
+                            catch { eventData = { message: line.slice(5).trim() }; }
                         }
                     }
 
                     if (!eventData) continue;
 
                     if (eventType === 'log') {
-                        const msg = eventData.message || '';
-                        const level = eventData.level || 'info';
-                        this.addLog(msg, level);
+                        this.addLog(eventData.message || '', eventData.level || 'info');
                     } else if (eventType === 'progress') {
                         const raw = Number(eventData.progress);
-                        const pct = Number.isFinite(raw)
-                            ? Math.round(Math.max(0, Math.min(1, raw)) * 100)
-                            : null;
-                        const msg = eventData.message || (pct !== null ? `Progress: ${pct}%` : 'Progress update');
-                        this.addLog(msg, 'info');
+                        const pct = Number.isFinite(raw) ? Math.round(Math.max(0, Math.min(1, raw)) * 100) : null;
+                        this.addLog(eventData.message || (pct !== null ? `Progress: ${pct}%` : 'Progress update'), 'info');
                     } else if (eventType === 'result') {
                         finalResult = eventData;
                         const numResults = Array.isArray(eventData.results) ? eventData.results.length : 0;
-                        this.addLog(`Prediction complete: ${numResults} result(s)`, 'success');
+                        this.addLog(`PDD prediction complete: ${numResults} result(s)`, 'success');
                     } else if (eventType === 'error') {
                         this.addLog(eventData.message || 'Unknown error', 'error');
                     }
-                }
-            }
-
-            if (buffer.trim()) {
-                const lines = buffer.split('\n');
-                let eventType = 'log';
-                let eventData = null;
-
-                for (const line of lines) {
-                    if (line.startsWith('event:')) {
-                        eventType = line.slice(6).trim();
-                    } else if (line.startsWith('data:')) {
-                        const dataStr = line.slice(5).trim();
-                        try {
-                            eventData = JSON.parse(dataStr);
-                        } catch (e) {
-                            eventData = { message: dataStr };
-                        }
-                    }
-                }
-
-                if (eventData && eventType === 'result') {
-                    finalResult = eventData;
                 }
             }
 
@@ -509,101 +479,59 @@ class AmdIUFeature extends BaseFeature {
         }
 
         const properties = result.properties || {};
-        const entries = Object.entries(properties);
-        if (entries.length === 0) {
-            propertiesDisplay.innerHTML = '<p style="color:#999;">No properties returned for this input</p>';
-            return;
+        let html = '<div style="display:grid; gap:8px;">';
+
+        // ── AMD vector (1-D summary) ─────────────────────────────────────────
+        const vec = properties.pdd_vector;
+        if (Array.isArray(vec)) {
+            const preview = vec.slice(0, 8).map(v => (typeof v === 'number' ? v.toFixed(4) : String(v))).join(', ');
+            const suffix = vec.length > 8 ? ` … (${vec.length} values)` : '';
+            html += `
+                <div style="padding:6px; background:#f9f9f9; border-radius:4px;">
+                    <strong style="color:#333;">AMD Vector (mean PDD row, shape ${vec.length})</strong>
+                    <div style="font-family:monospace; font-size:11px; color:#555; margin-top:4px; word-break:break-all;">[${preview}${suffix}]</div>
+                </div>`;
         }
 
-        let html = '<div style="display:grid; gap:8px;">';
-        const cifPropertyViews = [];
-
-        entries.forEach(([propKey, value]) => {
-            const unit = this._propertyUnitByKey[propKey] || '';
-            const displayLabel = this._formatLabelWithUnit(propKey, unit);
-
-            if (this._isCifProperty(propKey, value)) {
-                const safeId = this._sanitizeDomId(`${this.featureId}_${result.index}_${propKey}`);
-                const viewerId = `iuPropStructureViewer_${safeId}`;
-                const textId = `iuPropCifViewer_${safeId}`;
-                const toggleId = `iuPropToggleCifBtn_${safeId}`;
-
-                html += `
-                    <div style="padding:8px; background:#f9f9f9; border-radius:4px;">
-                        <strong style="color:#333;">${this._escapeHtml(displayLabel)}</strong>
-                        <div id="${viewerId}" style="width:100%; height:300px; position:relative; background:#ffffff; border-radius:6px; margin-top:6px;"></div>
-                        <div style="margin-top:6px; text-align:right;">
-                            <button id="${toggleId}" class="btn-secondary" style="font-size:11px; padding:4px 10px; cursor:pointer; background:#313244; color:#cdd6f4; border:1px solid #45475a; border-radius:4px;">Show CIF Text</button>
-                        </div>
-                        <pre id="${textId}" class="cif-viewer" style="display:none; max-height:240px; overflow:auto; background:#1e1e2e; color:#cdd6f4; padding:12px; border-radius:6px; font-size:12px; white-space:pre-wrap; margin-top:6px;"></pre>
-                    </div>
-                `;
-
-                cifPropertyViews.push({ viewerId, textId, toggleId, cifData: typeof value === 'string' ? value : '' });
-                return;
-            }
-
-            let displayValue = 'N/A';
-            if (value !== null && value !== undefined) {
-                if (typeof value === 'object') {
-                    displayValue = JSON.stringify(value);
-                } else {
-                    displayValue = String(value);
-                }
-            }
-
-            const valueColor = displayValue === 'N/A' ? '#999' : '#333';
+        // ── PDD matrix (shape summary) ────────────────────────────────────────
+        const mat = properties.pdd_matrix;
+        if (Array.isArray(mat)) {
+            const rows = mat.length;
+            const cols = Array.isArray(mat[0]) ? mat[0].length : 0;
             html += `
-                <div style="display:flex; justify-content:space-between; gap:12px; padding:6px; background:#f9f9f9; border-radius:4px; align-items:flex-start;">
-                    <strong style="color:#333;">${this._escapeHtml(displayLabel)}</strong>
-                    <span style="color:${valueColor}; font-family:monospace; text-align:right; white-space:pre-wrap; word-break:break-word;">${this._escapeHtml(displayValue)}</span>
-                </div>
-            `;
-        });
+                <div style="padding:6px; background:#f9f9f9; border-radius:4px;">
+                    <strong style="color:#333;">PDD Matrix (shape ${rows} × ${cols})</strong>
+                    <div style="font-size:11px; color:#666; margin-top:4px;">Full matrix included in downloaded JSON.</div>
+                </div>`;
+        }
+
+        // ── EMD matrix (cross-input, only when >1 structure) ─────────────────
+        const emd = properties.pdd_emd_matrix;
+        if (Array.isArray(emd)) {
+            const n = emd.length;
+            let tableHtml = `<table style="border-collapse:collapse; font-size:11px; margin-top:6px;">`;
+            tableHtml += `<tr><th style="padding:3px 6px;"></th>`;
+            for (let c = 0; c < n; c++) tableHtml += `<th style="padding:3px 6px; color:#555;">S${c + 1}</th>`;
+            tableHtml += '</tr>';
+            for (let r = 0; r < n; r++) {
+                tableHtml += `<tr><th style="padding:3px 6px; color:#555;">S${r + 1}</th>`;
+                for (let c = 0; c < n; c++) {
+                    const v = typeof emd[r][c] === 'number' ? emd[r][c].toFixed(4) : '-';
+                    const bg = r === c ? '#e8e8e8' : '#f9f9f9';
+                    tableHtml += `<td style="padding:3px 6px; background:${bg}; font-family:monospace;">${v}</td>`;
+                }
+                tableHtml += '</tr>';
+            }
+            tableHtml += '</table>';
+            html += `
+                <div style="padding:6px; background:#f9f9f9; border-radius:4px;">
+                    <strong style="color:#333;">Pairwise EMD Distance Matrix (${n} × ${n})</strong>
+                    ${tableHtml}
+                </div>`;
+        }
 
         html += '</div>';
         propertiesDisplay.innerHTML = html;
-
-        cifPropertyViews.forEach((entry) => {
-            const viewerContainer = document.getElementById(entry.viewerId);
-            const textEl = document.getElementById(entry.textId);
-            const toggleBtn = document.getElementById(entry.toggleId);
-            const cifData = entry.cifData || '';
-
-            if (textEl) {
-                textEl.textContent = cifData || '(no CIF data available)';
-            }
-
-            if (!viewerContainer || !cifData || typeof $3Dmol === 'undefined') {
-                if (viewerContainer) {
-                    viewerContainer.innerHTML = '<p style="color:#333;padding:20px;">3D viewer unavailable</p>';
-                }
-            } else {
-                viewerContainer.innerHTML = '';
-                const viewer = $3Dmol.createViewer(viewerContainer, {
-                    backgroundColor: '#ffffff',
-                });
-
-                viewer.addModel(cifData, 'cif', { doAssembly: true, duplicateAssemblyAtoms: true });
-                viewer.setStyle({}, {
-                    sphere: { radius: 0.4, colorscheme: 'Jmol' },
-                    stick: { radius: 0.15, colorscheme: 'Jmol' },
-                });
-                viewer.addUnitCell();
-                viewer.zoomTo();
-                viewer.render();
-            }
-
-            if (toggleBtn && textEl) {
-                const newBtn = toggleBtn.cloneNode(true);
-                toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
-                newBtn.addEventListener('click', () => {
-                    const hidden = textEl.style.display === 'none';
-                    textEl.style.display = hidden ? 'block' : 'none';
-                    newBtn.textContent = hidden ? 'Hide CIF Text' : 'Show CIF Text';
-                });
-            }
-        });
     }
 
     destroy() {
@@ -614,4 +542,4 @@ class AmdIUFeature extends BaseFeature {
     }
 }
 
-window.AmdIUFeature = AmdIUFeature;
+window.PddIUFeature = PddIUFeature;

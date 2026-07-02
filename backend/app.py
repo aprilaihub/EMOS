@@ -72,6 +72,27 @@ def _instantiate_iu(cls, iu_name, logger_obj):
         return cls(iu_name, logger_obj)
 
 
+def _apply_predictor_params(instance, payload: dict) -> None:
+    """Forward optional numerical parameters from the request payload to the predictor instance.
+
+    Recognised keys:
+    - ``k``      (int)  → ``instance.k``      (neighbourhood size, PDD / AMD)
+    - ``metric`` (str)  → ``instance.metric`` (distance metric, AMD)
+
+    Only applied when the instance actually has the attribute, so this is safe to
+    call for any predictor type.
+    """
+    if 'k' in payload and hasattr(instance, 'k'):
+        try:
+            instance.k = max(1, int(payload['k']))
+        except (ValueError, TypeError):
+            pass
+    if 'metric' in payload and hasattr(instance, 'metric'):
+        metric = str(payload['metric']).strip()
+        if metric:
+            instance.metric = metric
+
+
 @app.route('/api/features/info', methods=['GET'])
 def get_features_info():
     """Get information about available features and their architectures"""
@@ -286,6 +307,9 @@ def process_information_unit(iu_type, iu_id):
             if not cif_strings:
                 return jsonify({'error': 'No CIF strings provided for prediction'}), 400
 
+            # Apply optional predictor parameters forwarded from the payload
+            _apply_predictor_params(instance, inputs)
+
             results = instance.predict(cif_strings)
             return jsonify({
                 'results': results,
@@ -378,6 +402,9 @@ def process_information_unit_stream(iu_type, iu_id):
                         yield f"event: error\ndata: {json.dumps({'message': 'No CIF strings provided for prediction'})}\n\n"
                         yield f"event: done\ndata: {json.dumps({'message': 'Stream ended'})}\n\n"
                         return
+
+                    # Apply optional predictor parameters forwarded from the payload
+                    _apply_predictor_params(instance, inputs)
 
                     # Predictors can stream or be sync
                     if hasattr(instance, 'predict_stream'):

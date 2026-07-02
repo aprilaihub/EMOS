@@ -19,6 +19,12 @@ class AmdScreeningFeature extends BaseFeature {
                         <div id="cifFileList_${this.featureId}" style="margin-top:8px; font-size:12px; color:#333;"></div>
                     </div>
                 </label>
+                <label style="margin-top:10px; display:block;">
+                    Number of neighbours <em>k</em>
+                    <input type="number" id="amdK_${this.featureId}" value="100" min="1" max="500"
+                           style="width:90px; margin-left:8px;">
+                    <small style="color:#666; margin-left:6px;">(1 – 500)</small>
+                </label>
             </div>
         `;
     }
@@ -30,6 +36,14 @@ class AmdScreeningFeature extends BaseFeature {
                 <div class="output-item" id="amdSummaryRow_${this.featureId}" style="display:none;">
                     <strong>Summary:</strong>
                     <div id="amdSummary_${this.featureId}" style="margin-top:6px; font-size:13px;"></div>
+                </div>
+                <div class="output-item" id="amdPlotRow_${this.featureId}" style="display:none;">
+                    <strong>Heatmap / Dendrogram:</strong>
+                    <div style="margin-top:8px; text-align:center;">
+                        <img id="amdPlotImg_${this.featureId}"
+                             style="max-width:100%; border:1px solid #ddd; border-radius:4px;"
+                             alt="AMD heatmap and dendrogram">
+                    </div>
                 </div>
                 <div class="output-item">
                     <strong>Download Results (JSON):</strong>
@@ -122,14 +136,19 @@ class AmdScreeningFeature extends BaseFeature {
         this._abortController = new AbortController();
         this._cancelled = false;
 
+        const kInput = document.getElementById(`amdK_${this.featureId}`);
+        const k = Math.max(1, Math.min(500, parseInt(kInput?.value || '100', 10) || 100));
+
         this.addLog(`Reading ${this._uploadedFiles.length} CIF file(s)...`, 'info');
         const cifStrings = [];
+        const labels = [];
         for (const file of this._uploadedFiles) {
             cifStrings.push(await file.text());
+            labels.push(file.name.replace(/\.cif$/i, ''));
         }
-        this.addLog('Files loaded, sending to backend...', 'info');
+        this.addLog(`Files loaded (k=${k}), sending to backend...`, 'info');
 
-        const payload = { cif_strings: cifStrings };
+        const payload = { cif_strings: cifStrings, labels, k };
 
         const response = await fetch(
             `${backendUrl}/api/process/${this.featureId}/stream`,
@@ -205,6 +224,8 @@ class AmdScreeningFeature extends BaseFeature {
         const linkEl = document.getElementById(`downloadResultsLink_${this.featureId}`);
         const summaryRow = document.getElementById(`amdSummaryRow_${this.featureId}`);
         const summaryEl = document.getElementById(`amdSummary_${this.featureId}`);
+        const plotRow = document.getElementById(`amdPlotRow_${this.featureId}`);
+        const plotImg = document.getElementById(`amdPlotImg_${this.featureId}`);
 
         if (!finalResults || finalResults.error) {
             if (statusEl) statusEl.textContent = `Error: ${finalResults?.error || 'Unknown error'}`;
@@ -221,24 +242,25 @@ class AmdScreeningFeature extends BaseFeature {
             return;
         }
 
-        // Build summary from pairwise distances
-        const amdResults = finalResults.results;
-        if (amdResults) {
-            const resultItems = Array.isArray(amdResults.results) ? amdResults.results : [];
-            const first = resultItems[0];
-            if (first && first.status === 'success' && summaryEl && summaryRow) {
-                const pairs = first.properties?.pairwise_distances || [];
-                const identical = pairs.filter(p => p.identical).length;
-                const verySimilar = pairs.filter(p => p.very_similar && !p.identical).length;
-                const similar = pairs.filter(p => p.similar && !p.very_similar).length;
-                summaryEl.innerHTML = `
-                    <strong>Total pairs compared:</strong> ${pairs.length}<br>
-                    <strong>Identical:</strong> ${identical} &nbsp;
-                    <strong>Very similar (PDD/EMD &lt; 0.1):</strong> ${verySimilar} &nbsp;
-                    <strong>Similar (PDD/EMD &lt; 0.5):</strong> ${similar}
-                `;
-                summaryRow.style.display = '';
+        // Show heatmap/dendrogram image
+        if (finalResults.plot_base64 && plotImg && plotRow) {
+            plotImg.src = `data:image/png;base64,${finalResults.plot_base64}`;
+            plotRow.style.display = '';
+        }
+
+        // Build summary from matrix size
+        if (finalResults.amd_matrix && summaryEl && summaryRow) {
+            const n = finalResults.amd_matrix.length;
+            const labels = finalResults.labels || [];
+            const failed = finalResults.failed || [];
+            const k = finalResults.k || '?';
+            let html = `<strong>Structures compared:</strong> ${n} &nbsp; <strong>k:</strong> ${k}`;
+            if (failed.length > 0) html += ` &nbsp; <strong>Failed:</strong> ${failed.length}`;
+            if (labels.length > 0) {
+                html += `<br><strong>Labels:</strong> ${labels.map(l => `<code>${l}</code>`).join(', ')}`;
             }
+            summaryEl.innerHTML = html;
+            summaryRow.style.display = '';
         }
 
         // Create download link
