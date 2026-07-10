@@ -77,6 +77,7 @@ IU_DISPLAY = {
     "gbfs2d":   "GBFS-2D",
     "mattersim":"MatterSim",
     "synthnn":  "SynthNN",
+    "chgnet":   "CHGnet",
 }
 
 # Ordered row groups
@@ -86,13 +87,13 @@ ROW_ORDER = {
                    "mattergen_chemical_system", "mattergen_dft_band_gap", "mattergen_bulk_modulus",
                    "mattergen_magnetic_density", "mattergen_chemical_system_stability",
                    "mattergen_magnetic_density_hhi"],
-    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn"],
+    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn", "chgnet"],
 }
 
 SECTION_COLORS = {
-    "databases":  "#1f77b4",   # blue
+    "databases":  "#d62728",   # red
     "generators": "#2ca02c",   # green
-    "predictors": "#d62728",   # red
+    "predictors": "#1f77b4",   # blue
 }
 
 FONT_SCALE = 1.5

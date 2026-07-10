@@ -77,6 +77,7 @@ IU_DISPLAY = {
     "gbfs2d":                         "GBFS-2D",
     "mattersim":                      "MatterSim",
     "synthnn":                        "SynthNN",
+    "chgnet":                         "CHGnet",
 }
 
 # Short specialisation notes per IU
@@ -100,6 +101,7 @@ IU_NOTES = {
     "gbfs2d":  "Same as GBFS but specialised for 2D layered materials; includes stability prediction",
     "mattersim": "Universal ML force-field: energies, forces, stresses on any structure + full structure relaxation pipeline (relaxed CIF, energy, forces, stress)",
     "synthnn": "Synthesizability scoring — probability that a given structure can be experimentally synthesised",
+    "chgnet":  "Universal ML force-field with charge equilibration: energies, forces, stresses + full structure relaxation pipeline (relaxed CIF, energy, forces, stress)",
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
