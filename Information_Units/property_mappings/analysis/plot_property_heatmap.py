@@ -63,15 +63,15 @@ IU_DISPLAY = {
     "materialsproject":               "Materials Project",
     "mathub3d":                       "MatHub-3d",
     # generators
-    "mattergen_base_model":           "MatterGen · Base",
-    "mattergen_mp_20_base":           "MatterGen · MP-20 Base",
-    "mattergen_space_group":          "MatterGen · Space Group",
-    "mattergen_chemical_system":      "MatterGen · Chem. System",
-    "mattergen_dft_band_gap":         "MatterGen · Band Gap",
-    "mattergen_bulk_modulus":         "MatterGen · Bulk Modulus",
-    "mattergen_magnetic_density":     "MatterGen · Mag. Density",
-    "mattergen_chemical_system_stability": "MatterGen · Chem.+Stability",
-    "mattergen_magnetic_density_hhi": "MatterGen · Mag.+HHI",
+    "mattergen_base_model":           "MG ·\nBase",
+    "mattergen_mp_20_base":           "MG ·\nMP-20 Base",
+    "mattergen_space_group":          "MG ·\nSpace Group",
+    "mattergen_chemical_system":      "MG ·\nChem. System",
+    "mattergen_dft_band_gap":         "MG ·\nBand Gap",
+    "mattergen_bulk_modulus":         "MG ·\nBulk Modulus",
+    "mattergen_magnetic_density":     "MG ·\nMag. Density",
+    "mattergen_chemical_system_stability": "MG ·\nChem.+Stability",
+    "mattergen_magnetic_density_hhi": "MG ·\nMag.+HHI",
     # predictors
     "gbfs":     "GBFS (3D)",
     "gbfs2d":   "GBFS-2D",
@@ -151,7 +151,7 @@ def plot(matrix, row_labels, section_boundaries):
     matrix = matrix.T                        # shape: (n_props, n_ius)
     n_rows, n_cols = matrix.shape            # n_rows=11 props, n_cols=19 IUs
 
-    fig, ax = plt.subplots(figsize=(16, 8))
+    fig, ax = plt.subplots(figsize=(22, 8))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
 
