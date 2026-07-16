@@ -125,7 +125,7 @@ services:
     plan: standard
     region: oregon
     dockerfilePath: ./Information_Units/Predictors/AMD/docker/Dockerfile
-    dockerContext: ./Information_Units/Predictors/AMD/docker
+    dockerContext: .
     envVars:
       - key: AMD_HOST
         value: "0.0.0.0"
@@ -146,7 +146,7 @@ services:
     plan: standard
     region: oregon
     dockerfilePath: ./Information_Units/Predictors/Gbfs2d/docker/Dockerfile
-    dockerContext: ./Information_Units/Predictors/Gbfs2d/docker
+    dockerContext: .
     envVars:
       - key: GBFS2D_HOST
         value: "0.0.0.0"
