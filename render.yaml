@@ -114,27 +114,6 @@ services:
         value: "0.3.0"
 
   # -----------------------------------------------------------------------
-  # AMD — crystal-structure similarity predictor (Average Minimum Distance)
-  # -----------------------------------------------------------------------
-  # Deployed as a Docker private service. This supports the AMD screening
-  # feature in the EMOS UI.
-  # -----------------------------------------------------------------------
-  - type: pserv
-    name: emos-amd
-    runtime: docker
-    plan: standard
-    region: oregon
-    dockerfilePath: ./Information_Units/Predictors/AMD/docker/Dockerfile
-    dockerContext: .
-    envVars:
-      - key: AMD_HOST
-        value: "0.0.0.0"
-      - key: AMD_PORT
-        value: "8001"
-      - key: AMD_LOG_LEVEL
-        value: INFO
-
-  # -----------------------------------------------------------------------
   # GBFS-2D — specialized predictor for 2D layered materials
   # -----------------------------------------------------------------------
   # Deployed as a Docker private service. This supports the GBFS-2D UI
