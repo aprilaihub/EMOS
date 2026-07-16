@@ -13,11 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY . /app
 
-# Single runtime env for gateway and model APIs.
+# Single runtime env for gateway and the model APIs we mount.
 RUN conda create -n emos-gateway python=3.11 -y \
-    && conda run -n emos-gateway pip install --no-cache-dir -r /app/requirements.txt \
-    && conda run -n emos-gateway pip install --no-cache-dir mattersim==1.2.1 chgnet==0.4.0 ase==3.27.0 \
-    && conda run -n emos-gateway pip install --no-cache-dir "git+https://github.com/aprilaihub/mattergen.git" \
+    && conda run -n emos-gateway pip install --no-cache-dir -r /app/deploy/model-gateway/requirements.txt \
     && conda clean -afy
 
 WORKDIR /app/deploy/model-gateway
