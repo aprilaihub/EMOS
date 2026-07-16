@@ -1,0 +1,60 @@
+###############################################################################
+# Render Blueprint — EMOS Minimal 2-Service Hybrid
+# ---------------------------------------------------------------------------
+# This is opt-in and does not modify existing render.yaml deployments.
+#
+# Services:
+#   1) emos-backend-hybrid       (public web)
+#   2) emos-model-gateway-hybrid (private docker)
+###############################################################################
+
+services:
+  - type: web
+    name: emos-backend-hybrid
+    runtime: python
+    plan: starter
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: python backend/app.py
+    envVars:
+      - key: PORT
+        value: "5001"
+      - key: PYTHON_VERSION
+        value: "3.12.2"
+
+      # Same gateway host, model selected by URL path prefix.
+      - key: MATTERGEN_API_URL
+        value: "http://emos-model-gateway-hybrid:8000/mattergen"
+      - key: MATTERGEN_TIMEOUT
+        value: "600"
+
+      - key: MATTERSIM_API_URL
+        value: "http://emos-model-gateway-hybrid:8000/mattersim"
+      - key: MATTERSIM_TIMEOUT
+        value: "600"
+
+      - key: CHGNET_API_URL
+        value: "http://emos-model-gateway-hybrid:8000/chgnet"
+      - key: CHGNET_TIMEOUT
+        value: "600"
+
+      # Existing GBFS env var kept for compatibility/debug visibility.
+      - key: GBFS_PRED_API_URL
+        value: "http://emos-model-gateway-hybrid:8000/gbfs"
+
+    healthCheckPath: /api/health
+
+  - type: pserv
+    name: emos-model-gateway-hybrid
+    runtime: docker
+    plan: standard
+    region: oregon
+    dockerfilePath: ./deploy/model-gateway/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: MODEL_GATEWAY_LOG_LEVEL
+        value: INFO
+      - key: CHGNET_MODEL_NAME
+        value: "0.3.0"
+      - key: CHGNET_DEVICE
+        value: ""
