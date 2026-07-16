@@ -44,9 +44,13 @@ jobs:
           mkdir -p _site
           
           # Copy main website files
-          cp index.html about.html team.html documentation.html _site/
-          cp styles.css navigation.css navigation.js script.js _site/
+          cp index.html about.html team.html documentation.html node-editor.html _site/
+          cp styles.css navigation.css navigation.js script.js node-editor.css node-editor.js _site/
           cp -r images/ _site/
+
+          # Copy devtools data used by the Node Editor
+          mkdir -p _site/devtools
+          cp devtools/ui_data.json devtools/metadata.json _site/devtools/
           
           # Copy Features and Information_Units directories (CRITICAL for functionality)
           cp -r Features/ _site/
