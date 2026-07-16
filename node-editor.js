@@ -83,7 +83,6 @@
     // Loaded data
     let uiData            = null;
     let predictorPropsMap = {};  // factoryKey → { runtimePropName: displayLabel }
-    let resolvedBackendBaseUrl = null;
 
     // DOM refs
     let canvasContainer, canvas, wiresSvg, processBtn, cancelBtn, statusText, zoomText, contextMenu;
@@ -220,30 +219,9 @@
         cancelBtn.addEventListener('click', cancelPipeline);
     }
 
-    async function resolveBackendBaseUrl() {
-        if (resolvedBackendBaseUrl) return resolvedBackendBaseUrl;
-
-        const sanitizeUrl = (value) => String(value || '').trim().replace(/\/$/, '');
-
-        if (window.EMOS_BACKEND_BASE_URL) {
-            resolvedBackendBaseUrl = sanitizeUrl(window.EMOS_BACKEND_BASE_URL);
-            return resolvedBackendBaseUrl;
-        }
-
-        const meta = document.querySelector('meta[name="emos-backend"]');
-        if (meta?.content) {
-            resolvedBackendBaseUrl = sanitizeUrl(meta.content);
-            return resolvedBackendBaseUrl;
-        }
-
-        const { protocol, hostname } = window.location;
-        resolvedBackendBaseUrl = `${protocol}//${hostname}:5001`;
-        return resolvedBackendBaseUrl;
-    }
-
     async function cancelPipeline() {
         cancelFlag = true;
-        const backendUrl = await resolveBackendBaseUrl();
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
 
         // Tell the backend to cancel the active IU (e.g. send cancel to MatterGen Docker)
         if (activeRunId) {
@@ -1066,7 +1044,7 @@ output_results = results`;
             setNodeState(nid, 'waiting');
         }
 
-        const backendUrl = await resolveBackendBaseUrl();
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
 
         for (const nodeId of sorted) {
             if (cancelFlag) {

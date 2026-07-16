@@ -14,55 +14,31 @@
     <!-- 3Dmol.js for CIF viewer nodes -->
     <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
     <script>
-    // EMOS backend detection with support for custom deployment URLs.
+    // EMOS Intelligent Backend Detection System (same as index.html)
     (async function() {
         const BACKENDS = {
             local: 'http://localhost:5001',
             render: 'https://emos-backend.onrender.com'
         };
 
-        const sanitizeUrl = (value) => String(value || '').trim().replace(/\/$/, '');
-        const urlParams = new URLSearchParams(window.location.search);
-        const backendParam = urlParams.get('backend');
-        const backendUrlParam = urlParams.get('backendUrl');
-        const metaBackend = document.querySelector('meta[name="emos-backend"]')?.content;
-
         let selectedBackend = 'render';
-        let resolvedUrl = BACKENDS.render;
         let detectionMethod = 'default';
 
-        // Highest priority: explicit full backend URL via query param or meta tag.
-        if (backendUrlParam) {
-            resolvedUrl = sanitizeUrl(backendUrlParam);
-            detectionMethod = 'url_backend_url';
-            localStorage.setItem('emos_backend_url', resolvedUrl);
-        } else if (metaBackend) {
-            resolvedUrl = sanitizeUrl(metaBackend);
-            detectionMethod = 'meta_backend_url';
-        } else if (backendParam && BACKENDS[backendParam]) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const backendParam = urlParams.get('backend');
+
+        if (backendParam && BACKENDS[backendParam]) {
             selectedBackend = backendParam;
-            resolvedUrl = BACKENDS[selectedBackend];
             detectionMethod = 'url_parameter';
             localStorage.setItem('emos_backend_preference', backendParam);
-        } else if (backendParam && /^https?:\/\//i.test(backendParam)) {
-            resolvedUrl = sanitizeUrl(backendParam);
-            detectionMethod = 'url_backend_direct';
-            localStorage.setItem('emos_backend_url', resolvedUrl);
         } else {
-            const savedUrl = sanitizeUrl(localStorage.getItem('emos_backend_url'));
             const savedPreference = localStorage.getItem('emos_backend_preference');
-
-            if (savedUrl) {
-                resolvedUrl = savedUrl;
-                detectionMethod = 'saved_backend_url';
-            } else if (savedPreference && BACKENDS[savedPreference]) {
+            if (savedPreference && BACKENDS[savedPreference]) {
                 selectedBackend = savedPreference;
-                resolvedUrl = BACKENDS[selectedBackend];
                 detectionMethod = 'saved_preference';
             }
         }
 
-        // Auto-detect local backend only when no custom backend URL is configured.
         if (detectionMethod === 'default' || detectionMethod === 'saved_preference') {
             try {
                 const response = await fetch(BACKENDS.local + '/api/health', {
@@ -72,35 +48,19 @@
                 });
                 if (response.ok) {
                     selectedBackend = 'local';
-                    resolvedUrl = BACKENDS.local;
                     detectionMethod = detectionMethod === 'default' ? 'auto_detected' : 'saved_preference_verified';
                 }
             } catch (error) {
                 if (detectionMethod === 'saved_preference' && selectedBackend === 'local') {
                     selectedBackend = 'render';
-                    resolvedUrl = BACKENDS.render;
                     detectionMethod = 'auto_fallback';
                 }
             }
         }
 
-        window.EMOS_BACKEND_BASE_URL = sanitizeUrl(resolvedUrl);
-
-        // Console helpers for troubleshooting deployed pages.
-        window.setBackendUrl = function(url) {
-            const clean = sanitizeUrl(url);
-            if (!/^https?:\/\//i.test(clean)) {
-                console.error('Invalid backend URL. Example: https://your-service.onrender.com');
-                return false;
-            }
-            localStorage.setItem('emos_backend_url', clean);
-            window.EMOS_BACKEND_BASE_URL = clean;
-            console.log('Backend URL set to:', clean);
-            return true;
-        };
-
-        console.log(`🔌 Backend URL: ${window.EMOS_BACKEND_BASE_URL} [${detectionMethod}]`);
-    })().catch(console.error);
+        window.EMOS_BACKEND_BASE_URL = BACKENDS[selectedBackend];
+        console.log(`🔌 Backend: ${selectedBackend} (${BACKENDS[selectedBackend]}) [${detectionMethod}]`);
+    })();
     </script>
 </head>
 <body>
