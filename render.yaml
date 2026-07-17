@@ -32,7 +32,7 @@ services:
         fromService:
           name: emos-mattergen
           type: pserv
-          property: hostport
+          property: host
       - key: MATTERGEN_TIMEOUT
         value: "600"
       # Point at the MatterSim container's internal Render URL
@@ -40,7 +40,7 @@ services:
         fromService:
           name: emos-mattersim
           type: pserv
-          property: hostport
+          property: host
       - key: MATTERSIM_TIMEOUT
         value: "600"
       # Point at the CHGNet container's internal Render URL
@@ -48,7 +48,7 @@ services:
         fromService:
           name: emos-chgnet
           type: pserv
-          property: hostport
+          property: host
       - key: CHGNET_TIMEOUT
         value: "600"
       # Point at the GBFS container's internal Render URL
@@ -56,7 +56,7 @@ services:
         fromService:
           name: emos-gbfs-pred
           type: pserv
-          property: hostport
+          property: host
     healthCheckPath: /api/health
 
   # -----------------------------------------------------------------------
