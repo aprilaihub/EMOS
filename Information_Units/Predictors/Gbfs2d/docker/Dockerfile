@@ -44,7 +44,7 @@ USER gbfs2d_user
 
 # Health check to verify container is ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8000/ready || exit 1
 
 # Expose the FastAPI port
 EXPOSE 8000
@@ -53,6 +53,7 @@ EXPOSE 8000
 ENV GBFS2D_HOST=0.0.0.0
 ENV GBFS2D_PORT=8000
 ENV GBFS2D_LOG_LEVEL=INFO
+ENV EMOS_GBFS2D_CONTAINER=1
 
 # Run the FastAPI server via Gbfs2dPredictor
 CMD ["python", "-m", "Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor", "--serve"]

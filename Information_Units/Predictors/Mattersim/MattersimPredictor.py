@@ -28,6 +28,7 @@ import requests
 
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.property_mappings.property_loader import load_source_property_mapping
+from Information_Units.service_urls import normalise_service_url
 
 
 # ---------------------------------------------------------------------------
@@ -55,7 +56,10 @@ class MattersimPredictor(BasePredictor):
     def __init__(self, predictor_name='mattersim', logger=None):
         super().__init__(predictor_name, logger)
         self.source = "mattersim"
-        self.api_url = os.getenv("MATTERSIM_API_URL", _DEFAULT_API_URL).rstrip("/")
+        self.api_url = normalise_service_url(
+            os.getenv("MATTERSIM_API_URL"),
+            _DEFAULT_API_URL,
+        )
         self.timeout = int(os.getenv("MATTERSIM_TIMEOUT", _DEFAULT_TIMEOUT))
         
         # Load and validate property mappings
@@ -311,6 +315,27 @@ class MattersimPredictor(BasePredictor):
             self.logger.log(f"MatterSim container health: {status}", "info")
 
         return healthy
+
+    def availability(self) -> dict[str, Any]:
+        """Return container readiness and advertised MatterSim capabilities."""
+        result: dict[str, Any] = {
+            "available": False,
+            "service": "mattersim",
+            "models": [],
+        }
+        try:
+            health_response = requests.get(f"{self.api_url}/health", timeout=10)
+            health_response.raise_for_status()
+            info_response = requests.get(f"{self.api_url}/info", timeout=10)
+            info_response.raise_for_status()
+            info = info_response.json()
+            result["available"] = True
+            result["models"] = info.get("models", [info.get("name", "mattersim")])
+            result["version"] = info.get("version")
+            result["capabilities"] = info.get("capabilities", [])
+        except Exception as exc:
+            result["error"] = f"{type(exc).__name__}: service check failed"
+        return result
 
     # ------------------------------------------------------------------
     # Helper

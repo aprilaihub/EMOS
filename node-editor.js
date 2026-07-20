@@ -1176,6 +1176,7 @@ output_results = results`;
                 const decoder = new TextDecoder();
                 let buffer = '';
                 let result = null;
+                let currentEvent = 'log';
 
                 function read() {
                     reader.read().then(({ done, value }) => {
@@ -1190,7 +1191,6 @@ output_results = results`;
                         const lines = buffer.split('\n');
                         buffer = lines.pop(); // keep incomplete line
 
-                        let currentEvent = 'log';
                         for (const line of lines) {
                             if (line.startsWith('event: ')) {
                                 currentEvent = line.slice(7).trim();

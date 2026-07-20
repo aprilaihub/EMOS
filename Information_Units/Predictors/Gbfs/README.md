@@ -1,26 +1,22 @@
 # GBFS Predictor
 
-GBFS: Pretrained predictors from GBFS workflow, implemented in Python with integrated FastAPI service.
+GBFS is deployed as a dedicated prediction container. EMOS communicates with it only through `GbfsClient` and the HTTP API.
 
 ## Status
 
 ✅ **Production Ready** - All 135 tests passing (86 unit + 49 integration)  
 🎯 **6-Property Support** - bandgap, e_form, dielectric, is_metal, mob_n, mob_p  
 📊 **Feature Generation Optimized** - Selective featurizer instantiation (10-100× faster)  
-🔄 **Unified Architecture** - Single `GbfsPredictor.py` with integrated FastAPI server  
 🌐 **HTTP API Ready** - Full REST endpoints with Pydantic validation  
 🐳 **Docker Ready** - Production container with health checks and non-root user  
 
 ## Architecture Overview
 
-Gbfs now uses a unified architecture that mirrors **MattergenGenerator**:
+The host/backend and model runtime are deliberately separated:
 
 ```
-GbfsPredictor.py          ← Single source file containing:
-├── Predictor class              • Core LightGBM predictor logic
-├── Feature generation           • Matminer featurizers
-├── API models & endpoints       • FastAPI routes
-└── CLI/Server entry point       • --cif (legacy) or --serve modes
+GbfsClient.py             ← Lightweight host-side HTTP client
+GbfsPredictor.py          ← Container-only model and FastAPI implementation
 
 docker/                         ← Docker deployment folder
 ├── Dockerfile
@@ -29,34 +25,17 @@ docker/                         ← Docker deployment folder
 └── DOCKER.md
 ```
 
-## Usage Modes
-
-### Mode 1: Python Library (Programmatic)
+## Host Usage
 
 ```python
-from Information_Units.Predictors.Gbfs.GbfsPredictor import GbfsPredictor
-from pymatgen.core import Structure
+from pathlib import Path
+from Information_Units.Predictors.Gbfs.GbfsClient import GbfsClient
 
-# Load predictor
-predictor = GbfsPredictor(predictor_name="bandgap", property_name="bandgap")
-
-# Load structure
-structure = Structure.from_file("Si.cif")
-
-# Predict (with dict input - no files created)
-result = predictor.predict_numpy({"structure": structure})
-print(f"Bandgap: {result[0]} eV")
+client = GbfsClient()
+result = client.predict([Path("Si.cif").read_text()])
 ```
 
-### Mode 2: CLI Prediction (Legacy)
-
-```bash
-python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
-  --cif /path/to/structure.cif \
-  --property bandgap
-```
-
-### Mode 3: FastAPI Server
+## Container Service
 
 ```bash
 # Run server locally
@@ -92,7 +71,13 @@ Once running, API docs available at: `http://localhost:8000/docs`
 ```
 GET /health
 ```
-Returns service status. Used by Docker health checks.
+Returns process liveness.
+
+### Readiness Check
+```
+GET /ready
+```
+Loads and verifies all model artifacts. Docker and EMOS readiness checks use this endpoint.
 
 ### Model Information
 ```
@@ -196,12 +181,11 @@ If `properties` is omitted, predicts all supported properties.
 ### Local Development
 
 ```bash
-# Install dependencies
-pip install -r docker/requirements.txt
-
-# Run predictor
-python -m Information_Units.Predictors.Gbfs.Gbfs Predictor --cif test.cif --property bandgap
+# Start the model service
+docker compose up -d gbfs-pred
 ```
+
+Use `GbfsClient` from the host application; model dependencies remain inside the container.
 
 ### Docker
 
@@ -350,15 +334,9 @@ All tests validate:
 This implementation mirrors the **MattergenGenerator** architecture:
 
 1. **Single Source File**: All predictor + API code in one file
-2. **Flexible Modes**: Can run CLI (legacy), library, or HTTP server
+2. **Container Boundary**: Host code communicates only through the HTTP client
 3. **Integrated API**: FastAPI endpoints defined where data is processed
 4. **Docker Ready**: Container runs server mode automatically
-
-### Backward Compatibility
-
-- Old scripts using CIF file paths continue to work
-- CLI interface unchanged (`--cif` and `--property` flags)
-- JSON output format preserved
 
 ### Future Extensions
 
@@ -491,15 +469,9 @@ Comprehensive error handling includes:
 This implementation mirrors the **MattergenGenerator** architecture:
 
 1. **Single Source File**: All predictor + API code in one file
-2. **Flexible Modes**: Can run CLI (legacy), library, or HTTP server
+2. **Container Boundary**: Host code communicates only through the HTTP client
 3. **Integrated API**: FastAPI endpoints defined where data is processed
 4. **Docker Ready**: Container runs server mode automatically
-
-### Backward Compatibility
-
-- Old scripts using CIF file paths continue to work
-- CLI interface unchanged (`--cif` and `--property` flags)
-- JSON output format preserved
 
 ### Future Extensions
 

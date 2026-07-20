@@ -182,13 +182,13 @@ python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
   --log-level DEBUG
 ```
 
-### Run CLI Predictor Locally
+### Call from Python
 
-```bash
-# Single prediction
-python -m Information_Units.Predictors.Gbfs.GbfsPredictor \
-  --cif /path/to/structure.cif \
-  --property bandgap
+```python
+from pathlib import Path
+from Information_Units.Predictors.Gbfs.GbfsClient import GbfsClient
+
+result = GbfsClient().predict([Path("structure.cif").read_text()])
 ```
 
 ## Interactive API Documentation

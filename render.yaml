@@ -57,7 +57,16 @@ services:
           name: emos-gbfs-pred
           type: pserv
           property: host
-    healthCheckPath: /api/health
+      - key: GBFS2D_API_URL
+        fromService:
+          name: emos-gbfs-2d
+          type: pserv
+          property: host
+      - key: GBFS_PRED_TIMEOUT
+        value: "600"
+      - key: GBFS2D_TIMEOUT
+        value: "600"
+    healthCheckPath: /api/ready
 
   # -----------------------------------------------------------------------
   # MatterGen — crystal-structure generator (Microsoft Research)

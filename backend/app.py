@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, Response, send_file
 from flask_cors import CORS
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import sys
 import pathlib
@@ -21,6 +22,7 @@ sys.path.append(str(PROJECT_ROOT))
 from Information_Units.Generators.GeneratorFactory import generator_factory, generator_registry
 from Information_Units.Databases.DatabaseFactory import database_factory, database_registry
 from Information_Units.Predictors.PredictorFactory import predictor_factory, predictor_registry
+from backend.lambda_sandbox import LambdaSandboxError, run_sandboxed_lambda
 
 # New Feature architecture - try to import, fallback if not available
 try:
@@ -110,31 +112,86 @@ def health():
     return jsonify({'status': 'ok'}), 200
 
 
-@app.route('/api/debug/mattergen', methods=['GET'])
-def debug_mattergen_connectivity():
-    """Temporary diagnostics for Render deployment issues."""
-    api_url = os.getenv("MATTERGEN_API_URL", "http://localhost:8100").strip().rstrip("/")
-    if api_url and "://" not in api_url:
-        api_url = f"http://{api_url}"
-    health_url = f"{api_url}/health"
-
-    result = {
-        "configured_api_url": api_url,
-        "health_url": health_url,
-        "health_reachable": False,
+def _model_service_availability():
+    """Query model dependencies without running inference."""
+    checks = {
+        'mattergen': (generator_factory['mattergen_base_model'], 'mattergen_base_model'),
+        'mattersim': (predictor_factory['mattersim'], 'mattersim'),
+        'chgnet': (predictor_factory['chgnet'], 'chgnet'),
+        'gbfs': (predictor_factory['gbfs'], 'gbfs'),
+        'gbfs_2d': (predictor_factory['gbfs_2d'], 'gbfs_2d'),
     }
-    try:
-        resp = requests.get(health_url, timeout=8)
-        result["health_reachable"] = resp.status_code == 200
-        result["health_status_code"] = resp.status_code
+    def check_service(service_name, iu_cls, iu_name):
         try:
-            result["health_response"] = resp.json()
-        except Exception:
-            result["health_response"] = resp.text[:500]
-    except Exception as exc:
-        result["health_error"] = str(exc)
+            instance = _instantiate_iu(iu_cls, iu_name, logger)
+            return instance.availability()
+        except Exception as exc:
+            return {
+                'available': False,
+                'service': service_name,
+                'models': [],
+                'error': f'{type(exc).__name__}: service check failed',
+            }
 
-    return jsonify(result), 200
+    services = {}
+    with ThreadPoolExecutor(max_workers=len(checks), thread_name_prefix='readiness') as executor:
+        futures = {
+            executor.submit(check_service, service_name, iu_cls, iu_name): service_name
+            for service_name, (iu_cls, iu_name) in checks.items()
+        }
+        for future in as_completed(futures):
+            services[futures[future]] = future.result()
+    return services
+
+
+def _availability_payload():
+    services = _model_service_availability()
+    generators = {}
+    mattergen = services['mattergen']
+    advertised_models = set(mattergen.get('models', []))
+    for key, generator_cls in generator_factory.items():
+        model_name = getattr(generator_cls, 'PRETRAINED_NAME', None)
+        generators[key] = {
+            'available': bool(mattergen.get('available')) and (
+                not model_name or not advertised_models or model_name in advertised_models
+            ),
+            'service': 'mattergen',
+            'model': model_name,
+        }
+
+    predictors = {
+        'mattersim': {'available': bool(services['mattersim'].get('available')), 'service': 'mattersim'},
+        'chgnet': {'available': bool(services['chgnet'].get('available')), 'service': 'chgnet'},
+        'gbfs': {'available': bool(services['gbfs'].get('available')), 'service': 'gbfs'},
+        'gbfs_2d': {'available': bool(services['gbfs_2d'].get('available')), 'service': 'gbfs_2d'},
+        'synthnn': {'available': True, 'service': 'local'},
+    }
+    all_dependencies_available = all(
+        bool(service.get('available')) for service in services.values()
+    )
+    return {
+        'status': 'ready' if all_dependencies_available else 'degraded',
+        'services': services,
+        'information_units': {
+            'generators': generators,
+            'predictors': predictors,
+        },
+    }
+
+
+@app.route('/api/ready', methods=['GET', 'OPTIONS'])
+def readiness():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+    payload = _availability_payload()
+    return jsonify(payload), 200 if payload['status'] == 'ready' else 503
+
+
+@app.route('/api/availability', methods=['GET', 'OPTIONS'])
+def availability():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+    return jsonify(_availability_payload()), 200
 
 
 @app.route('/api/process/toggle_IU', methods=["POST", "OPTIONS"])
@@ -912,8 +969,6 @@ def _run_predictor(key, inputs, upstream, run_entry=None):
     
 
 # ── Lambda runner (utility node) ─────────────────────────────────────
-# NOTE: executes arbitrary user-supplied Python. Intended for local
-# research use only — never expose this endpoint on a public server.
 def _run_lambda(inputs, upstream):
     code = inputs.get('code', '').strip()
     if not code:
@@ -930,30 +985,14 @@ def _run_lambda(inputs, upstream):
 
     yield _sse_event('log', {'message': f'Lambda: executing on {len(cif_list)} CIF(s)…', 'level': 'info'})
 
-    namespace = {
-        'cif_list':       list(cif_list),
-        'results':        results,
-        'output_cifs':    None,
-        'output_results': None,
-    }
-
     try:
-        exec(compile(code, '<lambda_node>', 'exec'), namespace)  # noqa: S102
-    except Exception as exc:
+        result = run_sandboxed_lambda(code, cif_list, results)
+    except LambdaSandboxError as exc:
         yield _sse_event('error', {'message': f'Lambda error: {exc}'})
         return
 
-    output_cifs    = namespace.get('output_cifs')    or namespace.get('cif_list',  [])
-    output_results = namespace.get('output_results') or namespace.get('results',    {})
-
-    if not isinstance(output_cifs, list):
-        try:
-            output_cifs = list(output_cifs)
-        except Exception:
-            output_cifs = []
-
-    if not isinstance(output_results, dict):
-        output_results = {}
+    output_cifs = result['cif_out']
+    output_results = result['result_out']
 
     yield _sse_event('log', {'message': f'Lambda produced {len(output_cifs)} CIF(s)', 'level': 'info'})
     yield _sse_event('progress', {'progress': 1.0, 'message': 'Complete'})

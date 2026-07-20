@@ -16,6 +16,7 @@ import requests
 
 from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.property_mappings.property_loader import load_source_property_mapping
+from Information_Units.service_urls import normalise_service_url
 
 
 _DEFAULT_API_URL = "http://localhost:8400"
@@ -44,7 +45,10 @@ class ChgnetPredictor(BasePredictor):
     def __init__(self, predictor_name: str = "chgnet", logger=None):
         super().__init__(predictor_name, logger)
         self.source = "chgnet"
-        self.api_url = os.getenv("CHGNET_API_URL", _DEFAULT_API_URL).rstrip("/")
+        self.api_url = normalise_service_url(
+            os.getenv("CHGNET_API_URL"),
+            _DEFAULT_API_URL,
+        )
         self.timeout = int(os.getenv("CHGNET_TIMEOUT", _DEFAULT_TIMEOUT))
 
         self._mapped_output_properties = self._load_mapped_output_properties()
@@ -244,6 +248,27 @@ class ChgnetPredictor(BasePredictor):
             self.logger.log(f"CHGNet container health: {status}", "info")
 
         return healthy
+
+    def availability(self) -> dict[str, Any]:
+        """Return container readiness and advertised CHGNet capabilities."""
+        result: dict[str, Any] = {
+            "available": False,
+            "service": "chgnet",
+            "models": [],
+        }
+        try:
+            health_response = requests.get(f"{self.api_url}/health", timeout=10)
+            health_response.raise_for_status()
+            info_response = requests.get(f"{self.api_url}/info", timeout=10)
+            info_response.raise_for_status()
+            info = info_response.json()
+            result["available"] = True
+            result["models"] = info.get("models", [info.get("name", "chgnet")])
+            result["version"] = info.get("version")
+            result["capabilities"] = info.get("capabilities", [])
+        except Exception as exc:
+            result["error"] = f"{type(exc).__name__}: service check failed"
+        return result
 
     def _save_relaxed_cif(self, cif_string: str, cif_filename: str, output_dir: str) -> str:
         output_path = Path(output_dir)

@@ -394,19 +394,13 @@ python -m Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor \
   --log-level DEBUG
 ```
 
-### CLI Prediction (Local)
+### Call from Python
 
-```bash
-# Single prediction
-python -m Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor \
-  --cif /path/to/mos2.cif \
-  --property bandgap
+```python
+from pathlib import Path
+from Information_Units.Predictors.Gbfs2d.Gbfs2dClient import Gbfs2dClient
 
-# Get vdW detection
-python -m Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor \
-  --cif mp-2815.cif \
-  --property is_metal
-# Output includes: is_vdw_layered: True
+result = Gbfs2dClient().predict([Path("mp-2815.cif").read_text()])
 ```
 
 ## Interactive API Documentation

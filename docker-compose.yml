@@ -156,7 +156,37 @@ services:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+
+  gbfs-2d:
+    build:
+      context: .
+      dockerfile: Information_Units/Predictors/Gbfs2d/docker/Dockerfile
+    image: gbfs2d-pred:latest
+    container_name: emos-gbfs-2d
+    ports:
+      - "${GBFS2D_PORT:-8201}:8000"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      GBFS2D_HOST: 0.0.0.0
+      GBFS2D_PORT: 8000
+      GBFS2D_LOG_LEVEL: INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
       interval: 30s
       timeout: 10s
       start_period: 10s

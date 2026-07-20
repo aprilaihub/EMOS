@@ -38,7 +38,7 @@ USER gbfs_user
 
 # Health check to verify container is ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')" || exit 1
 
 # Expose the FastAPI port
 EXPOSE 8000
@@ -47,6 +47,7 @@ EXPOSE 8000
 ENV GBFS_HOST=0.0.0.0
 ENV GBFS_PORT=8000
 ENV GBFS_LOG_LEVEL=INFO
+ENV EMOS_GBFS_CONTAINER=1
 
 # Run the FastAPI server via GbfsPredictor
 CMD ["python", "-m", "Information_Units.Predictors.Gbfs.GbfsPredictor", "--serve"]
