@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from Information_Units.Predictors.Gbfs.GbfsClient import GbfsClient
-from Information_Units.Predictors.Gbfs2d.Gbfs2dClient import Gbfs2dClient
+from Information_Units.Predictors.Gbfs.GbfsClient import GbfsClient, GbfsPredictor
+from Information_Units.Predictors.Gbfs2d.Gbfs2dClient import Gbfs2dClient, Gbfs2dPredictor
 from Information_Units.Predictors.PredictorFactory import predictor_factory
 from Information_Units.service_urls import normalise_service_url
 
@@ -25,8 +25,10 @@ def test_normalise_service_url(raw_url, expected):
 
 
 def test_predictor_factory_uses_http_only_gbfs_clients():
-    assert predictor_factory["gbfs"] is GbfsClient
-    assert predictor_factory["gbfs_2d"] is Gbfs2dClient
+    assert predictor_factory["gbfs"] is GbfsPredictor
+    assert predictor_factory["gbfs_2d"] is Gbfs2dPredictor
+    assert GbfsClient is GbfsPredictor
+    assert Gbfs2dClient is Gbfs2dPredictor
     assert "Information_Units.Predictors.Gbfs.GbfsPredictor" not in sys.modules
     assert "Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor" not in sys.modules
 
