@@ -158,14 +158,14 @@ def plot(matrix, row_labels, section_boundaries):
     # Discrete colormap with steps of 5, fixed range 0–25
     step = 5
     bounds = list(range(0, 26, step))        # [0, 5, 10, 15, 20, 25]
-    # Shift lower bound to 1 so zero values fall below the range (shown as gray)
+    # Shift lower bound to 1 so zero values fall below the range (shown as light gray)
     color_bounds = [1] + bounds[1:]           # [1, 5, 10, 15, 20, 25]
     n_colors = len(color_bounds) - 1
 
     base_cmap = mcolors.LinearSegmentedColormap.from_list(
         "emos", ["#90e0ef", "#00b4d8", "#0e4d4d", "#0d1117"], N=n_colors
     )
-    base_cmap.set_under("#444444")            # gray for zero
+    base_cmap.set_under("#eeeeee")            # light gray for zero values
     norm = mcolors.BoundaryNorm(color_bounds, ncolors=n_colors, clip=False)
 
     im = ax.imshow(matrix, aspect="equal", cmap=base_cmap, norm=norm,
@@ -231,10 +231,11 @@ def plot(matrix, row_labels, section_boundaries):
             transform=bar_tf, clip_on=False, zorder=5)
 
     # ── Grid lines ────────────────────────────────────────────────────────────
+    grid_color = "#b8b8b8"
     for c in range(n_cols + 1):
-        ax.axvline(c - 0.5, color="#d6d6d6", linewidth=0.6, zorder=2)
+        ax.axvline(c - 0.5, color=grid_color, linewidth=0.6, zorder=2)
     for r in range(n_rows + 1):
-        ax.axhline(r - 0.5, color="#d6d6d6", linewidth=0.4, zorder=2)
+        ax.axhline(r - 0.5, color=grid_color, linewidth=0.4, zorder=2)
 
     # ── Colorbar ─────────────────────────────────────────────────────────────
     cbar = fig.colorbar(im, ax=ax, fraction=0.015, pad=0.02,
