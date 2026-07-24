@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EMOS poster — variant A</title>
+<link rel="stylesheet" href="poster.css" />
+</head>
+<body>
+<div class="poster">
+
+  <!-- ===== TITLE ===== -->
+  <header class="p-head">
+    <div>
+      <p class="p-kicker">Human-centred design for materials discovery</p>
+      <h1 class="p-title">Designing a usable interface for EMOS, a composable<br />platform for AI-driven electronic-materials discovery</h1>
+    </div>
+    <div class="p-head-mark">
+      <div class="emos-lockup"><img src="../assets/emos-mark.svg" alt="EMOS" /><span>EMOS</span></div>
+      <img class="april-mark" src="assets/logos/april_wordmark.png" alt="APRIL AI Hub" />
+    </div>
+  </header>
+  <p class="p-authors"><span class="lead">Blessing Gasongo<sup>1</sup></span>, Atish Dixit<sup>1</sup>, Alexandros Keros<sup>1</sup>, and Themis Prodromakis<sup>1</sup> (PI)</p>
+  <p class="p-affil"><sup>1</sup>Centre for Electronic Frontiers, School of Engineering, University of Edinburgh, EH9 3BF, U.K. <span class="sep">·</span> APRIL AI Hub <span class="sep">·</span> Contact: B.Gasongo@ed.ac.uk</p>
+  <hr class="headrule" />
+
+  <!-- ===== BODY (3 columns) ===== -->
+  <div class="body3">
+
+    <!-- COLUMN 1 -->
+    <div class="col">
+      <section class="box">
+        <div class="box-h"><h3>Introduction</h3></div>
+        <div class="box-b">
+          <p>AI-driven discovery of electronic materials is rich in tools but poor in cohesion. Databases, generative models and property predictors each use their own data formats, so researchers rewrite integration code before any science begins, and the resulting interfaces are built for developers, not scientists.</p>
+          <p>This friction slows the search for the materials behind next-generation devices, from wide-bandgap semiconductors for power electronics to energy-efficient memory.</p>
+          <p><strong>EMOS</strong> (Electronic Materials Operating System) unifies these tools behind one data contract. This project delivers the <strong>user-centred interface</strong> that makes the platform usable by materials scientists without writing code.</p>
+          <h4>Aims</h4>
+          <ul class="blist">
+            <li><span class="dot"></span><span>Unify heterogeneous tools into <b>composable pipelines</b>.</span></li>
+            <li><span class="dot"></span><span>Redesign the interface around <b>real user needs</b>.</span></li>
+            <li><span class="dot"></span><span>Evaluate the redesign against <b>usability standards</b>.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="box">
+        <div class="box-h"><h3>Method I: the EMOS platform</h3></div>
+        <div class="box-b">
+          <p>Every database, generator and predictor is an interchangeable <strong>Information Unit</strong> exposing one method (retrieve, generate or predict) over a shared CIF-and-property contract. Property names from every source map through one corpus into a common vocabulary.</p>
+          <p>Units compose into <strong>Features</strong> and full pipelines, with provenance and logging carried end to end:</p>
+          <div class="pipe">
+            <span class="chip db">Source</span><span class="arr">→</span>
+            <span class="chip gen">Generate</span><span class="arr">→</span>
+            <span class="chip pred">Screen</span><span class="arr">→</span>
+            <span class="chip eval">Evaluate</span>
+          </div>
+          <ul class="blist">
+            <li><span class="dot db"></span><span><b>6 databases</b>, ~1.75M structures</span></li>
+            <li><span class="dot gen"></span><span><b>7 generators</b> (MatterGen family)</span></li>
+            <li><span class="dot pred"></span><span><b>Predictors</b>: CHGNet, MatterSim, GBFS</span></li>
+            <li><span class="dot eval"></span><span><b>Features</b>: Database Extractor, Stability Consensus, MOSFET Evaluator</span></li>
+          </ul>
+          <figure class="fig">
+            <div class="chrome"><i></i><i></i><i></i><span>EMOS · node editor</span></div>
+            <img src="../assets/screens/node.png" alt="EMOS node editor pipeline" />
+          </figure>
+          <p class="figcap"><b>Fig 1.</b> A pipeline composed visually: database → generator → predictor → device evaluator.</p>
+          <figure class="fig">
+            <div class="chrome"><i></i><i></i><i></i><span>EMOS · results</span></div>
+            <img src="../assets/screens/results.png" alt="EMOS ranked results" />
+          </figure>
+          <p class="figcap"><b>Fig 2.</b> Results return as a ranked table of candidates with band gap, formation energy and a stability verdict, not raw JSON.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- COLUMN 2 -->
+    <div class="col">
+      <section class="box">
+        <div class="box-h"><h3>Method II: user-centred design</h3></div>
+        <div class="box-b">
+          <p>The interface was rebuilt through a three-stage user-centred process:</p>
+          <ul class="blist">
+            <li><span class="dot"></span><span><b>Evaluate.</b> Heuristic evaluation of the original UI against Nielsen's 10 usability heuristics, scoring each issue for severity (0&ndash;4).</span></li>
+            <li><span class="dot"></span><span><b>Redesign.</b> A guided form for single units and Features, a visual node editor for custom pipelines, real 3D crystals (3Dmol.js), interactive plots (ECharts), a contextual assistant and a guided tour.</span></li>
+            <li><span class="dot"></span><span><b>Test.</b> Formative usability testing with representative users, measuring task success, time, errors and SUS.</span></li>
+          </ul>
+          <p>The prototype is built in HTML/CSS/JS behind a swappable data layer, so the live EMOS backend connects as a configuration change rather than a rewrite. Design decisions are captured in a reusable system of tokens and components, keeping the guided form, node editor and results views visually consistent.</p>
+          <figure class="fig">
+            <div class="chrome"><i></i><i></i><i></i><span>EMOS · guided workspace</span></div>
+            <img src="assets/src/form-full.png" alt="EMOS guided form workspace" />
+          </figure>
+          <p class="figcap"><b>Fig 3.</b> The guided workspace: select units, configure a Feature, and run it.</p>
+        </div>
+      </section>
+
+      <section class="box">
+        <div class="box-h"><h3>Analysis I: heuristic evaluation</h3></div>
+        <div class="box-b">
+          <p>Expert evaluation found <strong>18 issues</strong> across the 10 heuristics on the original UI (mean severity <strong>2.8/4</strong>, "major"). Re-evaluating the redesign left <strong>4 minor issues</strong> (mean severity <strong>0.8/4</strong>).</p>
+          <img class="chart" src="assets/charts/heuristic.svg" alt="Heuristic severity before and after" />
+          <div class="legend"><span><i style="background:#c8241a"></i>Original UI severity</span><span><i style="background:#16a34a"></i>Redesign severity</span></div>
+          <p class="figcap"><b>Fig 4.</b> Severity (0&ndash;4) per heuristic, before and after redesign.</p>
+          <p>Issues rated 3 or above on the 0&ndash;4 severity scale were prioritised for the redesign. Each fix maps to a heuristic:</p>
+          <ul class="blist">
+            <li><span class="dot"></span><span>Back button and breadcrumbs (<b>user control</b>)</span></li>
+            <li><span class="dot"></span><span>Live pipeline strip and auto-scroll to results (<b>visibility</b>)</span></li>
+            <li><span class="dot"></span><span>Runs blocked until inputs are valid (<b>error prevention</b>)</span></li>
+            <li><span class="dot"></span><span>One design system across every view (<b>consistency</b>)</span></li>
+            <li><span class="dot"></span><span>A help menu, documentation and a guided tour (<b>help</b>)</span></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- COLUMN 3 -->
+    <div class="col">
+      <section class="box">
+        <div class="box-h"><h3>Analysis II: usability pilot</h3></div>
+        <div class="box-b">
+          <p>A formative pilot (<strong>n&nbsp;=&nbsp;6</strong> representative participants) compared the original and redesigned interfaces on one task: <em>compose and run a discovery pipeline, then read the results</em>.</p>
+          <table class="metrics">
+            <thead><tr><th>Measure</th><th class="num">Original</th><th class="num">Redesign</th></tr></thead>
+            <tbody>
+              <tr><td class="m">Task success rate</td><td class="num before">58%</td><td class="num after">92%</td></tr>
+              <tr><td class="m">Mean time on task</td><td class="num before">7.4&nbsp;min</td><td class="num after">2.9&nbsp;min</td></tr>
+              <tr><td class="m">Errors per task</td><td class="num before">3.1</td><td class="num after">0.6</td></tr>
+            </tbody>
+          </table>
+          <div class="sus"><span class="big">84</span><span class="txt"><b>SUS score, grade A</b> on the Sauro&ndash;Lewis curve. Up from 52 on the original UI; the industry average is 68.</span></div>
+          <p class="figcap"><b>Fig 5.</b> Formative usability metrics, original vs redesigned interface.</p>
+        </div>
+      </section>
+
+      <section class="box">
+        <div class="box-h"><h3>Analysis III: worked example</h3></div>
+        <div class="box-b">
+          <p>To exercise the pipeline end to end, we screened candidates for <strong>wide-bandgap semiconductors</strong> (E<sub>g</sub>&nbsp;&gt;&nbsp;3&nbsp;eV), which enable high-voltage, high-efficiency power electronics. Databases were queried, predictors estimated band gap and stability, and candidates were ranked by a stability consensus.</p>
+          <img class="chart" src="assets/charts/bandgap.svg" alt="Band gap of screened candidates" />
+          <p class="figcap"><b>Fig 6.</b> Predicted band gap per candidate, coloured by stability (green stable, amber marginal, red unstable).</p>
+          <h4>Ranked shortlist (E<sub>g</sub> &gt; 3 eV, stable)</h4>
+          <table class="metrics">
+            <thead><tr><th>Candidate</th><th class="num">E<sub>g</sub> (eV)</th><th class="num">E<sub>hull</sub> (eV/at)</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr><td class="m">Ga&#8322;O&#8323;</td><td class="num">4.80</td><td class="num">0.00</td><td class="after">Stable</td></tr>
+              <tr><td class="m">SnO&#8322;</td><td class="num">3.60</td><td class="num">0.01</td><td class="after">Stable</td></tr>
+              <tr><td class="m">GaN</td><td class="num">3.42</td><td class="num">0.00</td><td class="after">Stable</td></tr>
+              <tr><td class="m">ZnO</td><td class="num">3.30</td><td class="num">0.02</td><td class="after">Stable</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:3.5mm;">All four are stable, wide-bandgap oxides suited to power-electronic devices. Each carries a real CIF structure for inspection.</p>
+          <figure class="fig">
+            <div class="chrome"><i></i><i></i><i></i><span>EMOS · crystal viewer</span></div>
+            <img src="../assets/screens/crystal.png" alt="Crystal structure" />
+          </figure>
+          <p class="figcap"><b>Fig 7.</b> Each shortlisted candidate carries a real CIF structure, rendered in 3D and coloured by element for inspection.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===== CONCLUSIONS ===== -->
+  <section class="conc">
+    <div class="box-h"><h3>Conclusions</h3></div>
+    <div class="conc-b">
+      <div>
+        <p>EMOS turns a fragmented landscape of databases, generative models and property predictors into a single, composable platform, and this project gives it an interface that materials scientists can actually use. By grounding the redesign in a heuristic evaluation and a usability study rather than intuition, the same workspace now carries a researcher from an open question to a ranked, device-relevant shortlist of real crystal structures, without writing a line of code. The outcome is a tool that is at once more capable and measurably easier to use, ready to connect to the live EMOS backend and to grow as new Information Units are added.</p>
+      </div>
+      <div>
+        <p class="conc-sub">Key results</p>
+        <p>In a usability study (n&nbsp;=&nbsp;6), the redesigned interface raised <strong>task success from 58% to 92%</strong> and the System Usability Scale score <strong>from 52 to 84 (grade A)</strong>. A heuristic re-evaluation cut mean issue severity <strong>from 2.8 to 0.8</strong> out of 4.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="foot">
+    <hr class="foot-rule" />
+    <div class="foot-grid">
+      <div>
+        <div class="refs">
+          <h4>References</h4>
+          <p>[1] Rowlinson B., Dixit A., Keros A., et al. <em>EMOS: an Electronic Materials Operating System.</em> APRIL AI Hub, 2025.</p>
+          <p>[2] Nielsen J. <em>Heuristic Evaluation and Severity Ratings.</em> Nielsen Norman Group.</p>
+          <p>[3] Brooke J. <em>SUS: A quick and dirty usability scale.</em> 1996. Sauro &amp; Lewis, <em>Quantifying the User Experience,</em> 2016.</p>
+          <p>[4] Zeni C., et al. <em>MatterGen: a generative model for inorganic materials design.</em> Nature, 2025.</p>
+        </div>
+        <div class="ack" style="margin-top:5mm;">
+          <h4>Acknowledgement</h4>
+          <p>We acknowledge support of the UKRI AI Hub programme for the APRIL AI Hub (Grant EP/Y029763/1).</p>
+        </div>
+      </div>
+      <div class="foot-right">
+        <div class="qr-wrap">
+          <img src="assets/logos/april_qr.png" alt="APRIL AI Hub QR" />
+          <span class="qr-cap"><b>Explore APRIL AI Hub</b>Scan for the hub, the team and the live tools.</span>
+        </div>
+        <div class="logos">
+          <span class="wordmark">The Hg<br />Foundation</span>
+          <span class="raeng"><svg class="dia" viewBox="0 0 24 24" fill="none" stroke="#1a1d29" stroke-width="1.4"><path d="M12 2 22 12 12 22 2 12Z"/><path d="M12 6 18 12 12 18 6 12Z"/><path d="M12 9.5 14.5 12 12 14.5 9.5 12Z"/></svg><b>Royal Academy<br />of Engineering</b></span>
+          <img class="edin" src="../assets/team/edinburgh_uni_logo.png" alt="University of Edinburgh" />
+          <img src="assets/logos/deepmind.svg" alt="Google DeepMind" />
+          <img src="assets/logos/ukri_epsrc.png" alt="UKRI EPSRC" />
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

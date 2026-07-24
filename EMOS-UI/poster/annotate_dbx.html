@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<style>
+  @font-face { font-family:"Trebuchet MS"; src:url("assets/fonts/Trebuchet_MS.ttf"); }
+  @font-face { font-family:"Trebuchet MS"; font-weight:700; src:url("assets/fonts/Trebuchet_MS_Bold.ttf"); }
+  * { box-sizing:border-box; margin:0; }
+  .wrap { width:1990px; background:#fff; font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif; padding:20px; }
+  .hd { font-size:24px; font-weight:700; color:#091F3F; margin:4px 4px 14px; }
+  .row { display:flex; gap:26px; align-items:stretch; }
+  .shot { position:relative; flex-shrink:0; width:1440px; height:900px; border:1px solid #e2e5ea; border-radius:8px; overflow:hidden; }
+  .shot img { width:1440px; height:900px; display:block; }
+  .badge { position:absolute; width:34px; height:34px; margin:-17px 0 0 -17px; border-radius:50%;
+           background:#f2a359; color:#091F3F; font-weight:700; font-size:19px; display:flex; align-items:center; justify-content:center;
+           box-shadow:0 3px 8px rgba(0,0,0,.25); z-index:2; }
+  .ring { position:absolute; border:3.5px solid #92a2df; border-radius:6px; box-shadow:0 0 0 3px rgba(146,162,223,.22); }
+  .legend { flex:1; display:flex; flex-direction:column; justify-content:center; gap:20px; padding:6px 4px; }
+  .legend .it { display:flex; gap:12px; font-size:20px; color:#1a1d29; line-height:1.3; align-items:flex-start; }
+  .legend .n { flex-shrink:0; width:30px; height:30px; border-radius:50%; background:#f2a359; color:#091F3F; font-weight:700; font-size:17px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .legend .it b { font-weight:700; }
+</style></head>
+<body>
+<div class="wrap">
+  <div class="row">
+    <div class="shot">
+      <img src="assets/src/form-full.png" alt="Database Extractor" />
+      <!-- rings around regions -->
+      <div class="ring" style="left:255px; top:10px;  width:252px; height:30px;"></div>   <!-- 1 breadcrumb -->
+      <div class="ring" style="left:3px;   top:100px; width:242px; height:502px;"></div>  <!-- 2 unit library -->
+      <div class="ring" style="left:300px; top:352px; width:716px; height:228px;"></div>  <!-- 3 sliders -->
+      <div class="ring" style="left:1035px;top:382px; width:338px; height:208px;"></div>  <!-- 4 run + summary -->
+      <div class="ring" style="left:8px;   top:776px; width:234px; height:92px;"></div>   <!-- 5 node editor launcher -->
+      <div class="ring" style="left:1360px;top:825px; width:52px;  height:52px;"></div>   <!-- 6 AI FAB -->
+      <!-- number badges -->
+      <div class="badge" style="left:242px;  top:25px;">1</div>
+      <div class="badge" style="left:20px;   top:118px;">2</div>
+      <div class="badge" style="left:315px;  top:370px;">3</div>
+      <div class="badge" style="left:1050px; top:400px;">4</div>
+      <div class="badge" style="left:24px;   top:794px;">5</div>
+      <div class="badge" style="left:1352px; top:832px;">6</div>
+    </div>
+    <div class="legend">
+      <div class="it"><span class="n">1</span><span><b>Breadcrumbs</b> that fix the old navigation dead-end: you always know where you are.</span></div>
+      <div class="it"><span class="n">2</span><span><b>Colour-coded unit library</b> with type filters and click-to-open help on every unit.</span></div>
+      <div class="it"><span class="n">3</span><span><b>Plain-language sliders</b> with live values and real units, not raw developer fields.</span></div>
+      <div class="it"><span class="n">4</span><span><b>One clear Run action</b> with live status and a full settings summary.</span></div>
+      <div class="it"><span class="n">5</span><span><b>Node Editor on the same screen</b>: one click swaps the main panel, no separate page.</span></div>
+      <div class="it"><span class="n">6</span><span><b>AI assistant</b> available on every screen.</span></div>
+    </div>
+  </div>
+</div>
+</body></html>

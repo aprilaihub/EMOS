@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<style>
+  @font-face { font-family:"SFD"; src:url("../assets/fonts/SFProDisplay-Regular.otf"); }
+  @font-face { font-family:"SFD"; font-weight:700; src:url("../assets/fonts/SFProDisplay-Bold.otf"); }
+  @font-face { font-family:"SFM"; src:url("../assets/fonts/SFMono-Regular.otf"); }
+  * { box-sizing:border-box; margin:0; }
+  .card { width:900px; background:#fff; font-family:"SFD",Arial,sans-serif; padding:26px 30px; }
+  .row { display:flex; align-items:center; padding:16px 0; border-bottom:1px solid #eceef2; }
+  .row:last-child { border-bottom:none; }
+  .label { flex:1; font-size:21px; font-weight:700; color:#1a1d29; }
+  .vals { display:flex; align-items:baseline; gap:14px; }
+  .before { font-family:"SFM",monospace; font-size:22px; color:#c8863f; font-weight:700; }
+  .arrow { font-size:20px; color:#9aa0ac; }
+  .after { font-family:"SFM",monospace; font-size:26px; color:#5a6dc0; font-weight:700; }
+  .note { font-size:14px; color:#6b7280; margin-top:2px; }
+</style></head>
+<body>
+<div class="card">
+  <div class="row">
+    <div class="label">Task success rate</div>
+    <div class="vals"><span class="before">58%</span><span class="arrow">&#8594;</span><span class="after">92%</span></div>
+  </div>
+  <div class="row">
+    <div class="label">Mean time on task</div>
+    <div class="vals"><span class="before">7.4 min</span><span class="arrow">&#8594;</span><span class="after">2.9 min</span></div>
+  </div>
+  <div class="row">
+    <div class="label">Errors per task</div>
+    <div class="vals"><span class="before">3.1</span><span class="arrow">&#8594;</span><span class="after">0.6</span></div>
+  </div>
+  <div class="row">
+    <div class="label">System Usability Scale<div class="note">Industry average: 68</div></div>
+    <div class="vals"><span class="before">52</span><span class="arrow">&#8594;</span><span class="after">84&nbsp;&middot;&nbsp;grade&nbsp;A</span></div>
+  </div>
+</div>
+</body></html>

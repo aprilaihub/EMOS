@@ -1,0 +1,48 @@
+# Introduction to EMOS
+
+## What is EMOS?
+
+EMOS (Electronic Materials Optimization System) is a comprehensive web-based platform designed for materials scientists and researchers working in electronic materials research. It provides a unified interface to access multiple databases, utilize various generation algorithms, and apply prediction models for materials discovery and optimization.
+
+## Key Concepts
+
+### Information Units
+
+EMOS is built around three core types of **Information Units**:
+
+1. **Databases**: Access to multiple materials databases including ICSD, COD, OQMD, AFLOWLIB, Materials Project, Alexandria, NOMAD, and JARVIS
+2. **Generators**: AI-powered materials generation tools including MatterGen, GNoME, iMatGen, MatGAN, MolGAN, and others
+3. **Predictors**: Property prediction models such as MatterSim, M3GNet, PFP, DeepMD, SynthNN, and eSEN
+
+### Features
+
+**Features** are high-level workflows that combine multiple Information Units to solve specific research problems. They are organized into two main categories:
+
+1. **Materials Exploration**: Tools for discovering, generating, and analyzing new materials
+2. **Electronics Application**: Specialized features for electronic device development and optimization
+
+## System Architecture
+
+EMOS follows a modular architecture where:
+
+- Each Information Unit has a standardized interface
+- Features combine multiple Information Units to solve specific problems
+- The system is designed for easy extension with new components
+- All components follow factory patterns for registration and instantiation
+
+## Core Workflow
+
+The typical EMOS workflow follows these steps:
+
+1. **Select a Feature**: Choose from Materials Exploration or Electronics Application categories
+2. **Configure Information Units**: Select which databases, generators, and predictors to use
+3. **Provide Inputs**: Enter the necessary parameters for your specific use case
+4. **Execute and Analyze**: Run the feature and analyze the results
+
+## Benefits
+
+- **Unified Access**: Single interface to multiple tools and databases
+- **Modular Design**: Easy to extend and customize
+- **Comprehensive Coverage**: From basic material search to complex device optimization
+- **Research-Focused**: Designed specifically for materials science workflows
+- **Scalable**: Can handle both simple queries and complex multi-step workflows

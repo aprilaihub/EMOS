@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to EMOS &mdash; EMOS User Manual</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/logo.svg"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="System Overview" href="overview.html" />
+    <link rel="prev" title="EMOS User Manual" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EMOS
+              <img src="_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to EMOS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-emos">What is EMOS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#key-concepts">Key Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#information-units">Information Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-architecture">System Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-workflow">Core Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#benefits">Benefits</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">System Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#information-units-layer">Information Units Layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#databases">Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#generators">Generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#predictors">Predictors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#features-layer">Features Layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#materials-exploration-features">Materials Exploration Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#electronics-application-features">Electronics Application Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#data-flow">Data Flow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#typical-workflow-pattern">Typical Workflow Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#modular-design-benefits">Modular Design Benefits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#integration-patterns">Integration Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#factory-pattern">Factory Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#template-method-pattern">Template Method Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#basic-workflow">Basic Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#step-1-choose-your-research-goal">Step 1: Choose Your Research Goal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#step-2-select-a-feature">Step 2: Select a Feature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#step-3-configure-information-units">Step 3: Configure Information Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#step-4-provide-inputs">Step 4: Provide Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#example-workflows">Example Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#example-1-finding-high-conductivity-materials">Example 1: Finding High-Conductivity Materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#example-2-interface-analysis">Example 2: Interface Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#example-3-new-material-generation">Example 3: New Material Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#common-input-parameters">Common Input Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#universal-parameters">Universal Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#feature-specific-parameters">Feature-Specific Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#understanding-results">Understanding Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#result-structure">Result Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#interpreting-outputs">Interpreting Outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#information-unit-selection">Information Unit Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#result-analysis">Result Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#common-issues">Common Issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information Units</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="information_units/index.html">Information Units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="information_units/index.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/index.html#design-principles">Design Principles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#standardized-interface">Standardized Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#factory-pattern">Factory Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#consistent-usage-pattern">Consistent Usage Pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/index.html#component-categories">Component Categories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#databases-8-available">Databases (8 Available)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#generators-8-available">Generators (8 Available)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/index.html#predictors-8-available">Predictors (8 Available)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/index.html#adding-new-information-units">Adding New Information Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="information_units/databases.html">Databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="information_units/databases.html#available-databases">Available Databases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#icsd-inorganic-crystal-structure-database">ICSD - Inorganic Crystal Structure Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#cod-crystallography-open-database">COD - Crystallography Open Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#oqmd-open-quantum-materials-database">OQMD - Open Quantum Materials Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#aflowlib-automatic-flow-database">AFLOWLIB - Automatic-FLOW Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#mp-materials-project-database">MP - Materials Project Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#alexandria-materials-database">Alexandria - Materials Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#nomad-novel-materials-discovery-repository">NOMAD - Novel Materials Discovery Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#jarvis-joint-automated-repository-for-various-integrated-simulations">JARVIS - Joint Automated Repository for Various Integrated Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/databases.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#basic-database-query">Basic Database Query</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#multiple-database-integration">Multiple Database Integration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/databases.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#database-selection">Database Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#query-optimization">Query Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/databases.html#data-validation">Data Validation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="information_units/generators.html">Generators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="information_units/generators.html#available-generators">Available Generators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#mattergen-microsoft-s-crystal-structure-generator">MatterGen - Microsoft’s Crystal Structure Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#gnome-graph-networks-for-materials-exploration">GNoME - Graph Networks for Materials Exploration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#imatgen-inverse-materials-generator">iMatGen - Inverse Materials Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#matgan-materials-generative-adversarial-network">MatGAN - Materials Generative Adversarial Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#molgan-molecular-generative-adversarial-network">MolGAN - Molecular Generative Adversarial Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#conddfcvae-conditional-deep-feature-consistent-vae">CondDFCVAE - Conditional Deep Feature Consistent VAE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#mygen1-custom-generator-1">MyGen1 - Custom Generator 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#mygen2-custom-generator-2">MyGen2 - Custom Generator 2</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/generators.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#basic-material-generation">Basic Material Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#property-targeted-generation">Property-Targeted Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#multi-generator-workflow">Multi-Generator Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/generators.html#generation-strategies">Generation Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#composition-based-generation">Composition-Based Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#property-based-generation">Property-Based Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#hybrid-approaches">Hybrid Approaches</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/generators.html#validation-and-quality-control">Validation and Quality Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#structural-validation">Structural Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#property-validation">Property Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#synthesizability-assessment">Synthesizability Assessment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/generators.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#generator-selection">Generator Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#input-design">Input Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#output-processing">Output Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/generators.html#integration-tips">Integration Tips</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="information_units/predictors.html">Predictors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="information_units/predictors.html#available-predictors">Available Predictors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#mattersim-materials-simulation-predictor">MatterSim - Materials Simulation Predictor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#m3gnet-materials-3d-graph-network">M3GNet - Materials 3D Graph Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#pfp-property-fingerprint-predictor">PFP - Property Fingerprint Predictor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#deepmd-deep-molecular-dynamics">DeepMD - Deep Molecular Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#synthnn-synthesis-neural-network">SynthNN - Synthesis Neural Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#esen-electronic-structure-estimation-network">eSEN - Electronic Structure Estimation Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#mypred1-custom-predictor-1">MyPred1 - Custom Predictor 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#mypred2-custom-predictor-2">MyPred2 - Custom Predictor 2</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/predictors.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#basic-property-prediction">Basic Property Prediction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#multi-predictor-validation">Multi-Predictor Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#property-screening-workflow">Property Screening Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/predictors.html#prediction-strategies">Prediction Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#hierarchical-screening">Hierarchical Screening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#ensemble-prediction">Ensemble Prediction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#property-validation">Property Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/predictors.html#accuracy-and-limitations">Accuracy and Limitations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#accuracy-levels">Accuracy Levels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#common-limitations">Common Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="information_units/predictors.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#predictor-selection">Predictor Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#input-preparation">Input Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#result-interpretation">Result Interpretation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="information_units/predictors.html#performance-optimization">Performance Optimization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="features/index.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#materials-exploration-features-features-1-8">Materials Exploration Features (Features 1-8)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#electronics-application-features-features-9-16">Electronics Application Features (Features 9-16)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#feature-architecture">Feature Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#base-feature-interface">Base Feature Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#template-method-pattern">Template Method Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#information-unit-integration">Information Unit Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#feature-categories">Feature Categories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#materials-exploration-features">Materials Exploration Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#electronics-application-features">Electronics Application Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#common-input-parameters">Common Input Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#universal-parameters">Universal Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#feature-specific-parameters">Feature-Specific Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#common-output-format">Common Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#standard-output-structure">Standard Output Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#result-types">Result Types</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#basic-feature-usage">Basic Feature Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#multi-feature-workflow">Multi-Feature Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#error-handling-and-logging">Error Handling and Logging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#standard-error-handling">Standard Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/index.html#information-unit-error-handling">Information Unit Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/index.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features/materials_exploration.html">Materials Exploration Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features/materials_exploration.html#available-features">Available Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#material-search-id-1">1. Material Search (ID: 1)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#material-generation-id-2">2. Material Generation (ID: 2)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#database-extractor-id-3">3. Database Extractor (ID: 3)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#material-characterization-id-4">4. Material Characterization (ID: 4)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#dft-calculation-id-5">5. DFT Calculation (ID: 5)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#crystallographic-analysis-id-6">6. Crystallographic Analysis (ID: 6)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#quantum-mechanics-id-7">7. Quantum Mechanics (ID: 7)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#tensor-analysis-id-8">8. Tensor Analysis (ID: 8)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/materials_exploration.html#common-workflow-patterns">Common Workflow Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#multi-feature-material-discovery">Multi-Feature Material Discovery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#comprehensive-material-analysis">Comprehensive Material Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/materials_exploration.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#feature-selection">Feature Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/materials_exploration.html#result-interpretation">Result Interpretation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features/electronics_application.html">Electronics Application Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features/electronics_application.html#available-features">Available Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#device-synthesizability-id-9">9. Device Synthesizability (ID: 9)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#interface-calculation-id-10">10. Interface Calculation (ID: 10)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#property-prediction-id-11">11. Property Prediction (ID: 11)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#band-structure-id-12">12. Band Structure (ID: 12)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#thermal-management-id-13">13. Thermal Management (ID: 13)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#reliability-assessment-id-14">14. Reliability Assessment (ID: 14)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#process-integration-id-15">15. Process Integration (ID: 15)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#advanced-characterization-id-16">16. Advanced Characterization (ID: 16)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/electronics_application.html#common-workflow-patterns">Common Workflow Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#device-development-workflow">Device Development Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#performance-optimization-workflow">Performance Optimization Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/electronics_application.html#application-specific-guidelines">Application-Specific Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#semiconductor-devices">Semiconductor Devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#power-electronics">Power Electronics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#rf-microwave-devices">RF/Microwave Devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#photonic-devices">Photonic Devices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="features/electronics_application.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#feature-selection">Feature Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="features/electronics_application.html#result-interpretation">Result Interpretation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EMOS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Introduction to EMOS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduction.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction-to-emos">
+<h1>Introduction to EMOS<a class="headerlink" href="#introduction-to-emos" title="Link to this heading"></a></h1>
+<section id="what-is-emos">
+<h2>What is EMOS?<a class="headerlink" href="#what-is-emos" title="Link to this heading"></a></h2>
+<p>EMOS (Electronic Materials Optimization System) is a comprehensive web-based platform designed for materials scientists and researchers working in electronic materials research. It provides a unified interface to access multiple databases, utilize various generation algorithms, and apply prediction models for materials discovery and optimization.</p>
+</section>
+<section id="key-concepts">
+<h2>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading"></a></h2>
+<section id="information-units">
+<h3>Information Units<a class="headerlink" href="#information-units" title="Link to this heading"></a></h3>
+<p>EMOS is built around three core types of <strong>Information Units</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Databases</strong>: Access to multiple materials databases including ICSD, COD, OQMD, AFLOWLIB, Materials Project, Alexandria, NOMAD, and JARVIS</p></li>
+<li><p><strong>Generators</strong>: AI-powered materials generation tools including MatterGen, GNoME, iMatGen, MatGAN, MolGAN, and others</p></li>
+<li><p><strong>Predictors</strong>: Property prediction models such as MatterSim, M3GNet, PFP, DeepMD, SynthNN, and eSEN</p></li>
+</ol>
+</section>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
+<p><strong>Features</strong> are high-level workflows that combine multiple Information Units to solve specific research problems. They are organized into two main categories:</p>
+<ol class="arabic simple">
+<li><p><strong>Materials Exploration</strong>: Tools for discovering, generating, and analyzing new materials</p></li>
+<li><p><strong>Electronics Application</strong>: Specialized features for electronic device development and optimization</p></li>
+</ol>
+</section>
+</section>
+<section id="system-architecture">
+<h2>System Architecture<a class="headerlink" href="#system-architecture" title="Link to this heading"></a></h2>
+<p>EMOS follows a modular architecture where:</p>
+<ul class="simple">
+<li><p>Each Information Unit has a standardized interface</p></li>
+<li><p>Features combine multiple Information Units to solve specific problems</p></li>
+<li><p>The system is designed for easy extension with new components</p></li>
+<li><p>All components follow factory patterns for registration and instantiation</p></li>
+</ul>
+</section>
+<section id="core-workflow">
+<h2>Core Workflow<a class="headerlink" href="#core-workflow" title="Link to this heading"></a></h2>
+<p>The typical EMOS workflow follows these steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Select a Feature</strong>: Choose from Materials Exploration or Electronics Application categories</p></li>
+<li><p><strong>Configure Information Units</strong>: Select which databases, generators, and predictors to use</p></li>
+<li><p><strong>Provide Inputs</strong>: Enter the necessary parameters for your specific use case</p></li>
+<li><p><strong>Execute and Analyze</strong>: Run the feature and analyze the results</p></li>
+</ol>
+</section>
+<section id="benefits">
+<h2>Benefits<a class="headerlink" href="#benefits" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Unified Access</strong>: Single interface to multiple tools and databases</p></li>
+<li><p><strong>Modular Design</strong>: Easy to extend and customize</p></li>
+<li><p><strong>Comprehensive Coverage</strong>: From basic material search to complex device optimization</p></li>
+<li><p><strong>Research-Focused</strong>: Designed specifically for materials science workflows</p></li>
+<li><p><strong>Scalable</strong>: Can handle both simple queries and complex multi-step workflows</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="EMOS User Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overview.html" class="btn btn-neutral float-right" title="System Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, EMOS Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EMOS — Electronic Materials Operating System</title>
+<link rel="icon" href="assets/emos-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="fonts.css" />
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="site.css" />
+<link rel="stylesheet" href="home.css" />
+</head>
+<body class="home">
+<nav class="home-nav">
+  <a class="nav-wedge" href="index.html" aria-label="EMOS home">
+    <img src="assets/emos-mark-dark.svg" alt="" />
+    <span>EMOS</span>
+  </a>
+  <div class="home-nav-links">
+    <a class="home-nav-link active" href="index.html">Home</a>
+    <a class="home-nav-link" href="about.html">About</a>
+    <a class="home-nav-link" href="team.html">Team</a>
+    <a class="home-nav-link" href="documentation.html">Documentation</a>
+  </div>
+  <a class="nav-cta" href="form.html"><span>Open the app</span></a>
+</nav>
+
+<header class="home-hero">
+  <div class="home-hero-shapes" aria-hidden="true">
+    <span class="shape shape-a"></span>
+    <span class="shape shape-b"></span>
+  </div>
+  <div class="wrap home-hero-grid">
+    <div class="home-hero-copy">
+      <h1 class="page-title">Electronic Materials<br />Operating System</h1>
+      <p class="lead">One unified platform for electronic materials discovery: databases, generative AI models and
+        property predictors, composable into complete workflows from data retrieval to device-level evaluation.</p>
+      <div class="split-cta">
+        <a class="split-cta-a" href="form.html">Open the app</a>
+        <a class="split-cta-b" href="documentation.html">Read the documentation</a>
+      </div>
+    </div>
+    <div class="home-hero-graphic" aria-hidden="true">
+      <svg viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="180" cy="180" r="150" class="lattice-orbit" />
+        <circle cx="180" cy="180" r="104" class="lattice-orbit" />
+        <g class="lattice-bonds" stroke-width="1.2">
+          <line x1="180" y1="180" x2="180" y2="60" />
+          <line x1="180" y1="180" x2="290" y2="130" />
+          <line x1="180" y1="180" x2="290" y2="240" />
+          <line x1="180" y1="180" x2="180" y2="310" />
+          <line x1="180" y1="180" x2="70" y2="240" />
+          <line x1="180" y1="180" x2="70" y2="130" />
+          <line x1="180" y1="60" x2="290" y2="130" />
+          <line x1="290" y1="130" x2="290" y2="240" />
+          <line x1="290" y1="240" x2="180" y2="310" />
+          <line x1="180" y1="310" x2="70" y2="240" />
+          <line x1="70" y1="240" x2="70" y2="130" />
+          <line x1="70" y1="130" x2="180" y2="60" />
+        </g>
+        <circle cx="180" cy="180" r="7" class="lattice-node lattice-node-accent" />
+        <circle cx="180" cy="60" r="6" class="lattice-node" />
+        <circle cx="290" cy="130" r="6" class="lattice-node lattice-node-accent" />
+        <circle cx="290" cy="240" r="6" class="lattice-node" />
+        <circle cx="180" cy="310" r="6" class="lattice-node" />
+        <circle cx="70" cy="240" r="6" class="lattice-node lattice-node-accent" />
+        <circle cx="70" cy="130" r="6" class="lattice-node" />
+      </svg>
+    </div>
+  </div>
+  <div class="home-hero-fold" aria-hidden="true"></div>
+</header>
+
+<section class="section intro-band">
+  <div class="wrap">
+    <div class="intro-prose">
+      <p class="intro-lead">Electronic materials discovery has never been short of tools. It has been short of a
+        way to make them work together.</p>
+      <p>Every database speaks its own schema, every generative model emits its own structure format, and
+        every predictor expects its inputs just so. Teams end up rewriting the same glue code for each new
+        project before any real science begins. EMOS removes that tax: databases, generative models and
+        property predictors become interchangeable <strong>Information Units</strong> behind one data
+        contract, composed into complete workflows that carry provenance from the first query to a
+        device-level verdict, without a line of integration code.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="split">
+      <div class="split-copy">
+        <h2>Select units, run a feature, read the results</h2>
+        <p>Pick databases, generators and predictors from one sidebar, open a feature, and run it. Results come back as
+          a ranked table of candidates with band gaps, formation energies and stability verdicts, not raw JSON.</p>
+        <ul class="split-list">
+          <li>Query six materials databases together in a single pass.</li>
+          <li>Compare predictors for a stability consensus verdict.</li>
+          <li>Pin the candidates worth keeping.</li>
+        </ul>
+      </div>
+      <div class="split-media">
+        <div class="preview-card">
+          <div class="preview-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="pc-label">EMOS · ranked results</span></div>
+          <img src="assets/screens/results.png" alt="Ranked candidate structures with band gap, formation energy and stability" />
+        </div>
+      </div>
+    </div>
+
+    <div class="split reverse">
+      <div class="split-copy">
+        <h2>Compose a custom pipeline visually</h2>
+        <p>Drag databases, generators and predictors straight from the sidebar onto a canvas and wire them together.
+          Matching port colours connect; press Run to execute the whole graph. No code, no config files, and you can
+          save, load or export any pipeline as JSON.</p>
+      </div>
+      <div class="split-media">
+        <div class="preview-card">
+          <div class="preview-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="pc-label">EMOS · node editor</span></div>
+          <img src="assets/screens/node.png" alt="The EMOS node editor with a database, generator, predictor and evaluator wired together" />
+        </div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="split-copy">
+        <h2>Real structures, rendered from real CIF</h2>
+        <p>Every candidate carries its own crystal structure, drawn from CIF with the same 3D engine the production
+          platform uses. Rotate and zoom the unit cell, with atoms coloured by element, so what you screen is a real
+          material, not a stand-in.</p>
+      </div>
+      <div class="split-media">
+        <div class="preview-card">
+          <div class="preview-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="pc-label">EMOS · crystal viewer</span></div>
+          <img src="assets/screens/crystal.png" alt="A 3D ball-and-stick crystal structure rendered in the EMOS results panel" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Start discovering materials</h2>
+    <p>Open the guided workspace or the node editor and assemble a discovery pipeline in minutes.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn btn-primary" href="form.html">Open the app</a>
+      <a class="btn btn-ghost" href="documentation.html">Read the documentation</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>EMOS — Electronic Materials Operating System · APRIL AI Hub</span>
+    <span>Best viewed full screen in Chrome or Firefox</span>
+  </div>
+</footer>
+<script src="ux.js"></script>
+</body>
+</html>

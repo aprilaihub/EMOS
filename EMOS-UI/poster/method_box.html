@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<style>
+  @font-face { font-family:"Trebuchet MS"; src:url("assets/fonts/Trebuchet_MS.ttf"); }
+  @font-face { font-family:"Trebuchet MS"; font-weight:700; src:url("assets/fonts/Trebuchet_MS_Bold.ttf"); }
+  * { box-sizing:border-box; margin:0; }
+  .box { width:900px; background:#fff; font-family:"Trebuchet MS",Arial,sans-serif; padding:30px 34px; border:2px solid #091F3F; border-radius:16px; }
+  h3 { font-size:34px; font-weight:700; color:#091F3F; margin-bottom:20px; }
+  .steps { display:flex; align-items:center; gap:0; margin-bottom:26px; }
+  .step { flex:1; text-align:center; padding:14px 10px; border-radius:10px; font-weight:700; font-size:18px; color:#fff; }
+  .step.e { background:#f2a359; }
+  .step.r { background:#091F3F; }
+  .step.t { background:#92a2df; }
+  .chev { flex-shrink:0; width:26px; text-align:center; color:#9aa0ac; font-size:20px; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { font-size:20px; line-height:1.4; color:#1a1d29; margin-bottom:14px; padding-left:24px; text-indent:-24px; }
+  li:before { content:"•  "; font-weight:700; color:#091F3F; }
+  li b { font-weight:700; }
+</style></head>
+<body>
+<div class="box">
+  <h3>Method</h3>
+  <div class="steps">
+    <div class="step e">Evaluate</div>
+    <div class="chev">&#8594;</div>
+    <div class="step r">Redesign</div>
+    <div class="chev">&#8594;</div>
+    <div class="step t">Test</div>
+  </div>
+  <ul>
+    <li><b>Heuristic evaluation:</b> reviewed the original interface solo against Nielsen's 10 usability heuristics, rating each issue's severity (0&ndash;4).</li>
+    <li><b>Redesign:</b> rebuilt the interface end-to-end based on those findings (see figure above).</li>
+    <li><b>Usability study:</b> moderated, in-person sessions with 6 participants of mixed technical background, think-aloud protocol, followed by the SUS questionnaire.</li>
+    <li><b>Architecture:</b> built behind a swappable data layer, so the live backend connects without a rewrite.</li>
+  </ul>
+</div>
+</body></html>

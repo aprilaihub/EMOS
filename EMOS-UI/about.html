@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About — EMOS</title>
+<link rel="icon" href="assets/emos-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="fonts.css" />
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="site.css" />
+<link rel="stylesheet" href="home.css" />
+</head>
+<body class="site about-page">
+<nav class="home-nav">
+  <a class="nav-wedge" href="index.html" aria-label="EMOS home"><img src="assets/emos-mark-dark.svg" alt="" /><span>EMOS</span></a>
+  <div class="home-nav-links">
+    <a class="home-nav-link" href="index.html">Home</a>
+    <a class="home-nav-link active" href="about.html">About</a>
+    <a class="home-nav-link" href="team.html">Team</a>
+    <a class="home-nav-link" href="documentation.html">Documentation</a>
+  </div>
+  <a class="nav-cta" href="form.html"><span>Open the app</span></a>
+</nav>
+
+<!-- editorial lead: a mission statement, deliberately not the product hero -->
+<header class="about-lead">
+  <div class="wrap">
+    <p class="about-kicker">About EMOS</p>
+    <p class="about-statement">We are building the operating layer that lets electronic&#8209;materials
+      discovery run as one system instead of a dozen disconnected tools.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <div class="editorial">
+      <div class="editorial-head">
+        <h2>Discovery was fragmented by design</h2>
+      </div>
+      <div class="editorial-body">
+        <p>AI-driven materials discovery has never lacked capability. It has lacked cohesion. Each database
+          exposes its own schema, each generative model emits its own structure format, and each property
+          predictor expects its inputs in a particular shape. To connect any two, a researcher writes
+          bespoke, project-specific glue code, and rewrites it for the next project.</p>
+        <p>That overhead sits squarely between a scientific idea and a result. It is where momentum is lost.</p>
+      </div>
+    </div>
+
+    <div class="editorial">
+      <div class="editorial-head">
+        <h2>Standardize the core, extend at the edges</h2>
+      </div>
+      <div class="editorial-body">
+        <p>EMOS defines input and output contracts by Information Unit type, so databases, generators and
+          predictors all plug into the same workflow pattern. Property names from every source are mapped
+          through one framework-level corpus into a shared vocabulary.</p>
+        <p>A database's output can feed a predictor with no adapter. A generator's structures are compared on
+          the same property scale. Every stage writes to one provenance and logging layer, so benchmarking
+          and reproducibility come for free rather than as an afterthought.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--grey-50);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);">
+  <div class="wrap">
+    <h2 class="section-title">Three layers that build on each other</h2>
+    <div class="acc" id="archAcc">
+      <div class="acc-item open">
+        <button class="acc-head" type="button" aria-expanded="true"><span><span class="acc-num">01</span> Information Units</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="acc-panel"><div><p>The base layer. Databases, generators and predictors, each exposing one standardized method (retrieve, generate or predict) over CIF structures and a shared property schema, so any two can interoperate without bespoke glue code.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-head" type="button" aria-expanded="false"><span><span class="acc-num">02</span> Features</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="acc-panel"><div><p>The composition layer. Higher-level workflows that assemble one or more Information Units into an end-to-end task, such as the Database Extractor or Stability Consensus analysis.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-head" type="button" aria-expanded="false"><span><span class="acc-num">03</span> Interface</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="acc-panel"><div><p>The layer you touch. A guided form for running single units and features, and a node editor for fully custom drag-and-drop pipelines, served over a decoupled REST backend.</p></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" style="text-align:center;">
+    <h2 class="section-title" style="margin-bottom:var(--space-4);">Built by the APRIL AI Hub</h2>
+    <p class="lead" style="margin:0 auto var(--space-7);max-width:640px;">EMOS is developed by a team of materials
+      informatics, machine learning and device-engineering researchers, supported by UKRI EPSRC.
+      <a href="team.html">Meet the team &#8594;</a></p>
+    <div class="partners">
+      <img src="assets/team/april_hub_logo.jpeg" alt="APRIL AI Hub" />
+      <img src="assets/team/edinburgh_uni_logo.png" alt="University of Edinburgh" />
+      <img src="assets/team/cambridge_logo.jpeg" alt="University of Cambridge" />
+      <img src="assets/team/ukri-epsrc-square-logo.png" alt="UKRI EPSRC" />
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>See EMOS in action</h2>
+    <p>Open the guided workspace or the node editor and assemble a discovery pipeline in minutes.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn btn-primary" href="form.html">Open the app</a>
+      <a class="btn btn-ghost" href="documentation.html">Read the documentation</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>EMOS — Electronic Materials Operating System · APRIL AI Hub</span>
+    <span>Supported by UKRI EPSRC · Grant EP/Y029763/1</span>
+  </div>
+</footer>
+<script>
+  // accordion: one panel open at a time, accessible toggle
+  document.querySelectorAll('#archAcc .acc-head').forEach(function (h) {
+    h.addEventListener('click', function () {
+      var item = h.closest('.acc-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('#archAcc .acc-item').forEach(function (i) {
+        i.classList.remove('open');
+        var b = i.querySelector('.acc-head'); if (b) b.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) { item.classList.add('open'); h.setAttribute('aria-expanded', 'true'); }
+    });
+  });
+</script>
+<script src="ux.js"></script>
+</body>
+</html>

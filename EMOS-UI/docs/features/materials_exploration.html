@@ -1,0 +1,936 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materials Exploration Features &mdash; EMOS User Manual</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Electronics Application Features" href="electronics_application.html" />
+    <link rel="prev" title="Features" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EMOS
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to EMOS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#what-is-emos">What is EMOS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#key-concepts">Key Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../introduction.html#information-units">Information Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../introduction.html#features">Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#system-architecture">System Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#core-workflow">Core Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html#benefits">Benefits</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">System Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#information-units-layer">Information Units Layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#databases">Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#generators">Generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#predictors">Predictors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#features-layer">Features Layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#materials-exploration-features">Materials Exploration Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#electronics-application-features">Electronics Application Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#data-flow">Data Flow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#typical-workflow-pattern">Typical Workflow Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#modular-design-benefits">Modular Design Benefits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#integration-patterns">Integration Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#factory-pattern">Factory Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#template-method-pattern">Template Method Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#basic-workflow">Basic Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#step-1-choose-your-research-goal">Step 1: Choose Your Research Goal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#step-2-select-a-feature">Step 2: Select a Feature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#step-3-configure-information-units">Step 3: Configure Information Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#step-4-provide-inputs">Step 4: Provide Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#example-workflows">Example Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#example-1-finding-high-conductivity-materials">Example 1: Finding High-Conductivity Materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#example-2-interface-analysis">Example 2: Interface Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#example-3-new-material-generation">Example 3: New Material Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#common-input-parameters">Common Input Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#universal-parameters">Universal Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#feature-specific-parameters">Feature-Specific Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#understanding-results">Understanding Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#result-structure">Result Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#interpreting-outputs">Interpreting Outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#information-unit-selection">Information Unit Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#result-analysis">Result Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#common-issues">Common Issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information Units</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../information_units/index.html">Information Units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/index.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/index.html#design-principles">Design Principles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#standardized-interface">Standardized Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#factory-pattern">Factory Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#consistent-usage-pattern">Consistent Usage Pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/index.html#component-categories">Component Categories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#databases-8-available">Databases (8 Available)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#generators-8-available">Generators (8 Available)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/index.html#predictors-8-available">Predictors (8 Available)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/index.html#adding-new-information-units">Adding New Information Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../information_units/databases.html">Databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/databases.html#available-databases">Available Databases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#icsd-inorganic-crystal-structure-database">ICSD - Inorganic Crystal Structure Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#cod-crystallography-open-database">COD - Crystallography Open Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#oqmd-open-quantum-materials-database">OQMD - Open Quantum Materials Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#aflowlib-automatic-flow-database">AFLOWLIB - Automatic-FLOW Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#mp-materials-project-database">MP - Materials Project Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#alexandria-materials-database">Alexandria - Materials Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#nomad-novel-materials-discovery-repository">NOMAD - Novel Materials Discovery Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#jarvis-joint-automated-repository-for-various-integrated-simulations">JARVIS - Joint Automated Repository for Various Integrated Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/databases.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#basic-database-query">Basic Database Query</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#multiple-database-integration">Multiple Database Integration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/databases.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#database-selection">Database Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#query-optimization">Query Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/databases.html#data-validation">Data Validation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../information_units/generators.html">Generators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/generators.html#available-generators">Available Generators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#mattergen-microsoft-s-crystal-structure-generator">MatterGen - Microsoft’s Crystal Structure Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#gnome-graph-networks-for-materials-exploration">GNoME - Graph Networks for Materials Exploration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#imatgen-inverse-materials-generator">iMatGen - Inverse Materials Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#matgan-materials-generative-adversarial-network">MatGAN - Materials Generative Adversarial Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#molgan-molecular-generative-adversarial-network">MolGAN - Molecular Generative Adversarial Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#conddfcvae-conditional-deep-feature-consistent-vae">CondDFCVAE - Conditional Deep Feature Consistent VAE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#mygen1-custom-generator-1">MyGen1 - Custom Generator 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#mygen2-custom-generator-2">MyGen2 - Custom Generator 2</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/generators.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#basic-material-generation">Basic Material Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#property-targeted-generation">Property-Targeted Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#multi-generator-workflow">Multi-Generator Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/generators.html#generation-strategies">Generation Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#composition-based-generation">Composition-Based Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#property-based-generation">Property-Based Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#hybrid-approaches">Hybrid Approaches</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/generators.html#validation-and-quality-control">Validation and Quality Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#structural-validation">Structural Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#property-validation">Property Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#synthesizability-assessment">Synthesizability Assessment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/generators.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#generator-selection">Generator Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#input-design">Input Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#output-processing">Output Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/generators.html#integration-tips">Integration Tips</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../information_units/predictors.html">Predictors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/predictors.html#available-predictors">Available Predictors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#mattersim-materials-simulation-predictor">MatterSim - Materials Simulation Predictor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#m3gnet-materials-3d-graph-network">M3GNet - Materials 3D Graph Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#pfp-property-fingerprint-predictor">PFP - Property Fingerprint Predictor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#deepmd-deep-molecular-dynamics">DeepMD - Deep Molecular Dynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#synthnn-synthesis-neural-network">SynthNN - Synthesis Neural Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#esen-electronic-structure-estimation-network">eSEN - Electronic Structure Estimation Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#mypred1-custom-predictor-1">MyPred1 - Custom Predictor 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#mypred2-custom-predictor-2">MyPred2 - Custom Predictor 2</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/predictors.html#usage-patterns">Usage Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#basic-property-prediction">Basic Property Prediction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#multi-predictor-validation">Multi-Predictor Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#property-screening-workflow">Property Screening Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/predictors.html#prediction-strategies">Prediction Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#hierarchical-screening">Hierarchical Screening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#ensemble-prediction">Ensemble Prediction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#property-validation">Property Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/predictors.html#accuracy-and-limitations">Accuracy and Limitations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#accuracy-levels">Accuracy Levels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#common-limitations">Common Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../information_units/predictors.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#predictor-selection">Predictor Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#input-preparation">Input Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#result-interpretation">Result Interpretation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../information_units/predictors.html#performance-optimization">Performance Optimization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Features</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#materials-exploration-features-features-1-8">Materials Exploration Features (Features 1-8)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#electronics-application-features-features-9-16">Electronics Application Features (Features 9-16)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#feature-architecture">Feature Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#base-feature-interface">Base Feature Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#template-method-pattern">Template Method Pattern</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#information-unit-integration">Information Unit Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#feature-categories">Feature Categories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#materials-exploration-features">Materials Exploration Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#electronics-application-features">Electronics Application Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#common-input-parameters">Common Input Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#universal-parameters">Universal Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#feature-specific-parameters">Feature-Specific Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#common-output-format">Common Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#standard-output-structure">Standard Output Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#result-types">Result Types</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#basic-feature-usage">Basic Feature Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#multi-feature-workflow">Multi-Feature Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#error-handling-and-logging">Error Handling and Logging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#standard-error-handling">Standard Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#information-unit-error-handling">Information Unit Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Materials Exploration Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#available-features">Available Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#material-search-id-1">1. Material Search (ID: 1)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#material-generation-id-2">2. Material Generation (ID: 2)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-extractor-id-3">3. Database Extractor (ID: 3)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#material-characterization-id-4">4. Material Characterization (ID: 4)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dft-calculation-id-5">5. DFT Calculation (ID: 5)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#crystallographic-analysis-id-6">6. Crystallographic Analysis (ID: 6)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quantum-mechanics-id-7">7. Quantum Mechanics (ID: 7)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tensor-analysis-id-8">8. Tensor Analysis (ID: 8)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-workflow-patterns">Common Workflow Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multi-feature-material-discovery">Multi-Feature Material Discovery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comprehensive-material-analysis">Comprehensive Material Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#feature-selection">Feature Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#result-interpretation">Result Interpretation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="electronics_application.html">Electronics Application Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="electronics_application.html#available-features">Available Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#device-synthesizability-id-9">9. Device Synthesizability (ID: 9)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#interface-calculation-id-10">10. Interface Calculation (ID: 10)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#property-prediction-id-11">11. Property Prediction (ID: 11)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#band-structure-id-12">12. Band Structure (ID: 12)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#thermal-management-id-13">13. Thermal Management (ID: 13)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#reliability-assessment-id-14">14. Reliability Assessment (ID: 14)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#process-integration-id-15">15. Process Integration (ID: 15)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#advanced-characterization-id-16">16. Advanced Characterization (ID: 16)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="electronics_application.html#common-workflow-patterns">Common Workflow Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#device-development-workflow">Device Development Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#performance-optimization-workflow">Performance Optimization Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="electronics_application.html#application-specific-guidelines">Application-Specific Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#semiconductor-devices">Semiconductor Devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#power-electronics">Power Electronics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#rf-microwave-devices">RF/Microwave Devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#photonic-devices">Photonic Devices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="electronics_application.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#feature-selection">Feature Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#input-guidelines">Input Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="electronics_application.html#result-interpretation">Result Interpretation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EMOS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Materials Exploration Features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/features/materials_exploration.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="materials-exploration-features">
+<h1>Materials Exploration Features<a class="headerlink" href="#materials-exploration-features" title="Link to this heading"></a></h1>
+<p>Materials Exploration features focus on discovering, generating, and analyzing materials for fundamental research applications. These features provide comprehensive workflows for materials scientists to explore chemical space, discover new materials, and understand their properties.</p>
+<section id="available-features">
+<h2>Available Features<a class="headerlink" href="#available-features" title="Link to this heading"></a></h2>
+<section id="material-search-id-1">
+<h3>1. Material Search (ID: 1)<a class="headerlink" href="#material-search-id-1" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">MaterialSearchFeature</span></code></p>
+<p>Advanced database searching and filtering for materials discovery.</p>
+<p><strong>Description</strong>: “Material Search: Advanced search and filtering across multiple materials databases”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Multi-database querying</p></li>
+<li><p>Advanced filtering by composition, structure, and properties</p></li>
+<li><p>Similarity searching</p></li>
+<li><p>Recommendation systems</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">searchTerm</span></code>: Material name, formula, or keyword</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elementList</span></code>: Required or forbidden elements</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">propertyRange</span></code>: Target property ranges (band gap, formation energy, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">structureType</span></code>: Crystal system or space group constraints</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maxResults</span></code>: Maximum number of results to return</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_databases</span></code>: Database configurations to search</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Parse and validate search criteria</p></li>
+<li><p>Query selected databases with optimized search terms</p></li>
+<li><p>Aggregate and deduplicate results across databases</p></li>
+<li><p>Apply filters and ranking algorithms</p></li>
+<li><p>Generate similarity recommendations</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;search_results&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;material_id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;formula&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;structure&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="s1">&#39;database_source&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;similarity_score&#39;</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;search_statistics&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;total_found&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;databases_searched&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s1">&#39;search_time&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;recommendations&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Finding materials with specific properties</p></li>
+<li><p>Literature review and prior art search</p></li>
+<li><p>Building training datasets</p></li>
+<li><p>Identifying research gaps</p></li>
+</ul>
+</section>
+<section id="material-generation-id-2">
+<h3>2. Material Generation (ID: 2)<a class="headerlink" href="#material-generation-id-2" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">MaterialGenerationFeature</span></code></p>
+<p>AI-powered generation of novel materials with targeted properties.</p>
+<p><strong>Description</strong>: “Material Generation: Generate novel materials using AI and machine learning models”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Multi-generator ensemble approaches</p></li>
+<li><p>Property-targeted generation</p></li>
+<li><p>Composition-constrained generation</p></li>
+<li><p>Novelty assessment</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">targetProperties</span></code>: Desired property values and ranges</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elementConstraints</span></code>: Allowed/forbidden elements</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compositionSpace</span></code>: Chemical composition constraints</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numCandidates</span></code>: Number of materials to generate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noveltyThreshold</span></code>: Minimum novelty requirement</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_generators</span></code>: Generator configurations to use</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Translate property targets to generator inputs</p></li>
+<li><p>Apply composition and element constraints</p></li>
+<li><p>Generate material candidates using selected generators</p></li>
+<li><p>Validate structural feasibility</p></li>
+<li><p>Assess novelty against existing databases</p></li>
+<li><p>Rank candidates by target property alignment</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;generated_materials&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;structure&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="s1">&#39;composition&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;predicted_properties&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="s1">&#39;novelty_score&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s1">&#39;generator_source&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;confidence&#39;</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;generation_statistics&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;total_generated&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;valid_structures&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;novel_materials&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;generation_time&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Discovery of materials with specific properties</p></li>
+<li><p>Filling gaps in materials space</p></li>
+<li><p>Inverse design applications</p></li>
+<li><p>High-throughput virtual screening</p></li>
+</ul>
+</section>
+<section id="database-extractor-id-3">
+<h3>3. Database Extractor (ID: 3)<a class="headerlink" href="#database-extractor-id-3" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">DatabaseExtractorFeature</span></code></p>
+<p>Bulk extraction and analysis of materials data from multiple databases.</p>
+<p><strong>Description</strong>: “Database Extractor: Extract and analyze large datasets from materials databases”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Bulk data extraction</p></li>
+<li><p>Cross-database correlation analysis</p></li>
+<li><p>Data quality assessment</p></li>
+<li><p>Statistical analysis and visualization</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">extractionQuery</span></code>: Broad query for data extraction</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataFields</span></code>: Specific data fields to extract</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysisType</span></code>: Type of analysis to perform</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">qualityFilters</span></code>: Data quality criteria</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">outputFormat</span></code>: Format for extracted data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_databases</span></code>: Databases to extract from</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Execute bulk queries across selected databases</p></li>
+<li><p>Standardize data formats and units</p></li>
+<li><p>Perform quality assessment and filtering</p></li>
+<li><p>Conduct cross-database correlation analysis</p></li>
+<li><p>Generate statistical summaries and visualizations</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;extracted_data&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;materials&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
+        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;statistics&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;analysis_results&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;correlations&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;quality_metrics&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;coverage_analysis&#39;</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;visualizations&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Building comprehensive datasets</p></li>
+<li><p>Materials informatics studies</p></li>
+<li><p>Trend analysis across materials classes</p></li>
+<li><p>Database comparison and validation</p></li>
+</ul>
+</section>
+<section id="material-characterization-id-4">
+<h3>4. Material Characterization (ID: 4)<a class="headerlink" href="#material-characterization-id-4" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">MaterialCharacterizationFeature</span></code></p>
+<p>Comprehensive characterization of material properties using multiple methods.</p>
+<p><strong>Description</strong>: “Material Characterization: Comprehensive analysis and characterization of material properties”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Multi-property prediction and analysis</p></li>
+<li><p>Experimental data integration</p></li>
+<li><p>Property correlation analysis</p></li>
+<li><p>Characterization recommendations</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">targetMaterial</span></code>: Material to characterize</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">propertyList</span></code>: Properties to analyze</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">characterizationMethods</span></code>: Experimental/computational methods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comparisonMaterials</span></code>: Reference materials for comparison</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_predictors</span></code>: Predictor configurations to use</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Extract material structure and composition</p></li>
+<li><p>Predict properties using selected predictors</p></li>
+<li><p>Correlate with experimental data if available</p></li>
+<li><p>Perform comparative analysis with similar materials</p></li>
+<li><p>Generate characterization recommendations</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;material_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;structural&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;electronic&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;mechanical&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;thermal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;characterization_data&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;predictions&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;experimental&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+        <span class="s1">&#39;correlations&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;recommendations&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Complete material property assessment</p></li>
+<li><p>Validation of new materials</p></li>
+<li><p>Comparison with existing materials</p></li>
+<li><p>Experimental planning</p></li>
+</ul>
+</section>
+<section id="dft-calculation-id-5">
+<h3>5. DFT Calculation (ID: 5)<a class="headerlink" href="#dft-calculation-id-5" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">DFTCalculationFeature</span></code></p>
+<p>Density functional theory calculations for accurate property prediction.</p>
+<p><strong>Description</strong>: “DFT Calculation: Perform DFT calculations for accurate materials properties”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Structure optimization</p></li>
+<li><p>Electronic structure calculations</p></li>
+<li><p>Thermodynamic property prediction</p></li>
+<li><p>High-accuracy property calculations</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inputStructure</span></code>: Initial crystal structure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calculationType</span></code>: Type of DFT calculation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">functional</span></code>: Exchange-correlation functional</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kPointDensity</span></code>: K-point mesh density</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convergenceCriteria</span></code>: Convergence parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_predictors</span></code>: DFT-based predictors to use</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Prepare input structures for DFT calculation</p></li>
+<li><p>Optimize structures using DFT methods</p></li>
+<li><p>Calculate electronic structure properties</p></li>
+<li><p>Compute thermodynamic and mechanical properties</p></li>
+<li><p>Validate results and assess convergence</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;optimized_structure&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="s1">&#39;electronic_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;band_structure&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;dos&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;band_gap&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;work_function&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;thermodynamic_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;formation_energy&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;heat_capacity&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;thermal_expansion&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;calculation_details&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>High-accuracy property calculations</p></li>
+<li><p>Structure optimization</p></li>
+<li><p>Electronic structure analysis</p></li>
+<li><p>Thermodynamic stability assessment</p></li>
+</ul>
+</section>
+<section id="crystallographic-analysis-id-6">
+<h3>6. Crystallographic Analysis (ID: 6)<a class="headerlink" href="#crystallographic-analysis-id-6" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">CrystallographicAnalysisFeature</span></code></p>
+<p>Detailed analysis of crystal structures and symmetries.</p>
+<p><strong>Description</strong>: “Crystallographic Analysis: Analyze crystal structures, symmetries, and structural relationships”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Space group analysis</p></li>
+<li><p>Structure comparison and matching</p></li>
+<li><p>Defect analysis</p></li>
+<li><p>Phase relationship studies</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">crystalStructure</span></code>: Input crystal structure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysisType</span></code>: Type of crystallographic analysis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tolerances</span></code>: Symmetry and matching tolerances</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">referenceStructures</span></code>: Structures for comparison</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_databases</span></code>: Databases for structural comparison</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Analyze crystal symmetry and space group</p></li>
+<li><p>Identify structural motifs and coordination environments</p></li>
+<li><p>Compare with reference structures and databases</p></li>
+<li><p>Analyze structural relationships and transformations</p></li>
+<li><p>Generate crystallographic reports</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;symmetry_analysis&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;space_group&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;point_group&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;lattice_system&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;symmetry_operations&#39;</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;structural_analysis&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;coordination_environments&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;bond_analysis&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="s1">&#39;polyhedral_analysis&#39;</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;comparison_results&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;structural_relationships&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Crystal structure determination</p></li>
+<li><p>Phase identification</p></li>
+<li><p>Structural relationship studies</p></li>
+<li><p>Defect and disorder analysis</p></li>
+</ul>
+</section>
+<section id="quantum-mechanics-id-7">
+<h3>7. Quantum Mechanics (ID: 7)<a class="headerlink" href="#quantum-mechanics-id-7" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">QuantumMechanicsFeature</span></code></p>
+<p>Quantum mechanical calculations for fundamental property understanding.</p>
+<p><strong>Description</strong>: “Quantum Mechanics: Quantum mechanical calculations and analysis of electronic properties”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Wavefunction analysis</p></li>
+<li><p>Orbital visualization</p></li>
+<li><p>Electronic property calculations</p></li>
+<li><p>Quantum mechanical descriptors</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quantumSystem</span></code>: System for quantum calculation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calculationLevel</span></code>: Level of quantum theory</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">basisSet</span></code>: Quantum mechanical basis set</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysisOptions</span></code>: Types of quantum analysis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_predictors</span></code>: Quantum-based predictors</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Set up quantum mechanical calculations</p></li>
+<li><p>Solve electronic structure problem</p></li>
+<li><p>Analyze wavefunctions and orbitals</p></li>
+<li><p>Calculate quantum mechanical properties</p></li>
+<li><p>Generate quantum descriptors</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;electronic_structure&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;orbital_energies&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s1">&#39;orbital_occupations&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s1">&#39;electron_density&#39;</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;quantum_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ionization_potential&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;electron_affinity&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;chemical_hardness&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;wavefunction_analysis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+    <span class="s1">&#39;quantum_descriptors&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Fundamental electronic structure analysis</p></li>
+<li><p>Chemical bonding studies</p></li>
+<li><p>Reactivity prediction</p></li>
+<li><p>Quantum descriptor generation</p></li>
+</ul>
+</section>
+<section id="tensor-analysis-id-8">
+<h3>8. Tensor Analysis (ID: 8)<a class="headerlink" href="#tensor-analysis-id-8" title="Link to this heading"></a></h3>
+<p><strong>Class</strong>: <code class="docutils literal notranslate"><span class="pre">TensorAnalysisFeature</span></code></p>
+<p>Analysis of tensor properties such as elastic, piezoelectric, and optical tensors.</p>
+<p><strong>Description</strong>: “Tensor Analysis: Calculate and analyze tensor properties including elastic, piezoelectric, and optical tensors”</p>
+<p><strong>Capabilities</strong>:</p>
+<ul class="simple">
+<li><p>Elastic tensor calculations</p></li>
+<li><p>Piezoelectric property analysis</p></li>
+<li><p>Optical tensor determination</p></li>
+<li><p>Anisotropy analysis</p></li>
+</ul>
+<p><strong>Input Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">materialStructure</span></code>: Crystal structure for tensor analysis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tensorTypes</span></code>: Types of tensors to calculate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">strainAmplitudes</span></code>: Strain amplitudes for elastic calculations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">temperatureRange</span></code>: Temperature range for analysis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">active_predictors</span></code>: Tensor-capable predictors</p></li>
+</ul>
+<p><strong>Processing Steps</strong>:</p>
+<ol class="arabic simple">
+<li><p>Generate strained structures for tensor calculations</p></li>
+<li><p>Calculate response properties under various conditions</p></li>
+<li><p>Fit tensor elements from response data</p></li>
+<li><p>Analyze tensor symmetries and invariants</p></li>
+<li><p>Compute derived properties from tensors</p></li>
+</ol>
+<p><strong>Output Format</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;elastic_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;elastic_tensor&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">,</span>
+        <span class="s1">&#39;bulk_modulus&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;shear_modulus&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;elastic_anisotropy&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;piezoelectric_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;piezoelectric_tensor&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">,</span>
+        <span class="s1">&#39;piezoelectric_constants&#39;</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;optical_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;dielectric_tensor&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">,</span>
+        <span class="s1">&#39;refractive_indices&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s1">&#39;birefringence&#39;</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;anisotropy_analysis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong>:</p>
+<ul class="simple">
+<li><p>Mechanical property analysis</p></li>
+<li><p>Piezoelectric device design</p></li>
+<li><p>Optical materials characterization</p></li>
+<li><p>Anisotropic property studies</p></li>
+</ul>
+</section>
+</section>
+<section id="common-workflow-patterns">
+<h2>Common Workflow Patterns<a class="headerlink" href="#common-workflow-patterns" title="Link to this heading"></a></h2>
+<section id="multi-feature-material-discovery">
+<h3>Multi-Feature Material Discovery<a class="headerlink" href="#multi-feature-material-discovery" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Search for existing materials</span>
+<span class="n">search_results</span> <span class="o">=</span> <span class="n">material_search</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+    <span class="s1">&#39;searchTerm&#39;</span><span class="p">:</span> <span class="s1">&#39;high mobility semiconductor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;propertyRange&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mobility&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)},</span>
+    <span class="s1">&#39;active_databases&#39;</span><span class="p">:</span> <span class="n">database_configs</span>
+<span class="p">})</span>
+
+<span class="c1"># 2. Generate new candidates</span>
+<span class="n">generation_results</span> <span class="o">=</span> <span class="n">material_generation</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+    <span class="s1">&#39;targetProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mobility&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)},</span>
+    <span class="s1">&#39;elementConstraints&#39;</span><span class="p">:</span> <span class="n">search_results</span><span class="p">[</span><span class="s1">&#39;common_elements&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;active_generators&#39;</span><span class="p">:</span> <span class="n">generator_configs</span>
+<span class="p">})</span>
+
+<span class="c1"># 3. Characterize promising materials</span>
+<span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">generation_results</span><span class="p">[</span><span class="s1">&#39;top_candidates&#39;</span><span class="p">]:</span>
+    <span class="n">characterization</span> <span class="o">=</span> <span class="n">material_characterization</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+        <span class="s1">&#39;targetMaterial&#39;</span><span class="p">:</span> <span class="n">material</span><span class="p">,</span>
+        <span class="s1">&#39;propertyList&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mobility&#39;</span><span class="p">,</span> <span class="s1">&#39;stability&#39;</span><span class="p">,</span> <span class="s1">&#39;band_gap&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;active_predictors&#39;</span><span class="p">:</span> <span class="n">predictor_configs</span>
+    <span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="comprehensive-material-analysis">
+<h3>Comprehensive Material Analysis<a class="headerlink" href="#comprehensive-material-analysis" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Complete analysis workflow</span>
+<span class="n">material</span> <span class="o">=</span> <span class="n">get_target_material</span><span class="p">()</span>
+
+<span class="c1"># Structure and symmetry analysis</span>
+<span class="n">crystal_analysis</span> <span class="o">=</span> <span class="n">crystallographic_analysis</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+    <span class="s1">&#39;crystalStructure&#39;</span><span class="p">:</span> <span class="n">material</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+    <span class="s1">&#39;analysisType&#39;</span><span class="p">:</span> <span class="s1">&#39;full_symmetry&#39;</span>
+<span class="p">})</span>
+
+<span class="c1"># Electronic structure</span>
+<span class="n">dft_results</span> <span class="o">=</span> <span class="n">dft_calculation</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+    <span class="s1">&#39;inputStructure&#39;</span><span class="p">:</span> <span class="n">material</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+    <span class="s1">&#39;calculationType&#39;</span><span class="p">:</span> <span class="s1">&#39;electronic_structure&#39;</span>
+<span class="p">})</span>
+
+<span class="c1"># Tensor properties</span>
+<span class="n">tensor_results</span> <span class="o">=</span> <span class="n">tensor_analysis</span><span class="o">.</span><span class="n">process</span><span class="p">({</span>
+    <span class="s1">&#39;materialStructure&#39;</span><span class="p">:</span> <span class="n">material</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+    <span class="s1">&#39;tensorTypes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;elastic&#39;</span><span class="p">,</span> <span class="s1">&#39;piezoelectric&#39;</span><span class="p">,</span> <span class="s1">&#39;optical&#39;</span><span class="p">]</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="feature-selection">
+<h3>Feature Selection<a class="headerlink" href="#feature-selection" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Material Search</strong>: Start here for any new research direction</p></li>
+<li><p><strong>Material Generation</strong>: Use when existing materials don’t meet requirements</p></li>
+<li><p><strong>DFT Calculation</strong>: For high-accuracy, definitive property values</p></li>
+<li><p><strong>Material Characterization</strong>: For comprehensive property assessment</p></li>
+</ul>
+</section>
+<section id="input-guidelines">
+<h3>Input Guidelines<a class="headerlink" href="#input-guidelines" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Start with broad searches and narrow down progressively</p></li>
+<li><p>Use multiple databases and predictors for validation</p></li>
+<li><p>Consider computational cost vs. accuracy trade-offs</p></li>
+<li><p>Document all parameters for reproducibility</p></li>
+</ul>
+</section>
+<section id="result-interpretation">
+<h3>Result Interpretation<a class="headerlink" href="#result-interpretation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Cross-validate results across multiple features</p></li>
+<li><p>Consider uncertainty and confidence levels</p></li>
+<li><p>Validate against experimental data when available</p></li>
+<li><p>Use statistical analysis for large datasets</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="electronics_application.html" class="btn btn-neutral float-right" title="Electronics Application Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, EMOS Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

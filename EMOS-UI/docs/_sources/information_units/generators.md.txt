@@ -1,0 +1,285 @@
+# Generators
+
+Generators are AI-powered tools that create new materials and structures using machine learning models. They enable the discovery of novel materials by generating candidates with desired properties. All generators implement the `BaseGenerator` interface with a standardized `generate()` method.
+
+## Available Generators
+
+### MatterGen - Microsoft's Crystal Structure Generator
+**ID**: `mattergen`
+
+Generative model for crystal structures developed by Microsoft Research.
+
+**Capabilities**:
+- Generate novel crystal structures
+- Condition on chemical composition
+- Ensure crystallographic validity
+- High structural diversity
+
+**Input Parameters**:
+- `composition`: Target chemical composition
+- `num_structures`: Number of structures to generate
+- `temperature`: Generation temperature (creativity control)
+- `constraints`: Structural constraints
+
+**Output Format**:
+- Crystal structures (CIF format)
+- Generation confidence scores
+- Structural validity metrics
+
+**Use Cases**:
+- Discovery of new inorganic materials
+- Structure prediction for given compositions
+- Crystal polymorph exploration
+
+### GNoME - Graph Networks for Materials Exploration
+**ID**: `gnome`
+
+Deep learning framework for materials discovery using graph neural networks.
+
+**Capabilities**:
+- Graph-based material representation
+- Property-conditioned generation
+- Stability-aware structure generation
+- Large-scale materials screening
+
+**Input Parameters**:
+- `target_properties`: Desired material properties
+- `element_constraints`: Allowed chemical elements
+- `num_candidates`: Number of materials to generate
+- `stability_threshold`: Minimum stability requirement
+
+**Output Format**:
+- Material structures with property predictions
+- Stability assessments
+- Graph representations
+
+**Use Cases**:
+- Property-targeted material design
+- Screening large chemical spaces
+- Novel compound discovery
+
+### iMatGen - Inverse Materials Generator
+**ID**: `imatgen`
+
+Inverse design tool for targeted materials generation with specific properties.
+
+**Capabilities**:
+- Inverse design from target properties
+- Multi-objective optimization
+- Synthesizability considerations
+- Property gradient optimization
+
+**Input Parameters**:
+- `target_properties`: Property targets and ranges
+- `optimization_weights`: Property importance weights
+- `synthesis_constraints`: Manufacturing constraints
+- `search_iterations`: Number of optimization steps
+
+**Output Format**:
+- Optimized material candidates
+- Property predictions
+- Synthesizability scores
+- Optimization convergence data
+
+**Use Cases**:
+- Materials design for specific applications
+- Multi-property optimization
+- Synthesis-aware design
+
+### MatGAN - Materials Generative Adversarial Network
+**ID**: `matgan`
+
+GAN-based generator for creating new materials with learned representations.
+
+**Capabilities**:
+- Adversarial training for realism
+- Latent space interpolation
+- Style transfer between material classes
+- Conditional generation
+
+**Input Parameters**:
+- `material_class`: Type of material to generate
+- `style_reference`: Reference material for style
+- `diversity_factor`: Control structural diversity
+- `num_samples`: Number of samples to generate
+
+**Output Format**:
+- Generated material structures
+- Latent space embeddings
+- Diversity metrics
+- Realism scores
+
+**Use Cases**:
+- Exploring material design spaces
+- Creating material variants
+- Novel architecture discovery
+
+### MolGAN - Molecular Generative Adversarial Network
+**ID**: `molgan`
+
+Specialized GAN for molecular and small crystal structure generation.
+
+**Capabilities**:
+- Molecular graph generation
+- Small molecule and clusters
+- Chemical validity enforcement
+- Scaffold-based generation
+
+**Input Parameters**:
+- `molecule_type`: Target molecule class
+- `size_range`: Molecular size constraints
+- `scaffold`: Base molecular scaffold
+- `chemical_constraints`: Allowed chemical features
+
+**Output Format**:
+- Molecular structures (MOL/SDF format)
+- Chemical validity scores
+- Property predictions
+- Scaffold compliance metrics
+
+**Use Cases**:
+- Drug discovery applications
+- Small molecule catalysts
+- Molecular electronics materials
+
+### CondDFCVAE - Conditional Deep Feature Consistent VAE
+**ID**: `dfc-vae`
+
+Variational autoencoder with conditional generation and feature consistency.
+
+**Capabilities**:
+- Conditional material generation
+- Feature consistency enforcement
+- Smooth latent space interpolation
+- Property-guided sampling
+
+**Input Parameters**:
+- `condition_vector`: Property conditioning
+- `latent_constraints`: Latent space constraints
+- `consistency_weight`: Feature consistency importance
+- `sampling_strategy`: Latent space sampling method
+
+**Output Format**:
+- Generated structures with conditions
+- Latent space coordinates
+- Feature consistency metrics
+- Interpolation trajectories
+
+**Use Cases**:
+- Controlled property generation
+- Material property optimization
+- Design space exploration
+
+### MyGen1 - Custom Generator 1
+**ID**: `mygen1`
+
+Customizable generator template for domain-specific applications.
+
+**Capabilities**:
+- Domain-specific material generation
+- Customizable generation logic
+- Integration with external tools
+- Extensible architecture
+
+**Input Parameters**:
+- `domain_parameters`: Domain-specific inputs
+- `generation_mode`: Generation strategy
+- `custom_constraints`: User-defined constraints
+
+**Output Format**:
+- Domain-specific material structures
+- Custom metrics
+- Generation metadata
+
+### MyGen2 - Custom Generator 2
+**ID**: `mygen2`
+
+Secondary custom generator for specialized applications.
+
+**Capabilities**:
+- Alternative generation approaches
+- Specialized algorithms
+- Custom property targeting
+- Research-oriented features
+
+**Input Parameters**:
+- `algorithm_choice`: Generation algorithm
+- `research_parameters`: Research-specific inputs
+- `validation_criteria`: Output validation rules
+
+**Output Format**:
+- Specialized material outputs
+- Algorithm-specific metrics
+- Research data
+
+## Usage Patterns
+
+### Basic Material Generation
+
+```python
+# Example of using a generator in a Feature
+gen_instance = generator_factory["mattergen"]("mattergen", logger)
+inputs = {
+    'composition': 'Si2O4',
+    'num_structures': 10,
+    'temperature': 0.8
+}
+results = gen_instance.generate(inputs)
+```
+
+### Property-Targeted Generation
+
+```python
+# Generate materials with specific properties
+gen_instance = generator_factory["gnome"]("gnome", logger)
+inputs = {
+    'target_properties': {
+        'band_gap': (1.0, 3.0),  # eV range
+        'formation_energy': (-2.0, 0.0)  # eV/atom
+    },
+    'element_constraints': ['Si', 'O', 'Al'],
+    'num_candidates': 50
+}
+candidates = gen_instance.generate(inputs)
+```
+
+### Multi-Generator Workflow
+
+```python
+# Use multiple generators for diverse candidates
+generators = ['mattergen', 'gnome', 'imatgen']
+all_candidates = []
+
+for gen_id in generators:
+    gen_instance = generator_factory[gen_id](gen_id, logger)
+    candidates = gen_instance.generate(generation_inputs)
+    all_candidates.extend(candidates)
+
+# Filter and rank combined results
+```
+
+## Best Practices
+
+### Generator Selection
+- **MatterGen**: Excellent for general crystal structure generation
+- **GNoME**: Best for property-targeted design
+- **iMatGen**: Ideal for multi-objective optimization
+- **MatGAN/MolGAN**: Good for exploring design spaces
+
+### Input Design
+- Start with broad constraints and narrow down
+- Use multiple generation temperatures
+- Consider computational cost vs. diversity trade-offs
+- Validate input parameter ranges
+
+### Output Processing
+- Always validate generated structures
+- Use multiple quality metrics
+- Cross-reference with existing databases
+- Consider experimental feasibility
+
+### Integration Tips
+- Combine with predictors for property validation
+- Use databases for training data enhancement
+- Implement iterative refinement loops
+- Document generation parameters for reproducibility

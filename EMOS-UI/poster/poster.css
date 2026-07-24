@@ -1,0 +1,152 @@
+/* ============================================================
+   EMOS academic poster — A0 portrait (841 x 1189 mm).
+   Classic sectioned academic layout (Intro / Method / Analysis /
+   Conclusions) in rounded-corner boxes, matching the APRIL
+   template. Shared by variants a/b/c. EMOS brand type + colour.
+   ============================================================ */
+
+@font-face { font-family: "SF Pro Display"; font-weight: 400; src: url("../assets/fonts/SFProDisplay-Regular.otf") format("opentype"); }
+@font-face { font-family: "SF Pro Display"; font-weight: 500; src: url("../assets/fonts/SFProDisplay-Medium.otf") format("opentype"); }
+@font-face { font-family: "SF Pro Display"; font-weight: 700; src: url("../assets/fonts/SFProDisplay-Bold.otf") format("opentype"); }
+@font-face { font-family: "SF Mono"; font-weight: 400; src: url("../assets/fonts/SF-Mono-Regular.otf") format("opentype"); }
+@font-face { font-family: "SF Mono"; font-weight: 500; src: url("../assets/fonts/SF-Mono-Medium.otf") format("opentype"); }
+@font-face { font-family: "SF Mono"; font-weight: 700; src: url("../assets/fonts/SF-Mono-Bold.otf") format("opentype"); }
+
+:root {
+  --ink: #1a1d29; --ink-2: #3a3f4d; --ink-3: #6b7280;
+  --line: #e2e5ea; --line-2: #c8cdd6; --grey-50: #f6f7f9; --grey-100: #eef0f3; --white: #fff;
+  --accent: #c8241a; --accent-soft: #fbeceb;
+  --db: #2563eb; --gen: #16a34a; --pred: #7c3aed; --eval: #c8241a;
+  --stable: #16a34a; --marginal: #d97706; --unstable: #c8241a;
+  --navy: #232739;
+  --mono: "SF Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+@page { size: 841mm 1189mm; margin: 0; }
+html, body { margin: 0; padding: 0; background: #d7dae0; }
+
+.poster {
+  position: relative; display: flex; flex-direction: column;
+  width: 841mm; height: 1189mm; background: #fff url("assets/bg.jpg") center / 100% 100% no-repeat; color: var(--ink);
+  font-family: "SF Pro Display", -apple-system, system-ui, sans-serif;
+  font-size: 5.25mm; line-height: 1.42; padding: 24mm 28mm 16mm; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- title block ---------- */
+.p-head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16mm; }
+.p-kicker { font-size: 1.85em; font-weight: 600; color: var(--accent); margin: 0 0 4mm; }
+.p-title { font-size: 5.0em; font-weight: 700; line-height: 1.03; letter-spacing: -0.02em; margin: 0; }
+.p-head-mark { display: flex; flex-direction: column; align-items: flex-end; gap: 6mm; }
+.p-head-mark .emos-lockup { display: flex; align-items: center; gap: 4mm; }
+.p-head-mark .emos-lockup img { height: 23mm; }
+.p-head-mark .emos-lockup span { font-size: 3.5em; font-weight: 700; letter-spacing: -0.01em; }
+.p-head-mark .april-mark { height: 25mm; }
+.p-authors { margin: 6mm 0 0; font-size: 1.85em; font-weight: 500; color: var(--ink); }
+.p-authors .lead { font-weight: 700; }
+.p-authors sup { font-size: 0.6em; font-weight: 500; }
+.p-affil { margin: 3mm 0 0; font-size: 1.28em; color: var(--ink-3); line-height: 1.5; }
+.p-affil .sep { color: var(--line-2); margin: 0 2mm; }
+.headrule { height: 0.6mm; background: var(--line-2); border: 0; margin: 7mm 0 0; }
+
+/* ---------- highlight strip (one-line key result; not a marketing hero) ---------- */
+.highlight { margin: 10mm 0 0; padding: 9mm 11mm; background: var(--navy); color: #fff; border-radius: 4mm; display: flex; align-items: center; gap: 8mm; }
+.highlight .hl-key { font-size: 1.25em; font-weight: 700; color: #ff7a6e; flex-shrink: 0; }
+.highlight p { margin: 0; font-size: 1.95em; font-weight: 500; line-height: 1.28; }
+.highlight p b { font-weight: 700; color: #fff; }
+
+/* ---------- 3-column body of section boxes ---------- */
+.body3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12mm; margin: 13mm 0 0; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 14mm; }
+.box { border: 0.4mm solid var(--line); border-radius: 4mm; background: var(--white); overflow: hidden; break-inside: avoid; }
+.box-h { display: flex; align-items: baseline; gap: 3.5mm; padding: 5.5mm 7mm; background: var(--grey-50); border-bottom: 0.4mm solid var(--line); }
+.box-h .n { font-family: var(--mono); font-size: 1.25em; font-weight: 700; color: var(--accent); }
+.box-h h3 { margin: 0; font-size: 2.05em; font-weight: 700; letter-spacing: -0.015em; }
+.box-b { padding: 6mm 7mm 7mm; }
+.box-b > *:first-child { margin-top: 0; }
+.box-b > *:last-child { margin-bottom: 0; }
+.box-b p { font-size: 1.5em; line-height: 1.46; color: var(--ink-2); margin: 0 0 3.5mm; }
+.box-b p strong { color: var(--ink); font-weight: 700; }
+.box-b h4 { font-size: 1.55em; font-weight: 700; color: var(--ink); margin: 5mm 0 2.5mm; }
+
+/* labelled lists */
+.blist { list-style: none; margin: 3mm 0 0; padding: 0; display: flex; flex-direction: column; gap: 3mm; }
+.blist li { display: flex; gap: 3.5mm; font-size: 1.42em; line-height: 1.4; color: var(--ink-2); }
+.blist li b { color: var(--ink); font-weight: 700; }
+.blist .dot { flex-shrink: 0; width: 3mm; height: 3mm; border-radius: 50%; margin-top: 2.2mm; background: var(--ink-3); }
+.dot.db { background: var(--db); } .dot.gen { background: var(--gen); } .dot.pred { background: var(--pred); } .dot.eval { background: var(--eval); }
+
+/* pipeline chips */
+.pipe { display: flex; align-items: center; gap: 2.5mm; flex-wrap: wrap; margin: 4mm 0; }
+.pipe .chip { font-family: var(--mono); font-size: 1.05em; font-weight: 500; padding: 2mm 3.5mm; border-radius: 2mm; color: #fff; }
+.chip.db { background: var(--db); } .chip.gen { background: var(--gen); } .chip.pred { background: var(--pred); } .chip.eval { background: var(--eval); }
+.pipe .arr { color: var(--line-2); font-size: 1.4em; font-weight: 700; }
+
+/* figures */
+.fig { border: 0.4mm solid var(--line); border-radius: 3mm; overflow: hidden; background: var(--white); margin: 4mm 0 0; }
+.fig .chrome { height: 7mm; background: var(--grey-50); border-bottom: 0.4mm solid var(--line); display: flex; align-items: center; gap: 1.8mm; padding: 0 3.5mm; }
+.fig .chrome i { width: 2mm; height: 2mm; border-radius: 50%; background: var(--line-2); }
+.fig .chrome span { font-family: var(--mono); font-size: 0.9em; color: var(--ink-3); margin-left: 1.5mm; }
+.fig img { display: block; width: 100%; }
+.figcap { font-size: 1.15em; color: var(--ink-3); line-height: 1.4; margin: 2.5mm 0 0; }
+.figcap b { color: var(--ink); font-weight: 700; }
+
+/* ---------- charts (inline SVG) ---------- */
+.chart { width: 100%; height: auto; display: block; margin: 3mm 0 0; }
+.chart text { font-family: "SF Pro Display", sans-serif; fill: var(--ink-2); }
+.chart .mono { font-family: var(--mono); }
+.legend { display: flex; gap: 6mm; flex-wrap: wrap; margin: 3mm 0 0; font-size: 1.15em; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 2mm; }
+.legend i { width: 3.5mm; height: 3.5mm; border-radius: 1mm; }
+
+/* metric table (usability results) */
+.metrics { width: 100%; border-collapse: collapse; margin: 3mm 0 0; font-size: 1.4em; }
+.metrics th { text-align: left; font-size: 0.92em; font-weight: 600; color: var(--ink-3); padding: 0 0 2.5mm; border-bottom: 0.4mm solid var(--line-2); }
+.metrics th.num, .metrics td.num { text-align: right; font-family: var(--mono); }
+.metrics td { padding: 3mm 0; border-bottom: 0.4mm solid var(--line); }
+.metrics td.m { font-weight: 500; color: var(--ink); }
+.metrics td.before { color: var(--ink-3); }
+.metrics td.after { color: var(--stable); font-weight: 700; }
+
+/* big stat callouts */
+.statrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; margin: 4mm 0 0; }
+.stat { border: 0.4mm solid var(--line); border-radius: 3mm; padding: 5mm 5mm; }
+.stat .sv { font-family: var(--mono); font-size: 2.6em; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.stat .sl { font-size: 1.12em; color: var(--ink-3); margin-top: 2mm; line-height: 1.3; }
+.stat.db .sv { color: var(--db); } .stat.gen .sv { color: var(--gen); } .stat.pred .sv { color: var(--pred); } .stat.eval .sv { color: var(--accent); }
+
+/* SUS badge */
+.sus { display: flex; align-items: center; gap: 5mm; margin: 5mm 0 0; padding: 4mm 0 0; border-top: 0.4mm solid var(--line); }
+.sus .big { font-family: var(--mono); font-size: 3.4em; font-weight: 700; color: var(--stable); line-height: 1; }
+.sus .txt { font-size: 1.3em; color: var(--ink-2); line-height: 1.4; }
+.sus .txt b { color: var(--ink); font-weight: 700; }
+
+/* ---------- conclusions (full width) ---------- */
+.conc { margin: 11mm 0 0; border: 0.4mm solid var(--line); border-radius: 4mm; overflow: hidden; background: var(--white); }
+.conc .box-h { background: var(--navy); border-bottom: 0; }
+.conc .box-h .n { color: #ff7a6e; }
+.conc .box-h h3 { color: #fff; }
+.conc .conc-b { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10mm; padding: 7mm 8mm; }
+.conc .conc-b p { font-size: 1.55em; line-height: 1.46; color: var(--ink-2); margin: 0 0 3mm; }
+.conc .conc-b p strong { color: var(--ink); font-weight: 700; }
+.conc h4 { font-size: 1.35em; font-weight: 700; color: var(--accent); margin: 0 0 3mm; }
+.conc-sub { font-size: 1.7em; font-weight: 700; color: var(--ink); margin: 0 0 3mm; letter-spacing: -0.01em; }
+
+/* ---------- footer ---------- */
+.foot { margin-top: auto; padding-top: 9mm; }
+.foot-rule { height: 0.4mm; background: var(--line); border: 0; margin: 0 0 7mm; }
+.foot-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14mm; align-items: end; }
+.refs h4, .ack h4 { font-size: 1.15em; font-weight: 700; color: var(--ink-2); margin: 0 0 2.5mm; }
+.refs p, .ack p { font-size: 1.05em; line-height: 1.45; color: var(--ink-3); margin: 0 0 1.5mm; }
+.foot-right { display: flex; flex-direction: column; gap: 6mm; align-items: flex-end; }
+.qr-wrap { display: flex; align-items: center; gap: 5mm; }
+.qr-wrap img { width: 27mm; height: 27mm; }
+.qr-wrap .qr-cap { font-size: 1.1em; color: var(--ink-2); line-height: 1.4; text-align: right; }
+.qr-wrap .qr-cap b { display: block; color: var(--ink); font-weight: 700; }
+.logos { display: flex; align-items: center; gap: 8mm; flex-wrap: wrap; justify-content: flex-end; }
+.logos img { height: 16mm; width: auto; object-fit: contain; }
+.logos img.edin { height: 21mm; }
+.logos .wordmark { font-weight: 700; font-size: 1.45em; color: #453b5f; letter-spacing: -0.01em; line-height: 1.05; }
+.logos .raeng { display: flex; align-items: center; gap: 3mm; }
+.logos .raeng .dia { width: 11mm; height: 11mm; flex-shrink: 0; }
+.logos .raeng b { font-weight: 700; font-size: 1.2em; line-height: 1.05; color: var(--ink); }

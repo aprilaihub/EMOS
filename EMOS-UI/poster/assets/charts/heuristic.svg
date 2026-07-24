@@ -1,0 +1,38 @@
+<svg class="chart" viewBox="0 0 490 270" xmlns="http://www.w3.org/2000/svg">
+<line x1="206.0" y1="6" x2="206.0" y2="250" stroke="#e2e5ea" stroke-width="0.6"/>
+<text x="206.0" y="266" font-family='SF Mono, ui-monospace, monospace' font-size="10" fill="#6b7280" text-anchor="middle">0</text>
+<line x1="261.0" y1="6" x2="261.0" y2="250" stroke="#e2e5ea" stroke-width="0.6"/>
+<text x="261.0" y="266" font-family='SF Mono, ui-monospace, monospace' font-size="10" fill="#6b7280" text-anchor="middle">1</text>
+<line x1="316.0" y1="6" x2="316.0" y2="250" stroke="#e2e5ea" stroke-width="0.6"/>
+<text x="316.0" y="266" font-family='SF Mono, ui-monospace, monospace' font-size="10" fill="#6b7280" text-anchor="middle">2</text>
+<line x1="371.0" y1="6" x2="371.0" y2="250" stroke="#e2e5ea" stroke-width="0.6"/>
+<text x="371.0" y="266" font-family='SF Mono, ui-monospace, monospace' font-size="10" fill="#6b7280" text-anchor="middle">3</text>
+<line x1="426.0" y1="6" x2="426.0" y2="250" stroke="#e2e5ea" stroke-width="0.6"/>
+<text x="426.0" y="266" font-family='SF Mono, ui-monospace, monospace' font-size="10" fill="#6b7280" text-anchor="middle">4</text>
+<text x="316.0" y="266" font-family='SF Pro Display, Arial, sans-serif' font-size="10" fill="#6b7280" text-anchor="middle"></text>
+<text x="192" y="30" font-family='SF Pro Display, Arial, sans-serif' font-size="13" font-weight="600" fill="#1a1d29" text-anchor="end">User control &amp; freedom</text>
+<rect x="206" y="12" width="192.5" height="16" rx="1.5" fill="#f2a359"/>
+<text x="403.5" y="25" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">3.5</text>
+<rect x="206" y="31" width="27.5" height="16" rx="1.5" fill="#92a2df"/>
+<text x="238.5" y="44" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">0.5</text>
+<text x="192" y="78" font-family='SF Pro Display, Arial, sans-serif' font-size="13" font-weight="600" fill="#1a1d29" text-anchor="end">Visibility of status</text>
+<rect x="206" y="60" width="165.0" height="16" rx="1.5" fill="#f2a359"/>
+<text x="376.0" y="73" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">3.0</text>
+<rect x="206" y="79" width="55.0" height="16" rx="1.5" fill="#92a2df"/>
+<text x="266.0" y="92" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">1.0</text>
+<text x="192" y="126" font-family='SF Pro Display, Arial, sans-serif' font-size="13" font-weight="600" fill="#1a1d29" text-anchor="end">Error prevention</text>
+<rect x="206" y="108" width="165.0" height="16" rx="1.5" fill="#f2a359"/>
+<text x="376.0" y="121" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">3.0</text>
+<rect x="206" y="127" width="27.5" height="16" rx="1.5" fill="#92a2df"/>
+<text x="238.5" y="140" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">0.5</text>
+<text x="192" y="174" font-family='SF Pro Display, Arial, sans-serif' font-size="13" font-weight="600" fill="#1a1d29" text-anchor="end">Consistency</text>
+<rect x="206" y="156" width="137.5" height="16" rx="1.5" fill="#f2a359"/>
+<text x="348.5" y="169" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">2.5</text>
+<rect x="206" y="175" width="55.0" height="16" rx="1.5" fill="#92a2df"/>
+<text x="266.0" y="188" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">1.0</text>
+<text x="192" y="222" font-family='SF Pro Display, Arial, sans-serif' font-size="13" font-weight="600" fill="#1a1d29" text-anchor="end">Help &amp; documentation</text>
+<rect x="206" y="204" width="137.5" height="16" rx="1.5" fill="#f2a359"/>
+<text x="348.5" y="217" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">2.5</text>
+<rect x="206" y="223" width="55.0" height="16" rx="1.5" fill="#92a2df"/>
+<text x="266.0" y="236" font-family='SF Mono, ui-monospace, monospace' font-size="10.5" fill="#6b7280">1.0</text>
+</svg>

@@ -1,0 +1,92 @@
+# System Overview
+
+## Architecture Overview
+
+EMOS implements a three-tier architecture that separates data access, computational processing, and user interaction:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  Web Interface                      │
+│               (User Interaction)                    │
+├─────────────────────────────────────────────────────┤
+│                    Features                         │
+│               (Workflow Logic)                      │
+│  ┌─────────────────┐  ┌─────────────────────────┐   │
+│  │ Materials       │  │ Electronics             │   │
+│  │ Exploration     │  │ Application             │   │
+│  └─────────────────┘  └─────────────────────────┘   │
+├─────────────────────────────────────────────────────┤
+│               Information Units                     │
+│               (Data & Computation)                  │
+│  ┌───────────┐ ┌─────────────┐ ┌─────────────────┐  │
+│  │ Databases │ │ Generators  │ │ Predictors      │  │
+│  └───────────┘ └─────────────┘ └─────────────────┘  │
+└─────────────────────────────────────────────────────┘
+```
+
+## Information Units Layer
+
+### Databases
+Databases serve as the foundational data sources for EMOS, providing access to vast repositories of experimental and computational materials data. These components implement standardized retrieval interfaces that allow features to search, filter, and extract materials information based on various criteria such as composition, crystal structure, properties, and experimental conditions. EMOS integrates with 8 major materials databases, each offering unique strengths: for example, **ICSD** provides high-quality experimentally determined crystal structures with precise atomic positions, while **Materials Project (MP)** offers comprehensive computational data including formation energies, band gaps, and stability predictions. The **JARVIS** database specializes in machine learning-ready datasets with consistent computational parameters, making it ideal for training and validating prediction models.
+
+### Generators
+Generators are AI-powered computational engines that create novel materials and structures using advanced machine learning techniques. These components leverage trained models to design new materials with targeted properties, expanding the materials discovery space beyond what exists in current databases. Each generator employs different approaches: **MatterGen** uses diffusion models to generate crystal structures with specific symmetries and compositions, while **GNoME** employs graph neural networks to explore chemical space systematically. The generators can work conditionally (targeting specific properties like a particular band gap) or unconditionally (exploring general chemical space), and they often incorporate physics-based constraints to ensure the generated structures are chemically reasonable and potentially synthesizable.
+
+### Predictors
+Predictors are sophisticated machine learning models that estimate materials properties from structural and compositional information. These components bridge the gap between materials discovery and property evaluation by providing rapid, accurate property predictions without the need for expensive experimental measurements or time-consuming first-principles calculations. EMOS includes 8 state-of-the-art predictors, each with specialized capabilities: **M3GNet** excels at predicting mechanical, electronic, and thermodynamic properties using graph neural networks that understand 3D crystal structures, while **MatterSim** provides universal property prediction across diverse materials classes. **DeepMD** specializes in molecular dynamics and interfacial properties, making it particularly valuable for studying materials behavior under different conditions and understanding structure-property relationships at the atomic scale.
+
+## Features Layer
+
+### Materials Exploration Features
+These features focus on the fundamental aspects of materials research, providing comprehensive tools for discovering, generating, and analyzing materials from the atomic level up. They implement sophisticated workflows that combine database searching, AI-powered generation, and advanced computational methods to accelerate materials discovery. For example, the **Material Search** feature enables researchers to query multiple databases simultaneously using complex criteria like crystal structure, composition, and property ranges, while the **Material Generation** feature leverages state-of-the-art AI models to create entirely new materials with targeted properties. The **DFT Calculation** feature provides access to quantum mechanical simulations for accurate property prediction, and **Crystallographic Analysis** offers deep insights into structure-property relationships through advanced structural analysis algorithms.
+
+### Electronics Application Features
+These features are specifically designed for electronic device development and optimization, addressing the unique challenges of translating materials discoveries into functional electronic components. They provide specialized computational tools that bridge the gap between materials science and electronics engineering. The **Interface Calculation** feature, for instance, analyzes how different materials interact at interfaces, calculating crucial properties like band alignments and interface energies that determine device performance. **Band Structure** calculations reveal the electronic transport properties essential for semiconductor applications, while **Thermal Management** helps optimize heat dissipation in high-power devices. The **Reliability Assessment** feature predicts device lifetime and failure modes, enabling the design of robust electronic systems that can withstand real-world operating conditions.
+
+## Data Flow
+
+### Typical Workflow Pattern
+
+1. **Input Processing**: Features extract and validate user inputs
+2. **Information Unit Activation**: Selected databases, generators, and predictors are instantiated
+3. **Data Retrieval**: Databases provide relevant existing data
+4. **Generation**: Generators create new material candidates if needed
+5. **Prediction**: Predictors analyze properties of materials
+6. **Integration**: Features combine results from multiple information units
+7. **Output Formatting**: Results are formatted for presentation
+
+### Modular Design Benefits
+
+- **Extensibility**: New information units can be added without modifying existing code
+- **Flexibility**: Features can combine any subset of available information units
+- **Maintainability**: Each component has a clear, isolated responsibility
+- **Testability**: Components can be tested independently
+- **Scalability**: System can grow by adding new components or scaling existing ones
+
+## Integration Patterns
+
+### Factory Pattern
+All components use factory patterns for registration and instantiation:
+
+```python
+# Information Unit Factories
+database_factory = {"icsd": ICSD, "mp": MP, ...}
+generator_factory = {"mattergen": MatterGen, ...}
+predictor_factory = {"m3gnet": M3GNet, ...}
+
+# Feature Factory
+feature_factory = {"1": MaterialSearchFeature, ...}
+```
+
+### Template Method Pattern
+Features follow a standardized workflow template:
+
+```python
+def process(self, input_data):
+    inputs = self.extract_inputs(input_data)
+    results = self.process_feature(inputs)
+    outputs = self.format_outputs(results)
+    return outputs
+```
+
+This ensures consistency across all features while allowing for feature-specific customization.

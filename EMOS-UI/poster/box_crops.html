@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<style>
+  @font-face { font-family:"Trebuchet MS"; src:url("assets/fonts/Trebuchet_MS.ttf"); }
+  @font-face { font-family:"Trebuchet MS"; font-weight:700; src:url("assets/fonts/Trebuchet_MS_Bold.ttf"); }
+  * { box-sizing:border-box; margin:0; }
+  body { background:#e9ebef; font-family:"Trebuchet MS",Arial,sans-serif; }
+  .box { background:#fff; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
+  h3 { color:#091F3F; font-weight:700; margin:0 0 0.45em 0; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { color:#1a1d29; line-height:1.32; margin-bottom:0.5em; padding-left:1.15em; text-indent:-1.15em; }
+  li:before { content:"\2022  "; font-weight:700; color:#091F3F; }
+  li b { font-weight:700; }
+
+  /* Introduction : ratio 564:75 -> 5640x750 */
+  #intro { width:5640px; height:750px; padding:50px 80px; }
+  #intro h3 { font-size:92px; margin-bottom:0.5em; }
+  #intro .grid { display:grid; grid-template-columns:1fr 1fr; column-gap:90px; row-gap:14px; }
+  #intro li { font-size:52px; }
+
+  /* Method : ratio 279:250 -> 2790x2500 */
+  #method { width:2790px; height:2500px; padding:110px 110px; }
+  #method h3 { font-size:160px; margin-bottom:0.6em; }
+  #method .steps { display:flex; align-items:center; gap:0; margin-bottom:0.9em; }
+  #method .step { flex:1; text-align:center; padding:52px 10px; border-radius:30px; font-weight:700; font-size:70px; color:#fff; }
+  #method .step.e { background:#f2a359; }
+  #method .step.r { background:#091F3F; }
+  #method .step.t { background:#92a2df; }
+  #method .chev { flex-shrink:0; width:80px; text-align:center; color:#9aa0ac; font-size:70px; }
+  #method li { font-size:72px; margin-bottom:0.6em; line-height:1.38; }
+
+  /* Analysis : ratio 269:302 -> 2690x3020 */
+  #analysis { width:2690px; height:3020px; padding:100px 110px; }
+  #analysis h3 { font-size:150px; margin-bottom:0.55em; }
+  #analysis li { font-size:70px; margin-bottom:0.5em; line-height:1.36; }
+  #analysis img { width:100%; margin-top:50px; display:block; }
+  #analysis .cap { font-size:46px; color:#6b7280; margin-top:24px; line-height:1.35; }
+
+  /* Conclusion : ratio 279:88 -> 2790x880 */
+  #conclusion { width:2790px; height:880px; padding:54px 90px; }
+  #conclusion h3 { font-size:96px; margin-bottom:0.5em; }
+  #conclusion li { font-size:56px; margin-bottom:0.35em; }
+</style></head>
+<body>
+
+<div class="box" id="intro">
+  <h3>Introduction</h3>
+  <div class="grid">
+    <ul>
+      <li>AI materials-discovery tools are powerful but fragmented: every database, model and predictor uses its own data format.</li>
+      <li>Researchers must write custom integration code before any science begins, a barrier to entry.</li>
+    </ul>
+    <ul>
+      <li>Existing interfaces are built for developers, locking out the materials scientists who need them most.</li>
+      <li>EMOS unifies these tools; this project makes it usable by anyone, democratising access to AI-driven discovery.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="box" id="method">
+  <h3>Method</h3>
+  <div class="steps">
+    <div class="step e">Evaluate</div>
+    <div class="chev">&#8594;</div>
+    <div class="step r">Redesign</div>
+    <div class="chev">&#8594;</div>
+    <div class="step t">Test</div>
+  </div>
+  <ul>
+    <li><b>Heuristic evaluation:</b> reviewed the original interface solo against Nielsen's 10 usability heuristics, rating severity (0&ndash;4).</li>
+    <li><b>Redesign:</b> rebuilt the interface end-to-end based on those findings.</li>
+    <li><b>Usability study:</b> moderated, in-person sessions with 6 participants, think-aloud protocol, then the SUS questionnaire.</li>
+    <li><b>Architecture:</b> built behind a swappable data layer, so the live backend connects without a rewrite.</li>
+  </ul>
+</div>
+
+<div class="box" id="analysis">
+  <h3>Analysis</h3>
+  <ul>
+    <li>Heuristic evaluation: 18 issues (mean severity 2.8/4) fell to 4 minor issues (0.8/4) after redesign.</li>
+    <li>Usability study (n = 6): task success rose 58% &rarr; 92%; errors per task 3.1 &rarr; 0.6.</li>
+    <li>System Usability Scale: 52 &rarr; 84 (grade A; industry average 68).</li>
+  </ul>
+  <img src="assets/charts/heuristic.png" />
+  <div class="cap">Fig. Heuristic severity, before (orange) vs after (purple).</div>
+</div>
+
+<div class="box" id="conclusion">
+  <h3>Conclusion</h3>
+  <ul>
+    <li>EMOS makes AI materials discovery composable and, for the first time, usable without code.</li>
+    <li>Improvement validated by heuristic evaluation and a usability study, not opinion.</li>
+    <li>Lowers the barrier to entry so materials scientists can run discovery workflows without writing code.</li>
+  </ul>
+</div>
+
+</body></html>
