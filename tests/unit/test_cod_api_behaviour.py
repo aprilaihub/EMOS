@@ -40,11 +40,23 @@ def test_build_filter_variations(elements, properties, expected):
 # ============================================================================
 
 @pytest.mark.unit
-def test_fetch_api_host_down(monkeypatch):
-    """Verify no API calls when host is unreachable."""
+def test_fetch_api_request_retries_then_returns_empty(monkeypatch):
+    """Verify transient request failures are retried and return empty on exhaustion."""
+    import requests
+    import time
+
     helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: False)
+    monkeypatch.setattr(time, "sleep", lambda _x: None)
+
+    call_count = [0]
+
+    def mock_failing_get(*args, **kwargs):
+        call_count[0] += 1
+        raise requests.exceptions.ReadTimeout("timed out")
+
+    monkeypatch.setattr(requests, "get", mock_failing_get)
     assert helper.fetch_from_api("Fe", 1, {}) == []
+    assert call_count[0] == helper.max_retries + 1
 
 
 @pytest.mark.unit
@@ -54,7 +66,6 @@ def test_fetch_api_with_pagination_and_limit(monkeypatch):
     import requests
     
     helper = _make_helper()
-    monkeypatch.setattr(helper, "is_host_reachable", lambda: True)
     monkeypatch.setattr(time, "sleep", lambda x: None)
     
     # Create mock response
