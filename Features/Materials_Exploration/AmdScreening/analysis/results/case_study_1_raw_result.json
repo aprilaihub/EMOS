@@ -1,0 +1,4196 @@
+{
+  "results": [
+    {
+      "status": "success",
+      "properties": {
+        "pairwise_distances": [
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "pdd_emd_distance": 0.77518694,
+            "amd_distance": 0.775186948659317,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "pdd_emd_distance": 0.6635535737500001,
+            "amd_distance": 0.5278438731964696,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "pdd_emd_distance": 0.6115780576250001,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "pdd_emd_distance": 0.6457268970000001,
+            "amd_distance": 0.5392213557815828,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "pdd_emd_distance": 0.632396364,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 0.88916896,
+            "amd_distance": 0.8891689674841246,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.81369739,
+            "amd_distance": 0.8136973991821455,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.8077683099999999,
+            "amd_distance": 0.8077683136044875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 0.84870991,
+            "amd_distance": 0.8487099150432442,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.18757351,
+            "amd_distance": 1.187573511161066,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.7791266000836045,
+            "amd_distance": 0.7451933869636376,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.81781505,
+            "amd_distance": 0.8178150565854119,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.7452146,
+            "amd_distance": 0.7452146069616039,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 0.920827785,
+            "amd_distance": 0.9208277934674092,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 0.9725719565430119,
+            "amd_distance": 0.7673051266296493,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.79481588,
+            "amd_distance": 0.7831748622059842,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.806446215,
+            "amd_distance": 0.8064462192650672,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.797566235,
+            "amd_distance": 0.7975662392650673,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.809382535,
+            "amd_distance": 0.8093825392650673,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.82277041,
+            "amd_distance": 0.8227704192650671,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.824481375,
+            "amd_distance": 0.8244813792650674,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.841931145,
+            "amd_distance": 0.8419311492650676,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.80869389,
+            "amd_distance": 0.8086938970338653,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.8752225477265254,
+            "amd_distance": 0.8091226829558638,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.7992186699999999,
+            "amd_distance": 0.7992186792650671,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.79840205,
+            "amd_distance": 0.7984020592650671,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.79453525,
+            "amd_distance": 0.7945352592650672,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.8044263300000001,
+            "amd_distance": 0.8044263357306785,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.74525218,
+            "amd_distance": 0.745252181192348,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1017539.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.74551123,
+            "amd_distance": 0.745511232737571,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "pdd_emd_distance": 0.5883998191250001,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "pdd_emd_distance": 0.57631623575,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "pdd_emd_distance": 0.5382816525,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "pdd_emd_distance": 0.55747533,
+            "amd_distance": 0.48750000000000004,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 1.05363189,
+            "amd_distance": 1.053631899166537,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.48638014,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.4333373,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.08933676,
+            "amd_distance": 1.0893367694214544,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.27556334,
+            "amd_distance": 1.27556334939425,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 1.0820962319518634,
+            "amd_distance": 1.08046789656717,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.45338159,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.44112232,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.11877877,
+            "amd_distance": 1.11877877,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.0240645568988906,
+            "amd_distance": 0.76470958831929,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.47746109,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.42893748,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.417735,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.43686795,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.4568187,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.47359832,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.49487137,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.42361335,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.8687268702330299,
+            "amd_distance": 0.7153160352543377,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.41859775,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.41484468,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.41615114,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.4179699,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.39005534,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1093993.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.39061652,
+            "amd_distance": 0.5,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "pdd_emd_distance": 0.288693859125,
+            "amd_distance": 0.1399446857133384,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "pdd_emd_distance": 0.26609850975,
+            "amd_distance": 0.09729791490512874,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "pdd_emd_distance": 0.255913303625,
+            "amd_distance": 0.09049830066486564,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 1.1606553988750001,
+            "amd_distance": 1.152194775816679,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.844957644625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.75874067675,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.154825636375,
+            "amd_distance": 1.1484034543320405,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.046842287,
+            "amd_distance": 0.9984251452713298,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 1.0321162635749488,
+            "amd_distance": 0.9683965004220028,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.769685070125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.6695475737500001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.223958210375,
+            "amd_distance": 1.2205213327562054,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 0.7311353671625086,
+            "amd_distance": 0.4116075902377325,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.7896985403750001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.761234426125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.750785069,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.768683189375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.788061608125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.803685977,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.820461385,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.7544554705000001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.5599266610871961,
+            "amd_distance": 0.2940168657493052,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.751581052,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.7483269530000001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.750032090875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.7501743162500001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.71550983275,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245015.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.715910345625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "pdd_emd_distance": 0.263463314625,
+            "amd_distance": 0.09899680804778654,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "pdd_emd_distance": 0.256234038,
+            "amd_distance": 0.10039380134966525,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 1.075380003375,
+            "amd_distance": 1.0690330224953204,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.769245872875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.688959138625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.0249466091250001,
+            "amd_distance": 1.021424869041283,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.072226244875,
+            "amd_distance": 0.9498939054358781,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.9158752904030429,
+            "amd_distance": 0.8516336710547137,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.701559578875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.6104220367500001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.09524598775,
+            "amd_distance": 1.093542747465448,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 0.7711660628473704,
+            "amd_distance": 0.4448425147684807,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.7201426016250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.68811853025,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.678392879375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.694746111875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.712780869375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.725882043875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.7427444555,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.683529760625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.58976433763028,
+            "amd_distance": 0.4241449448813448,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.6792234016250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.67637485275,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.6771705357500001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.67906189425,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.646708863125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245109.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.6471105478750001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "pdd_emd_distance": 0.246699575,
+            "amd_distance": 0.056824520127021216,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 1.10607404425,
+            "amd_distance": 1.0903853853762353,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.7640346040000001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.68410427725,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.087198941875,
+            "amd_distance": 1.0849272404109769,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.0831061755000002,
+            "amd_distance": 1.0395977565165158,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.9662479368887726,
+            "amd_distance": 0.8942334978497026,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.6922358336250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.614942568375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.158209809875,
+            "amd_distance": 1.1570451188351418,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 0.7562007948696334,
+            "amd_distance": 0.45278020148291853,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.7123887853749999,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.689101426875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.678981638125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.6967322155,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.7158501881250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.73222829575,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.7469924433749999,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.6811925670000001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.5799671957538768,
+            "amd_distance": 0.37036431607851483,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.679652817125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.6765924622500001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.67870197275,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.67743717475,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.638186501875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245209.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.638533957125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "pdd_emd_distance": 1.0794500139999998,
+            "amd_distance": 1.070084514488908,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 0.80109889925,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.7178529339999999,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.1010345695000001,
+            "amd_distance": 1.099641579251383,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.050948332125,
+            "amd_distance": 0.9873768603591659,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.9879623205447603,
+            "amd_distance": 0.9262629363857116,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.72884353825,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.639991874625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.1718593395,
+            "amd_distance": 1.171759457675548,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 0.7430386934175446,
+            "amd_distance": 0.42563498414313194,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.7545358511250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.718610605375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.70905936475,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.72507124725,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.7417261640000001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.753848489125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.768385438125,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.71328443675,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.5622273656535743,
+            "amd_distance": 0.36829951171765085,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.709857580375,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.7070152356250001,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.70808574575,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.7091723142499999,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.679982951625,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1245255.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.680364766875,
+            "amd_distance": 0.9875,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "pdd_emd_distance": 1.11907277,
+            "amd_distance": 1.119072776060971,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 1.12818267,
+            "amd_distance": 1.12818267353102,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 0.73880496,
+            "amd_distance": 0.7388049631553901,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.5976648450000002,
+            "amd_distance": 1.5788371684411038,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.7391733029330667,
+            "amd_distance": 0.8571428571428572,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 1.09934939,
+            "amd_distance": 1.0993493972248345,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 1.28290824,
+            "amd_distance": 1.2829082422980624,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 0.78044223,
+            "amd_distance": 0.7804422396769666,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.2775177880185242,
+            "amd_distance": 1.2115045280549088,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.20540583,
+            "amd_distance": 1.2054058388382023,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.1258881,
+            "amd_distance": 1.1258881039160835,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.14034286,
+            "amd_distance": 1.1403428693493014,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.11323344,
+            "amd_distance": 1.113233446234637,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 1.08610135,
+            "amd_distance": 1.0861013561482578,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 1.06069036,
+            "amd_distance": 1.060690362490365,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 1.04291118,
+            "amd_distance": 1.042911184161369,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.14054109,
+            "amd_distance": 1.14054109579358,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 1.301804887143318,
+            "amd_distance": 1.2500412332207036,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.14020688,
+            "amd_distance": 1.1402068850169504,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.14629584,
+            "amd_distance": 1.1462958409380573,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.14020688,
+            "amd_distance": 1.1402068850169504,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.14629584,
+            "amd_distance": 1.1462958409380573,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.14106196,
+            "amd_distance": 1.1410619628579841,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-13161.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.14040883,
+            "amd_distance": 1.14040883100376,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "pdd_emd_distance": 0.78003852,
+            "amd_distance": 0.7800385201296391,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.05391063,
+            "amd_distance": 1.0539106340386288,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.31407379,
+            "amd_distance": 1.3140737999170784,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 1.0466707372998354,
+            "amd_distance": 1.0450423441916317,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.75699597,
+            "amd_distance": 0.756995979360763,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.88901287,
+            "amd_distance": 0.8890128780926521,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.08335263,
+            "amd_distance": 1.0833526346171745,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.1819112701106378,
+            "amd_distance": 0.9214917551161372,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.10425762,
+            "amd_distance": 0.10425762167290031,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.77424674,
+            "amd_distance": 0.774246749427351,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.78639312,
+            "amd_distance": 0.7863931261597319,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.76393678,
+            "amd_distance": 0.7639367821933316,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.74145252,
+            "amd_distance": 0.7414525231031348,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.71999896,
+            "amd_distance": 0.7199989646340823,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.70552111,
+            "amd_distance": 0.7055211157676089,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.78670188,
+            "amd_distance": 0.7867018854931915,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 1.0338710488949487,
+            "amd_distance": 1.0356495859142907,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.78623778,
+            "amd_distance": 0.7862377851480593,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.79093576,
+            "amd_distance": 0.7909357629432092,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.78623778,
+            "amd_distance": 0.7862377851480593,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.79093576,
+            "amd_distance": 0.7909357629432092,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.78721609,
+            "amd_distance": 0.787216096438045,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-1986.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.78677026,
+            "amd_distance": 0.7867702652350026,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "pdd_emd_distance": 1.04162554,
+            "amd_distance": 1.0416255448081309,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.30814471,
+            "amd_distance": 1.3081447143394205,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 1.034385647791239,
+            "amd_distance": 1.0327572549611337,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 0.04455364,
+            "amd_distance": 0.044553648155744696,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.22485277,
+            "amd_distance": 0.22485277377921342,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.07106754,
+            "amd_distance": 1.0710675453866765,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.1349140107080438,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.72159191,
+            "amd_distance": 0.7215919121783818,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.04945151,
+            "amd_distance": 0.049451516403386186,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.03112731,
+            "amd_distance": 0.031127310515384643,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.06283287,
+            "amd_distance": 0.06283287789158631,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.09318541,
+            "amd_distance": 0.0931854130330576,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.13302646,
+            "amd_distance": 0.13302646998053458,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.14515626,
+            "amd_distance": 0.14515626191990005,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.02146877,
+            "amd_distance": 0.021468773779214523,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.928702065755572,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.03178698,
+            "amd_distance": 0.031786987840376035,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.02945277,
+            "amd_distance": 0.02945277377921407,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.03624418,
+            "amd_distance": 0.036244189449704756,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.02945277,
+            "amd_distance": 0.02945277377921407,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.1764088,
+            "amd_distance": 0.1764088068605274,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2133.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.1763743,
+            "amd_distance": 0.17637430686052746,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "pdd_emd_distance": 1.46762492,
+            "amd_distance": 1.467624926110524,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 0.2790627921708212,
+            "amd_distance": 0.8571428571428572,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 1.02671854,
+            "amd_distance": 1.0267185468458169,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 1.0817251,
+            "amd_distance": 1.0817251031432362,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 0.088326,
+            "amd_distance": 0.08832600173563776,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.333313289804187,
+            "amd_distance": 1.3511696765788832,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.10375528,
+            "amd_distance": 1.1037552895339822,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.02899056,
+            "amd_distance": 1.028990563001527,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.03880938,
+            "amd_distance": 1.038809388796047,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.02224031,
+            "amd_distance": 1.0222403107046425,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 1.00563109,
+            "amd_distance": 1.0056310920068015,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.98979947,
+            "amd_distance": 0.989799472942873,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.97879265,
+            "amd_distance": 0.9787926513505316,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.03901323,
+            "amd_distance": 1.039013235812464,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 1.3123446960686835,
+            "amd_distance": 1.3102909355391903,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.03825915,
+            "amd_distance": 1.0382591502483547,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.04099562,
+            "amd_distance": 1.040995621685258,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.03825915,
+            "amd_distance": 1.0382591502483547,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.04099562,
+            "amd_distance": 1.040995621685258,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.0395503,
+            "amd_distance": 1.0395503009366265,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2229.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.0394221,
+            "amd_distance": 1.0394221095096126,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "pdd_emd_distance": 1.4193969265963888,
+            "amd_distance": 1.314492651640955,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 1.31819145,
+            "amd_distance": 1.3181914573203448,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 1.245591,
+            "amd_distance": 1.2455910076965369,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.5397428,
+            "amd_distance": 1.539742804534689,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.0337130271355537,
+            "amd_distance": 0.5868175550335972,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.28355126,
+            "amd_distance": 1.2835512629409171,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.30682262,
+            "amd_distance": 1.3068226200000002,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.29794264,
+            "amd_distance": 1.2979426400000003,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.30975894,
+            "amd_distance": 1.3097589400000003,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 1.32314682,
+            "amd_distance": 1.32314682,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 1.337103125,
+            "amd_distance": 1.3371031268855926,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 1.3583761650000001,
+            "amd_distance": 1.3583761717979055,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.30907029,
+            "amd_distance": 1.3090702977687982,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.8829580035518609,
+            "amd_distance": 0.7044082795220246,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.29959508,
+            "amd_distance": 1.29959508,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.29877846,
+            "amd_distance": 1.29877846,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.29491166,
+            "amd_distance": 1.2949116600000001,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.30480273,
+            "amd_distance": 1.3048027364656114,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.24562858,
+            "amd_distance": 1.245628581927281,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-2346983.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.24588763,
+            "amd_distance": 1.245887633472504,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "pdd_emd_distance": 1.0194786500541857,
+            "amd_distance": 1.0178502569988197,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 1.0744852061872567,
+            "amd_distance": 1.072856813296239,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 0.3406829638726808,
+            "amd_distance": 0.8571428571428572,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.2422154299224442,
+            "amd_distance": 1.2010230026156945,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.0965153894727158,
+            "amd_distance": 1.094886999686985,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.0217506682966382,
+            "amd_distance": 1.0201222731545299,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.031569492070552,
+            "amd_distance": 1.0299410989490498,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.015000415233315,
+            "amd_distance": 1.0133720208576453,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.9983911958976838,
+            "amd_distance": 0.9967628021598038,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.982558899864309,
+            "amd_distance": 0.9809306000885885,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.9715527569712215,
+            "amd_distance": 0.9699243615035344,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.0317733378957314,
+            "amd_distance": 1.0301449459654668,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 1.2040601008938283,
+            "amd_distance": 1.1532595110860946,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.0310192545925614,
+            "amd_distance": 1.0293908604013575,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.0337557244831026,
+            "amd_distance": 1.0321273318382609,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.0310192545925614,
+            "amd_distance": 1.0293908604013575,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.0337557244831026,
+            "amd_distance": 1.0321273318382609,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.0323104045409155,
+            "amd_distance": 1.0306820110896293,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/mp/mp-997630.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.032182212046043,
+            "amd_distance": 1.0305538196626154,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "pdd_emd_distance": 0.24694771,
+            "amd_distance": 0.24694771516140168,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.05616054,
+            "amd_distance": 1.0561605474243625,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.1449475258786743,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.70760141,
+            "amd_distance": 0.707601412064248,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.04578273,
+            "amd_distance": 0.04578273755927054,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.06131559,
+            "amd_distance": 0.06131559631984107,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.03494099,
+            "amd_distance": 0.034940996464524865,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.06607989,
+            "amd_distance": 0.06607989103990342,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.10513458,
+            "amd_distance": 0.10513458855347313,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.11797542,
+            "amd_distance": 0.11797542157740626,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.05551676,
+            "amd_distance": 0.05551676866293054,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9376665639812991,
+            "amd_distance": 0.8899012249918306,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.06076494,
+            "amd_distance": 0.060764941654531945,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.06740634,
+            "amd_distance": 0.06740634907942766,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.06232668,
+            "amd_distance": 0.0623266887118854,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.06016165,
+            "amd_distance": 0.060161659619324404,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.16157458,
+            "amd_distance": 0.16157458026167593,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011258.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.16159887,
+            "amd_distance": 0.1615988782569895,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "pdd_emd_distance": 1.1111671,
+            "amd_distance": 1.1111671037217818,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.0815129778831336,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 0.83056627,
+            "amd_distance": 0.8305662701413947,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.2186,
+            "amd_distance": 0.21860000000000035,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.20319999,
+            "amd_distance": 0.20319999999999983,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.2336,
+            "amd_distance": 0.23360000000000003,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.264,
+            "amd_distance": 0.26400000000000023,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.2922,
+            "amd_distance": 0.29220000000000024,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.312,
+            "amd_distance": 0.3120000000000003,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.20338399,
+            "amd_distance": 0.2033839999999998,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.8679254189368526,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.20319999,
+            "amd_distance": 0.20319999999999983,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.1954,
+            "amd_distance": 0.19540000000000024,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.20319999,
+            "amd_distance": 0.20319999999999983,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.1954,
+            "amd_distance": 0.19540000000000024,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.2180055,
+            "amd_distance": 0.21800550616886216,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1011259.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.21882003,
+            "amd_distance": 0.21882003095133307,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "pdd_emd_distance": 1.4054311661982928,
+            "amd_distance": 1.4232875550030482,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.13319729,
+            "amd_distance": 1.1331972901125278,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.05843256,
+            "amd_distance": 1.0584325635800726,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.06825138,
+            "amd_distance": 1.0682513893745926,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.05168231,
+            "amd_distance": 1.0516823112831881,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 1.03507309,
+            "amd_distance": 1.035073092585347,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 1.01924147,
+            "amd_distance": 1.0192414735214186,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 1.00823465,
+            "amd_distance": 1.0082346519290772,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.06845523,
+            "amd_distance": 1.0684552363910096,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 1.3808737329213572,
+            "amd_distance": 1.3824088139633552,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.06770115,
+            "amd_distance": 1.0677011508269003,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.07043762,
+            "amd_distance": 1.0704376222638037,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.06770115,
+            "amd_distance": 1.0677011508269003,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.07043762,
+            "amd_distance": 1.0704376222638037,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.0689923,
+            "amd_distance": 1.068992301515172,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1534836.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.06886411,
+            "amd_distance": 1.0688641100881582,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "pdd_emd_distance": 1.138216578628444,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 1.1335672692763574,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 1.1258025870637594,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 1.1372115674413592,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 1.149674751637971,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 1.1559057852092065,
+            "amd_distance": 0.9173774078525527,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 1.17320337514509,
+            "amd_distance": 0.9386504527648656,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 1.1331276273001196,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.6359844044855296,
+            "amd_distance": 0.2428458209481852,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 1.126942308556756,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 1.1255479794475176,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 1.1238023878652672,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 1.1291521571345857,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 1.0869497164567843,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1536063.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 1.087236989518887,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "pdd_emd_distance": 0.71580014,
+            "amd_distance": 0.7158001414760937,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.72794651,
+            "amd_distance": 0.7279465182084754,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.70549017,
+            "amd_distance": 0.7054901742420743,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.71424445,
+            "amd_distance": 0.7142444577517306,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.73708075,
+            "amd_distance": 0.7370807544919602,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.75111376,
+            "amd_distance": 0.7511137608135003,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.72825527,
+            "amd_distance": 0.7282552775419342,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9912898901626008,
+            "amd_distance": 0.9772032746023163,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.72779117,
+            "amd_distance": 0.7277911771968029,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.73248915,
+            "amd_distance": 0.7324891549919519,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.72779117,
+            "amd_distance": 0.7277911771968029,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.73248915,
+            "amd_distance": 0.7324891549919519,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.72876948,
+            "amd_distance": 0.7287694884867877,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-1537875.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.72832365,
+            "amd_distance": 0.7283236572837453,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "pdd_emd_distance": 0.01957072,
+            "amd_distance": 0.019570727599358406,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.01499999,
+            "amd_distance": 0.01499999999999968,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.0454,
+            "amd_distance": 0.04540000000000077,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.08366116,
+            "amd_distance": 0.0836611643607581,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.096744,
+            "amd_distance": 0.0967440065794607,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.03499682,
+            "amd_distance": 0.034996829299231536,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9277683405946587,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.01781906,
+            "amd_distance": 0.01781906528713506,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.02322743,
+            "amd_distance": 0.02322743483592049,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.02117397,
+            "amd_distance": 0.021173975265359246,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.04339292,
+            "amd_distance": 0.043392929155224635,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.18263708,
+            "amd_distance": 0.18263708260788114,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2107059.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.18266138,
+            "amd_distance": 0.1826613806031956,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "pdd_emd_distance": 0.03197032,
+            "amd_distance": 0.031970320367597616,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.06402474,
+            "amd_distance": 0.06402474572604255,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.101901,
+            "amd_distance": 0.10190100957059389,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.11592027,
+            "amd_distance": 0.1159202762635454,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.01731765,
+            "amd_distance": 0.01731765191000001,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9205939369659978,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.00240859,
+            "amd_distance": 0.0024085945686742605,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.00779999,
+            "amd_distance": 0.007799999999999585,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.00528095,
+            "amd_distance": 0.005280956648567425,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.02507734,
+            "amd_distance": 0.025077344826288872,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.17812985,
+            "amd_distance": 0.17812985418475868,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300112.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.17816534,
+            "amd_distance": 0.17816534529807626,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "pdd_emd_distance": 0.03242756,
+            "amd_distance": 0.03242756772797595,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.07019472,
+            "amd_distance": 0.07019472216298617,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.08394995,
+            "amd_distance": 0.08394995589594778,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.04837819,
+            "amd_distance": 0.04837819078743166,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9318669962033639,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.03105452,
+            "amd_distance": 0.031054527155232492,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.03820925,
+            "amd_distance": 0.03820925626994587,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.03313209,
+            "amd_distance": 0.0331320950215197,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.05678291,
+            "amd_distance": 0.05678291220249143,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.19543113,
+            "amd_distance": 0.19543113329139405,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300113.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.19545543,
+            "amd_distance": 0.1954554312867085,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "pdd_emd_distance": 0.03984142,
+            "amd_distance": 0.039841428782409594,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.05197193,
+            "amd_distance": 0.05197193136801648,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.07873072,
+            "amd_distance": 0.07873072592890296,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9459532833914371,
+            "amd_distance": 0.8933383342027361,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.06266754,
+            "amd_distance": 0.06266754132909291,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.0686,
+            "amd_distance": 0.06860000000000088,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.06555827,
+            "amd_distance": 0.06555827896127653,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.08713544,
+            "amd_distance": 0.08713544734396272,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.22748555,
+            "amd_distance": 0.227485558649839,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300114.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.22750985,
+            "amd_distance": 0.22750985664515344,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "pdd_emd_distance": 0.02805329,
+            "amd_distance": 0.02805329505410814,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.11857178,
+            "amd_distance": 0.11857178287637993,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9579978606587779,
+            "amd_distance": 0.9062603061432681,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.10124811,
+            "amd_distance": 0.10124811924418076,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.10615866,
+            "amd_distance": 0.10615866478087543,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.09679092,
+            "amd_distance": 0.0967909239377267,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.1269765,
+            "amd_distance": 0.1269765042914397,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.25810804,
+            "amd_distance": 0.258108044275029,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300115.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.25813234,
+            "amd_distance": 0.25813234227034343,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "pdd_emd_distance": 0.13070157,
+            "amd_distance": 0.1307015748157454,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9723988900792153,
+            "amd_distance": 0.9238044388200346,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.11456307,
+            "amd_distance": 0.11456307186659576,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.11959763,
+            "amd_distance": 0.11959763642898569,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.11580901,
+            "amd_distance": 0.11580901189584658,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.13910629,
+            "amd_distance": 0.13910629623080517,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.27938108,
+            "amd_distance": 0.27938108918734184,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300116.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.27940538,
+            "amd_distance": 0.2794053871826563,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "pdd_emd_distance": 0.9268796276700225,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.0173323,
+            "amd_distance": 0.017332300736221384,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.01657989,
+            "amd_distance": 0.016579895997572258,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.02194863,
+            "amd_distance": 0.02194863190999996,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.00962669,
+            "amd_distance": 0.00962669711896691,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.17663526,
+            "amd_distance": 0.1766352680900003,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-2300450.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.17660076,
+            "amd_distance": 0.17660076809000036,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "pdd_emd_distance": 0.9214179569069476,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.919915502300067,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.9197510958554916,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.923485803208765,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.9004038120059646,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-4517837.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.9007821419782308,
+            "amd_distance": 0.8888888888888888,
+            "identical": false,
+            "very_similar": false,
+            "similar": false
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "pdd_emd_distance": 0.00779999,
+            "amd_distance": 0.007799999999999585,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.00468342,
+            "amd_distance": 0.004683420000000105,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.0257284,
+            "amd_distance": 0.025728400592214484,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.17741779,
+            "amd_distance": 0.17741779119931667,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004178.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.17738329,
+            "amd_distance": 0.17738329119931673,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "pdd_emd_distance": 0.00951847,
+            "amd_distance": 0.009518478738790748,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.02187066,
+            "amd_distance": 0.021870660000000264,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.17984803,
+            "amd_distance": 0.17984803335256405,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004179.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.17981353,
+            "amd_distance": 0.17981353335256411,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "pdd_emd_distance": 0.0301856,
+            "amd_distance": 0.030185602201543205,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.18005729,
+            "amd_distance": 0.1800572933952953,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004180.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.18009278,
+            "amd_distance": 0.18009278119390792,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "pdd_emd_distance": 0.17093744,
+            "amd_distance": 0.1709374400000001,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9004181.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.17090294,
+            "amd_distance": 0.17090294000000017,
+            "identical": false,
+            "very_similar": false,
+            "similar": true
+          },
+          {
+            "crystal_1_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9008877.cif",
+            "crystal_2_file": "/home/soe/EMOS/tests/fixtures/cif_files/cod/cod-9011662.cif",
+            "pdd_emd_distance": 0.00099999,
+            "amd_distance": 0.0009999999999994458,
+            "identical": false,
+            "very_similar": true,
+            "similar": true
+          }
+        ]
+      }
+    }
+  ]
+}
