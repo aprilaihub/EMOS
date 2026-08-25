@@ -12,9 +12,13 @@ class AmdScreeningFeature extends BaseFeature {
             <p>Upload two or more CIF files to run AMD pairwise similarity screening.</p>
             <div class="input-controls">
                 <label>CIF Files
-                    <div style="margin-top:6px; padding:12px; background:#f5f5f5; border-radius:4px; border:2px dashed #ccc;">
+                    <div id="cifDropZone_${this.featureId}" style="margin-top:6px; padding:12px; background:#f5f5f5; border-radius:4px; border:2px dashed #ccc;"
+                         ondragover="event.preventDefault(); this.style.background='#efefef';"
+                         ondragleave="this.style.background='#f5f5f5';"
+                         ondrop="event.preventDefault(); this.style.background='#f5f5f5'; window.features[${this.featureId}]._handleFileDrop(event);">
                         <input type="file" id="cifFiles_${this.featureId}" multiple accept=".cif"
-                               style="display:block; margin-bottom:8px;">
+                               style="display:block; margin-bottom:8px;"
+                               onchange="window.features[${this.featureId}]._handleFileSelection();">
                         <small style="color:#666;">Select two or more .cif files. Drag &amp; drop supported.</small>
                         <div id="cifFileList_${this.featureId}" style="margin-top:8px; font-size:12px; color:#333;"></div>
                     </div>
@@ -55,27 +59,17 @@ class AmdScreeningFeature extends BaseFeature {
     }
 
     async initializeUI() {
+        // No-op: the file input and drop zone are wired via inline HTML
+        // event handlers in createInputsHTML() so they work even when the
+        // host page never calls initializeUI() after rendering.
+    }
+
+    _handleFileDrop(event) {
         const fileInput = document.getElementById(`cifFiles_${this.featureId}`);
-        if (!fileInput) return;
+        if (!fileInput || !event.dataTransfer || event.dataTransfer.files.length === 0) return;
 
-        fileInput.addEventListener('change', () => this._handleFileSelection());
-
-        const dropZone = fileInput.parentElement;
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.background = '#efefef';
-        });
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.background = '#f5f5f5';
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.background = '#f5f5f5';
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                this._handleFileSelection();
-            }
-        });
+        fileInput.files = event.dataTransfer.files;
+        this._handleFileSelection();
     }
 
     _handleFileSelection() {
