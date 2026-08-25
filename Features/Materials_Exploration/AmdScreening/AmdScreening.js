@@ -78,7 +78,7 @@ class AmdScreeningFeature extends BaseFeature {
         if (!fileInput || !listEl) return;
 
         this._uploadedFiles = Array.from(fileInput.files);
-        listEl.textContent = `${this._uploadedFiles.length} file(s) selected: ${this._uploadedFiles.map(f => f.name).join(', ')}`;
+        listEl.textContent = `${this._uploadedFiles.length} CIF file(s) selected`;
     }
 
     async cancelProcessing() {
@@ -211,6 +211,86 @@ class AmdScreeningFeature extends BaseFeature {
         return { status: 'local_fallback', results: null };
     }
 
+    // Render the lower-triangle AMD distance matrix as an inline HTML heatmap
+    // (YlOrRd-style gradient), so the summary shows a visual matrix instead
+    // of a flat list of file labels.
+    _buildDistanceHeatmapHTML(matrix, labels) {
+        const n = matrix.length;
+        if (n === 0) return '';
+
+        const escape = (s) => String(s).replace(/[&<>"']/g, (c) => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+        ));
+
+        let vmax = 0;
+        for (const row of matrix) {
+            for (const v of row) if (v > vmax) vmax = v;
+        }
+        if (vmax === 0) vmax = 1;
+
+        const colorFor = (v) => {
+            const t = Math.min(1, Math.max(0, v / vmax));
+            const r = 255;
+            const g = Math.round(255 * (1 - 0.85 * t));
+            const b = Math.round(255 * (1 - 0.95 * t));
+            return `rgb(${r},${g},${b})`;
+        };
+
+        const cellSize = n > 25 ? 14 : n > 15 ? 20 : 28;
+        const showValues = n <= 20;
+        const labelFontSize = n > 25 ? 7 : 9;
+
+        let html = `<div style="margin-top:10px;"><strong>Distance Matrix (lower triangle):</strong>`;
+        html += `<div style="overflow:auto; max-width:100%; margin-top:6px;">`;
+        html += `<table style="border-collapse:collapse;">`;
+
+        html += '<tr><th></th>';
+        for (let j = 0; j < n; j++) {
+            const fileLabel = escape(labels[j] ?? `S${j + 1}`);
+            html += `<th style="font-size:${labelFontSize}px; padding:2px; max-width:${cellSize}px; ` +
+                `overflow:hidden; white-space:nowrap;" title="${fileLabel}">${j + 1}</th>`;
+        }
+        html += '</tr>';
+
+        for (let i = 0; i < n; i++) {
+            const rowFileLabel = escape(labels[i] ?? `S${i + 1}`);
+            html += `<tr><th style="font-size:${labelFontSize}px; padding:2px; text-align:right; ` +
+                `white-space:nowrap;" title="${rowFileLabel}">${i + 1}</th>`;
+            for (let j = 0; j < n; j++) {
+                if (j > i) {
+                    html += `<td style="width:${cellSize}px; height:${cellSize}px; border:1px solid #eee;"></td>`;
+                    continue;
+                }
+                const v = matrix[i][j];
+                const bg = colorFor(v);
+                const text = showValues ? v.toFixed(2) : '';
+                const titleLabel = `${escape(labels[i] ?? `S${i + 1}`)} vs ${escape(labels[j] ?? `S${j + 1}`)}: ${v.toFixed(4)}`;
+                html += `<td style="width:${cellSize}px; height:${cellSize}px; background:${bg}; border:1px solid #ddd; ` +
+                    `text-align:center; font-size:${labelFontSize}px;" title="${titleLabel}">${text}</td>`;
+            }
+            html += '</tr>';
+        }
+
+        html += '</table></div>';
+
+        // Colorbar legend so the color scale can be read against actual AMD distance values
+        const stops = [0, 0.25, 0.5, 0.75, 1].map((t) => `${colorFor(t * vmax)} ${t * 100}%`).join(', ');
+        html += `<div style="margin-top:8px; display:flex; align-items:center; gap:8px;">`;
+        html += `<span style="font-size:11px; color:#333;">0</span>`;
+        html += `<div style="flex:0 1 220px; height:14px; background:linear-gradient(to right, ${stops}); ` +
+            `border:1px solid #ccc; border-radius:2px;"></div>`;
+        html += `<span style="font-size:11px; color:#333;">${vmax.toFixed(3)}</span>`;
+        html += `<span style="font-size:11px; color:#666; margin-left:6px;">AMD distance</span>`;
+        html += `</div>`;
+
+        // Indices map to the "labels" array in the downloaded JSON results
+        html += `<div style="margin-top:6px; font-size:11px; color:#666;">`;
+        html += `<em>Index-to-filename mapping is available in the downloaded JSON results (<code>labels</code> field).</em>`;
+        html += `</div></div>`;
+
+        return html;
+    }
+
     updateOutputs(results = null) {
         const finalResults = results || this.results;
 
@@ -250,9 +330,7 @@ class AmdScreeningFeature extends BaseFeature {
             const k = finalResults.k || '?';
             let html = `<strong>Structures compared:</strong> ${n} &nbsp; <strong>k:</strong> ${k}`;
             if (failed.length > 0) html += ` &nbsp; <strong>Failed:</strong> ${failed.length}`;
-            if (labels.length > 0) {
-                html += `<br><strong>Labels:</strong> ${labels.map(l => `<code>${l}</code>`).join(', ')}`;
-            }
+            html += this._buildDistanceHeatmapHTML(finalResults.amd_matrix, labels);
             summaryEl.innerHTML = html;
             summaryRow.style.display = '';
         }
