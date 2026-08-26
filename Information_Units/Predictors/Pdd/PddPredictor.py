@@ -24,7 +24,7 @@ from Information_Units.Predictors.BasePredictor import BasePredictor
 from Information_Units.property_mappings.property_loader import load_source_property_mapping
 
 
-class PDDPredictor(BasePredictor):
+class PddPredictor(BasePredictor):
     """Compute PDD descriptors for crystal structures.
 
     Input:  ``list[str]`` of CIF text strings (EMOS standard contract).
