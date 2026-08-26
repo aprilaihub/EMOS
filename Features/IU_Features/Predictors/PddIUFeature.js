@@ -4,7 +4,7 @@ class PddIUFeature extends BaseFeature {
         super(
             featureId,
             iuMeta.iuName ? `${iuMeta.iuName} IU Feature` : 'PDD IU Feature',
-            iuMeta.iuDesc || 'Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures'
+            iuMeta.iuDesc || 'Pointwise Distance Distribution predictor — computes PDD descriptor matrices and AMD vectors for crystal structures'
         );
         this.iuType = iuMeta.iuType || 'predictor';
         this.iuId = iuMeta.iuId || 'pdd';
@@ -502,31 +502,6 @@ class PddIUFeature extends BaseFeature {
                 <div style="padding:6px; background:#f9f9f9; border-radius:4px;">
                     <strong style="color:#333;">PDD Matrix (shape ${rows} × ${cols})</strong>
                     <div style="font-size:11px; color:#666; margin-top:4px;">Full matrix included in downloaded JSON.</div>
-                </div>`;
-        }
-
-        // ── EMD matrix (cross-input, only when >1 structure) ─────────────────
-        const emd = properties.pdd_emd_matrix;
-        if (Array.isArray(emd)) {
-            const n = emd.length;
-            let tableHtml = `<table style="border-collapse:collapse; font-size:11px; margin-top:6px;">`;
-            tableHtml += `<tr><th style="padding:3px 6px;"></th>`;
-            for (let c = 0; c < n; c++) tableHtml += `<th style="padding:3px 6px; color:#555;">S${c + 1}</th>`;
-            tableHtml += '</tr>';
-            for (let r = 0; r < n; r++) {
-                tableHtml += `<tr><th style="padding:3px 6px; color:#555;">S${r + 1}</th>`;
-                for (let c = 0; c < n; c++) {
-                    const v = typeof emd[r][c] === 'number' ? emd[r][c].toFixed(4) : '-';
-                    const bg = r === c ? '#e8e8e8' : '#f9f9f9';
-                    tableHtml += `<td style="padding:3px 6px; background:${bg}; font-family:monospace;">${v}</td>`;
-                }
-                tableHtml += '</tr>';
-            }
-            tableHtml += '</table>';
-            html += `
-                <div style="padding:6px; background:#f9f9f9; border-radius:4px;">
-                    <strong style="color:#333;">Pairwise EMD Distance Matrix (${n} × ${n})</strong>
-                    ${tableHtml}
                 </div>`;
         }
 

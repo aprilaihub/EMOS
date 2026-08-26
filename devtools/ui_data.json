@@ -42,7 +42,7 @@
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
       "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python",
       "GBFS-2D": "Pretrained GBFS workflow predictors specialized for 2D layered materials",
-      "PDD": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures"
+      "PDD": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and AMD vectors for crystal structures"
     }
   },
   "features": {

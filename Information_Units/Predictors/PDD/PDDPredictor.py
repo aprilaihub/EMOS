@@ -25,7 +25,7 @@ from Information_Units.property_mappings.property_loader import load_source_prop
 
 
 class PDDPredictor(BasePredictor):
-    """Compute PDD descriptors and pairwise EMD similarity for crystal structures.
+    """Compute PDD descriptors for crystal structures.
 
     Input:  ``list[str]`` of CIF text strings (EMOS standard contract).
     Output: ``dict`` with ``"source"`` and ``"results"`` keys.
@@ -33,7 +33,6 @@ class PDDPredictor(BasePredictor):
     Each result item carries:
     - ``pdd_vector``   – 1-D AMD vector (mean of PDD rows), shape ``(k,)``
     - ``pdd_matrix``   – Full PDD matrix as a nested list, shape ``(n_atoms, k)``
-    - ``pdd_emd_matrix`` – Pairwise EMD distance matrix (only when >1 input), shape ``(n, n)``
 
     Parameters
     ----------
@@ -46,7 +45,6 @@ class PDDPredictor(BasePredictor):
     OUTPUT_PROPERTIES = (
         "pdd_vector",
         "pdd_matrix",
-        "pdd_emd_matrix",
     )
 
     def __init__(self, predictor_name: str = "pdd", k: int = 100, logger=None):
@@ -85,8 +83,7 @@ class PDDPredictor(BasePredictor):
             f"Computes geometric crystal-structure descriptors using the "
             f"average-minimum-distance package.\n"
             f"Parameters: k={self.k}\n"
-            f"Output per structure: pdd_vector (AMD, shape k), pdd_matrix (PDD, shape n_atoms×k).\n"
-            f"Output across structures: pdd_emd_matrix (pairwise EMD, shape n×n)."
+            f"Output per structure: pdd_vector and pdd_matrix."
         )
 
     def predict(self, input_data: list[str]) -> dict[str, Any]:
@@ -111,14 +108,12 @@ class PDDPredictor(BasePredictor):
                 f"PDD prediction starting: {len(cif_strings)} CIF string(s), k={self.k}",
                 "info",
             )
-
         if not cif_strings:
             return {"source": self.SOURCE, "results": []}
 
         results: list[dict] = []
-        periodic_sets: list[tuple[int, amd.PeriodicSet]] = []  # (original_idx, ps)
 
-        # ── Pass 1: compute per-structure PDD descriptors ─────────────────────
+        # ── Compute per-structure PDD descriptors ────────────────────────────
         for idx, cif_text in enumerate(cif_strings):
             if self._is_cancelled():
                 if self.logger:
@@ -130,15 +125,12 @@ class PDDPredictor(BasePredictor):
                 pdd_mat = amd.PDD(ps, self.k)          # shape (n_atoms, k)
                 amd_vec = np.mean(pdd_mat, axis=0)     # shape (k,)  — the AMD vector
 
-                periodic_sets.append((idx, ps))
-
                 item = {
                     "index": idx,
                     "status": "ok",
                     "properties": {
                         "pdd_vector": amd_vec.tolist(),
                         "pdd_matrix": pdd_mat.tolist(),
-                        "pdd_emd_matrix": None,   # filled below for multi-input
                     },
                     "warnings": [],
                     "error": None,
@@ -162,43 +154,11 @@ class PDDPredictor(BasePredictor):
                     "properties": {
                         "pdd_vector": None,
                         "pdd_matrix": None,
-                        "pdd_emd_matrix": None,
                     },
                     "warnings": [],
                     "error": err_msg,
                     "cif_input": cif_text,
                 })
-
-        # ── Pass 2: pairwise EMD matrix (only when ≥2 successful structures) ──
-        successful = [(orig_idx, ps) for orig_idx, ps in periodic_sets
-                      if results[orig_idx]["status"] == "ok"]  # type: ignore[index]
-
-        if len(successful) >= 2 and not self._is_cancelled():
-            if self.logger:
-                self.logger.log(
-                    f"Computing pairwise EMD matrix for {len(successful)} structure(s)…",
-                    "info",
-                )
-            n = len(successful)
-            emd_mat = np.zeros((n, n))
-            for i in range(n):
-                for j in range(i + 1, n):
-                    if self._is_cancelled():
-                        break
-                    pdd_i = amd.PDD(successful[i][1], self.k)
-                    pdd_j = amd.PDD(successful[j][1], self.k)
-                    dist = float(amd.EMD(pdd_i, pdd_j))
-                    emd_mat[i, j] = dist
-                    emd_mat[j, i] = dist
-                    if self.logger:
-                        self.logger.log(
-                            f"  EMD({i},{j}) = {dist:.6f}", "info"
-                        )
-
-            emd_list = emd_mat.tolist()
-            for rank, (orig_idx, _) in enumerate(successful):
-                # Embed the full n×n matrix into each result that contributed
-                results[orig_idx]["properties"]["pdd_emd_matrix"] = emd_list  # type: ignore[index]
 
         if self.logger:
             ok_count = sum(1 for r in results if r["status"] == "ok")
@@ -216,8 +176,6 @@ class PDDPredictor(BasePredictor):
         if self.logger:
             self.logger.log("Cancel signal received — PDD will stop after current structure.", "warning")
         return {"status": "ok", "message": "Cancel signal sent to PDD predictor."}
-
-    # ── helpers ───────────────────────────────────────────────────────────────
 
     def _is_cancelled(self) -> bool:
         with self._cancel_lock:

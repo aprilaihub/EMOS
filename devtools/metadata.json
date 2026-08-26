@@ -183,7 +183,7 @@
         "id": "pdd",
         "name": "PDD",
         "display_name": "PDD",
-        "description": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and pairwise EMD similarity for crystal structures",
+        "description": "Pointwise Distance Distribution predictor — computes PDD descriptor matrices and AMD vectors for crystal structures",
         "folder_path": "Information_Units/Predictors/PDD",
         "class_name": "PDDPredictor",
         "file_name": "PDDPredictor.py"
