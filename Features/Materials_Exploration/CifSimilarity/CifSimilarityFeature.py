@@ -1,5 +1,3 @@
-import base64
-import io
 import json
 import os
 import tempfile
@@ -9,6 +7,7 @@ import amd
 import numpy as np
 
 from Features.BaseFeature import BaseFeature
+from Information_Units.Predictors.Pdd.PddPredictor import PddPredictor
 
 
 class CifSimilarityFeature(BaseFeature):
@@ -61,14 +60,33 @@ class CifSimilarityFeature(BaseFeature):
             return {'status': 'error', 'message': 'Fewer than two valid CIF structures were loaded.', 'failed': failed}
 
         labels = [label for label, _ in structures]
-        vectors = [amd.AMD(structure, k) for _, structure in structures]
-        matrix = np.asarray(amd.AMD_cdist(vectors, vectors, metric='chebyshev'), dtype=float)
+        metric = inputs.get('distanceMetric', 'amd')
+        if metric == 'pdd_emd':
+            predictor = PddPredictor(predictor_name='cif_similarity_pdd', k=k, logger=self.logger)
+            pdd_result = predictor.predict(cif_strings)
+            pdd_items = [item for item in pdd_result.get('results', []) if item.get('status') == 'ok']
+            if len(pdd_items) != len(structures):
+                return {
+                    'status': 'error',
+                    'message': 'PDD descriptor calculation failed for one or more CIF structures.',
+                    'failed': failed,
+                }
+            pdd_matrices = [np.asarray(item['properties']['pdd_matrix'], dtype=float) for item in pdd_items]
+            matrix = np.zeros((len(pdd_matrices), len(pdd_matrices)))
+            for row in range(len(pdd_matrices)):
+                for column in range(row + 1, len(pdd_matrices)):
+                    distance = float(amd.EMD(pdd_matrices[row], pdd_matrices[column]))
+                    matrix[row, column] = distance
+                    matrix[column, row] = distance
+        else:
+            vectors = [amd.AMD(structure, k) for _, structure in structures]
+            matrix = np.asarray(amd.AMD_cdist(vectors, vectors, metric='chebyshev'), dtype=float)
+            metric = 'amd'
         return {
             'status': 'completed',
-            'message': f'AMD similarity complete. {len(labels)} structures compared.',
+            'message': f'{metric.upper()} similarity complete. {len(labels)} structures compared.',
             'labels': labels,
-            'amd_matrix': matrix.tolist(),
-            'plot_base64': self._make_figure(matrix, labels, k),
+            'distance_matrix': matrix.tolist(),
             'k': k,
             'distance_metric': inputs.get('distanceMetric', 'amd'),
             'failed': failed,
@@ -79,8 +97,7 @@ class CifSimilarityFeature(BaseFeature):
             'status': results.get('status', 'unknown'),
             'message': results.get('message', ''),
             'labels': results.get('labels', []),
-            'amd_matrix': results.get('amd_matrix'),
-            'plot_base64': results.get('plot_base64', ''),
+            'distance_matrix': results.get('distance_matrix'),
             'k': results.get('k'),
             'distance_metric': results.get('distance_metric', 'amd'),
             'failed': results.get('failed', []),
@@ -97,35 +114,3 @@ class CifSimilarityFeature(BaseFeature):
         with self._cancel_lock:
             self._cancelled = True
         return {'status': 'ok', 'message': 'Cancel signal sent to CIF similarity.'}
-
-    def _make_figure(self, matrix, labels, k):
-        try:
-            import matplotlib
-            matplotlib.use('Agg')
-            import matplotlib.pyplot as plt
-        except ImportError:
-            return ''
-
-        figure, heatmap_axis = plt.subplots(
-            figsize=(max(8, len(labels) * 0.55 + 4), max(6, len(labels) * 0.55 + 3)),
-        )
-        mask = np.triu(np.ones_like(matrix, dtype=bool), k=1)
-        heatmap_matrix = np.ma.array(matrix, mask=mask)
-        image = heatmap_axis.imshow(
-            heatmap_matrix, cmap='YlOrRd', vmin=0,
-            vmax=float(matrix.max()) or 1.0,
-        )
-        heatmap_axis.set_xticks(range(len(labels)), labels, rotation=90)
-        heatmap_axis.set_yticks(range(len(labels)), labels)
-        if len(labels) <= 20:
-            for row in range(len(labels)):
-                for column in range(row + 1):
-                    heatmap_axis.text(column, row, f'{matrix[row, column]:.3f}',
-                                      ha='center', va='center', fontsize=7)
-        figure.colorbar(image, ax=heatmap_axis, label=f'AMD distance (k={k})')
-        heatmap_axis.set_title('CIF Similarity: AMD Distance Matrix')
-        figure.tight_layout()
-        buffer = io.BytesIO()
-        figure.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
-        plt.close(figure)
-        return base64.b64encode(buffer.getvalue()).decode('ascii')

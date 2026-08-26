@@ -137,7 +137,7 @@ class CifSimilarityFeature extends BaseFeature {
         return {status: 'local_fallback', message: 'CIF similarity requires the Python backend.'};
     }
 
-    _buildDistanceHeatmapHTML(matrix, labels) {
+    _buildDistanceHeatmapHTML(matrix, labels, metric = 'amd') {
         const n = matrix.length;
         if (n === 0) return '';
 
@@ -189,7 +189,11 @@ class CifSimilarityFeature extends BaseFeature {
         html += '<span style="font-size:11px; color:#333;">0</span>';
         html += `<div style="flex:0 1 220px; height:14px; background:linear-gradient(to right, ${stops}); border:1px solid #ccc; border-radius:2px;"></div>`;
         html += `<span style="font-size:11px; color:#333;">${vmax.toFixed(3)}</span>`;
-        html += '<span style="font-size:11px; color:#666; margin-left:6px;">AMD distance</span></div></div>';
+        html += `<span style="font-size:11px; color:#666; margin-left:6px;">${String(metric).toUpperCase()} distance</span>`;
+        html += '</div>';
+        html += '<div style="margin-top:6px; font-size:11px; color:#666;">';
+        html += '<em>Index-to-filename mapping is available in the downloaded JSON results (<code>labels</code> field).</em>';
+        html += '</div></div>';
         return html;
     }
 
@@ -204,10 +208,11 @@ class CifSimilarityFeature extends BaseFeature {
             return;
         }
 
-        if (matrixEl && finalResults.amd_matrix) {
+        if (matrixEl && finalResults.distance_matrix) {
             matrixEl.innerHTML = this._buildDistanceHeatmapHTML(
-                finalResults.amd_matrix,
+            finalResults.distance_matrix,
                 finalResults.labels || [],
+                finalResults.distance_metric || 'amd',
             );
         }
         if (this._downloadUrl) URL.revokeObjectURL(this._downloadUrl);
