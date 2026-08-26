@@ -4,6 +4,7 @@ from Features.Materials_Exploration.DatabaseExtractor.DatabaseExtractorFeature i
 from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import StabilityConsensusAnalysisFeature
 from Features.Materials_Exploration.AmdScreening.AmdScreeningFeature import AmdScreeningFeature
 from Features.Electronics_Application.MosfetEvaluator.MosfetEvaluatorFeature import MosfetEvaluatorFeature
+from Features.Materials_Exploration.CifSimilarity.CifSimilarityFeature import CifSimilarityFeature
 
 
 # Feature registry - simple mapping like Information Units
@@ -11,7 +12,8 @@ feature_factory = {
     "1": DatabaseExtractorFeature,
     "2": StabilityConsensusAnalysisFeature,
     "3": AmdScreeningFeature,
-    "4": MosfetEvaluatorFeature
+    "4": CifSimilarityFeature,
+    "5": MosfetEvaluatorFeature
 
 }
 
