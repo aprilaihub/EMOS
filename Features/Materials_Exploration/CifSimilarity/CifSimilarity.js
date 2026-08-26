@@ -1,16 +1,18 @@
 // CIF similarity Feature
 class CifSimilarityFeature extends BaseFeature {
     constructor(featureId) {
-        super(featureId, 'CIF similarity', 'Compare uploaded crystal structures using AMD or PDD Earth Mover's Distance');
+        super(featureId, 'CIF similarity', 'Compare uploaded crystal structures using AMD or PDD Earth Movers Distance');
     }
 
     createInputsHTML() {
         return `
             <p>Configure input parameters for CIF similarity</p>
             <div class="input-controls">
-                ${this.createFileInput(`cifFiles_${this.featureId}`, 'CIF Files', '.cif')}
-                ${this.createSelectInput(`distanceMetric_${this.featureId}`, 'Distance Metric', [{value: 'amd', text: 'Average Minimum Distance (AMD)'}, {value: 'pdd_emd', text: 'PDD Earth Mover's Distance'}])}
-                ${this.createNumberInput(`k_${this.featureId}`, 'Neighbourhood size k', '1', '500', '1')}
+                <label>CIF Files:
+                    <input type="file" id="cifFiles_${this.featureId}" accept=".cif" multiple required>
+                </label>
+                ${this.createSelectInput(`distanceMetric_${this.featureId}`, 'Distance Metric', [{value: 'amd', text: 'Average Minimum Distance (AMD)'}, {value: 'pdd_emd', text: 'PDD Earth Movers Distance'}], true)}
+                ${this.createNumberInput(`k_${this.featureId}`, 'Neighbourhood size k', '1', '500', '1', '100')}
             </div>
         `;
     }
@@ -20,7 +22,8 @@ class CifSimilarityFeature extends BaseFeature {
             <p>CIF similarity results and outputs</p>
             <div class="output-display" id="outputDisplay_${this.featureId}">
                 <div class="output-item">
-                    <strong>Distance Matrix:</strong> <span id="distanceMatrix_${this.featureId}">Pending...</span>
+                    <strong>Distance Matrix:</strong>
+                    <pre id="distanceMatrix_${this.featureId}" style="max-height:300px; overflow:auto; white-space:pre-wrap;">Pending...</pre>
                 </div>
             </div>
         `;
