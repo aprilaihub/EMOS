@@ -1,0 +1,5019 @@
+{
+  "results_per_cif": [
+    {
+      "cif_name": "AcDy3 (1).cif",
+      "composition": "AcDy3",
+      "space_group_number": 139,
+      "space_group_symbol": "I4/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0712,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0712 eV/atom)",
+          "cif_space_group": "I4/mmm"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "I4/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.1716,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -35.4032,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -35.40324,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -4.425405,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.426641,
+              "Dy": -6.320522
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Dy": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.597052,
+            "delta_hf_eV_per_atom": 1.171647
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.9101,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -35.3826,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -35.382618,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -4.422827,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.436841,
+              "Dy": -5.96498
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Dy": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.332945,
+            "delta_hf_eV_per_atom": 0.910118
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "AcDy3.cif",
+      "composition": "AcDy3",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0763,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0763 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.1719,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.7007,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.700701,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -4.425175,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.426641,
+              "Dy": -6.320522
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Dy": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.597052,
+            "delta_hf_eV_per_atom": 1.171877
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.9101,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.6913,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.691307,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -4.422827,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.436841,
+              "Dy": -5.96498
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Dy": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.332945,
+            "delta_hf_eV_per_atom": 0.910118
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "AcEr3.cif",
+      "composition": "AcEr3",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0754,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0754 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0728,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries under threshold; fallback hull_distance value used",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.71,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.5675,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.567482,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -4.39187,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.426641,
+              "Er": -8.326933
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Er": 0.75
+            },
+            "reference_sum_eV_per_atom": -7.10186,
+            "delta_hf_eV_per_atom": 2.70999
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.8421,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.5378,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.537758,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -4.384439,
+            "reference_energies_eV_per_atom": {
+              "Ac": -3.436841,
+              "Er": -7.156432
+            },
+            "element_fractions": {
+              "Ac": 0.25,
+              "Er": 0.75
+            },
+            "reference_sum_eV_per_atom": -6.226535,
+            "delta_hf_eV_per_atom": 1.842095
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 4,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Ba3As2.cif",
+      "composition": "Ba3As2",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.4142,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 8,
+          "message": "Decision from energy_above_hull_r2scan (0.4142 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.1719,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.4039,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.403933,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.680787,
+            "reference_energies_eV_per_atom": {
+              "Ba": -6.117749,
+              "As": -5.455023
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.4
+            },
+            "reference_sum_eV_per_atom": -5.852659,
+            "delta_hf_eV_per_atom": 2.171872
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.8155,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.2957,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.295671,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.659134,
+            "reference_energies_eV_per_atom": {
+              "Ba": -5.743274,
+              "As": -5.071586
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.4
+            },
+            "reference_sum_eV_per_atom": -5.474599,
+            "delta_hf_eV_per_atom": 1.815465
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Ba3AsN.cif",
+      "composition": "Ba3AsN",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0811,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0811 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 3.2949,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.902,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.901979,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.580396,
+            "reference_energies_eV_per_atom": {
+              "Ba": -6.117749,
+              "As": -5.455023,
+              "N": -10.568326
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.2,
+              "N": 0.2
+            },
+            "reference_sum_eV_per_atom": -6.875319,
+            "delta_hf_eV_per_atom": 3.294924
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 3.0914,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -17.0129,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -17.012911,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.402582,
+            "reference_energies_eV_per_atom": {
+              "Ba": -5.743275,
+              "As": -5.071587,
+              "N": -10.168315
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.2,
+              "N": 0.2
+            },
+            "reference_sum_eV_per_atom": -6.493945,
+            "delta_hf_eV_per_atom": 3.091363
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Ba3AsP.cif",
+      "composition": "Ba3AsP",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.3437,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.3437 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.8803,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.3219,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.321873,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.664375,
+            "reference_energies_eV_per_atom": {
+              "Ba": -6.117749,
+              "As": -5.455023,
+              "P": -8.91526
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.2,
+              "P": 0.2
+            },
+            "reference_sum_eV_per_atom": -6.544706,
+            "delta_hf_eV_per_atom": 2.880332
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.2908,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.3466,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.3466,
+            "compound_num_atoms": 5,
+            "compound_energy_per_atom_eV": -3.66932,
+            "reference_energies_eV_per_atom": {
+              "Ba": -5.743275,
+              "As": -5.071585,
+              "P": -7.498978
+            },
+            "element_fractions": {
+              "Ba": 0.6,
+              "As": 0.2,
+              "P": 0.2
+            },
+            "reference_sum_eV_per_atom": -5.960077,
+            "delta_hf_eV_per_atom": 2.290758
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "CsHo3.cif",
+      "composition": "CsHo3",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.7304,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.7304 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.3282,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -11.9166,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -11.916618,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -2.979155,
+            "reference_energies_eV_per_atom": {
+              "Cs": -4.113353,
+              "Ho": -5.705307
+            },
+            "element_fractions": {
+              "Cs": 0.25,
+              "Ho": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.307318,
+            "delta_hf_eV_per_atom": 2.328164
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.39,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -11.5123,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -11.512347,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -2.878087,
+            "reference_energies_eV_per_atom": {
+              "Cs": -3.918284,
+              "Ho": -5.717969
+            },
+            "element_fractions": {
+              "Cs": 0.25,
+              "Ho": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.268048,
+            "delta_hf_eV_per_atom": 2.389961
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Dy.cif",
+      "composition": "Eu3Dy",
+      "space_group_number": 194,
+      "space_group_symbol": "P6_3/mmc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0814,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0814 eV/atom)",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.5378,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -70.1566,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -70.156563,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.76957,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Dy": -6.320522
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Dy": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.231807,
+            "delta_hf_eV_per_atom": -0.537764
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.1902,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -70.3248,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -70.324776,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.790597,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145523,
+              "Dy": -5.96498
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Dy": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.600387,
+            "delta_hf_eV_per_atom": -1.19021
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Ho.cif",
+      "composition": "Eu3Ho",
+      "space_group_number": 194,
+      "space_group_symbol": "P6_3/mmc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0827,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0827 eV/atom)",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.6826,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -70.0848,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -70.084801,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.7606,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Ho": -5.705307
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Ho": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.078003,
+            "delta_hf_eV_per_atom": -0.682597
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.2416,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -70.2417,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -70.241737,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.780217,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145521,
+              "Ho": -5.717969
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Ho": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.538633,
+            "delta_hf_eV_per_atom": -1.241584
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Mg.cif",
+      "composition": "Eu3Mg",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0293,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.0293 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0332,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 2,
+          "message": "2 entries evaluated for hull_distance",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0629,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -32.4728,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -32.472832,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -8.118208,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Mg": -6.117749
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Mg": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.181114,
+            "delta_hf_eV_per_atom": 0.062906
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.6123,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -32.6292,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -32.629192,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -8.157298,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145523,
+              "Mg": -5.743275
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Mg": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.544961,
+            "delta_hf_eV_per_atom": -0.612337
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 3 stable, 1 unstable",
+        "stable_count": 3,
+        "unstable_count": 1,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Tm.cif",
+      "composition": "Eu3Tm",
+      "space_group_number": 194,
+      "space_group_symbol": "P6_3/mmc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0835,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0835 eV/atom)",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.0817,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -69.8703,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -69.870323,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.73379,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Tm": -8.001478
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Tm": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.652046,
+            "delta_hf_eV_per_atom": -0.081745
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.661,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -70.069,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -70.069031,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.758629,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145523,
+              "Tm": -7.953914
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Tm": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.097621,
+            "delta_hf_eV_per_atom": -0.661008
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Zr.cif",
+      "composition": "Eu3Zr",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.3303,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.3303 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.9781,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -37.999,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -37.999016,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -9.499754,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Zr": -7.479954
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Zr": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.521665,
+            "delta_hf_eV_per_atom": -0.978089
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.6346,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -38.3193,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -38.319283,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -9.579821,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145524,
+              "Zr": -7.344376
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Zr": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.945237,
+            "delta_hf_eV_per_atom": -1.634584
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Eu3Zr_2.cif",
+      "composition": "Eu3Zr",
+      "space_group_number": 139,
+      "space_group_symbol": "I4/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.3172,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.3172 eV/atom)",
+          "cif_space_group": "I4/mmm"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "I4/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.9792,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -76.0065,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -76.006523,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -9.500815,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Zr": -7.479954
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Zr": 0.25
+            },
+            "reference_sum_eV_per_atom": -8.521665,
+            "delta_hf_eV_per_atom": -0.979151
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.6346,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -76.6385,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -76.638489,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -9.579811,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145523,
+              "Zr": -7.344373
+            },
+            "element_fractions": {
+              "Eu": 0.75,
+              "Zr": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.945235,
+            "delta_hf_eV_per_atom": -1.634576
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "EuEr.cif",
+      "composition": "EuEr",
+      "space_group_number": 187,
+      "space_group_symbol": "P-6m2",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.1011,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.1011 eV/atom)",
+          "cif_space_group": "P-6m2"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0807,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries under threshold; fallback hull_distance value used",
+          "cif_space_group": "P-6m2"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.2885,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -14.6189,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -14.618863,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -7.309432,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Er": -8.326933
+            },
+            "element_fractions": {
+              "Eu": 0.5,
+              "Er": 0.5
+            },
+            "reference_sum_eV_per_atom": -8.597917,
+            "delta_hf_eV_per_atom": 1.288486
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.359,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -14.5839,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -14.583944,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -7.291972,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145524,
+              "Er": -7.156432
+            },
+            "element_fractions": {
+              "Eu": 0.5,
+              "Er": 0.5
+            },
+            "reference_sum_eV_per_atom": -7.650978,
+            "delta_hf_eV_per_atom": 0.359006
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 4,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "EuTh3.cif",
+      "composition": "EuTh3",
+      "space_group_number": 194,
+      "space_group_symbol": "P6_3/mmc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.1761,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 5,
+          "message": "Decision from energy_above_hull_r2scan (0.1761 eV/atom)",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.6092,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -63.7924,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -63.792358,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -7.974045,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.868902,
+              "Th": -6.863555
+            },
+            "element_fractions": {
+              "Eu": 0.25,
+              "Th": 0.75
+            },
+            "reference_sum_eV_per_atom": -7.364891,
+            "delta_hf_eV_per_atom": -0.609153
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.0365,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -63.6768,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -63.676823,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -7.959603,
+            "reference_energies_eV_per_atom": {
+              "Eu": -8.145524,
+              "Th": -6.51568
+            },
+            "element_fractions": {
+              "Eu": 0.25,
+              "Th": 0.75
+            },
+            "reference_sum_eV_per_atom": -6.923141,
+            "delta_hf_eV_per_atom": -1.036462
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "GdZnAsO.cif",
+      "composition": "GdZnAsO",
+      "space_group_number": 129,
+      "space_group_symbol": "P4/nmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "P4/nmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "P4/nmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.1399,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -65.6691,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -65.669144,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.208643,
+            "reference_energies_eV_per_atom": {
+              "Gd": -5.632323,
+              "Zn": -6.619406,
+              "As": -5.455023,
+              "O": -10.568326
+            },
+            "element_fractions": {
+              "Gd": 0.25,
+              "Zn": 0.25,
+              "As": 0.25,
+              "O": 0.25
+            },
+            "reference_sum_eV_per_atom": -7.06877,
+            "delta_hf_eV_per_atom": -1.139873
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.4814,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -64.3002,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -64.300217,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -8.037527,
+            "reference_energies_eV_per_atom": {
+              "Gd": -4.774881,
+              "Zn": -6.209644,
+              "As": -5.071585,
+              "O": -10.168315
+            },
+            "element_fractions": {
+              "Gd": 0.25,
+              "Zn": 0.25,
+              "As": 0.25,
+              "O": 0.25
+            },
+            "reference_sum_eV_per_atom": -6.556106,
+            "delta_hf_eV_per_atom": -1.481421
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "HfC.cif",
+      "composition": "HfC",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.3391,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 6,
+          "message": "Decision from energy_above_hull_r2scan (1.3391 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.359,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.3673,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.36725,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -9.183625,
+            "reference_energies_eV_per_atom": {
+              "Hf": -10.168315,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Hf": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -8.824608,
+            "delta_hf_eV_per_atom": -0.359017
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.0487,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -18.5564,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -18.556389,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -9.278194,
+            "reference_energies_eV_per_atom": {
+              "Hf": -10.568326,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Hf": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -9.229525,
+            "delta_hf_eV_per_atom": -0.048669
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "HfTaTiB4MoC4.cif",
+      "composition": "HfTaTiB4MoC4",
+      "space_group_number": 2,
+      "space_group_symbol": "P-1",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.6142,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.6142 eV/atom)",
+          "cif_space_group": "P-1"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P-1"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.2976,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -210.1952,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -210.19519,
+            "compound_num_atoms": 24,
+            "compound_energy_per_atom_eV": -8.758133,
+            "reference_energies_eV_per_atom": {
+              "Hf": -10.168315,
+              "Ta": -10.168315,
+              "Ti": -8.80244,
+              "B": -6.000486,
+              "Mo": -6.461875,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Hf": 0.083333,
+              "Ta": 0.083333,
+              "Ti": 0.083333,
+              "B": 0.333333,
+              "Mo": 0.083333,
+              "C": 0.333333
+            },
+            "reference_sum_eV_per_atom": -7.460541,
+            "delta_hf_eV_per_atom": -1.297592
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.1053,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -214.5728,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -214.57283,
+            "compound_num_atoms": 24,
+            "compound_energy_per_atom_eV": -8.940535,
+            "reference_energies_eV_per_atom": {
+              "Hf": -10.568326,
+              "Ta": -10.568326,
+              "Ti": -9.23772,
+              "B": -6.332958,
+              "Mo": -6.753391,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Hf": 0.083333,
+              "Ta": 0.083333,
+              "Ti": 0.083333,
+              "B": 0.333333,
+              "Mo": 0.083333,
+              "C": 0.333333
+            },
+            "reference_sum_eV_per_atom": -7.835208,
+            "delta_hf_eV_per_atom": -1.105327
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "KPm3.cif",
+      "composition": "KPm3",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.4811,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 5,
+          "message": "Decision from energy_above_hull_r2scan (0.4811 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.2411,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -13.4826,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -13.482584,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -3.370646,
+            "reference_energies_eV_per_atom": {
+              "K": -6.99124,
+              "Pm": -3.818595
+            },
+            "element_fractions": {
+              "K": 0.25,
+              "Pm": 0.75
+            },
+            "reference_sum_eV_per_atom": -4.611756,
+            "delta_hf_eV_per_atom": 1.24111
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.076,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -13.4334,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -13.433418,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -3.358355,
+            "reference_energies_eV_per_atom": {
+              "K": -6.397499,
+              "Pm": -3.779979
+            },
+            "element_fractions": {
+              "K": 0.25,
+              "Pm": 0.75
+            },
+            "reference_sum_eV_per_atom": -4.434359,
+            "delta_hf_eV_per_atom": 1.076004
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "KPm3_2.cif",
+      "composition": "KPm3",
+      "space_group_number": 139,
+      "space_group_symbol": "I4/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.4686,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 5,
+          "message": "Decision from energy_above_hull_r2scan (0.4686 eV/atom)",
+          "cif_space_group": "I4/mmm"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "I4/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.2418,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -26.9593,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -26.959269,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -3.369909,
+            "reference_energies_eV_per_atom": {
+              "K": -6.99124,
+              "Pm": -3.818595
+            },
+            "element_fractions": {
+              "K": 0.25,
+              "Pm": 0.75
+            },
+            "reference_sum_eV_per_atom": -4.611756,
+            "delta_hf_eV_per_atom": 1.241848
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 1.076,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -26.8668,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -26.866837,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -3.358355,
+            "reference_energies_eV_per_atom": {
+              "K": -6.3975,
+              "Pm": -3.779979
+            },
+            "element_fractions": {
+              "K": 0.25,
+              "Pm": 0.75
+            },
+            "reference_sum_eV_per_atom": -4.434359,
+            "delta_hf_eV_per_atom": 1.076005
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Lu2MgSe4.cif",
+      "composition": "Lu2MgSe4",
+      "space_group_number": 227,
+      "space_group_symbol": "Fd-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 8,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Fd-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0156,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Fd-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.4689,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -290.0871,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -290.087067,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.180126,
+            "reference_energies_eV_per_atom": {
+              "Lu": -3.50818,
+              "Mg": -5.743275,
+              "Se": -5.05475
+            },
+            "element_fractions": {
+              "Lu": 0.285714,
+              "Mg": 0.142857,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -4.711234,
+            "delta_hf_eV_per_atom": -0.468892
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.4492,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -304.3914,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -304.391357,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.43556,
+            "reference_energies_eV_per_atom": {
+              "Lu": -3.553776,
+              "Mg": -6.117749,
+              "Se": -5.419752
+            },
+            "element_fractions": {
+              "Lu": 0.285714,
+              "Mg": 0.142857,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -4.98633,
+            "delta_hf_eV_per_atom": -0.44923
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Mg(ScSe2)2.cif",
+      "composition": "Mg(ScSe2)2",
+      "space_group_number": 227,
+      "space_group_symbol": "Fd-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 9,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Fd-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0233,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Fd-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.8785,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -313.0246,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -313.024597,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.589725,
+            "reference_energies_eV_per_atom": {
+              "Mg": -5.743276,
+              "Sc": -3.50818,
+              "Se": -5.05475
+            },
+            "element_fractions": {
+              "Mg": 0.142857,
+              "Sc": 0.285714,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -4.711234,
+            "delta_hf_eV_per_atom": -0.878491
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.8505,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -326.8603,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -326.860291,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.836791,
+            "reference_energies_eV_per_atom": {
+              "Mg": -6.117749,
+              "Sc": -3.553776,
+              "Se": -5.419752
+            },
+            "element_fractions": {
+              "Mg": 0.142857,
+              "Sc": 0.285714,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -4.98633,
+            "delta_hf_eV_per_atom": -0.850461
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "NbVB4.cif",
+      "composition": "NbVB4",
+      "space_group_number": 191,
+      "space_group_symbol": "P6/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0132,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0132 eV/atom)",
+          "cif_space_group": "P6/mmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0118,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "P6/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.5842,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -50.2358,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -50.235794,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -8.372632,
+            "reference_energies_eV_per_atom": {
+              "Nb": -8.136494,
+              "V": -7.262284,
+              "B": -6.332958
+            },
+            "element_fractions": {
+              "Nb": 0.166667,
+              "V": 0.166667,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -6.788435,
+            "delta_hf_eV_per_atom": -1.584197
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.9949,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -50.3278,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -50.327751,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -8.387959,
+            "reference_energies_eV_per_atom": {
+              "Nb": -7.683151,
+              "V": -6.765597,
+              "B": -5.977471
+            },
+            "element_fractions": {
+              "Nb": 0.166667,
+              "V": 0.166667,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -6.393105,
+            "delta_hf_eV_per_atom": -1.994853
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "NpS.cif",
+      "composition": "NpS",
+      "space_group_number": 225,
+      "space_group_symbol": "Fm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Fm-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Fm-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.8719,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -79.2761,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -79.276085,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -9.909511,
+            "reference_energies_eV_per_atom": {
+              "Np": -7.658638,
+              "S": -6.416604
+            },
+            "element_fractions": {
+              "Np": 0.5,
+              "S": 0.5
+            },
+            "reference_sum_eV_per_atom": -7.037621,
+            "delta_hf_eV_per_atom": -2.871889
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.9054,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -80.5853,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -80.585304,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -10.073163,
+            "reference_energies_eV_per_atom": {
+              "Np": -7.672906,
+              "S": -6.662546
+            },
+            "element_fractions": {
+              "Np": 0.5,
+              "S": 0.5
+            },
+            "reference_sum_eV_per_atom": -7.167726,
+            "delta_hf_eV_per_atom": -2.905437
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "PtC.cif",
+      "composition": "PtC",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.0091,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (2.0091 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.5194,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries under threshold; fallback hull_distance value used",
+          "cif_space_group": "Pm-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.2595,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -11.3018,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -11.301752,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -5.650876,
+            "reference_energies_eV_per_atom": {
+              "Pt": -8.33993,
+              "C": -7.480902
+            },
+            "element_fractions": {
+              "Pt": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -7.910416,
+            "delta_hf_eV_per_atom": 2.25954
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.4227,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -11.3772,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -11.377199,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -5.6886,
+            "reference_energies_eV_per_atom": {
+              "Pt": -8.331806,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Pt": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -8.111265,
+            "delta_hf_eV_per_atom": 2.422666
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 4,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc15C19.cif",
+      "composition": "Sc15C19",
+      "space_group_number": 128,
+      "space_group_symbol": "P4/mnc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0017,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.0017 eV/atom)",
+          "cif_space_group": "P4/mnc"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 2,
+          "message": "2 entries evaluated for hull_distance",
+          "cif_space_group": "P4/mnc"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -6.244,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -568.6359,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -568.635925,
+            "compound_num_atoms": 68,
+            "compound_energy_per_atom_eV": -8.362293,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.352941,
+              "C": 0.117647
+            },
+            "reference_sum_eV_per_atom": -2.118287,
+            "delta_hf_eV_per_atom": -6.244006
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -6.1717,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -568.09,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -568.089966,
+            "compound_num_atoms": 68,
+            "compound_energy_per_atom_eV": -8.354264,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.352941,
+              "C": 0.117647
+            },
+            "reference_sum_eV_per_atom": -2.182594,
+            "delta_hf_eV_per_atom": -6.17167
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc2BC2.cif",
+      "composition": "Sc2BC2",
+      "space_group_number": 139,
+      "space_group_symbol": "I4/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 5,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "I4/mmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0167,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "I4/mmm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.5417,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -81.374,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -81.374023,
+            "compound_num_atoms": 10,
+            "compound_energy_per_atom_eV": -8.137402,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "B": -6.000479,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "B": 0.2,
+              "C": 0.4
+            },
+            "reference_sum_eV_per_atom": -5.595728,
+            "delta_hf_eV_per_atom": -2.541674
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.3548,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -81.992,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -81.991966,
+            "compound_num_atoms": 10,
+            "compound_energy_per_atom_eV": -8.199197,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "B": -6.332958,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "B": 0.2,
+              "C": 0.4
+            },
+            "reference_sum_eV_per_atom": -5.844392,
+            "delta_hf_eV_per_atom": -2.354805
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc2C3.cif",
+      "composition": "Sc2C3",
+      "space_group_number": 220,
+      "space_group_symbol": "I-43d",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.1126,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.1126 eV/atom)",
+          "cif_space_group": "I-43d"
+        },
+        "alexandria": {
+          "status": "no_exact_formula_match",
+          "stability": null,
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No exact formula match found for Sc2C3 in returned entries",
+          "cif_space_group": "I-43d"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.4349,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -333.0706,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -333.070587,
+            "compound_num_atoms": 40,
+            "compound_energy_per_atom_eV": -8.326765,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "C": -7.480933
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "C": 0.6
+            },
+            "reference_sum_eV_per_atom": -5.891832,
+            "delta_hf_eV_per_atom": -2.434933
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.2254,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -335.2551,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -335.255127,
+            "compound_num_atoms": 40,
+            "compound_energy_per_atom_eV": -8.381378,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "C": 0.6
+            },
+            "reference_sum_eV_per_atom": -6.155945,
+            "delta_hf_eV_per_atom": -2.225433
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc2ZnSe4.cif",
+      "composition": "Sc2ZnSe4",
+      "space_group_number": 227,
+      "space_group_symbol": "Fd-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0131,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0131 eV/atom)",
+          "cif_space_group": "Fd-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0249,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Fd-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.6035,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -317.042,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -317.041962,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.661464,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Zn": -6.619406,
+              "Se": -5.419752
+            },
+            "element_fractions": {
+              "Sc": 0.285714,
+              "Zn": 0.142857,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -5.057995,
+            "delta_hf_eV_per_atom": -0.603469
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -0.61,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -301.7216,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -301.721588,
+            "compound_num_atoms": 56,
+            "compound_energy_per_atom_eV": -5.387886,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Zn": -6.209644,
+              "Se": -5.05475
+            },
+            "element_fractions": {
+              "Sc": 0.285714,
+              "Zn": 0.142857,
+              "Se": 0.571429
+            },
+            "reference_sum_eV_per_atom": -4.777858,
+            "delta_hf_eV_per_atom": -0.610028
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3C4.cif",
+      "composition": "Sc3C4",
+      "space_group_number": 128,
+      "space_group_symbol": "P4/mnc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "no_exact_formula_match",
+          "stability": null,
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 0,
+          "message": "No exact formula match found for Sc3C4 in returned entries",
+          "cif_space_group": "P4/mnc"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 2,
+          "message": "2 entries evaluated for hull_distance",
+          "cif_space_group": "P4/mnc"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -6.127,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -586.9683,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -586.968323,
+            "compound_num_atoms": 70,
+            "compound_energy_per_atom_eV": -8.385262,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "C": 0.114286
+            },
+            "reference_sum_eV_per_atom": -2.258232,
+            "delta_hf_eV_per_atom": -6.12703
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -6.0686,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -587.4368,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -587.436768,
+            "compound_num_atoms": 70,
+            "compound_energy_per_atom_eV": -8.391954,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.4,
+              "C": 0.114286
+            },
+            "reference_sum_eV_per_atom": -2.323307,
+            "delta_hf_eV_per_atom": -6.068646
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 3,
+        "unstable_count": 0,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3CoC4.cif",
+      "composition": "Sc3CoC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.2342,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -133.2993,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -133.299301,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.331206,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Co": -6.551729,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Co": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.096994,
+            "delta_hf_eV_per_atom": -2.234212
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.5284,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -133.1425,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -133.142487,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.321405,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Co": -5.896041,
+              "C": -7.480934
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Co": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.79304,
+            "delta_hf_eV_per_atom": -2.528366
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3FeC4.cif",
+      "composition": "Sc3FeC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.6176,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -135.6105,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -135.610489,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.475656,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Fe": -6.416604,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Fe": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.858093,
+            "delta_hf_eV_per_atom": -2.617562
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.3487,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -135.3531,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -135.353149,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.459572,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Fe": -6.662546,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Fe": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.110846,
+            "delta_hf_eV_per_atom": -2.348725
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3IrC4 (1).cif",
+      "composition": "Sc3IrC4",
+      "space_group_number": 12,
+      "space_group_symbol": "C2/m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "C2/m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "C2/m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.664,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -275.0013,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -275.001282,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.59379,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Ir": -6.989672,
+              "C": -7.480935
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ir": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.929744,
+            "delta_hf_eV_per_atom": -2.664046
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.443,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -275.0354,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -275.0354,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.594856,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Ir": -6.990929,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ir": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.151894,
+            "delta_hf_eV_per_atom": -2.442962
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3IrC4.cif",
+      "composition": "Sc3IrC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0032,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0032 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.004,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.6623,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -137.4718,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -137.471832,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.59199,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Ir": -6.989672,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ir": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.929727,
+            "delta_hf_eV_per_atom": -2.662262
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.4429,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -137.5164,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -137.516388,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.594774,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Ir": -6.990929,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ir": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.151894,
+            "delta_hf_eV_per_atom": -2.44288
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3NiC4.cif",
+      "composition": "Sc3NiC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.4201,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -130.2443,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -130.244293,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.140268,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Ni": -5.312964,
+              "C": -7.480933
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ni": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.720155,
+            "delta_hf_eV_per_atom": -2.420114
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.1057,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -130.5372,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -130.53717,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.158573,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Ni": -6.198393,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ni": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.052827,
+            "delta_hf_eV_per_atom": -2.105746
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3OsC4 (1).cif",
+      "composition": "Sc3OsC4",
+      "space_group_number": 12,
+      "space_group_symbol": "C2/m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "C2/m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "C2/m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.4772,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -281.6862,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -281.686188,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.802693,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Os": -8.379809,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Os": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.325504,
+            "delta_hf_eV_per_atom": -2.477189
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.7463,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -282.0455,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -282.045502,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.813922,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Os": -8.092555,
+              "C": -7.480934
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Os": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.067604,
+            "delta_hf_eV_per_atom": -2.746318
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3OsC4.cif",
+      "composition": "Sc3OsC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0032,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0032 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0023,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.4774,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -140.8467,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -140.84671,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.802919,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Os": -8.379809,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Os": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.325504,
+            "delta_hf_eV_per_atom": -2.477415
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.7463,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -141.0228,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -141.022766,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.813923,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Os": -8.092445,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Os": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.067573,
+            "delta_hf_eV_per_atom": -2.746349
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3RhC4 (1).cif",
+      "composition": "Sc3RhC4",
+      "space_group_number": 12,
+      "space_group_symbol": "C2/m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "C2/m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "C2/m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.8835,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -269.597,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -269.597015,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.424907,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Rh": -2.107251,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Rh": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.541434,
+            "delta_hf_eV_per_atom": -2.883472
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -3.0848,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -269.1203,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -269.1203,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.410009,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Rh": -2.153068,
+              "C": -7.480933
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Rh": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.325168,
+            "delta_hf_eV_per_atom": -3.084842
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3RhC4.cif",
+      "composition": "Sc3RhC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0034,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0034 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0038,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -3.0848,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -134.559,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -134.55899,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.409937,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Rh": -2.153068,
+              "C": -7.480902
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Rh": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.325152,
+            "delta_hf_eV_per_atom": -3.084785
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.8838,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -134.803,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -134.80304,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.42519,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Rh": -2.107251,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Rh": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.541434,
+            "delta_hf_eV_per_atom": -2.883755
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3RuC4 (1).cif",
+      "composition": "Sc3RuC4",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.002,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0020 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0021,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Immm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.5623,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -137.8017,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -137.801682,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.612605,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Ru": -7.953914,
+              "C": -7.480933
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ru": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.050273,
+            "delta_hf_eV_per_atom": -2.562332
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.3275,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -137.6909,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -137.690918,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -8.605682,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Ru": -8.001478,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ru": 0.125,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.278213,
+            "delta_hf_eV_per_atom": -2.327469
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc3RuC4.cif",
+      "composition": "Sc3RuC4",
+      "space_group_number": 12,
+      "space_group_symbol": "C2/m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "C2/m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "C2/m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -4.4326,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -275.6031,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -275.603149,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.612598,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Ru": -7.953914,
+              "C": -7.480935
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ru": 0.125,
+              "C": 0.25
+            },
+            "reference_sum_eV_per_atom": -4.18004,
+            "delta_hf_eV_per_atom": -4.432558
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -4.3003,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -275.3851,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -275.385132,
+            "compound_num_atoms": 32,
+            "compound_energy_per_atom_eV": -8.605785,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Ru": -8.001478,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.375,
+              "Ru": 0.125,
+              "C": 0.25
+            },
+            "reference_sum_eV_per_atom": -4.305532,
+            "delta_hf_eV_per_atom": -4.300254
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc4C3.cif",
+      "composition": "Sc4C3",
+      "space_group_number": 220,
+      "space_group_symbol": "I-43d",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "I-43d"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "I-43d"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.8095,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -224.569,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -224.56897,
+            "compound_num_atoms": 28,
+            "compound_energy_per_atom_eV": -8.02032,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "C": -7.480934
+            },
+            "element_fractions": {
+              "Sc": 0.571429,
+              "C": 0.428571
+            },
+            "reference_sum_eV_per_atom": -5.210789,
+            "delta_hf_eV_per_atom": -2.809531
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.522,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -222.1638,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -222.163803,
+            "compound_num_atoms": 28,
+            "compound_energy_per_atom_eV": -7.934422,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.571429,
+              "C": 0.428571
+            },
+            "reference_sum_eV_per_atom": -5.412468,
+            "delta_hf_eV_per_atom": -2.521953
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Sc5Re2C7.cif",
+      "composition": "Sc5Re2C7",
+      "space_group_number": 65,
+      "space_group_symbol": "Cmmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "Cmmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Cmmm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -5.4625,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -255.7692,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -255.769165,
+            "compound_num_atoms": 28,
+            "compound_energy_per_atom_eV": -9.134613,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "Re": -9.453233,
+              "C": -7.480934
+            },
+            "element_fractions": {
+              "Sc": 0.357143,
+              "Re": 0.142857,
+              "C": 0.142857
+            },
+            "reference_sum_eV_per_atom": -3.672088,
+            "delta_hf_eV_per_atom": -5.462525
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -5.3916,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -256.0714,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -256.07135,
+            "compound_num_atoms": 28,
+            "compound_energy_per_atom_eV": -9.145405,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "Re": -9.501174,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.357143,
+              "Re": 0.142857,
+              "C": 0.142857
+            },
+            "reference_sum_eV_per_atom": -3.753763,
+            "delta_hf_eV_per_atom": -5.391643
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "ScBC.cif",
+      "composition": "ScBC",
+      "space_group_number": 194,
+      "space_group_symbol": "P6_3/mmc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.039,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 5,
+          "message": "Decision from energy_above_hull_r2scan (0.0390 eV/atom)",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "P6_3/mmc"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.2761,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -47.5617,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -47.561703,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -7.92695,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "B": -5.963435,
+              "C": -7.480901
+            },
+            "element_fractions": {
+              "Sc": 0.333333,
+              "B": 0.333333,
+              "C": 0.333333
+            },
+            "reference_sum_eV_per_atom": -5.650839,
+            "delta_hf_eV_per_atom": -2.276112
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -2.0023,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -47.5687,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -47.568691,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -7.928115,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "B": -6.332958,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.333333,
+              "B": 0.333333,
+              "C": 0.333333
+            },
+            "reference_sum_eV_per_atom": -5.925819,
+            "delta_hf_eV_per_atom": -2.002296
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "ScC.cif",
+      "composition": "ScC",
+      "space_group_number": 221,
+      "space_group_symbol": "Pm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.8398,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.8398 eV/atom)",
+          "cif_space_group": "Pm-3m"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "Pm-3m"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.8858,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -14.7608,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -14.760771,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -7.380385,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.50818,
+              "C": -7.480933
+            },
+            "element_fractions": {
+              "Sc": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.494557,
+            "delta_hf_eV_per_atom": -1.885829
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.7572,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -14.959,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -14.958956,
+            "compound_num_atoms": 2,
+            "compound_energy_per_atom_eV": -7.479478,
+            "reference_energies_eV_per_atom": {
+              "Sc": -3.553776,
+              "C": -7.890724
+            },
+            "element_fractions": {
+              "Sc": 0.5,
+              "C": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.72225,
+            "delta_hf_eV_per_atom": -1.757228
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "SmSe.cif",
+      "composition": "SmSe",
+      "space_group_number": 186,
+      "space_group_symbol": "P6_3mc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.5353,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 8,
+          "message": "Decision from energy_above_hull_r2scan (0.5353 eV/atom)",
+          "cif_space_group": "P6_3mc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3mc"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0362,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -21.4514,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -21.451376,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -5.362844,
+            "reference_energies_eV_per_atom": {
+              "Sm": -5.743275,
+              "Se": -5.05475
+            },
+            "element_fractions": {
+              "Sm": 0.5,
+              "Se": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.399012,
+            "delta_hf_eV_per_atom": 0.036168
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.1794,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -22.3573,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -22.357307,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -5.589327,
+            "reference_energies_eV_per_atom": {
+              "Sm": -6.117749,
+              "Se": -5.419752
+            },
+            "element_fractions": {
+              "Sm": 0.5,
+              "Se": 0.5
+            },
+            "reference_sum_eV_per_atom": -5.768751,
+            "delta_hf_eV_per_atom": 0.179424
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "TaB2.cif",
+      "composition": "TaB2",
+      "space_group_number": 191,
+      "space_group_symbol": "P6/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 7,
+          "message": "Decision from energy_above_hull_r2scan (0.0000 eV/atom)",
+          "cif_space_group": "P6/mmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "P6/mmm"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.6796,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -27.208,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -27.20797,
+            "compound_num_atoms": 3,
+            "compound_energy_per_atom_eV": -9.069323,
+            "reference_energies_eV_per_atom": {
+              "Ta": -10.168315,
+              "B": -6.000485
+            },
+            "element_fractions": {
+              "Ta": 0.333333,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -7.389761,
+            "delta_hf_eV_per_atom": -1.679562
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.3524,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -27.2915,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -27.291473,
+            "compound_num_atoms": 3,
+            "compound_energy_per_atom_eV": -9.097158,
+            "reference_energies_eV_per_atom": {
+              "Ta": -10.568326,
+              "B": -6.332958
+            },
+            "element_fractions": {
+              "Ta": 0.333333,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -7.744748,
+            "delta_hf_eV_per_atom": -1.35241
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "TaVB4.cif",
+      "composition": "TaVB4",
+      "space_group_number": 191,
+      "space_group_symbol": "P6/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0008,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 1,
+          "message": "Decision from energy_above_hull_r2scan (0.0008 eV/atom)",
+          "cif_space_group": "P6/mmm"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0001,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "P6/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.4562,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -51.8995,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -51.89946,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -8.64991,
+            "reference_energies_eV_per_atom": {
+              "Ta": -10.568326,
+              "V": -7.262284,
+              "B": -6.332958
+            },
+            "element_fractions": {
+              "Ta": 0.166667,
+              "V": 0.166667,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -7.19374,
+            "delta_hf_eV_per_atom": -1.45617
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.8439,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -51.9995,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -51.999485,
+            "compound_num_atoms": 6,
+            "compound_energy_per_atom_eV": -8.666581,
+            "reference_energies_eV_per_atom": {
+              "Ta": -10.168315,
+              "V": -6.765597,
+              "B": -6.000487
+            },
+            "element_fractions": {
+              "Ta": 0.166667,
+              "V": 0.166667,
+              "B": 0.666667
+            },
+            "reference_sum_eV_per_atom": -6.822643,
+            "delta_hf_eV_per_atom": -1.843938
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "TbSe.cif",
+      "composition": "TbSe",
+      "space_group_number": 186,
+      "space_group_symbol": "P6_3mc",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.5254,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 10,
+          "message": "Decision from energy_above_hull_r2scan (0.5254 eV/atom)",
+          "cif_space_group": "P6_3mc"
+        },
+        "alexandria": {
+          "status": "not_found",
+          "stability": "\u26a0\ufe0f Not found",
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No entries found with hull_distance <= 0.05",
+          "cif_space_group": "P6_3mc"
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.6827,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -21.3579,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -21.357857,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -5.339464,
+            "reference_energies_eV_per_atom": {
+              "Tb": -6.989672,
+              "Se": -5.05475
+            },
+            "element_fractions": {
+              "Tb": 0.5,
+              "Se": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.022211,
+            "delta_hf_eV_per_atom": 0.682746
+          }
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.6597,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -22.1825,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -22.182539,
+            "compound_num_atoms": 4,
+            "compound_energy_per_atom_eV": -5.545635,
+            "reference_energies_eV_per_atom": {
+              "Tb": -6.990929,
+              "Se": -5.419752
+            },
+            "element_fractions": {
+              "Tb": 0.5,
+              "Se": 0.5
+            },
+            "reference_sum_eV_per_atom": -6.20534,
+            "delta_hf_eV_per_atom": 0.659706
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "ThH3.cif",
+      "composition": "ThH3",
+      "space_group_number": 139,
+      "space_group_symbol": "I4/mmm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.0718,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 4,
+          "message": "Decision from energy_above_hull_r2scan (0.0718 eV/atom)",
+          "cif_space_group": "I4/mmm"
+        },
+        "alexandria": {
+          "status": "no_exact_formula_match",
+          "stability": null,
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No exact formula match found for ThH3 in returned entries",
+          "cif_space_group": "I4/mmm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.8324,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -40.2636,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -40.263588,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -5.032948,
+            "reference_energies_eV_per_atom": {
+              "Th": -6.863555,
+              "H": -5.532607
+            },
+            "element_fractions": {
+              "Th": 0.25,
+              "H": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.865344,
+            "delta_hf_eV_per_atom": 0.832396
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.7128,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -38.8163,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -38.816288,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -4.852036,
+            "reference_energies_eV_per_atom": {
+              "Th": -6.515677,
+              "H": -5.247883
+            },
+            "element_fractions": {
+              "Th": 0.25,
+              "H": 0.75
+            },
+            "reference_sum_eV_per_atom": -5.564831,
+            "delta_hf_eV_per_atom": 0.712795
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "TiVRu2.cif",
+      "composition": "TiVRu2",
+      "space_group_number": 225,
+      "space_group_symbol": "Fm-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0358,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 2,
+          "message": "Decision from energy_above_hull_r2scan (0.0358 eV/atom)",
+          "cif_space_group": "Fm-3m"
+        },
+        "alexandria": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": 0.0246,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 1,
+          "message": "1 entries evaluated for hull_distance",
+          "cif_space_group": "Fm-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.2616,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -150.1978,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -150.197784,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -9.387362,
+            "reference_energies_eV_per_atom": {
+              "Ti": -9.23772,
+              "V": -7.262284,
+              "Ru": -8.001478
+            },
+            "element_fractions": {
+              "Ti": 0.25,
+              "V": 0.25,
+              "Ru": 0.5
+            },
+            "reference_sum_eV_per_atom": -8.12574,
+            "delta_hf_eV_per_atom": -1.261621
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.5309,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -150.3986,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -150.398621,
+            "compound_num_atoms": 16,
+            "compound_energy_per_atom_eV": -9.399914,
+            "reference_energies_eV_per_atom": {
+              "Ti": -8.80244,
+              "V": -6.765597,
+              "Ru": -7.953914
+            },
+            "element_fractions": {
+              "Ti": 0.25,
+              "V": 0.25,
+              "Ru": 0.5
+            },
+            "reference_sum_eV_per_atom": -7.868966,
+            "delta_hf_eV_per_atom": -1.530948
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u2705 All sources agree: Stable",
+        "stable_count": 4,
+        "unstable_count": 0,
+        "error_count": 0,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "Tm4Ir.cif",
+      "composition": "Tm4Ir",
+      "space_group_number": 227,
+      "space_group_symbol": "Fd-3m",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 0.6066,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 7,
+          "message": "Decision from energy_above_hull_r2scan (0.6066 eV/atom)",
+          "cif_space_group": "Fd-3m"
+        },
+        "alexandria": {
+          "status": "no_exact_formula_match",
+          "stability": null,
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No exact formula match found for Tm4Ir in returned entries",
+          "cif_space_group": "Fd-3m"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.5462,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -210.1262,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -210.12619,
+            "compound_num_atoms": 40,
+            "compound_energy_per_atom_eV": -5.253155,
+            "reference_energies_eV_per_atom": {
+              "Tm": -8.001478,
+              "Ir": -6.990929
+            },
+            "element_fractions": {
+              "Tm": 0.8,
+              "Ir": 0.2
+            },
+            "reference_sum_eV_per_atom": -7.799368,
+            "delta_hf_eV_per_atom": 2.546214
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 2.5988,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -206.4909,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -206.490921,
+            "compound_num_atoms": 40,
+            "compound_energy_per_atom_eV": -5.162273,
+            "reference_energies_eV_per_atom": {
+              "Tm": -7.953914,
+              "Ir": -6.989672
+            },
+            "element_fractions": {
+              "Tm": 0.8,
+              "Ir": 0.2
+            },
+            "reference_sum_eV_per_atom": -7.761065,
+            "delta_hf_eV_per_atom": 2.598792
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u274c All sources agree: Unstable",
+        "stable_count": 0,
+        "unstable_count": 3,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    },
+    {
+      "cif_name": "ZrScTc2.cif",
+      "composition": "ZrScTc2",
+      "space_group_number": 71,
+      "space_group_symbol": "Immm",
+      "materialsproject_id": null,
+      "sources": {
+        "materialsproject": {
+          "status": "success",
+          "stability": "\u274c Unstable",
+          "raw_value": 3.577,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Formation energy above convex hull",
+          "num_matches": 3,
+          "message": "Decision from energy_above_hull_r2scan (3.5770 eV/atom)",
+          "cif_space_group": "Immm"
+        },
+        "alexandria": {
+          "status": "no_exact_formula_match",
+          "stability": null,
+          "raw_value": null,
+          "threshold": 0.05,
+          "unit": "eV/atom",
+          "description": "Distance to convex hull",
+          "num_matches": 0,
+          "message": "No exact formula match found for ZrScTc2 in returned entries",
+          "cif_space_group": "Immm"
+        },
+        "chgnet": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.3714,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -44.2704,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -44.270416,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -5.533802,
+            "reference_energies_eV_per_atom": {
+              "Zr": -7.479954,
+              "Sc": -3.553776,
+              "Tc": -2.807982
+            },
+            "element_fractions": {
+              "Zr": 0.25,
+              "Sc": 0.25,
+              "Tc": 0.5
+            },
+            "reference_sum_eV_per_atom": -4.162424,
+            "delta_hf_eV_per_atom": -1.371378
+          }
+        },
+        "mattersim": {
+          "status": "success",
+          "stability": "\u2705 Stable",
+          "raw_value": -1.875,
+          "threshold": 0.0,
+          "unit": "eV/atom",
+          "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+          "energy": -47.6924,
+          "energy_unit": "eV",
+          "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+          "formation_energy_details": {
+            "compound_energy_eV": -47.692406,
+            "compound_num_atoms": 8,
+            "compound_energy_per_atom_eV": -5.961551,
+            "reference_energies_eV_per_atom": {
+              "Zr": -7.344374,
+              "Sc": -3.50818,
+              "Tc": -2.746915
+            },
+            "element_fractions": {
+              "Zr": 0.25,
+              "Sc": 0.25,
+              "Tc": 0.5
+            },
+            "reference_sum_eV_per_atom": -4.086596,
+            "delta_hf_eV_per_atom": -1.874955
+          }
+        }
+      },
+      "summary": {
+        "consensus": "\u26a0\ufe0f  Mixed opinion: 2 stable, 1 unstable",
+        "stable_count": 2,
+        "unstable_count": 1,
+        "error_count": 1,
+        "total_sources": 4
+      }
+    }
+  ],
+  "batch_summary": {
+    "total_files": 53,
+    "processed_files": 53,
+    "failed_files": 0,
+    "stable_votes": 128,
+    "unstable_votes": 60
+  },
+  "plot_data": {
+    "materialsproject": {
+      "stable_count": 26,
+      "unstable_count": 26,
+      "error_count": 0,
+      "total": 52,
+      "stable_pct": 50.0,
+      "unstable_pct": 50.0,
+      "error_pct": 0.0
+    },
+    "alexandria": {
+      "stable_count": 27,
+      "unstable_count": 3,
+      "error_count": 19,
+      "total": 49,
+      "stable_pct": 55.1,
+      "unstable_pct": 6.1,
+      "error_pct": 38.8
+    },
+    "chgnet": {
+      "stable_count": 37,
+      "unstable_count": 16,
+      "error_count": 0,
+      "total": 53,
+      "stable_pct": 69.8,
+      "unstable_pct": 30.2,
+      "error_pct": 0.0
+    },
+    "mattersim": {
+      "stable_count": 38,
+      "unstable_count": 15,
+      "error_count": 0,
+      "total": 53,
+      "stable_pct": 71.7,
+      "unstable_pct": 28.3,
+      "error_pct": 0.0
+    }
+  },
+  "composition": "AcDy3",
+  "sources": {
+    "materialsproject": {
+      "status": "success",
+      "stability": "\u274c Unstable",
+      "raw_value": 0.0712,
+      "threshold": 0.05,
+      "unit": "eV/atom",
+      "description": "Formation energy above convex hull",
+      "num_matches": 4,
+      "message": "Decision from energy_above_hull_r2scan (0.0712 eV/atom)",
+      "cif_space_group": "I4/mmm"
+    },
+    "alexandria": {
+      "status": "not_found",
+      "stability": "\u26a0\ufe0f Not found",
+      "raw_value": null,
+      "threshold": 0.05,
+      "unit": "eV/atom",
+      "description": "Distance to convex hull",
+      "num_matches": 0,
+      "message": "No entries found with hull_distance <= 0.05",
+      "cif_space_group": "I4/mmm"
+    },
+    "chgnet": {
+      "status": "success",
+      "stability": "\u274c Unstable",
+      "raw_value": 1.1716,
+      "threshold": 0.0,
+      "unit": "eV/atom",
+      "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+      "energy": -35.4032,
+      "energy_unit": "eV",
+      "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+      "formation_energy_details": {
+        "compound_energy_eV": -35.40324,
+        "compound_num_atoms": 8,
+        "compound_energy_per_atom_eV": -4.425405,
+        "reference_energies_eV_per_atom": {
+          "Ac": -3.426641,
+          "Dy": -6.320522
+        },
+        "element_fractions": {
+          "Ac": 0.25,
+          "Dy": 0.75
+        },
+        "reference_sum_eV_per_atom": -5.597052,
+        "delta_hf_eV_per_atom": 1.171647
+      }
+    },
+    "mattersim": {
+      "status": "success",
+      "stability": "\u274c Unstable",
+      "raw_value": 0.9101,
+      "threshold": 0.0,
+      "unit": "eV/atom",
+      "description": "MLIP formation enthalpy per atom (\u0394Hf < 0 => stable)",
+      "energy": -35.3826,
+      "energy_unit": "eV",
+      "message": "\u0394Hf = E(compound) \u2212 \u03a3 x_i E(element_i), stable if \u0394Hf < 0",
+      "formation_energy_details": {
+        "compound_energy_eV": -35.382618,
+        "compound_num_atoms": 8,
+        "compound_energy_per_atom_eV": -4.422827,
+        "reference_energies_eV_per_atom": {
+          "Ac": -3.436841,
+          "Dy": -5.96498
+        },
+        "element_fractions": {
+          "Ac": 0.25,
+          "Dy": 0.75
+        },
+        "reference_sum_eV_per_atom": -5.332945,
+        "delta_hf_eV_per_atom": 0.910118
+      }
+    }
+  },
+  "summary": {
+    "consensus": "\u274c All sources agree: Unstable",
+    "stable_count": 0,
+    "unstable_count": 3,
+    "error_count": 1,
+    "total_sources": 4
+  }
+}
