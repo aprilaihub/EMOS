@@ -28,6 +28,7 @@ from typing import Any, Generator, Optional
 import requests
 
 from Information_Units.Generators.BaseGenerator import BaseGenerator
+from Information_Units.service_urls import normalise_service_url
 
 
 # ---------------------------------------------------------------------------
@@ -35,17 +36,6 @@ from Information_Units.Generators.BaseGenerator import BaseGenerator
 # ---------------------------------------------------------------------------
 _DEFAULT_API_URL = "http://localhost:8100"
 _DEFAULT_TIMEOUT = 600  # seconds
-
-
-def _normalise_api_url(raw_url: str) -> str:
-    """Ensure MATTERGEN_API_URL is a valid absolute HTTP(S) URL."""
-    candidate = (raw_url or _DEFAULT_API_URL).strip().rstrip("/")
-    if not candidate:
-        return _DEFAULT_API_URL
-    if "://" not in candidate:
-        candidate = f"http://{candidate}"
-    return candidate
-
 
 
 class MattergenGenerator(BaseGenerator):
@@ -57,7 +47,10 @@ class MattergenGenerator(BaseGenerator):
 
     def __init__(self, generator_name: str = "mattergen", logger=None):
         super().__init__(generator_name, logger)
-        self.api_url = _normalise_api_url(os.getenv("MATTERGEN_API_URL", _DEFAULT_API_URL))
+        self.api_url = normalise_service_url(
+            os.getenv("MATTERGEN_API_URL"),
+            _DEFAULT_API_URL,
+        )
         self.timeout = int(os.getenv("MATTERGEN_TIMEOUT", _DEFAULT_TIMEOUT))
 
     # ------------------------------------------------------------------
@@ -529,6 +522,27 @@ class MattergenGenerator(BaseGenerator):
             return resp.json().get("pretrained_models", [])
         except Exception:
             return []
+
+    def availability(self) -> dict[str, Any]:
+        """Return container readiness and the models advertised by MatterGen."""
+        result: dict[str, Any] = {
+            "available": False,
+            "service": "mattergen",
+            "models": [],
+        }
+        try:
+            health_response = requests.get(f"{self.api_url}/health", timeout=5)
+            health_response.raise_for_status()
+            info_response = requests.get(f"{self.api_url}/info", timeout=10)
+            info_response.raise_for_status()
+            info = info_response.json()
+            result["available"] = True
+            result["models"] = info.get("pretrained_models", [])
+            result["version"] = info.get("version")
+            result["capabilities"] = info.get("capabilities", [])
+        except Exception as exc:
+            result["error"] = f"{type(exc).__name__}: service check failed"
+        return result
 
     def get_results(self, job_id: str) -> dict:
         """Poll results for a previously submitted job."""

@@ -152,6 +152,9 @@ def test_predict_success_returns_ok_envelope(mock_logger, sample_cif_file):
 
     assert result["source"] == "mattersim"
     assert result["results"][0]["status"] == "ok"
+    assert "cell" not in result["results"][0]["properties"]
+    assert "positions" not in result["results"][0]["properties"]
+    assert "atomic_numbers" not in result["results"][0]["properties"]
 
     sent_payload = post_mock.call_args.kwargs["json"]
     assert sent_payload["compute_energy"] is True

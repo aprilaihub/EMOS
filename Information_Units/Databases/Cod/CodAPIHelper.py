@@ -22,6 +22,10 @@ class CodAPIHelper:
         self.base_url = base_url
         self.logger = logger
         self.property_mapping = self._load_property_mapping()
+        self.request_timeout = 30
+        self.host_check_timeout = 20
+        self.max_retries = 2
+        self.retry_backoff_seconds = 1.0
 
     def _load_property_mapping(self) -> dict:
         """
@@ -96,9 +100,6 @@ class CodAPIHelper:
         filters = filters or {}
 
         try:
-            if not self.is_host_reachable():
-                return []
-
             while len(all_results) < limit:
                 # Build OPTIMADE filter query
                 optimade_filter = self.build_filter(query, filters)
@@ -128,16 +129,13 @@ class CodAPIHelper:
                 if self.logger:
                     self.logger.log(f"API Request (offset={page_offset}): {self.base_url}structures with params {params}")
 
-                response = requests.get(
+                data = self._request_json_with_retries(
                     f"{self.base_url}structures",
                     params=params,
-                    headers={"Accept": "application/json"},
-                    timeout=30
+                    timeout=self.request_timeout,
                 )
-                response.raise_for_status()
-
-                # Parse JSON response
-                data = response.json()
+                if data is None:
+                    break
 
                 if 'data' in data and len(data['data']) > 0:
                     page_results = data['data']
@@ -166,6 +164,37 @@ class CodAPIHelper:
                 self.logger.log(f"Error fetching from API: {str(e)}")
             return all_results
 
+    def _request_json_with_retries(self, url: str, params: dict | None, timeout: int) -> dict | None:
+        """Request JSON payload with retries for transient timeout/connection errors."""
+        attempts = self.max_retries + 1
+        last_error = None
+
+        for attempt in range(1, attempts + 1):
+            try:
+                response = requests.get(
+                    url,
+                    params=params,
+                    headers={"Accept": "application/json"},
+                    timeout=timeout,
+                )
+                response.raise_for_status()
+                return response.json()
+            except requests.exceptions.RequestException as e:
+                last_error = e
+                if attempt >= attempts:
+                    break
+
+                wait_seconds = self.retry_backoff_seconds * attempt
+                if self.logger:
+                    self.logger.log(
+                        f"COD request attempt {attempt}/{attempts} failed: {str(e)}; retrying in {wait_seconds:.1f}s"
+                    )
+                time.sleep(wait_seconds)
+
+        if self.logger and last_error is not None:
+            self.logger.log(f"API request failed after {attempts} attempts: {str(last_error)}")
+        return None
+
     def is_host_reachable(self) -> bool:
         """
         Check whether the COD OPTIMADE host is reachable.
@@ -173,18 +202,17 @@ class CodAPIHelper:
         Returns:
             bool: True if reachable, False otherwise
         """
-        try:
-            response = requests.get(
-                self.base_url,
-                headers={"Accept": "application/json"},
-                timeout=5
-            )
-            # Any HTTP response indicates the host is reachable.
+        data = self._request_json_with_retries(
+            self.base_url,
+            params=None,
+            timeout=self.host_check_timeout,
+        )
+        if data is not None:
             return True
-        except requests.exceptions.RequestException as e:
-            if self.logger:
-                self.logger.log(f"COD host unreachable: {str(e)}")
-            return False
+
+        if self.logger:
+            self.logger.log("COD host unreachable after retries")
+        return False
 
     def build_filter(self, query: str, filters: dict = None) -> str:
         """

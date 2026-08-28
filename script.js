@@ -97,6 +97,11 @@ const iuFeatureModules = {
             file: './Features/IU_Features/Predictors/MattersimIUFeature.js',
             id: 2001,
         },
+        chgnet: {
+            className: 'ChgnetIUFeature',
+            file: './Features/IU_Features/Predictors/ChgnetIUFeature.js',
+            id: 2003,
+        },
         synthnn: {
             className: 'SynthnnIUFeature',
             file: './Features/IU_Features/Predictors/SynthnnIUFeature.js',
@@ -280,6 +285,9 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             // Replace the feature view content with the specific feature's interface
             featureView.innerHTML = currentFeatureInstance.createFeatureHTML();
             console.log('Feature HTML created successfully');
+            if (typeof currentFeatureInstance.attachEventListeners === 'function') {
+                currentFeatureInstance.attachEventListeners();
+            }
             
         } else {
             // Fallback to generic processing view for features not yet implemented

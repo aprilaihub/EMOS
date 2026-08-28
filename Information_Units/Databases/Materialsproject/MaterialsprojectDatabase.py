@@ -1,7 +1,11 @@
 import tempfile
-from typing import Any
+from typing import Any, Optional
 from Information_Units.Databases.BaseDatabase import BaseDatabase
 from Information_Units.Databases.Materialsproject.MaterialsprojectAPIHelper import MaterialsprojectAPIHelper
+try:
+    from pymatgen.symmetry.analyzer import SpacegroupAnalyzer as _SGA
+except ImportError:
+    _SGA = None
 
 
 class MaterialsprojectDatabase(BaseDatabase):
@@ -73,6 +77,7 @@ class MaterialsprojectDatabase(BaseDatabase):
             "source": "materialsproject",
             "queries": queries,
             "cif_strings": [],
+            "entries": [],
         }
         try:
             query = inputs.get('target_compositions', '')
@@ -104,6 +109,7 @@ class MaterialsprojectDatabase(BaseDatabase):
                     cif_str = structure.to(fmt='cif')
                     if cif_str:
                         result["cif_strings"].append(cif_str)
+                        result["entries"].append(self._extract_entry_metadata(entry, structure))
                         if self.logger:
                             self.logger.log(f"Retrieved CIF string {i + 1}")
 
@@ -113,3 +119,85 @@ class MaterialsprojectDatabase(BaseDatabase):
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
             return result
+
+    def _extract_entry_metadata(self, entry: dict[str, Any], structure=None) -> dict[str, Any]:
+        """Extract lightweight metadata and thermodynamic metrics from OPTIMADE entry."""
+        attrs = entry.get('attributes', {}) if isinstance(entry, dict) else {}
+        predicted_stable = self._extract_mp_stability_metric(attrs, 'is_stable')
+        if predicted_stable is None:
+            predicted_stable = self._extract_mp_stability_metric(attrs, 'predicted_stable')
+        if predicted_stable is None:
+            # Alternate flat keys (defensive fallback).
+            for alt_name in ('predicted_stable', '_mp_stability.predicted_stable'):
+                predicted_stable = self._extract_mapped_value(attrs, alt_name)
+                if predicted_stable is not None:
+                    break
+
+        energy_above_hull = self._extract_mp_stability_metric(attrs, 'energy_above_hull')
+        if energy_above_hull is None:
+            for alt_name in ('energy_above_hull_r2scan', '_mp_stability.energy_above_hull'):
+                energy_above_hull = self._extract_mapped_value(attrs, alt_name)
+                if energy_above_hull is not None:
+                    break
+
+        formation_energy = self._extract_mp_stability_metric(attrs, 'formation_energy_per_atom')
+        if formation_energy is None:
+            for alt_name in ('formation_energy_r2scan', '_mp_stability.formation_energy_per_atom'):
+                formation_energy = self._extract_mapped_value(attrs, alt_name)
+                if formation_energy is not None:
+                    break
+
+        space_group_number: Optional[int] = None
+        if structure is not None and _SGA is not None:
+            try:
+                space_group_number = _SGA(structure, symprec=0.1).get_space_group_number()
+            except Exception:
+                pass
+
+        return {
+            'id': entry.get('id'),
+            'chemical_formula_reduced': attrs.get('chemical_formula_reduced'),
+            'space_group_number': space_group_number,
+            'predicted_stable_r2scan': predicted_stable,
+            'energy_above_hull_r2scan': energy_above_hull,
+            'formation_energy_r2scan': formation_energy,
+        }
+
+    def _extract_mapped_value(self, attrs: dict[str, Any], mapped_name: str):
+        """Read a value from attributes, supporting dotted paths and literal dotted keys."""
+        if mapped_name in attrs:
+            return attrs.get(mapped_name)
+
+        cur: Any = attrs
+        for part in mapped_name.split('.'):
+            if not isinstance(cur, dict) or part not in cur:
+                return None
+            cur = cur.get(part)
+        return cur
+
+    def _extract_mp_stability_metric(self, attrs: dict[str, Any], metric_key: str):
+        """Extract MP stability metric from known branch variants in priority order."""
+        stability_obj = attrs.get('_mp_stability')
+        if not isinstance(stability_obj, dict):
+            return None
+
+        # Prefer the newest branch first, then fall back.
+        branch_priority = [
+            'r2scan',
+            'gga_gga+u_r2scan',
+            'gga_gga+u',
+            'gga+u_r2scan',
+            'gga+u',
+        ]
+
+        for branch in branch_priority:
+            branch_obj = stability_obj.get(branch)
+            if isinstance(branch_obj, dict) and metric_key in branch_obj:
+                return branch_obj.get(metric_key)
+
+        # Unknown branch names: scan all branch dicts.
+        for branch_obj in stability_obj.values():
+            if isinstance(branch_obj, dict) and metric_key in branch_obj:
+                return branch_obj.get(metric_key)
+
+        return None

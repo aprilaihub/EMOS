@@ -63,20 +63,21 @@ IU_DISPLAY = {
     "materialsproject":               "Materials Project",
     "mathub3d":                       "MatHub-3d",
     # generators
-    "mattergen_base_model":           "MatterGen · Base",
-    "mattergen_mp_20_base":           "MatterGen · MP-20 Base",
-    "mattergen_space_group":          "MatterGen · Space Group",
-    "mattergen_chemical_system":      "MatterGen · Chem. System",
-    "mattergen_dft_band_gap":         "MatterGen · Band Gap",
-    "mattergen_bulk_modulus":         "MatterGen · Bulk Modulus",
-    "mattergen_magnetic_density":     "MatterGen · Mag. Density",
-    "mattergen_chemical_system_stability": "MatterGen · Chem.+Stability",
-    "mattergen_magnetic_density_hhi": "MatterGen · Mag.+HHI",
+    "mattergen_base_model":           "MG ·\nBase",
+    "mattergen_mp_20_base":           "MG ·\nMP-20 Base",
+    "mattergen_space_group":          "MG ·\nSpace Group",
+    "mattergen_chemical_system":      "MG ·\nChem. System",
+    "mattergen_dft_band_gap":         "MG ·\nBand Gap",
+    "mattergen_bulk_modulus":         "MG ·\nBulk Modulus",
+    "mattergen_magnetic_density":     "MG ·\nMag. Density",
+    "mattergen_chemical_system_stability": "MG ·\nChem.+Stability",
+    "mattergen_magnetic_density_hhi": "MG ·\nMag.+HHI",
     # predictors
     "gbfs":     "GBFS (3D)",
     "gbfs2d":   "GBFS-2D",
     "mattersim":"MatterSim",
     "synthnn":  "SynthNN",
+    "chgnet":   "CHGnet",
 }
 
 # Ordered row groups
@@ -86,13 +87,13 @@ ROW_ORDER = {
                    "mattergen_chemical_system", "mattergen_dft_band_gap", "mattergen_bulk_modulus",
                    "mattergen_magnetic_density", "mattergen_chemical_system_stability",
                    "mattergen_magnetic_density_hhi"],
-    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn"],
+    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn", "chgnet"],
 }
 
 SECTION_COLORS = {
-    "databases":  "#1f77b4",   # blue
+    "databases":  "#d62728",   # red
     "generators": "#2ca02c",   # green
-    "predictors": "#d62728",   # red
+    "predictors": "#1f77b4",   # blue
 }
 
 FONT_SCALE = 1.5
@@ -150,21 +151,21 @@ def plot(matrix, row_labels, section_boundaries):
     matrix = matrix.T                        # shape: (n_props, n_ius)
     n_rows, n_cols = matrix.shape            # n_rows=11 props, n_cols=19 IUs
 
-    fig, ax = plt.subplots(figsize=(16, 8))
+    fig, ax = plt.subplots(figsize=(22, 8))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
 
     # Discrete colormap with steps of 5, fixed range 0–25
     step = 5
     bounds = list(range(0, 26, step))        # [0, 5, 10, 15, 20, 25]
-    # Shift lower bound to 1 so zero values fall below the range (shown as gray)
+    # Shift lower bound to 1 so zero values fall below the range (shown as light gray)
     color_bounds = [1] + bounds[1:]           # [1, 5, 10, 15, 20, 25]
     n_colors = len(color_bounds) - 1
 
     base_cmap = mcolors.LinearSegmentedColormap.from_list(
         "emos", ["#90e0ef", "#00b4d8", "#0e4d4d", "#0d1117"], N=n_colors
     )
-    base_cmap.set_under("#444444")            # gray for zero
+    base_cmap.set_under("#eeeeee")            # light gray for zero values
     norm = mcolors.BoundaryNorm(color_bounds, ncolors=n_colors, clip=False)
 
     im = ax.imshow(matrix, aspect="equal", cmap=base_cmap, norm=norm,
@@ -230,10 +231,11 @@ def plot(matrix, row_labels, section_boundaries):
             transform=bar_tf, clip_on=False, zorder=5)
 
     # ── Grid lines ────────────────────────────────────────────────────────────
+    grid_color = "#b8b8b8"
     for c in range(n_cols + 1):
-        ax.axvline(c - 0.5, color="#d6d6d6", linewidth=0.6, zorder=2)
+        ax.axvline(c - 0.5, color=grid_color, linewidth=0.6, zorder=2)
     for r in range(n_rows + 1):
-        ax.axhline(r - 0.5, color="#d6d6d6", linewidth=0.4, zorder=2)
+        ax.axhline(r - 0.5, color=grid_color, linewidth=0.4, zorder=2)
 
     # ── Colorbar ─────────────────────────────────────────────────────────────
     cbar = fig.colorbar(im, ax=ax, fraction=0.015, pad=0.02,

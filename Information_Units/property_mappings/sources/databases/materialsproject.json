@@ -22,6 +22,11 @@
       "retrievable": true,
       "range_support": true
     },
+    "predicted_stable_r2scan": {
+      "name": "_mp_stability.r2scan.is_stable",
+      "retrievable": true,
+      "range_support": false
+    },
     "formation_energy_r2scan": {
       "name": "_mp_stability.r2scan.formation_energy_per_atom",
       "retrievable": true,

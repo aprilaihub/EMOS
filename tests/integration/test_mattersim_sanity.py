@@ -130,14 +130,12 @@ def assert_ok_prediction(result):
     assert result['error'] is None
 
     props = result['properties']
-    # Structural info
+    # Core structural metadata
     assert isinstance(props.get('num_atoms'), int)
     assert props['num_atoms'] > 0
-    assert isinstance(props.get('cell'), list)
-    assert isinstance(props.get('positions'), list)
-    assert isinstance(props.get('atomic_numbers'), list)
-    assert len(props['positions']) == props['num_atoms']
-    assert len(props['atomic_numbers']) == props['num_atoms']
+    assert 'cell' not in props
+    assert 'positions' not in props
+    assert 'atomic_numbers' not in props
 
     # Energy
     assert isinstance(props.get('energy'), (int, float))
@@ -240,17 +238,13 @@ def test_al2o3_energy_in_expected_range(cif_files, predictor):
     )
 
 
-def test_al2o3_has_correct_composition(cif_files, predictor):
-    """Al2O3 should have 4 Al (Z=13) and 6 O (Z=8) atoms."""
+def test_al2o3_has_expected_atom_count(cif_files, predictor):
+    """Al2O3 should still expose correct atom count after slimming public output."""
     output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
     result = output["results"][0]
     assert_ok_prediction(result)
 
-    atomic_numbers = result['properties']['atomic_numbers']
-    al_count = atomic_numbers.count(13)
-    o_count = atomic_numbers.count(8)
-    assert al_count == 4, f"Expected 4 Al atoms, got {al_count}"
-    assert o_count == 6, f"Expected 6 O atoms, got {o_count}"
+    assert result['properties']['num_atoms'] == 10
 
 
 def test_relaxation_lowers_energy(cif_files, predictor):
@@ -300,13 +294,13 @@ def test_relaxed_forces_near_zero(cif_files, predictor):
     )
 
 
-def test_relaxed_cif_string_returned(cif_files, predictor):
-    """Relaxation should return a CIF string for the optimized structure."""
+def test_relaxed_cif_returned_without_output_dir(cif_files, predictor):
+    """Relaxation should return the optimized CIF contents when no output_dir is supplied."""
     output = predictor.predict([Path(cif_files['al2o3_path']).read_text()])
     result = output["results"][0]
     assert_ok_prediction(result)
 
-    cif_string = result['properties'].get('relaxed_cif_string')
+    cif_string = result['properties'].get('relaxed_cif')
     assert cif_string is not None, "No relaxed CIF string returned"
     assert "data_" in cif_string
     assert "_cell_length_a" in cif_string

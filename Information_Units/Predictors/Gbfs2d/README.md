@@ -1,6 +1,6 @@
 # GBFS-2D Predictor
 
-GBFS-2D: Specialized predictors for 2D layered materials, implemented in Python with integrated FastAPI service and van der Waals structure detection.
+GBFS-2D is a dedicated container service for 2D layered materials. EMOS accesses it only through `Gbfs2dClient` and the HTTP API.
 
 ## Status
 
@@ -8,7 +8,6 @@ GBFS-2D: Specialized predictors for 2D layered materials, implemented in Python 
 ✅ **vdW Detection** - Automatic identification of van der Waals layered structures  
 ✅ **3-Property Support** - bandgap, is_metal, is_stable  
 ✅ **Optimized Features** - Selective featurizer instantiation (10-100× faster)  
-✅ **Unified Architecture** - Single `Gbfs2dPredictor.py` with integrated FastAPI server  
 ✅ **HTTP API Ready** - Full REST endpoints with Pydantic validation and vdW detection  
 ✅ **Docker Ready** - Production container with health checks, non-root user, orchestration  
 ✅ **Comprehensive Testing** - 94 tests (47 unit + 47 integration, including 18 MoS2 tests)  
@@ -19,12 +18,13 @@ GBFS-2D: Specialized predictors for 2D layered materials, implemented in Python 
 Gbfs-2D uses a unified architecture following the **MattergenGenerator** pattern:
 
 ```
-Gbfs2dPredictor.py        ← Single source file containing:
+Gbfs2dClient.py           ← Lightweight host-side HTTP client
+Gbfs2dPredictor.py        ← Container-only implementation containing:
 ├── Predictor class              • Core LightGBM predictor logic
 ├── Feature generation           • Matminer featurizers (optimized)
 ├── vdW detection               • Space group analysis via pymatgen
 ├── API models & endpoints       • FastAPI routes with vdW detection output
-└── CLI/Server entry point       • --cif or --serve modes
+└── FastAPI server entry point
 
 docker/                    ← Production container configuration
 ├── Dockerfile               • Multi-stage image (7 KB)
@@ -63,27 +63,14 @@ The predictor identifies 2D layered materials via space group detection:
 | P1 | 1 | Low-symmetry heterostructures |
 | P-1 | 2 | Low-symmetry heterostructures |
 
-## Usage Modes
-
-### Mode 1: Python Library (Programmatic)
+## Host Usage
 
 ```python
-from Information_Units.Predictors.Gbfs_2d.Gbfs2dPredictor import Gbfs2dPredictor
-from pymatgen.core import Structure
+from pathlib import Path
+from Information_Units.Predictors.Gbfs2d.Gbfs2dClient import Gbfs2dClient
 
-# Load predictor
-predictor = Gbfs2dPredictor(predictor_name="bandgap", property_name="bandgap")
-
-# Load structure
-structure = Structure.from_file("MoS2.cif")
-
-# Predict using standardized I/O contract
-result = predictor.predict(input_data=[structure.to(fmt="cif")])
-# Returns: {"source": "gbfs-2d", "results": [...]}
-
-# Or use numpy method for quick predictions
-predictions = predictor.predict_numpy([structure.to(fmt="cif")])
-print(f"Bandgap: {predictions[0]} eV")
+client = Gbfs2dClient()
+result = client.predict([Path("MoS2.cif").read_text()])
 ```
 
 **I/O Contract:**
@@ -99,15 +86,7 @@ The `predict()` method follows EMOS standardized conventions:
     - `warnings`: list[str] (empty if no warnings)
     - `error`: str or None (error message if status is "error")
 
-### Mode 2: CLI Prediction (Legacy)
-
-```bash
-python -m Information_Units.Predictors.Gbfs_2d.Gbfs2dPredictor \
-  --cif /path/to/structure.cif \
-  --property bandgap
-```
-
-### Mode 3: FastAPI Server
+## Container Service
 
 ```bash
 # Run server locally
@@ -130,7 +109,13 @@ python -m Information_Units.Predictors.Gbfs_2d.Gbfs2dPredictor --serve
 ```
 GET /health
 ```
-Returns service status for Docker health checks and monitoring.
+Returns process liveness.
+
+### Readiness Check
+```
+GET /ready
+```
+Loads and verifies every model artifact. Docker and EMOS readiness checks use this endpoint.
 
 ### Model Information
 ```
@@ -289,7 +274,7 @@ docker run --rm gbfs2d-pred:latest python -m pytest tests/integration/ -v
 - **Image**: Python 3.10 slim with system dependencies
 - **Port**: 8000 (internal) → 8001 (host, via compose)
 - **User**: Non-root `gbfs2d_user` for security
-- **Health Check**: HTTP /health endpoint (30s interval)
+- **Health Check**: HTTP /ready endpoint (30s interval)
 - **Resources**: 2 CPU cores (limit), 1 CPU (reserved); 4 GB (limit), 2 GB (reserved)
 - **Restart**: unless-stopped
 

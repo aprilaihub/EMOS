@@ -153,6 +153,15 @@
         "file_name": "MattersimPredictor.py"
       },
       {
+        "id": "chgnet",
+        "name": "Chgnet",
+        "display_name": "CHGNet",
+        "description": "Charge-informed graph neural network potential for energy, force, stress, and relaxation prediction",
+        "folder_path": "Information_Units/Predictors/Chgnet",
+        "class_name": "ChgnetPredictor",
+        "file_name": "ChgnetPredictor.py"
+      },
+      {
         "id": "synthnn",
         "name": "Synthnn",
         "display_name": "SynthNN",

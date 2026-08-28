@@ -30,54 +30,24 @@
     };
 
     // ── Factory key mapping ──────────────────────────────────────────
-    // Maps ui_data.json display names to their actual Python factory keys.
-    // The parenthesized IDs in ui_data.json are MatterGen pretrained model
-    // names, NOT factory keys — so we need an explicit mapping.
-    const GENERATOR_FACTORY_KEYS = {
-        'MatterGen: Base Model':                  'mattergen_base_model',
-        'MatterGen: MP-20 Base':                  'mattergen_mp_20_base',
-        'MatterGen: Chemical System':             'mattergen_chemical_system',
-        'MatterGen: Chemical System + Stability': 'mattergen_chemical_system_stability',
-        'MatterGen: DFT Band Gap':                'mattergen_dft_band_gap',
-        'MatterGen: Magnetic Density':            'mattergen_magnetic_density',
-        'MatterGen: Magnetic Density + HHI':      'mattergen_magnetic_density_hhi',
-        'MatterGen: Bulk Modulus':                 'mattergen_bulk_modulus',
-        'MatterGen: Space Group':                  'mattergen_space_group',
-    };
+    // These maps are populated at startup from devtools/metadata.json so they
+    // stay in sync automatically when new IUs are added.
+    let DATABASE_FACTORY_KEYS  = {};  // display_name → factory id
+    let GENERATOR_FACTORY_KEYS = {};  // display_name → factory id
+    let PREDICTOR_FACTORY_KEYS = {};  // display_name → factory id
 
-    // Also store the pretrained model name for the backend payload
-    const GENERATOR_PRETRAINED_NAMES = {
-        'mattergen_base_model':                  'mattergen_base',
-        'mattergen_mp_20_base':                  'mp_20_base',
-        'mattergen_chemical_system':             'chemical_system',
-        'mattergen_chemical_system_stability':   'chemical_system_energy_above_hull',
-        'mattergen_dft_band_gap':                'dft_band_gap',
-        'mattergen_magnetic_density':            'dft_mag_density',
-        'mattergen_magnetic_density_hhi':        'dft_mag_density_hhi_score',
-        'mattergen_bulk_modulus':                 'ml_bulk_modulus',
-        'mattergen_space_group':                  'space_group',
-    };
+    async function loadFactoryKeysFromMetadata() {
+        try {
+            const meta = await fetch('./devtools/metadata.json').then(r => r.json());
+            const ius  = meta.information_units || {};
 
-    const DATABASE_FACTORY_KEYS = {
-        'COD': 'cod',
-        'MaterialsProject': 'materialsproject',
-        'Alexandria': 'alexandria',
-        'Mathub3d': 'mathub3d',
-        'JarvisDFT': 'jarvisdft',
-        'AFLOW': 'aflow',
-    };
-
-    const PREDICTOR_FACTORY_KEYS = {
-        'MatterSim': 'mattersim',
-        'M3GNet': 'm3gnet',
-        'PFP': 'pfp',
-        'DeepMD': 'deepmd',
-        'SynthNN': 'synthnn',
-        'eSEN': 'esen',
-        'MyPred1': 'mypred1',
-        'MyPred2': 'mypred2',
-        'GBFS': 'gbfs',
-    };
+            for (const entry of (ius.databases  || [])) DATABASE_FACTORY_KEYS[entry.display_name]  = entry.id;
+            for (const entry of (ius.generators  || [])) GENERATOR_FACTORY_KEYS[entry.display_name] = entry.id;
+            for (const entry of (ius.predictors  || [])) PREDICTOR_FACTORY_KEYS[entry.display_name] = entry.id;
+        } catch (e) {
+            console.warn('Could not load factory keys from metadata.json:', e);
+        }
+    }
 
     // ── State ────────────────────────────────────────────────────────
     let nodes      = {};   // nodeId → nodeObj
@@ -132,6 +102,7 @@
 
         // Load data
         uiData = await fetch('./devtools/ui_data.json').then(r => r.json()).catch(() => null);
+        await loadFactoryKeysFromMetadata();
         predictorPropsMap = await loadPredictorProperties();
 
         populateSidebar();
@@ -153,7 +124,7 @@
             dbContainer.appendChild(makeSidebarItem('database', key, name, desc));
         }
 
-        // Generators — use explicit factory key map
+        // Generators
         const genContainer = document.getElementById('sidebarGenerators');
         for (const [name, desc] of Object.entries(iu.generators || {})) {
             const key = GENERATOR_FACTORY_KEYS[name] || deriveKey(name);
@@ -1205,6 +1176,7 @@ output_results = results`;
                 const decoder = new TextDecoder();
                 let buffer = '';
                 let result = null;
+                let currentEvent = 'log';
 
                 function read() {
                     reader.read().then(({ done, value }) => {
@@ -1219,7 +1191,6 @@ output_results = results`;
                         const lines = buffer.split('\n');
                         buffer = lines.pop(); // keep incomplete line
 
-                        let currentEvent = 'log';
                         for (const line of lines) {
                             if (line.startsWith('event: ')) {
                                 currentEvent = line.slice(7).trim();

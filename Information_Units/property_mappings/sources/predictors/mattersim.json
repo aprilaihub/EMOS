@@ -14,7 +14,7 @@
       "predictable": true,
       "range_support": true
     },
-    "stress_tensor": {
+    "stress": {
       "name": "stress",
       "predictable": true,
       "range_support": true
@@ -23,11 +23,6 @@
       "name": "num_atoms",
       "predictable": true,
       "range_support": true
-    },
-    "atomic_numbers": {
-      "name": "atomic_numbers",
-      "predictable": true,
-      "range_support": false
     },
     "relaxed_energy": {
       "name": "relaxed_energy",
@@ -46,6 +41,16 @@
     },
     "relaxed_cif": {
       "name": "relaxed_cif",
+      "predictable": true,
+      "range_support": false
+    },
+    "relaxed_structure": {
+      "name": "relaxed_structure",
+      "predictable": true,
+      "range_support": false
+    },
+    "relaxed_cell": {
+      "name": "relaxed_cell",
       "predictable": true,
       "range_support": false
     }

@@ -43,8 +43,8 @@ except ImportError:
 # Set up logging for API server
 _API_LOGGER = logging.getLogger("gbfs_api")
 
-# Global predictor cache for API
-_API_PREDICTORS: Dict[str, 'GbfsPredictor'] = {}
+# One model bundle per container process. GbfsPredictor loads every property.
+_API_PREDICTOR: Optional['GbfsPredictor'] = None
 
 # -----------------------------
 # GLOBAL CACHE
@@ -407,6 +407,10 @@ class GbfsPredictor(BasePredictor):
             ValueError: If property directories or files are missing
             OSError: If directory structure is malformed
         """
+        if os.getenv("EMOS_GBFS_CONTAINER") != "1":
+            raise RuntimeError(
+                "GbfsPredictor is container-only; use GbfsClient from host code"
+            )
         super().__init__(predictor_name, logger)
         self.source = "gbfs"
         
@@ -862,18 +866,18 @@ if FASTAPI_AVAILABLE:
         )
 
     # Helper functions
-    def _get_or_load_predictor(property_name: str) -> GbfsPredictor:
-        """Get a predictor from cache, or load it if not cached."""
-        if property_name not in _API_PREDICTORS:
-            _API_LOGGER.info(f"Loading {property_name} predictor...")
-            _API_PREDICTORS[property_name] = GbfsPredictor(
-                predictor_name=property_name,
-                property_name=property_name,
+    def _get_or_load_predictor() -> GbfsPredictor:
+        """Load the all-property model bundle once per container process."""
+        global _API_PREDICTOR
+        if _API_PREDICTOR is None:
+            _API_LOGGER.info("Loading GBFS model bundle...")
+            _API_PREDICTOR = GbfsPredictor(
+                predictor_name="gbfs",
                 model_dir=None,
                 logger=None
             )
-            _API_LOGGER.info(f"Loaded {property_name} predictor")
-        return _API_PREDICTORS[property_name]
+            _API_LOGGER.info("Loaded GBFS model bundle")
+        return _API_PREDICTOR
 
     def _structure_from_dict(struct_dict: Dict[str, Any]) -> Structure:
         """Load a Structure from a pymatgen JSON dictionary."""
@@ -893,13 +897,26 @@ if FASTAPI_AVAILABLE:
 
         @app.get("/health", response_model=HealthResponse)
         def health():
-            """Liveness / readiness check."""
+            """Process liveness check."""
             _API_LOGGER.debug("Health check requested")
             return HealthResponse(
                 status="ok",
                 service="gbfs",
                 message="GBFS service is operational"
             )
+
+        @app.get("/ready")
+        def ready():
+            """Verify that every GBFS model artifact can be loaded."""
+            try:
+                predictor = _get_or_load_predictor()
+                return {
+                    "status": "ready",
+                    "service": "gbfs",
+                    "models": list(predictor.all_properties),
+                }
+            except Exception as exc:
+                raise HTTPException(status_code=503, detail=f"GBFS models unavailable: {exc}")
 
         @app.get("/info", response_model=InfoResponse)
         def info():
@@ -933,36 +950,25 @@ if FASTAPI_AVAILABLE:
                 structure = _structure_from_dict(request.structure)
                 _API_LOGGER.debug(f"[{job_id}] Loaded structure: {structure.composition.reduced_formula}")
                 
-                predictor = _get_or_load_predictor(property_name)
-                numpy_pred = predictor.predict_numpy([structure.to(fmt="cif")])
+                predictor = _get_or_load_predictor()
+                predictions, warnings = predictor._predict_structure(structure)
+                prediction_value = predictions.get(property_name)
+                if prediction_value is None:
+                    detail = next(
+                        (warning for warning in warnings if warning.startswith(f"{property_name}:")),
+                        f"{property_name}: prediction unavailable",
+                    )
+                    raise RuntimeError(detail)
                 
-                probabilities = None
-                if hasattr(predictor.model, 'predict_proba'):
-                    try:
-                        composition = structure.composition
-                        features = generate_features(structure, composition, predictor.feature_list, nan_strategy="zero")
-                        if hasattr(predictor.scaler, 'transform'):
-                            scaled = predictor.scaler.transform(features)
-                        else:
-                            scaled = features
-                        probas = predictor.model.predict_proba(scaled)
-                        probabilities = probas.tolist()
-                    except Exception as e:
-                        _API_LOGGER.debug(f"[{job_id}] Could not get probabilities: {str(e)}")
-                
-                _API_LOGGER.info(f"[{job_id}] Prediction complete for {property_name}: {numpy_pred}")
+                _API_LOGGER.info(f"[{job_id}] Prediction complete for {property_name}: {prediction_value}")
                 
                 prop_info = PROPERTY_INFO[property_name]
-                prediction_value = numpy_pred.tolist()
-                
-                if isinstance(prediction_value, list) and len(prediction_value) == 1:
-                    prediction_value = prediction_value[0]
                 
                 return PredictResponse(
                     job_id=job_id,
                     property=property_name,
                     prediction=prediction_value,
-                    probabilities=probabilities,
+                    probabilities=None,
                     unit=prop_info["unit"],
                     type=prop_info["type"],
                 )
@@ -989,6 +995,8 @@ if FASTAPI_AVAILABLE:
                 structure = _structure_from_dict(structure_dict)
                 _API_LOGGER.debug(f"[{job_id}] Loaded structure: {structure.composition.reduced_formula}")
                 
+                predictor = _get_or_load_predictor()
+                all_predictions, prediction_warnings = predictor._predict_structure(structure)
                 results = {}
                 for prop in properties:
                     if prop not in SUPPORTED_PROPERTIES:
@@ -996,32 +1004,17 @@ if FASTAPI_AVAILABLE:
                         continue
                     
                     try:
-                        predictor = _get_or_load_predictor(prop)
-                        pred_result = predictor.predict_numpy([structure.to(fmt="cif")])
-                        
+                        prediction_value = all_predictions.get(prop)
+                        if prediction_value is None:
+                            detail = next(
+                                (warning for warning in prediction_warnings if warning.startswith(f"{prop}:")),
+                                f"{prop}: prediction unavailable",
+                            )
+                            raise RuntimeError(detail)
                         prop_info = PROPERTY_INFO[prop]
-                        prediction_value = pred_result.tolist()
-                        
-                        if isinstance(prediction_value, list) and len(prediction_value) == 1:
-                            prediction_value = prediction_value[0]
-                        
-                        probabilities = None
-                        if hasattr(predictor.model, 'predict_proba'):
-                            try:
-                                composition = structure.composition
-                                features = generate_features(structure, composition, predictor.feature_list, nan_strategy="zero")
-                                if hasattr(predictor.scaler, 'transform'):
-                                    scaled = predictor.scaler.transform(features)
-                                else:
-                                    scaled = features
-                                probas = predictor.model.predict_proba(scaled)
-                                probabilities = probas.tolist()
-                            except Exception as pe:
-                                _API_LOGGER.debug(f"[{job_id}] Could not get probabilities for {prop}: {str(pe)}")
-                        
                         results[prop] = {
                             "prediction": prediction_value,
-                            "probabilities": probabilities,
+                            "probabilities": None,
                             "unit": prop_info["unit"],
                             "type": prop_info["type"],
                         }
@@ -1051,25 +1044,13 @@ if FASTAPI_AVAILABLE:
 
 def main():
     import argparse
-    import json
 
-    parser = argparse.ArgumentParser(description="GBFS Prediction Pipeline")
-    
-    # Server mode
+    parser = argparse.ArgumentParser(description="GBFS container service")
     parser.add_argument(
         "--serve",
         action="store_true",
-        help="Run as FastAPI server instead of CLI predictor"
+        help="Run the FastAPI service (retained for Docker command compatibility)"
     )
-    
-    # CLI mode
-    parser.add_argument("--cif", default=None, help="Path to CIF structure file")
-    parser.add_argument("--property", default="bandgap", 
-                        help="Property to predict: bandgap, e_form, dielectric, is_metal, mob_n, mob_p")
-    parser.add_argument("--model-dir", default=None,
-                        help="Optional path to model directory. If not provided, uses default GBFS/{property}/")
-    
-    # Server configuration
     parser.add_argument("--host", default="0.0.0.0", help="Server host (default: 0.0.0.0)")
     parser.add_argument("--port", type=int, default=8000, help="Server port (default: 8000)")
     parser.add_argument("--log-level", default="INFO", help="Logging level (default: INFO)")
@@ -1084,90 +1065,15 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    # Run as FastAPI server
-    if args.serve:
-        if not FASTAPI_AVAILABLE:
-            print("Error: FastAPI is not installed. Install it with: pip install fastapi uvicorn")
-            return
-        
-        import uvicorn
-        
-        _API_LOGGER.info(f"Starting GBFS API server on {args.host}:{args.port}")
-        app = create_app()
-        uvicorn.run(app, host=args.host, port=args.port, log_level=args.log_level.lower())
-    
-    # Run as CLI predictor
-    else:
-        if not args.cif:
-            parser.print_help()
-            print("\nError: --cif is required for prediction mode. Use --serve to run as server.")
-            return
-        
-        predictor = GbfsPredictor(
-            predictor_name=args.property,
-            property_name=args.property,
-            model_dir=args.model_dir
-        )
+    if not FASTAPI_AVAILABLE:
+        raise RuntimeError("FastAPI and Uvicorn are required to run the GBFS container service")
 
-        with open(args.cif, "r", encoding="utf-8") as f:
-            cif_string = f.read()
-        result = predictor.predict([cif_string])
-        print(json.dumps(result, indent=2))
+    import uvicorn
+
+    _API_LOGGER.info(f"Starting GBFS API server on {args.host}:{args.port}")
+    app = create_app()
+    uvicorn.run(app, host=args.host, port=args.port, log_level=args.log_level.lower())
 
 
 if __name__ == "__main__":
     main()
-
-
-# -----------------------------
-# DOCKERFILE (production-ready)
-# -----------------------------
-"""
-FROM python:3.10-slim
-
-WORKDIR /app
-
-# System deps (important for pymatgen)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    gfortran \
-    libopenblas-dev \
-    liblapack-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create non-root user
-RUN useradd -m -u 1000 predictor
-
-# Copy only necessary files
-COPY --chown=predictor:predictor Information_Units/ /app/Information_Units/
-COPY --chown=predictor:predictor requirements.txt /app/
-
-# Install Python dependencies
-RUN pip install --no-cache-dir --user \
-    numpy==1.26.4 \
-    scipy==1.11.4 \
-    pandas==2.0.3 \
-    scikit-learn==1.3.2 \
-    pymatgen==2023.8.10 \
-    matminer==0.9.0 \
-    lightgbm==4.3.0 \
-    joblib==1.3.2
-
-# Switch to non-root user
-USER predictor
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import sys; sys.exit(0)" || exit 1
-
-# Use Python CLI entrypoint
-ENTRYPOINT ["python", "-m", "Information_Units.Predictors.Gbfs.GbfsPredictor"]
-
-# Usage:
-# docker run -v $(pwd)/models:/models predictor:latest \
-#   --cif /models/sample.cif \
-#   --model /models/bandgap_model.pkl \
-#   --scaler /models/bandgap_scaler.pkl \
-#   --features /models/bandgap_features.pkl
-"""

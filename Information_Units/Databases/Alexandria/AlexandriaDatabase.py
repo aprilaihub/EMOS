@@ -95,6 +95,7 @@ class AlexandriaDatabase(BaseDatabase):
             "source": "alexandria",
             "queries": queries,
             "cif_strings": [],
+            "entries": [],
         }
         try:
             query = inputs.get('target_compositions', '')
@@ -127,6 +128,7 @@ class AlexandriaDatabase(BaseDatabase):
                     cif_str = structure.to(fmt='cif')
                     if cif_str:
                         result["cif_strings"].append(cif_str)
+                        result["entries"].append(self._extract_entry_metadata(entry))
                         if self.logger:
                             self.logger.log(f"Retrieved CIF string {i + 1}")
 
@@ -136,3 +138,25 @@ class AlexandriaDatabase(BaseDatabase):
             if self.logger:
                 self.logger.log(f"Error: {str(e)}")
             return result
+
+    def _extract_entry_metadata(self, entry: dict[str, Any]) -> dict[str, Any]:
+        """Extract lightweight metadata and thermodynamic metrics from OPTIMADE entry."""
+        attrs = entry.get('attributes', {}) if isinstance(entry, dict) else {}
+        return {
+            'id': entry.get('id'),
+            'chemical_formula_reduced': attrs.get('chemical_formula_reduced'),
+            'hull_distance': self._extract_mapped_value(attrs, '_alexandria_hull_distance'),
+            'formation_energy_per_atom': self._extract_mapped_value(attrs, '_alexandria_formation_energy_per_atom'),
+        }
+
+    def _extract_mapped_value(self, attrs: dict[str, Any], mapped_name: str):
+        """Read a value from attributes, supporting dotted paths and literal dotted keys."""
+        if mapped_name in attrs:
+            return attrs.get(mapped_name)
+
+        cur = attrs
+        for part in mapped_name.split('.'):
+            if not isinstance(cur, dict) or part not in cur:
+                return None
+            cur = cur.get(part)
+        return cur
