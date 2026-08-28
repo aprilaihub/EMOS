@@ -187,6 +187,15 @@
         "folder_path": "Information_Units/Predictors/Gbfs2d",
         "class_name": "Gbfs2dPredictor",
         "file_name": "Gbfs2dPredictor.py"
+      },
+      {
+        "id": "pdd",
+        "name": "Pdd",
+        "display_name": "PDD",
+        "description": "Pointwise Distance Distribution predictor \u2014 computes PDD descriptor matrices and AMD vectors for crystal structures",
+        "folder_path": "Information_Units/Predictors/Pdd",
+        "class_name": "PddPredictor",
+        "file_name": "PddPredictor.py"
       }
     ]
   },
@@ -358,13 +367,13 @@
       },
       {
         "id": 3,
-        "name": "AMD screening",
-        "display_name": "AMD screening",
-        "description": "Screen uploaded CIF structures for AMD-based candidate selection",
-        "folder_path": "Features/Materials_Exploration/AmdScreening",
-        "class_name": "AmdScreeningFeature",
-        "file_name": "AmdScreeningFeature.py",
-        "js_file_name": "AmdScreening.js",
+        "name": "CIF similarity",
+        "display_name": "CIF similarity",
+        "description": "Compare uploaded crystal structures using AMD or PDD Earth Mover's Distance",
+        "folder_path": "Features/Materials_Exploration/CifSimilarity",
+        "class_name": "CifSimilarityFeature",
+        "file_name": "CifSimilarityFeature.py",
+        "js_file_name": "CifSimilarity.js",
         "inputs": [
           {
             "name": "cifFiles",
@@ -373,15 +382,44 @@
             "required": true,
             "accept": ".cif",
             "multiple": true,
-            "description": "Browse and upload one or more CIF files for AMD screening"
+            "description": "Upload two or more CIF files for similarity comparison"
+          },
+          {
+            "name": "distanceMetric",
+            "display_name": "Distance Metric",
+            "type": "select",
+            "required": true,
+            "options": [
+              {
+                "value": "amd",
+                "text": "Average Minimum Distance (AMD)"
+              },
+              {
+                "value": "pdd_emd",
+                "text": "PDD Earth Mover's Distance"
+              }
+            ],
+            "default": "amd",
+            "description": "Select the metric used to calculate the pairwise distance matrix"
+          },
+          {
+            "name": "k",
+            "display_name": "Neighbourhood size k",
+            "type": "number",
+            "required": false,
+            "min": 1,
+            "max": 500,
+            "step": 1,
+            "default": 100,
+            "description": "Number of nearest neighbours used for the descriptor calculation"
           }
         ],
         "outputs": [
           {
-            "name": "downloadResultsJson",
-            "display_name": "Download Results (JSON)",
-            "type": "link",
-            "description": "Download JSON file containing AMD screening results"
+            "name": "distanceMatrix",
+            "display_name": "Distance Matrix",
+            "type": "table",
+            "description": "Pairwise distance matrix calculated using the selected metric"
           }
         ]
       }

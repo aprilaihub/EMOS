@@ -117,6 +117,11 @@ const iuFeatureModules = {
             file: './Features/IU_Features/Predictors/Gbfs2dIUFeature.js',
             id: 2006,
         },
+        pdd: {
+            className: 'PddIUFeature',
+            file: './Features/IU_Features/Predictors/PddIUFeature.js',
+            id: 2008,
+        },
     }
 };
 
@@ -124,7 +129,7 @@ const iuFeatureModules = {
 const featureClasses = {
     1: 'DatabaseExtractorFeature',
     2: 'StabilityConsensusAnalysisFeature',
-    3: 'AmdScreeningFeature',
+    3: 'CifSimilarityFeature',
     4: 'MosfetEvaluatorFeature',
 };
 
@@ -132,7 +137,7 @@ const featureClasses = {
 const featureFiles = {
     1: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
     2: './Features/Materials_Exploration/StabilityConsensusAnalysis/StabilityConsensusAnalysis.js',
-    3: './Features/Materials_Exploration/AmdScreening/AmdScreening.js',
+    3: './Features/Materials_Exploration/CifSimilarity/CifSimilarity.js',
     4: './Features/Electronics_Application/MosfetEvaluator/MosfetEvaluator.js',
 };
 
@@ -280,8 +285,6 @@ async function loadFeatureModule(featureId, featureName, featureDesc) {
             // Replace the feature view content with the specific feature's interface
             featureView.innerHTML = currentFeatureInstance.createFeatureHTML();
             console.log('Feature HTML created successfully');
-
-            // Wire feature-specific DOM listeners after injecting HTML.
             if (typeof currentFeatureInstance.attachEventListeners === 'function') {
                 currentFeatureInstance.attachEventListeners();
             }

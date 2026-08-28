@@ -158,7 +158,7 @@
             <!-- Left Panel: Controls -->
             <div class="left-panel">
                 <!-- Information Units Section -->
-                                                                                                                                                                <section class="control-section">
+                                                                                                                                                                                                                                                <section class="control-section">
                     <h2>Information Units</h2>
                     <div class="info-units">
                         <div class="info-column">
@@ -414,10 +414,27 @@
                                     aria-label="Open IU panel"
                                 >▶</button>
                             </div>
+                            <div class="iu-option-row">
+                                <label><input type="checkbox" ui-type="predictor" value="pdd"> PDD</label>
+                                <button
+                                    class="iu-feature-btn"
+                                    data-iu-feature="pdd"
+                                    data-iu-type="predictor"
+                                    data-iu-name="PDD"
+                                    data-iu-desc="Pointwise Distance Distribution predictor — computes PDD descriptor matrices and AMD vectors for crystal structures"
+                                    title="Open IU panel"
+                                    aria-label="Open IU panel"
+                                >▶</button>
+                            </div>
                             </div>
                         </div>
                     </div>
                 </section>
+
+
+
+
+
 
 
 
@@ -439,7 +456,7 @@
                             <div class="feature-grid">
                                 <button class="feature-btn" data-feature="1" data-feature-name="Database Extractor" data-feature-desc="Extract and analyze specific material properties and data from integrated databases">Database Extractor</button>
                                 <button class="feature-btn" data-feature="2" data-feature-name="Stability Consensus Analysis" data-feature-desc="Analyze and aggregate stability consensus from uploaded CIF structures">Stability Consensus Analysis</button>
-                                <button class="feature-btn" data-feature="3" data-feature-name="AMD screening" data-feature-desc="Screen uploaded CIF structures for AMD-based candidate selection">AMD screening</button>
+                                <button class="feature-btn" data-feature="3" data-feature-name="CIF similarity" data-feature-desc="Compare uploaded crystal structures using AMD or PDD Earth Mover's Distance">CIF similarity</button>
                             </div>
                         </div>
                     </div>
@@ -449,7 +466,7 @@
                         <h3>Electronics Application</h3>
                         <div class="feature-container">
                             <div class="feature-grid">
-                                <button class="feature-btn" data-feature="4" data-feature-name="MOSFET evaluator" data-feature-desc="2D Poisson and drift-diffusion solver for MOSFET evaluation from simulation parameters">MOSFET evaluator</button>
+                                <button class="feature-btn" data-feature="4" data-feature-name="MOSFET evaluator" data-feature-desc="Evaluate MOSFET performance from uploaded CIF files and simulation parameters">MOSFET evaluator</button>
                             </div>
                         </div>
                     </div>
