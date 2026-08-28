@@ -124,18 +124,16 @@ const iuFeatureModules = {
 const featureClasses = {
     1: 'DatabaseExtractorFeature',
     2: 'StabilityConsensusAnalysisFeature',
-    3: 'AmdScreeningFeature',
-    4: 'CifSimilarityFeature',
-    5: 'MosfetEvaluatorFeature',
+    3: 'CifSimilarityFeature',
+    4: 'MosfetEvaluatorFeature',
 };
 
 // Feature file paths for dynamic loading (relative paths for GitHub Pages compatibility)
 const featureFiles = {
     1: './Features/Materials_Exploration/DatabaseExtractor/DatabaseExtractor.js',
     2: './Features/Materials_Exploration/StabilityConsensusAnalysis/StabilityConsensusAnalysis.js',
-    3: './Features/Materials_Exploration/AmdScreening/AmdScreening.js',
-    4: './Features/Materials_Exploration/CifSimilarity/CifSimilarity.js',
-    5: './Features/Electronics_Application/MosfetEvaluator/MosfetEvaluator.js',
+    3: './Features/Materials_Exploration/CifSimilarity/CifSimilarity.js',
+    4: './Features/Electronics_Application/MosfetEvaluator/MosfetEvaluator.js',
 };
 
 // Global feature instances storage

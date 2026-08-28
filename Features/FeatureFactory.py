@@ -2,7 +2,6 @@
 
 from Features.Materials_Exploration.DatabaseExtractor.DatabaseExtractorFeature import DatabaseExtractorFeature
 from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import StabilityConsensusAnalysisFeature
-from Features.Materials_Exploration.AmdScreening.AmdScreeningFeature import AmdScreeningFeature
 from Features.Electronics_Application.MosfetEvaluator.MosfetEvaluatorFeature import MosfetEvaluatorFeature
 from Features.Materials_Exploration.CifSimilarity.CifSimilarityFeature import CifSimilarityFeature
 
@@ -11,9 +10,8 @@ from Features.Materials_Exploration.CifSimilarity.CifSimilarityFeature import Ci
 feature_factory = {
     "1": DatabaseExtractorFeature,
     "2": StabilityConsensusAnalysisFeature,
-    "3": AmdScreeningFeature,
-    "4": CifSimilarityFeature,
-    "5": MosfetEvaluatorFeature
+    "3": CifSimilarityFeature,
+    "4": MosfetEvaluatorFeature
 
 }
 

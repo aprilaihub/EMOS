@@ -358,52 +358,6 @@
       },
       {
         "id": 3,
-        "name": "AMD screening",
-        "display_name": "AMD screening",
-        "description": "Screen uploaded CIF structures for AMD-based candidate selection",
-        "folder_path": "Features/Materials_Exploration/AmdScreening",
-        "class_name": "AmdScreeningFeature",
-        "file_name": "AmdScreeningFeature.py",
-        "js_file_name": "AmdScreening.js",
-        "inputs": [
-          {
-            "name": "cifFiles",
-            "display_name": "CIF Files",
-            "type": "file",
-            "required": true,
-            "accept": ".cif",
-            "multiple": true,
-            "description": "Browse and upload two or more CIF files for AMD similarity screening"
-          },
-          {
-            "name": "k",
-            "display_name": "Neighbourhood size k",
-            "type": "number",
-            "required": false,
-            "min": 1,
-            "max": 500,
-            "step": 1,
-            "default": 100,
-            "description": "Number of nearest neighbours for AMD descriptor (default 100)"
-          }
-        ],
-        "outputs": [
-          {
-            "name": "downloadResultsJson",
-            "display_name": "Download Results (JSON)",
-            "type": "link",
-            "description": "Download JSON file containing AMD matrix and labels"
-          },
-          {
-            "name": "heatmapDendrogram",
-            "display_name": "Heatmap & Dendrogram",
-            "type": "image",
-            "description": "AMD cross-correlation heatmap with Ward-linkage dendrogram"
-          }
-        ]
-      },
-      {
-        "id": 4,
         "name": "CIF similarity",
         "display_name": "CIF similarity",
         "description": "Compare uploaded crystal structures using AMD or PDD Earth Mover's Distance",
@@ -463,7 +417,7 @@
     ],
     "electronics_application": [
       {
-        "id": 5,
+        "id": 4,
         "name": "MOSFET evaluator",
         "display_name": "MOSFET evaluator",
         "description": "Evaluate MOSFET performance from uploaded CIF files and simulation parameters",
