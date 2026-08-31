@@ -144,7 +144,9 @@ O1 1.0 0.5 0.5 0.5
                 'materialsproject': {
                     'status': 'success',
                     'stability': '✅ Stable',
-                    'raw_value': 0.02
+                    'raw_value': 0.02,
+                    'matched_entry_ids': ['mp-100', 'mp-200'],
+                    'selected_entry_id': 'mp-200',
                 }
             },
             'summary': {
@@ -160,6 +162,10 @@ O1 1.0 0.5 0.5 0.5
         assert formatted['downloadResultsJson'] is not None
         assert 'Al2O3' in formatted['downloadResultsJson']
         assert '✅ Stable' in formatted['downloadResultsJson']
+        downloaded = json.loads(formatted['downloadResultsJson'])
+        mp_result = downloaded['sources']['materialsproject']
+        assert mp_result['matched_entry_ids'] == ['mp-100', 'mp-200']
+        assert mp_result['selected_entry_id'] == 'mp-200'
     
     def test_output_format_error(self):
         """Test output formatting for error cases."""

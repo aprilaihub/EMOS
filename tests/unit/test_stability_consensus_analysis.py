@@ -74,7 +74,43 @@ class TestDatabaseStabilityEvaluation:
         assert result['status'] == 'success'
         assert '❌' in result['stability']
         assert result['raw_value'] == 0.15
-    
+
+    def test_materialsproject_reports_matched_and_selected_entry_ids(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'materialsproject',
+            'queries': {},
+            'entries': [
+                {'id': 'mp-100', 'energy_above_hull_r2scan': 0.12},
+                {'id': 'mp-200', 'energy_above_hull_r2scan': 0.02},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('materialsproject', db_result)
+
+        assert result['matched_entry_ids'] == ['mp-100', 'mp-200']
+        assert result['selected_entry_id'] == 'mp-200'
+        assert result['raw_value'] == 0.02
+
+    def test_materialsproject_reports_id_used_for_boolean_decision(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'materialsproject',
+            'queries': {},
+            'entries': [
+                {'id': 'mp-unstable', 'predicted_stable_r2scan': False},
+                {'id': 'mp-stable', 'predicted_stable_r2scan': True},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('materialsproject', db_result)
+
+        assert result['matched_entry_ids'] == ['mp-unstable', 'mp-stable']
+        assert result['selected_entry_id'] == 'mp-stable'
+        assert result['raw_value'] is True
+
     def test_evaluate_stable_alexandria(self):
         """Test evaluation of stable structure (Alexandria)."""
         feature = StabilityConsensusAnalysisFeature()
@@ -91,6 +127,24 @@ class TestDatabaseStabilityEvaluation:
         assert result['status'] == 'success'
         assert '✅' in result['stability']
         assert result['raw_value'] == 0.03
+
+    def test_alexandria_reports_matched_and_selected_entry_ids(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'alexandria',
+            'queries': {},
+            'entries': [
+                {'id': 'alex-100', 'hull_distance': 0.04},
+                {'id': 'alex-200', 'hull_distance': 0.01},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('alexandria', db_result)
+
+        assert result['matched_entry_ids'] == ['alex-100', 'alex-200']
+        assert result['selected_entry_id'] == 'alex-200'
+        assert result['raw_value'] == 0.01
     
     def test_evaluate_no_matches(self):
         """Test evaluation when no structures found."""

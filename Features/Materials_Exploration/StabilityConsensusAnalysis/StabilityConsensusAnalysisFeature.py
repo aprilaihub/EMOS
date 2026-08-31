@@ -622,7 +622,9 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 results[db_key] = {
                     'status': 'error',
                     'error': str(e),
-                    'stability': None
+                    'stability': None,
+                    'matched_entry_ids': [],
+                    'selected_entry_id': None,
                 }
 
         return results
@@ -653,6 +655,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             if sg_filtered:  # only apply if at least one entry matches
                 entries = sg_filtered
 
+        matched_entry_ids = self._extract_database_entry_ids(entries)
+
         # Extract stability metric from queries
         queries = db_result.get('queries', {})
         threshold_cfg = self.STABILITY_THRESHOLDS.get(source_name, {})
@@ -663,7 +667,12 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             fallback_entries = self._filter_entries_by_id(fallback_entries, target_entry_id)
         if target_formula:
             fallback_entries = self._filter_entries_by_formula(fallback_entries, target_formula)
-        fallback_raw = self._extract_database_metric(fallback_entries, metric_name)
+        fallback_metric_entry = self._select_database_metric_entry(fallback_entries, metric_name)
+        fallback_raw = (
+            float(fallback_metric_entry[metric_name])
+            if fallback_metric_entry is not None
+            else None
+        )
 
         if target_formula and not entries and cif_strings:
             return {
@@ -674,6 +683,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': 0,
+                'matched_entry_ids': [],
+                'selected_entry_id': None,
                 'message': f'No exact formula match found for {target_formula} in returned entries'
             }
 
@@ -687,6 +698,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': 0,
+                    'matched_entry_ids': self._extract_database_entry_ids(fallback_entries),
+                    'selected_entry_id': fallback_metric_entry.get('id'),
                     'message': f'No entries under threshold; fallback {metric_name} value used'
                 }
 
@@ -701,27 +714,36 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': 0,
+                    'matched_entry_ids': [],
+                    'selected_entry_id': None,
                     'message': f'No entries found with {metric_name} <= {threshold}'
                 }
             return {
                 'status': 'no_matches',
                 'stability': None,
                 'raw_value': None,
+                'matched_entry_ids': [],
+                'selected_entry_id': None,
                 'message': 'No matching structures found in database'
             }
 
         if source_name == 'materialsproject':
             # Hierarchy requested by user:
             # 1) predicted_stable, 2) energy_above_hull, 3) formation_energy (< 0 => stable).
-            predicted_stable = self._extract_database_boolean(entries, 'predicted_stable_r2scan')
-            if predicted_stable is None:
-                # Try additional aliases for robustness.
-                for alt_name in ('predicted_stable', 'is_stable'):
-                    predicted_stable = self._extract_database_boolean(entries, alt_name)
-                    if predicted_stable is not None:
-                        break
+            predicted_stable = None
+            predicted_stable_field = None
+            for field_name in ('predicted_stable_r2scan', 'predicted_stable', 'is_stable'):
+                predicted_stable = self._extract_database_boolean(entries, field_name)
+                if predicted_stable is not None:
+                    predicted_stable_field = field_name
+                    break
 
             if predicted_stable is not None:
+                selected_entry = self._select_database_boolean_entry(
+                    entries,
+                    predicted_stable_field,
+                    predicted_stable,
+                )
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if predicted_stable else '❌ Unstable',
@@ -730,11 +752,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': '',
                     'description': 'Materials Project predicted stable (r2SCAN)',
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': selected_entry.get('id') if selected_entry else None,
                     'message': 'Decision from Materials Project predicted stable field'
                 }
 
-            hull_value = self._extract_database_metric(entries, 'energy_above_hull_r2scan')
-            if hull_value is not None:
+            hull_entry = self._select_database_metric_entry(entries, 'energy_above_hull_r2scan')
+            if hull_entry is not None:
+                hull_value = float(hull_entry['energy_above_hull_r2scan'])
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if hull_value < threshold else '❌ Unstable',
@@ -743,11 +768,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': hull_entry.get('id'),
                     'message': f'Decision from energy_above_hull_r2scan ({hull_value:.4f} eV/atom)'
                 }
 
-            formation_value = self._extract_database_metric(entries, 'formation_energy_r2scan')
-            if formation_value is not None:
+            formation_entry = self._select_database_metric_entry(entries, 'formation_energy_r2scan')
+            if formation_entry is not None:
+                formation_value = float(formation_entry['formation_energy_r2scan'])
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if formation_value < 0.0 else '❌ Unstable',
@@ -756,6 +784,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': 'eV/atom',
                     'description': 'Formation energy fallback (negative => stable)',
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': formation_entry.get('id'),
                     'message': 'Fallback decision from formation_energy_r2scan'
                 }
 
@@ -767,12 +797,15 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': len(cif_strings),
+                'matched_entry_ids': matched_entry_ids,
+                'selected_entry_id': None,
                 'message': 'No usable MP stability fields found (predicted_stable, energy_above_hull, formation_energy)'
             }
 
-        raw_value = self._extract_database_metric(entries, metric_name)
+        selected_entry = self._select_database_metric_entry(entries, metric_name)
 
-        if raw_value is not None:
+        if selected_entry is not None:
+            raw_value = float(selected_entry[metric_name])
             return {
                 'status': 'success',
                 'stability': '✅ Stable' if raw_value < threshold else '❌ Unstable',
@@ -781,6 +814,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': len(cif_strings),
+                'matched_entry_ids': matched_entry_ids,
+                'selected_entry_id': selected_entry.get('id'),
                 'message': f'{len(cif_strings)} entries evaluated for {metric_name}'
             }
 
@@ -792,8 +827,71 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             'unit': threshold_cfg.get('unit', ''),
             'description': threshold_cfg.get('description', ''),
             'num_matches': len(cif_strings),
+            'matched_entry_ids': matched_entry_ids,
+            'selected_entry_id': None,
             'message': f'Stability metric "{metric_name}" not available in database response'
         }
+
+    def _extract_database_entry_ids(self, entries: List[Dict[str, Any]]) -> List[str]:
+        """Return unique database IDs from the entries retained for evaluation."""
+        entry_ids: List[str] = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            entry_id = entry.get('id')
+            if entry_id is not None and entry_id not in entry_ids:
+                entry_ids.append(entry_id)
+        return entry_ids
+
+    def _select_database_metric_entry(
+        self,
+        entries: List[Dict[str, Any]],
+        metric_name: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the entry with the lowest usable value for a metric."""
+        selected_entry = None
+        selected_value = None
+
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            raw = entry.get(metric_name)
+            if raw is None:
+                continue
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if selected_value is None or value < selected_value:
+                selected_entry = entry
+                selected_value = value
+
+        return selected_entry
+
+    def _select_database_boolean_entry(
+        self,
+        entries: List[Dict[str, Any]],
+        field_name: str,
+        selected_value: bool,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the first entry carrying the boolean used for an MP decision."""
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            raw = entry.get(field_name)
+            if isinstance(raw, bool) and raw is selected_value:
+                return entry
+            if isinstance(raw, str):
+                normalized = raw.strip().lower()
+                if normalized in ('true', '1', 'yes'):
+                    parsed = True
+                elif normalized in ('false', '0', 'no'):
+                    parsed = False
+                else:
+                    continue
+                if parsed is selected_value:
+                    return entry
+        return None
 
     def _extract_database_metric(self, entries: List[Dict[str, Any]], metric_name: str) -> Optional[float]:
         """Extract a representative thermodynamic metric value from DB entries."""
