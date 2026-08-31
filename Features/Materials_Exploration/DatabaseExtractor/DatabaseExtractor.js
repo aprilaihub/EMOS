@@ -7,10 +7,30 @@ class DatabaseExtractorFeature extends BaseFeature {
 
     createInputsHTML() {
         const propertyFiltersHTML = this._buildPropertyFiltersHTML();
+        const databaseOptions = [
+            { value: 'cod', label: 'COD' },
+            { value: 'materialsproject', label: 'Materials Project' },
+            { value: 'alexandria', label: 'Alexandria' },
+            { value: 'mathub3d', label: 'MatHub-3d' },
+            { value: 'jarvisdft', label: 'JARVIS-DFT' },
+            { value: 'aflow', label: 'AFLOW' },
+        ];
+        const databaseCheckboxesHTML = databaseOptions.map(({ value, label }) => `
+            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                <input type="checkbox" name="databaseExtractorDatabase" value="${value}" style="width:18px; height:18px; margin:0; padding:0;">
+                <span style="text-align:left;">${label}</span>
+            </label>
+        `).join('');
 
         return `
-            <p>Select the targeted databases from the Information Units panel, then configure the extraction parameters below.</p>
+            <p>Select one or more databases, then configure the extraction parameters below.</p>
             <div class="input-controls">
+                <fieldset style="box-sizing:border-box; width:min(100%, 520px); align-self:center; margin:0; padding:14px 16px 16px; border:1px solid #d9dee7; border-radius:8px; background:#fff;">
+                    <legend style="padding:0 7px; color:#495057; font-weight:600;">Databases</legend>
+                    <div id="databaseExtractorDatabases_${this.featureId}_group" style="display:flex; flex-direction:column; gap:8px;">
+                        ${databaseCheckboxesHTML}
+                    </div>
+                </fieldset>
                 ${this.createNumberInput(`batchSize_${this.featureId}`, 'Max Batch Size / Database', '1', '10000', '1')}
                 ${this.createSelectInput(`retrievalMode_${this.featureId}`, 'Retrieval Mode', [{value: 'lenient', text: 'Lenient'}, {value: 'strict', text: 'Strict'}])}
                 ${this.createTextInput(`targetCompositions_${this.featureId}`, 'Target Compositions (optional)', 'e.g., Fe, Al2O3')}
@@ -59,6 +79,15 @@ class DatabaseExtractorFeature extends BaseFeature {
 
     collectInputData() {
         const inputs = super.collectInputData();
+
+        inputs.active_databases = Array.from(
+            document.querySelectorAll(
+                `#databaseExtractorDatabases_${this.featureId}_group input[type="checkbox"]:checked`
+            )
+        ).map((checkbox) => ({
+            value: checkbox.value,
+            name: checkbox.closest('label')?.textContent?.trim() || checkbox.value,
+        }));
 
         inputs.queryValues = this._collectPropertyFilterValues();
         // Use filter keys as selected properties so strict/lenient mode applies
