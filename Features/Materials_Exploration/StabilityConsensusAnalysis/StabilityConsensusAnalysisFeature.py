@@ -1,13 +1,19 @@
 import json
 import re
-from typing import Any, Dict, List, Optional
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List, Optional
+
 from pymatgen.core import Structure, Composition
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+
 from Features.BaseFeature import BaseFeature
-from Information_Units.Generators.GeneratorFactory import generator_factory
 from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
+
+
+class StabilityConsensusAnalysisCancelled(Exception):
+    """Raised internally when a user cancels an active analysis."""
 
 
 class StabilityConsensusAnalysisFeature(BaseFeature):
@@ -51,6 +57,23 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
     
     def __init__(self, logger=None):
         super().__init__("Stability Consensus Analysis", logger)
+        self._cancel_event = threading.Event()
+
+    def cancel(self) -> Dict[str, str]:
+        """Request cooperative termination of the active analysis."""
+        self._cancel_event.set()
+        if self.logger:
+            self.logger.log('Stability Consensus Analysis cancellation requested', 'warning')
+        return {
+            'status': 'cancelled',
+            'message': 'Cancellation requested. Stopping Stability Consensus Analysis.',
+        }
+
+    def _check_cancelled(self) -> None:
+        if self._cancel_event.is_set():
+            raise StabilityConsensusAnalysisCancelled(
+                'Stability Consensus Analysis was cancelled by the user.'
+            )
     
     def info(self):
         return "Stability Consensus Analysis: Query materials databases and run predictors to evaluate multi-source stability consensus"
@@ -106,11 +129,13 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         element_ref_cache: Dict[str, Optional[float]],
     ) -> Dict[str, Any]:
         """Process one CIF and return per-file result payload."""
+        self._check_cancelled()
         if self.logger:
             self.logger.log(f'Processing {cif_name}...', 'info')
 
         # Parse CIF and extract composition, space group
         structure = Structure.from_str(cif_content, fmt='cif')
+        self._check_cancelled()
         composition = structure.composition
         composition_formula = composition.reduced_formula
         mp_materials_id = self._extract_materials_project_id(cif_content)
@@ -150,6 +175,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         active_databases = inputs.get('active_databases', [])
         if active_databases:
+            self._check_cancelled()
             cache_bits = [composition_formula]
             if space_group_number is not None:
                 cache_bits.append(str(space_group_number))
@@ -167,6 +193,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     space_group_number,
                     mp_materials_id,
                 )
+                self._check_cancelled()
                 db_cache[cache_key] = db_results
                 # Annotate each source result with the CIF space group for UI transparency
                 for src_data in db_results.values():
@@ -176,6 +203,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         active_predictors = inputs.get('active_predictors', [])
         if active_predictors:
+            self._check_cancelled()
             element_reference_cifs = self._get_element_reference_cifs(
                 inputs.get('active_databases', []),
                 list(element_fractions.keys()),
@@ -187,6 +215,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 element_fractions,
                 element_reference_cifs,
             )
+            self._check_cancelled()
             result['sources'].update(predictor_results)
 
         result['summary'] = self._compute_consensus_summary(result['sources'])
@@ -208,6 +237,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         fallback_configs = [db for db in active_databases if db.get('value') != 'materialsproject']
 
         for symbol in element_symbols:
+            self._check_cancelled()
             if symbol in element_ref_cache:
                 cached = element_ref_cache[symbol]
                 if cached:
@@ -217,18 +247,22 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             found_cif: Optional[str] = None
             lookup_order = [mp_db_config] + fallback_configs
             for db_config in lookup_order:
+                self._check_cancelled()
                 db_key = db_config.get('value')
                 if db_key not in database_factory:
                     continue
                 try:
                     db_instance = database_factory[db_key](db_key, self.logger)
                     db_result = db_instance.retrieve({'target_compositions': symbol, 'batch_size': 1})
+                    self._check_cancelled()
                     cifs = db_result.get('cif_strings', []) if isinstance(db_result, dict) else []
                     if cifs:
                         found_cif = cifs[0]
                         if self.logger:
                             self.logger.log(f'Element reference found for {symbol} from {db_config.get("name", db_key)}', 'info')
                         break
+                except StabilityConsensusAnalysisCancelled:
+                    raise
                 except Exception as ref_err:
                     if self.logger:
                         self.logger.log(f'Element reference lookup failed for {symbol} in {db_key}: {str(ref_err)}', 'warning')
@@ -329,55 +363,10 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             'unstable_votes': unstable_votes,
         }
 
-    def _compute_source_plot_data(self, results_per_cif: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
-        """Aggregate stable/unstable counts and percentages for each source."""
-        aggregate: Dict[str, Dict[str, Any]] = {}
-
-        for entry in results_per_cif:
-            if entry.get('error'):
-                continue
-            for source, source_data in (entry.get('sources') or {}).items():
-                if source not in aggregate:
-                    aggregate[source] = {
-                        'stable_count': 0,
-                        'unstable_count': 0,
-                        'error_count': 0,
-                        'total': 0,
-                        'stable_pct': 0,
-                        'unstable_pct': 0,
-                        'error_pct': 0,
-                    }
-
-                stability = source_data.get('stability')
-                if not isinstance(stability, str):
-                    continue
-
-                if '✅' in stability:
-                    aggregate[source]['stable_count'] += 1
-                    aggregate[source]['total'] += 1
-                elif '❌' in stability:
-                    aggregate[source]['unstable_count'] += 1
-                    aggregate[source]['total'] += 1
-                else:
-                    aggregate[source]['error_count'] += 1
-                    aggregate[source]['total'] += 1
-
-        for source, stats in aggregate.items():
-            total = stats['total']
-            if total > 0:
-                stats['stable_pct'] = round((stats['stable_count'] * 100.0) / total, 1)
-                stats['unstable_pct'] = round((stats['unstable_count'] * 100.0) / total, 1)
-                stats['error_pct'] = round((stats['error_count'] * 100.0) / total, 1)
-            else:
-                stats['stable_pct'] = 0
-                stats['unstable_pct'] = 0
-                stats['error_pct'] = 0
-
-        return aggregate
-    
     def process_feature(self, inputs):
         """Main processing pipeline for stability consensus analysis."""
         try:
+            self._check_cancelled()
             if self.logger:
                 self.logger.log('Initializing Stability Consensus Analysis...', 'info')
 
@@ -392,6 +381,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             db_cache: Dict[str, Dict[str, Any]] = {}
             element_ref_cache: Dict[str, Optional[float]] = {}
             for entry in cif_entries:
+                self._check_cancelled()
                 try:
                     results_per_cif.append(
                         self._process_single_cif(
@@ -402,6 +392,9 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                             element_ref_cache,
                         )
                     )
+                    self._check_cancelled()
+                except StabilityConsensusAnalysisCancelled:
+                    raise
                 except Exception as single_err:
                     if self.logger:
                         self.logger.log(f'Error in {entry["name"]}: {str(single_err)}', 'error')
@@ -415,7 +408,6 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             consensus_results = {
                 'results_per_cif': results_per_cif,
                 'batch_summary': self._compute_batch_summary(results_per_cif),
-                'plot_data': self._compute_source_plot_data(results_per_cif),
             }
 
             # Backward compatibility: expose first file result on top-level fields used by older UI code.
@@ -429,7 +421,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 self.logger.log('Stability Consensus Analysis processing completed', 'info')
             
             return consensus_results
-        
+
+        except StabilityConsensusAnalysisCancelled as exc:
+            if self.logger:
+                self.logger.log(str(exc), 'warning')
+            return {
+                'status': 'cancelled',
+                'message': str(exc),
+            }
         except Exception as e:
             if self.logger:
                 self.logger.log(f'Error: {str(e)}', 'error')
@@ -437,23 +436,50 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'error': str(e),
                 'status': 'failed'
             }
-    
+
+    def process_feature_stream(self, inputs):
+        """Stream an initial event, then the formatted result.
+
+        Using the feature stream keeps this instance registered with the
+        backend cancellation endpoint for the full lifetime of the analysis.
+        """
+        start_event = {
+            'message': 'Stability Consensus Analysis started',
+            'level': 'info',
+        }
+        yield f"event: log\ndata: {json.dumps(start_event)}\n\n"
+
+        results = self.process_feature(inputs)
+        formatted = self.format_outputs(results)
+        yield f"event: result\ndata: {json.dumps(formatted, ensure_ascii=False)}\n\n"
+
     def format_outputs(self, results):
         """Format results for frontend (JSON string for download)."""
+        if results.get('status') == 'cancelled':
+            return {
+                'status': 'cancelled',
+                'message': results.get('message', 'Analysis cancelled.'),
+                'downloadResultsJson': None,
+            }
+
         if 'error' in results:
             return {
                 'error': results['error'],
                 'downloadResultsJson': None,
             }
-        
+
+        download_results = {
+            key: value for key, value in results.items()
+            if key != 'plot_data'
+        }
+
         return {
             'composition': results.get('composition'),
             'sources': results.get('sources', {}),
             'summary': results.get('summary', {}),
             'results_per_cif': results.get('results_per_cif', []),
             'batch_summary': results.get('batch_summary', {}),
-            'plot_data': results.get('plot_data', {}),
-            'downloadResultsJson': json.dumps(results, indent=2, ensure_ascii=False),
+            'downloadResultsJson': json.dumps(download_results, indent=2, ensure_ascii=False),
         }
     
     def _query_databases(
@@ -470,6 +496,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         SPACE_GROUP_CAPABLE_DBS = {'alexandria', 'jarvisdft', 'mathub3d', 'aflow', 'cod'}
         
         for db_config in active_databases:
+            self._check_cancelled()
             db_key = db_config['value']
             db_name = db_config['name']
             
@@ -507,6 +534,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     db_inputs[metric_name] = [0.0, threshold]
 
                 db_result = db_instance.retrieve(db_inputs)
+                self._check_cancelled()
 
                 # If strict MP-ID query misses, fall back to composition-only MP lookup.
                 if db_key == 'materialsproject' and mp_materials_id and not db_result.get('cif_strings'):
@@ -517,6 +545,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         )
                     fallback_inputs = {'target_compositions': composition}
                     db_result = db_instance.retrieve(fallback_inputs)
+                    self._check_cancelled()
 
                 fallback_result = None
                 if metric_name and not db_result.get('cif_strings'):
@@ -525,6 +554,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         'target_compositions': composition,
                         'batch_size': 1,
                     })
+                    self._check_cancelled()
 
                 # Extract stability metrics
                 source_name = db_result.get('source', db_key).lower()
@@ -541,13 +571,17 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 if self.logger:
                     self.logger.log(f'{db_name}: Retrieved {len(db_result.get("cif_strings", []))} structures', 'info')
             
+            except StabilityConsensusAnalysisCancelled:
+                raise
             except Exception as e:
                 if self.logger:
                     self.logger.log(f'Error querying {db_name}: {str(e)}', 'error')
                 results[db_key] = {
                     'status': 'error',
                     'error': str(e),
-                    'stability': None
+                    'stability': None,
+                    'matched_entry_ids': [],
+                    'selected_entry_id': None,
                 }
 
         return results
@@ -578,6 +612,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             if sg_filtered:  # only apply if at least one entry matches
                 entries = sg_filtered
 
+        matched_entry_ids = self._extract_database_entry_ids(entries)
+
         # Extract stability metric from queries
         queries = db_result.get('queries', {})
         threshold_cfg = self.STABILITY_THRESHOLDS.get(source_name, {})
@@ -588,7 +624,12 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             fallback_entries = self._filter_entries_by_id(fallback_entries, target_entry_id)
         if target_formula:
             fallback_entries = self._filter_entries_by_formula(fallback_entries, target_formula)
-        fallback_raw = self._extract_database_metric(fallback_entries, metric_name)
+        fallback_metric_entry = self._select_database_metric_entry(fallback_entries, metric_name)
+        fallback_raw = (
+            float(fallback_metric_entry[metric_name])
+            if fallback_metric_entry is not None
+            else None
+        )
 
         if target_formula and not entries and cif_strings:
             return {
@@ -599,6 +640,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': 0,
+                'matched_entry_ids': [],
+                'selected_entry_id': None,
                 'message': f'No exact formula match found for {target_formula} in returned entries'
             }
 
@@ -612,6 +655,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': 0,
+                    'matched_entry_ids': self._extract_database_entry_ids(fallback_entries),
+                    'selected_entry_id': fallback_metric_entry.get('id'),
                     'message': f'No entries under threshold; fallback {metric_name} value used'
                 }
 
@@ -626,27 +671,36 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': 0,
+                    'matched_entry_ids': [],
+                    'selected_entry_id': None,
                     'message': f'No entries found with {metric_name} <= {threshold}'
                 }
             return {
                 'status': 'no_matches',
                 'stability': None,
                 'raw_value': None,
+                'matched_entry_ids': [],
+                'selected_entry_id': None,
                 'message': 'No matching structures found in database'
             }
 
         if source_name == 'materialsproject':
             # Hierarchy requested by user:
             # 1) predicted_stable, 2) energy_above_hull, 3) formation_energy (< 0 => stable).
-            predicted_stable = self._extract_database_boolean(entries, 'predicted_stable_r2scan')
-            if predicted_stable is None:
-                # Try additional aliases for robustness.
-                for alt_name in ('predicted_stable', 'is_stable'):
-                    predicted_stable = self._extract_database_boolean(entries, alt_name)
-                    if predicted_stable is not None:
-                        break
+            predicted_stable = None
+            predicted_stable_field = None
+            for field_name in ('predicted_stable_r2scan', 'predicted_stable', 'is_stable'):
+                predicted_stable = self._extract_database_boolean(entries, field_name)
+                if predicted_stable is not None:
+                    predicted_stable_field = field_name
+                    break
 
             if predicted_stable is not None:
+                selected_entry = self._select_database_boolean_entry(
+                    entries,
+                    predicted_stable_field,
+                    predicted_stable,
+                )
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if predicted_stable else '❌ Unstable',
@@ -655,11 +709,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': '',
                     'description': 'Materials Project predicted stable (r2SCAN)',
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': selected_entry.get('id') if selected_entry else None,
                     'message': 'Decision from Materials Project predicted stable field'
                 }
 
-            hull_value = self._extract_database_metric(entries, 'energy_above_hull_r2scan')
-            if hull_value is not None:
+            hull_entry = self._select_database_metric_entry(entries, 'energy_above_hull_r2scan')
+            if hull_entry is not None:
+                hull_value = float(hull_entry['energy_above_hull_r2scan'])
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if hull_value < threshold else '❌ Unstable',
@@ -668,11 +725,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': threshold_cfg.get('unit', ''),
                     'description': threshold_cfg.get('description', ''),
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': hull_entry.get('id'),
                     'message': f'Decision from energy_above_hull_r2scan ({hull_value:.4f} eV/atom)'
                 }
 
-            formation_value = self._extract_database_metric(entries, 'formation_energy_r2scan')
-            if formation_value is not None:
+            formation_entry = self._select_database_metric_entry(entries, 'formation_energy_r2scan')
+            if formation_entry is not None:
+                formation_value = float(formation_entry['formation_energy_r2scan'])
                 return {
                     'status': 'success',
                     'stability': '✅ Stable' if formation_value < 0.0 else '❌ Unstable',
@@ -681,6 +741,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     'unit': 'eV/atom',
                     'description': 'Formation energy fallback (negative => stable)',
                     'num_matches': len(cif_strings),
+                    'matched_entry_ids': matched_entry_ids,
+                    'selected_entry_id': formation_entry.get('id'),
                     'message': 'Fallback decision from formation_energy_r2scan'
                 }
 
@@ -692,12 +754,15 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': len(cif_strings),
+                'matched_entry_ids': matched_entry_ids,
+                'selected_entry_id': None,
                 'message': 'No usable MP stability fields found (predicted_stable, energy_above_hull, formation_energy)'
             }
 
-        raw_value = self._extract_database_metric(entries, metric_name)
+        selected_entry = self._select_database_metric_entry(entries, metric_name)
 
-        if raw_value is not None:
+        if selected_entry is not None:
+            raw_value = float(selected_entry[metric_name])
             return {
                 'status': 'success',
                 'stability': '✅ Stable' if raw_value < threshold else '❌ Unstable',
@@ -706,6 +771,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'unit': threshold_cfg.get('unit', ''),
                 'description': threshold_cfg.get('description', ''),
                 'num_matches': len(cif_strings),
+                'matched_entry_ids': matched_entry_ids,
+                'selected_entry_id': selected_entry.get('id'),
                 'message': f'{len(cif_strings)} entries evaluated for {metric_name}'
             }
 
@@ -717,8 +784,71 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             'unit': threshold_cfg.get('unit', ''),
             'description': threshold_cfg.get('description', ''),
             'num_matches': len(cif_strings),
+            'matched_entry_ids': matched_entry_ids,
+            'selected_entry_id': None,
             'message': f'Stability metric "{metric_name}" not available in database response'
         }
+
+    def _extract_database_entry_ids(self, entries: List[Dict[str, Any]]) -> List[str]:
+        """Return unique database IDs from the entries retained for evaluation."""
+        entry_ids: List[str] = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            entry_id = entry.get('id')
+            if entry_id is not None and entry_id not in entry_ids:
+                entry_ids.append(entry_id)
+        return entry_ids
+
+    def _select_database_metric_entry(
+        self,
+        entries: List[Dict[str, Any]],
+        metric_name: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the entry with the lowest usable value for a metric."""
+        selected_entry = None
+        selected_value = None
+
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            raw = entry.get(metric_name)
+            if raw is None:
+                continue
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if selected_value is None or value < selected_value:
+                selected_entry = entry
+                selected_value = value
+
+        return selected_entry
+
+    def _select_database_boolean_entry(
+        self,
+        entries: List[Dict[str, Any]],
+        field_name: str,
+        selected_value: bool,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the first entry carrying the boolean used for an MP decision."""
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            raw = entry.get(field_name)
+            if isinstance(raw, bool) and raw is selected_value:
+                return entry
+            if isinstance(raw, str):
+                normalized = raw.strip().lower()
+                if normalized in ('true', '1', 'yes'):
+                    parsed = True
+                elif normalized in ('false', '0', 'no'):
+                    parsed = False
+                else:
+                    continue
+                if parsed is selected_value:
+                    return entry
+        return None
 
     def _extract_database_metric(self, entries: List[Dict[str, Any]], metric_name: str) -> Optional[float]:
         """Extract a representative thermodynamic metric value from DB entries."""
@@ -832,6 +962,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         # Prepare predictor instances
         predictor_instances = []
         for pred_config in active_predictors:
+            self._check_cancelled()
             pred_key = pred_config['value']
             pred_name = pred_config['name']
             
@@ -848,6 +979,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         def _run_single_predictor(pred_key: str, pred_name: str, pred_instance):
             try:
+                self._check_cancelled()
                 if self.logger:
                     self.logger.log(f'Running {pred_name}...', 'info')
 
@@ -871,6 +1003,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     relax_atoms=True,
                     relax_cell=True,
                 )
+                self._check_cancelled()
 
                 # Evaluate stability
                 source_name = pred_result.get('source', pred_key).lower()
@@ -889,6 +1022,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         self.logger.log(f'{pred_name}: {stability_data["stability"]}', 'info')
 
                 return source_name, stability_data
+            except StabilityConsensusAnalysisCancelled:
+                raise
             except Exception as e:
                 if self.logger:
                     self.logger.log(f'Error running {pred_name}: {str(e)}', 'error')
@@ -905,9 +1040,12 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 for pred_key, pred_name, pred_instance in predictor_instances
             }
             for future in as_completed(future_map):
+                self._check_cancelled()
                 source_name, stability_data = future.result()
                 results[source_name] = stability_data
-        
+
+        self._check_cancelled()
+
         return results
     
     def _evaluate_predictor_stability(

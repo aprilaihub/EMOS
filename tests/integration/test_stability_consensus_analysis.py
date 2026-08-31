@@ -13,6 +13,10 @@ actual Docker containers, databases to be online, or network calls.
 Run with: pytest tests/integration/test_stability_consensus_analysis.py -v
 """
 
+import json
+import threading
+import time
+
 import pytest
 from unittest.mock import Mock, MagicMock, patch
 from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import (
@@ -140,14 +144,17 @@ O1 1.0 0.5 0.5 0.5
                 'materialsproject': {
                     'status': 'success',
                     'stability': '✅ Stable',
-                    'raw_value': 0.02
+                    'raw_value': 0.02,
+                    'matched_entry_ids': ['mp-100', 'mp-200'],
+                    'selected_entry_id': 'mp-200',
                 }
             },
             'summary': {
                 'consensus': '✅ All sources agree: Stable',
                 'stable_count': 1,
                 'unstable_count': 0
-            }
+            },
+            'plot_data': {'legacy': 'must not be downloaded'},
         }
         
         formatted = feature.format_outputs(results)
@@ -156,6 +163,12 @@ O1 1.0 0.5 0.5 0.5
         assert formatted['downloadResultsJson'] is not None
         assert 'Al2O3' in formatted['downloadResultsJson']
         assert '✅ Stable' in formatted['downloadResultsJson']
+        downloaded = json.loads(formatted['downloadResultsJson'])
+        assert 'plot_data' not in formatted
+        assert 'plot_data' not in downloaded
+        mp_result = downloaded['sources']['materialsproject']
+        assert mp_result['matched_entry_ids'] == ['mp-100', 'mp-200']
+        assert mp_result['selected_entry_id'] == 'mp-200'
     
     def test_output_format_error(self):
         """Test output formatting for error cases."""
@@ -339,6 +352,62 @@ Al1 1.0 0.0 0.0 0.0 Al
         # Should extract Al composition
         assert 'composition' in result
         assert 'Al' in result['composition'] or 'error' not in result
+
+
+class TestCancellationFlow:
+    """Exercise the same stream and cancel endpoints used by the UI."""
+
+    def test_cancel_endpoint_stops_the_streamed_feature(self):
+        from backend import app as backend_app
+
+        started = threading.Event()
+        streamed_events = []
+
+        class SlowFeature(StabilityConsensusAnalysisFeature):
+            def _process_single_cif(self, cif_name, *_args):
+                started.set()
+                while True:
+                    self._check_cancelled()
+                    time.sleep(0.01)
+
+        def consume_stream():
+            with backend_app.app.test_client() as client:
+                response = client.post(
+                    '/api/process/2/stream',
+                    json={'cif_files': [{'name': 'slow.cif', 'content': 'unused'}]},
+                    buffered=False,
+                )
+                streamed_events.extend(chunk.decode() for chunk in response.response)
+
+        with patch.object(
+            backend_app,
+            'create_feature',
+            side_effect=lambda *_args: SlowFeature(backend_app.logger),
+        ):
+            worker = threading.Thread(target=consume_stream)
+            worker.start()
+            try:
+                assert started.wait(2), 'analysis did not start'
+                with backend_app.app.test_client() as client:
+                    cancel_response = client.post('/api/process/2/cancel')
+                assert cancel_response.status_code == 200
+                assert cancel_response.get_json()['status'] == 'cancelled'
+                worker.join(2)
+                assert not worker.is_alive(), 'analysis did not terminate after cancellation'
+            finally:
+                active = backend_app._active_features.get('2')
+                if active is not None:
+                    active.cancel()
+                worker.join(2)
+                backend_app._active_features.pop('2', None)
+
+        result_events = [
+            event for event in streamed_events
+            if event.startswith('event: result')
+        ]
+        assert result_events
+        result = json.loads(result_events[-1].split('data: ', 1)[1])
+        assert result['status'] == 'cancelled'
 
 
 if __name__ == '__main__':

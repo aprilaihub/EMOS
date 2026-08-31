@@ -1,0 +1,213 @@
+cif_name,composition,source,status,stability,stability_class,raw_value,threshold,unit,description,message
+AcDy3 (1).cif,AcDy3,materialsproject,success,❌ Unstable,unstable,0.0712,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0712 eV/atom)
+AcDy3 (1).cif,AcDy3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+AcDy3 (1).cif,AcDy3,chgnet,success,❌ Unstable,unstable,1.1716,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+AcDy3 (1).cif,AcDy3,mattersim,success,❌ Unstable,unstable,0.9101,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+AcDy3.cif,AcDy3,materialsproject,success,❌ Unstable,unstable,0.0763,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0763 eV/atom)
+AcDy3.cif,AcDy3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+AcDy3.cif,AcDy3,chgnet,success,❌ Unstable,unstable,1.1719,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+AcDy3.cif,AcDy3,mattersim,success,❌ Unstable,unstable,0.9101,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+AcEr3.cif,AcEr3,materialsproject,success,❌ Unstable,unstable,0.0754,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0754 eV/atom)
+AcEr3.cif,AcEr3,alexandria,success,❌ Unstable,unstable,0.0728,0.05,eV/atom,Distance to convex hull,No entries under threshold; fallback hull_distance value used
+AcEr3.cif,AcEr3,chgnet,success,❌ Unstable,unstable,2.71,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+AcEr3.cif,AcEr3,mattersim,success,❌ Unstable,unstable,1.8421,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3As2.cif,Ba3As2,materialsproject,success,❌ Unstable,unstable,0.4142,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.4142 eV/atom)
+Ba3As2.cif,Ba3As2,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Ba3As2.cif,Ba3As2,chgnet,success,❌ Unstable,unstable,2.1719,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3As2.cif,Ba3As2,mattersim,success,❌ Unstable,unstable,1.8155,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3AsN.cif,Ba3AsN,materialsproject,success,❌ Unstable,unstable,0.0811,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0811 eV/atom)
+Ba3AsN.cif,Ba3AsN,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Ba3AsN.cif,Ba3AsN,chgnet,success,❌ Unstable,unstable,3.2949,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3AsN.cif,Ba3AsN,mattersim,success,❌ Unstable,unstable,3.0914,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3AsP.cif,Ba3AsP,materialsproject,success,❌ Unstable,unstable,0.3437,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.3437 eV/atom)
+Ba3AsP.cif,Ba3AsP,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Ba3AsP.cif,Ba3AsP,chgnet,success,❌ Unstable,unstable,2.8803,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Ba3AsP.cif,Ba3AsP,mattersim,success,❌ Unstable,unstable,2.2908,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+CsHo3.cif,CsHo3,materialsproject,success,❌ Unstable,unstable,0.7304,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.7304 eV/atom)
+CsHo3.cif,CsHo3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+CsHo3.cif,CsHo3,chgnet,success,❌ Unstable,unstable,2.3282,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+CsHo3.cif,CsHo3,mattersim,success,❌ Unstable,unstable,2.39,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Dy.cif,Eu3Dy,materialsproject,success,❌ Unstable,unstable,0.0814,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0814 eV/atom)
+Eu3Dy.cif,Eu3Dy,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Eu3Dy.cif,Eu3Dy,chgnet,success,✅ Stable,stable,-0.5378,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Dy.cif,Eu3Dy,mattersim,success,✅ Stable,stable,-1.1902,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Ho.cif,Eu3Ho,materialsproject,success,❌ Unstable,unstable,0.0827,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0827 eV/atom)
+Eu3Ho.cif,Eu3Ho,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Eu3Ho.cif,Eu3Ho,chgnet,success,✅ Stable,stable,-0.6826,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Ho.cif,Eu3Ho,mattersim,success,✅ Stable,stable,-1.2416,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Mg.cif,Eu3Mg,materialsproject,success,✅ Stable,stable,0.0293,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0293 eV/atom)
+Eu3Mg.cif,Eu3Mg,alexandria,success,✅ Stable,stable,0.0332,0.05,eV/atom,Distance to convex hull,2 entries evaluated for hull_distance
+Eu3Mg.cif,Eu3Mg,chgnet,success,❌ Unstable,unstable,0.0629,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Mg.cif,Eu3Mg,mattersim,success,✅ Stable,stable,-0.6123,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Tm.cif,Eu3Tm,materialsproject,success,❌ Unstable,unstable,0.0835,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0835 eV/atom)
+Eu3Tm.cif,Eu3Tm,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Eu3Tm.cif,Eu3Tm,chgnet,success,✅ Stable,stable,-0.0817,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Tm.cif,Eu3Tm,mattersim,success,✅ Stable,stable,-0.661,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Zr.cif,Eu3Zr,materialsproject,success,❌ Unstable,unstable,0.3303,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.3303 eV/atom)
+Eu3Zr.cif,Eu3Zr,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Eu3Zr.cif,Eu3Zr,chgnet,success,✅ Stable,stable,-0.9781,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Zr.cif,Eu3Zr,mattersim,success,✅ Stable,stable,-1.6346,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Zr_2.cif,Eu3Zr,materialsproject,success,❌ Unstable,unstable,0.3172,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.3172 eV/atom)
+Eu3Zr_2.cif,Eu3Zr,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+Eu3Zr_2.cif,Eu3Zr,chgnet,success,✅ Stable,stable,-0.9792,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Eu3Zr_2.cif,Eu3Zr,mattersim,success,✅ Stable,stable,-1.6346,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+EuEr.cif,EuEr,materialsproject,success,❌ Unstable,unstable,0.1011,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.1011 eV/atom)
+EuEr.cif,EuEr,alexandria,success,❌ Unstable,unstable,0.0807,0.05,eV/atom,Distance to convex hull,No entries under threshold; fallback hull_distance value used
+EuEr.cif,EuEr,chgnet,success,❌ Unstable,unstable,1.2885,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+EuEr.cif,EuEr,mattersim,success,❌ Unstable,unstable,0.359,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+EuTh3.cif,EuTh3,materialsproject,success,❌ Unstable,unstable,0.1761,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.1761 eV/atom)
+EuTh3.cif,EuTh3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+EuTh3.cif,EuTh3,chgnet,success,✅ Stable,stable,-0.6092,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+EuTh3.cif,EuTh3,mattersim,success,✅ Stable,stable,-1.0365,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+GdZnAsO.cif,GdZnAsO,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+GdZnAsO.cif,GdZnAsO,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+GdZnAsO.cif,GdZnAsO,chgnet,success,✅ Stable,stable,-1.1399,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+GdZnAsO.cif,GdZnAsO,mattersim,success,✅ Stable,stable,-1.4814,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+HfC.cif,HfC,materialsproject,success,❌ Unstable,unstable,1.3391,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (1.3391 eV/atom)
+HfC.cif,HfC,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+HfC.cif,HfC,mattersim,success,✅ Stable,stable,-0.359,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+HfC.cif,HfC,chgnet,success,✅ Stable,stable,-0.0487,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+HfTaTiB4MoC4.cif,HfTaTiB4MoC4,materialsproject,success,❌ Unstable,unstable,0.6142,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.6142 eV/atom)
+HfTaTiB4MoC4.cif,HfTaTiB4MoC4,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+HfTaTiB4MoC4.cif,HfTaTiB4MoC4,mattersim,success,✅ Stable,stable,-1.2976,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+HfTaTiB4MoC4.cif,HfTaTiB4MoC4,chgnet,success,✅ Stable,stable,-1.1053,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+KPm3.cif,KPm3,materialsproject,success,❌ Unstable,unstable,0.4811,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.4811 eV/atom)
+KPm3.cif,KPm3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+KPm3.cif,KPm3,chgnet,success,❌ Unstable,unstable,1.2411,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+KPm3.cif,KPm3,mattersim,success,❌ Unstable,unstable,1.076,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+KPm3_2.cif,KPm3,materialsproject,success,❌ Unstable,unstable,0.4686,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.4686 eV/atom)
+KPm3_2.cif,KPm3,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+KPm3_2.cif,KPm3,chgnet,success,❌ Unstable,unstable,1.2418,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+KPm3_2.cif,KPm3,mattersim,success,❌ Unstable,unstable,1.076,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Lu2MgSe4.cif,Lu2MgSe4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Lu2MgSe4.cif,Lu2MgSe4,alexandria,success,✅ Stable,stable,0.0156,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Lu2MgSe4.cif,Lu2MgSe4,mattersim,success,✅ Stable,stable,-0.4689,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Lu2MgSe4.cif,Lu2MgSe4,chgnet,success,✅ Stable,stable,-0.4492,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Mg(ScSe2)2.cif,Mg(ScSe2)2,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Mg(ScSe2)2.cif,Mg(ScSe2)2,alexandria,success,✅ Stable,stable,0.0233,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Mg(ScSe2)2.cif,Mg(ScSe2)2,mattersim,success,✅ Stable,stable,-0.8785,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Mg(ScSe2)2.cif,Mg(ScSe2)2,chgnet,success,✅ Stable,stable,-0.8505,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+NbVB4.cif,NbVB4,materialsproject,success,✅ Stable,stable,0.0132,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0132 eV/atom)
+NbVB4.cif,NbVB4,alexandria,success,✅ Stable,stable,0.0118,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+NbVB4.cif,NbVB4,chgnet,success,✅ Stable,stable,-1.5842,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+NbVB4.cif,NbVB4,mattersim,success,✅ Stable,stable,-1.9949,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+NpS.cif,NpS,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+NpS.cif,NpS,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+NpS.cif,NpS,mattersim,success,✅ Stable,stable,-2.8719,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+NpS.cif,NpS,chgnet,success,✅ Stable,stable,-2.9054,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+PtC.cif,PtC,materialsproject,success,❌ Unstable,unstable,2.0091,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (2.0091 eV/atom)
+PtC.cif,PtC,alexandria,success,❌ Unstable,unstable,2.5194,0.05,eV/atom,Distance to convex hull,No entries under threshold; fallback hull_distance value used
+PtC.cif,PtC,mattersim,success,❌ Unstable,unstable,2.2595,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+PtC.cif,PtC,chgnet,success,❌ Unstable,unstable,2.4227,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc15C19.cif,Sc15C19,materialsproject,success,✅ Stable,stable,0.0017,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0017 eV/atom)
+Sc15C19.cif,Sc15C19,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,2 entries evaluated for hull_distance
+Sc15C19.cif,Sc15C19,mattersim,success,✅ Stable,stable,-6.244,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc15C19.cif,Sc15C19,chgnet,success,✅ Stable,stable,-6.1717,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2BC2.cif,Sc2BC2,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc2BC2.cif,Sc2BC2,alexandria,success,✅ Stable,stable,0.0167,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc2BC2.cif,Sc2BC2,mattersim,success,✅ Stable,stable,-2.5417,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2BC2.cif,Sc2BC2,chgnet,success,✅ Stable,stable,-2.3548,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2C3.cif,Sc2C3,materialsproject,success,❌ Unstable,unstable,0.1126,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.1126 eV/atom)
+Sc2C3.cif,Sc2C3,alexandria,no_exact_formula_match,,unknown,,0.05,eV/atom,Distance to convex hull,No exact formula match found for Sc2C3 in returned entries
+Sc2C3.cif,Sc2C3,mattersim,success,✅ Stable,stable,-2.4349,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2C3.cif,Sc2C3,chgnet,success,✅ Stable,stable,-2.2254,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2ZnSe4.cif,Sc2ZnSe4,materialsproject,success,✅ Stable,stable,0.0131,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0131 eV/atom)
+Sc2ZnSe4.cif,Sc2ZnSe4,alexandria,success,✅ Stable,stable,0.0249,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc2ZnSe4.cif,Sc2ZnSe4,chgnet,success,✅ Stable,stable,-0.6035,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc2ZnSe4.cif,Sc2ZnSe4,mattersim,success,✅ Stable,stable,-0.61,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3C4.cif,Sc3C4,materialsproject,no_exact_formula_match,,unknown,,0.05,eV/atom,Formation energy above convex hull,No exact formula match found for Sc3C4 in returned entries
+Sc3C4.cif,Sc3C4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,2 entries evaluated for hull_distance
+Sc3C4.cif,Sc3C4,mattersim,success,✅ Stable,stable,-6.127,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3C4.cif,Sc3C4,chgnet,success,✅ Stable,stable,-6.0686,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3CoC4.cif,Sc3CoC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3CoC4.cif,Sc3CoC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3CoC4.cif,Sc3CoC4,chgnet,success,✅ Stable,stable,-2.2342,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3CoC4.cif,Sc3CoC4,mattersim,success,✅ Stable,stable,-2.5284,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3FeC4.cif,Sc3FeC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3FeC4.cif,Sc3FeC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3FeC4.cif,Sc3FeC4,mattersim,success,✅ Stable,stable,-2.6176,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3FeC4.cif,Sc3FeC4,chgnet,success,✅ Stable,stable,-2.3487,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3IrC4 (1).cif,Sc3IrC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3IrC4 (1).cif,Sc3IrC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3IrC4 (1).cif,Sc3IrC4,mattersim,success,✅ Stable,stable,-2.664,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3IrC4 (1).cif,Sc3IrC4,chgnet,success,✅ Stable,stable,-2.443,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3IrC4.cif,Sc3IrC4,materialsproject,success,✅ Stable,stable,0.0032,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0032 eV/atom)
+Sc3IrC4.cif,Sc3IrC4,alexandria,success,✅ Stable,stable,0.004,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3IrC4.cif,Sc3IrC4,mattersim,success,✅ Stable,stable,-2.6623,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3IrC4.cif,Sc3IrC4,chgnet,success,✅ Stable,stable,-2.4429,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3NiC4.cif,Sc3NiC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3NiC4.cif,Sc3NiC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3NiC4.cif,Sc3NiC4,mattersim,success,✅ Stable,stable,-2.4201,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3NiC4.cif,Sc3NiC4,chgnet,success,✅ Stable,stable,-2.1057,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3OsC4 (1).cif,Sc3OsC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3OsC4 (1).cif,Sc3OsC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3OsC4 (1).cif,Sc3OsC4,chgnet,success,✅ Stable,stable,-2.4772,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3OsC4 (1).cif,Sc3OsC4,mattersim,success,✅ Stable,stable,-2.7463,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3OsC4.cif,Sc3OsC4,materialsproject,success,✅ Stable,stable,0.0032,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0032 eV/atom)
+Sc3OsC4.cif,Sc3OsC4,alexandria,success,✅ Stable,stable,0.0023,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3OsC4.cif,Sc3OsC4,chgnet,success,✅ Stable,stable,-2.4774,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3OsC4.cif,Sc3OsC4,mattersim,success,✅ Stable,stable,-2.7463,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RhC4 (1).cif,Sc3RhC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3RhC4 (1).cif,Sc3RhC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3RhC4 (1).cif,Sc3RhC4,chgnet,success,✅ Stable,stable,-2.8835,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RhC4 (1).cif,Sc3RhC4,mattersim,success,✅ Stable,stable,-3.0848,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RhC4.cif,Sc3RhC4,materialsproject,success,✅ Stable,stable,0.0034,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0034 eV/atom)
+Sc3RhC4.cif,Sc3RhC4,alexandria,success,✅ Stable,stable,0.0038,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3RhC4.cif,Sc3RhC4,mattersim,success,✅ Stable,stable,-3.0848,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RhC4.cif,Sc3RhC4,chgnet,success,✅ Stable,stable,-2.8838,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RuC4 (1).cif,Sc3RuC4,materialsproject,success,✅ Stable,stable,0.002,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0020 eV/atom)
+Sc3RuC4 (1).cif,Sc3RuC4,alexandria,success,✅ Stable,stable,0.0021,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3RuC4 (1).cif,Sc3RuC4,mattersim,success,✅ Stable,stable,-2.5623,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RuC4 (1).cif,Sc3RuC4,chgnet,success,✅ Stable,stable,-2.3275,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RuC4.cif,Sc3RuC4,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc3RuC4.cif,Sc3RuC4,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc3RuC4.cif,Sc3RuC4,mattersim,success,✅ Stable,stable,-4.4326,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc3RuC4.cif,Sc3RuC4,chgnet,success,✅ Stable,stable,-4.3003,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc4C3.cif,Sc4C3,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc4C3.cif,Sc4C3,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc4C3.cif,Sc4C3,mattersim,success,✅ Stable,stable,-2.8095,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc4C3.cif,Sc4C3,chgnet,success,✅ Stable,stable,-2.522,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc5Re2C7.cif,Sc5Re2C7,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+Sc5Re2C7.cif,Sc5Re2C7,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+Sc5Re2C7.cif,Sc5Re2C7,mattersim,success,✅ Stable,stable,-5.4625,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Sc5Re2C7.cif,Sc5Re2C7,chgnet,success,✅ Stable,stable,-5.3916,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ScBC.cif,ScBC,materialsproject,success,✅ Stable,stable,0.039,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0390 eV/atom)
+ScBC.cif,ScBC,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+ScBC.cif,ScBC,mattersim,success,✅ Stable,stable,-2.2761,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ScBC.cif,ScBC,chgnet,success,✅ Stable,stable,-2.0023,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ScC.cif,ScC,materialsproject,success,❌ Unstable,unstable,0.8398,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.8398 eV/atom)
+ScC.cif,ScC,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+ScC.cif,ScC,mattersim,success,✅ Stable,stable,-1.8858,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ScC.cif,ScC,chgnet,success,✅ Stable,stable,-1.7572,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+SmSe.cif,SmSe,materialsproject,success,❌ Unstable,unstable,0.5353,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.5353 eV/atom)
+SmSe.cif,SmSe,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+SmSe.cif,SmSe,mattersim,success,❌ Unstable,unstable,0.0362,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+SmSe.cif,SmSe,chgnet,success,❌ Unstable,unstable,0.1794,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TaB2.cif,TaB2,materialsproject,success,✅ Stable,stable,0.0,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0000 eV/atom)
+TaB2.cif,TaB2,alexandria,success,✅ Stable,stable,0.0,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+TaB2.cif,TaB2,mattersim,success,✅ Stable,stable,-1.6796,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TaB2.cif,TaB2,chgnet,success,✅ Stable,stable,-1.3524,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TaVB4.cif,TaVB4,materialsproject,success,✅ Stable,stable,0.0008,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0008 eV/atom)
+TaVB4.cif,TaVB4,alexandria,success,✅ Stable,stable,0.0001,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+TaVB4.cif,TaVB4,chgnet,success,✅ Stable,stable,-1.4562,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TaVB4.cif,TaVB4,mattersim,success,✅ Stable,stable,-1.8439,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TbSe.cif,TbSe,materialsproject,success,❌ Unstable,unstable,0.5254,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.5254 eV/atom)
+TbSe.cif,TbSe,alexandria,not_found,⚠️ Not found,not_found,,0.05,eV/atom,Distance to convex hull,No entries found with hull_distance <= 0.05
+TbSe.cif,TbSe,mattersim,success,❌ Unstable,unstable,0.6827,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TbSe.cif,TbSe,chgnet,success,❌ Unstable,unstable,0.6597,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ThH3.cif,ThH3,materialsproject,success,❌ Unstable,unstable,0.0718,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0718 eV/atom)
+ThH3.cif,ThH3,alexandria,no_exact_formula_match,,unknown,,0.05,eV/atom,Distance to convex hull,No exact formula match found for ThH3 in returned entries
+ThH3.cif,ThH3,chgnet,success,❌ Unstable,unstable,0.8324,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ThH3.cif,ThH3,mattersim,success,❌ Unstable,unstable,0.7128,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TiVRu2.cif,TiVRu2,materialsproject,success,✅ Stable,stable,0.0358,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.0358 eV/atom)
+TiVRu2.cif,TiVRu2,alexandria,success,✅ Stable,stable,0.0246,0.05,eV/atom,Distance to convex hull,1 entries evaluated for hull_distance
+TiVRu2.cif,TiVRu2,chgnet,success,✅ Stable,stable,-1.2616,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+TiVRu2.cif,TiVRu2,mattersim,success,✅ Stable,stable,-1.5309,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Tm4Ir.cif,Tm4Ir,materialsproject,success,❌ Unstable,unstable,0.6066,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (0.6066 eV/atom)
+Tm4Ir.cif,Tm4Ir,alexandria,no_exact_formula_match,,unknown,,0.05,eV/atom,Distance to convex hull,No exact formula match found for Tm4Ir in returned entries
+Tm4Ir.cif,Tm4Ir,chgnet,success,❌ Unstable,unstable,2.5462,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+Tm4Ir.cif,Tm4Ir,mattersim,success,❌ Unstable,unstable,2.5988,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ZrScTc2.cif,ZrScTc2,materialsproject,success,❌ Unstable,unstable,3.577,0.05,eV/atom,Formation energy above convex hull,Decision from energy_above_hull_r2scan (3.5770 eV/atom)
+ZrScTc2.cif,ZrScTc2,alexandria,no_exact_formula_match,,unknown,,0.05,eV/atom,Distance to convex hull,No exact formula match found for ZrScTc2 in returned entries
+ZrScTc2.cif,ZrScTc2,chgnet,success,✅ Stable,stable,-1.3714,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"
+ZrScTc2.cif,ZrScTc2,mattersim,success,✅ Stable,stable,-1.875,0.0,eV/atom,MLIP formation enthalpy per atom (ΔHf < 0 => stable),"ΔHf = E(compound) − Σ x_i E(element_i), stable if ΔHf < 0"

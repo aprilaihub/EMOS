@@ -8,6 +8,8 @@ Tests cover:
 - Error handling and edge cases
 """
 
+import json
+
 import pytest
 from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import (
     StabilityConsensusAnalysisFeature
@@ -72,7 +74,43 @@ class TestDatabaseStabilityEvaluation:
         assert result['status'] == 'success'
         assert '❌' in result['stability']
         assert result['raw_value'] == 0.15
-    
+
+    def test_materialsproject_reports_matched_and_selected_entry_ids(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'materialsproject',
+            'queries': {},
+            'entries': [
+                {'id': 'mp-100', 'energy_above_hull_r2scan': 0.12},
+                {'id': 'mp-200', 'energy_above_hull_r2scan': 0.02},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('materialsproject', db_result)
+
+        assert result['matched_entry_ids'] == ['mp-100', 'mp-200']
+        assert result['selected_entry_id'] == 'mp-200'
+        assert result['raw_value'] == 0.02
+
+    def test_materialsproject_reports_id_used_for_boolean_decision(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'materialsproject',
+            'queries': {},
+            'entries': [
+                {'id': 'mp-unstable', 'predicted_stable_r2scan': False},
+                {'id': 'mp-stable', 'predicted_stable_r2scan': True},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('materialsproject', db_result)
+
+        assert result['matched_entry_ids'] == ['mp-unstable', 'mp-stable']
+        assert result['selected_entry_id'] == 'mp-stable'
+        assert result['raw_value'] is True
+
     def test_evaluate_stable_alexandria(self):
         """Test evaluation of stable structure (Alexandria)."""
         feature = StabilityConsensusAnalysisFeature()
@@ -89,6 +127,24 @@ class TestDatabaseStabilityEvaluation:
         assert result['status'] == 'success'
         assert '✅' in result['stability']
         assert result['raw_value'] == 0.03
+
+    def test_alexandria_reports_matched_and_selected_entry_ids(self):
+        feature = StabilityConsensusAnalysisFeature()
+        db_result = {
+            'source': 'alexandria',
+            'queries': {},
+            'entries': [
+                {'id': 'alex-100', 'hull_distance': 0.04},
+                {'id': 'alex-200', 'hull_distance': 0.01},
+            ],
+            'cif_strings': ['CIF_DATA_1', 'CIF_DATA_2'],
+        }
+
+        result = feature._evaluate_database_stability('alexandria', db_result)
+
+        assert result['matched_entry_ids'] == ['alex-100', 'alex-200']
+        assert result['selected_entry_id'] == 'alex-200'
+        assert result['raw_value'] == 0.01
     
     def test_evaluate_no_matches(self):
         """Test evaluation when no structures found."""
@@ -377,28 +433,6 @@ class TestConsensusSummary:
         assert summary['total_sources'] == 0
         assert 'Insufficient data' in summary['consensus']
 
-    def test_plot_data_includes_not_found_as_error_count(self):
-        """Test plot data tracks not_found entries as grey/error segments."""
-        feature = StabilityConsensusAnalysisFeature()
-
-        results_per_cif = [
-            {
-                'sources': {
-                    'materialsproject': {'stability': '✅ Stable'},
-                    'alexandria': {'stability': '⚠️ Not found'},
-                    'mattersim': {'stability': '❌ Unstable'},
-                }
-            }
-        ]
-
-        plot_data = feature._compute_source_plot_data(results_per_cif)
-
-        assert plot_data['materialsproject']['stable_count'] == 1
-        assert plot_data['alexandria']['error_count'] == 1
-        assert plot_data['alexandria']['error_pct'] == 100.0
-        assert plot_data['mattersim']['unstable_count'] == 1
-
-
 class TestInputExtraction:
     """Test input extraction from frontend data."""
     
@@ -433,6 +467,53 @@ class TestInputExtraction:
         assert extracted['cif_file'] == ''
         assert extracted['active_databases'] == []
         assert extracted['active_predictors'] == []
+
+
+class TestCancellation:
+    """Test cancellation of an active stability analysis."""
+
+    def test_cancel_sets_the_signal(self):
+        feature = StabilityConsensusAnalysisFeature()
+
+        response = feature.cancel()
+
+        assert response['status'] == 'cancelled'
+        assert feature._cancel_event.is_set()
+
+    def test_cancel_stops_the_batch_before_the_next_cif(self, monkeypatch):
+        feature = StabilityConsensusAnalysisFeature()
+        processed = []
+
+        def process_one(cif_name, *_args):
+            processed.append(cif_name)
+            feature.cancel()
+            return {
+                'cif_name': cif_name,
+                'sources': {},
+                'summary': feature._compute_consensus_summary({}),
+            }
+
+        monkeypatch.setattr(feature, '_process_single_cif', process_one)
+        result = feature.process_feature({
+            'cif_files': [
+                {'name': 'first.cif', 'content': 'first'},
+                {'name': 'second.cif', 'content': 'second'},
+            ],
+        })
+
+        assert result['status'] == 'cancelled'
+        assert processed == ['first.cif']
+
+    def test_stream_returns_a_formatted_cancelled_result(self):
+        feature = StabilityConsensusAnalysisFeature()
+        feature.cancel()
+
+        events = list(feature.process_feature_stream({'cif_file': 'unused'}))
+        payload = json.loads(events[-1].split('data: ', 1)[1])
+
+        assert events[0].startswith('event: log\n')
+        assert payload['status'] == 'cancelled'
+        assert payload['downloadResultsJson'] is None
 
 
 if __name__ == '__main__':
