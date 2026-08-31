@@ -4,7 +4,7 @@
     viewBox="0 0 300 100"
     class="logo-name"
 >
-    <title>EMOS - Electronics Materials Operating System Logo with Name</title>
+    <title>EMOS - Electronic Materials Ontology System Logo with Name</title>
     
     <!-- Logo part (scaled and positioned on left) -->
     <g transform="translate(5,5) scale(0.9)">
@@ -34,10 +34,10 @@
         <!-- EMOS - Large text in blue -->
         <text x="0" y="35" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4A90E2">EMOS</text>
         
-        <!-- Electronics Materials - Smaller text in grey -->
-        <text x="0" y="55" font-family="Arial, sans-serif" font-size="14" fill="#333">Electronics Materials</text>
+        <!-- Electronic Materials - Smaller text in grey -->
+        <text x="0" y="55" font-family="Arial, sans-serif" font-size="14" fill="#333">Electronic Materials</text>
         
-        <!-- Operating System - Smaller text in grey -->
-        <text x="0" y="72" font-family="Arial, sans-serif" font-size="14" fill="#333">Operating System</text>
+        <!-- Ontology System - Smaller text in grey -->
+        <text x="0" y="72" font-family="Arial, sans-serif" font-size="14" fill="#333">Ontology System</text>
     </g>
 </svg>
