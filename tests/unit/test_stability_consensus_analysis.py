@@ -8,6 +8,8 @@ Tests cover:
 - Error handling and edge cases
 """
 
+import json
+
 import pytest
 from Features.Materials_Exploration.StabilityConsensusAnalysis.StabilityConsensusAnalysisFeature import (
     StabilityConsensusAnalysisFeature
@@ -433,6 +435,53 @@ class TestInputExtraction:
         assert extracted['cif_file'] == ''
         assert extracted['active_databases'] == []
         assert extracted['active_predictors'] == []
+
+
+class TestCancellation:
+    """Test cancellation of an active stability analysis."""
+
+    def test_cancel_sets_the_signal(self):
+        feature = StabilityConsensusAnalysisFeature()
+
+        response = feature.cancel()
+
+        assert response['status'] == 'cancelled'
+        assert feature._cancel_event.is_set()
+
+    def test_cancel_stops_the_batch_before_the_next_cif(self, monkeypatch):
+        feature = StabilityConsensusAnalysisFeature()
+        processed = []
+
+        def process_one(cif_name, *_args):
+            processed.append(cif_name)
+            feature.cancel()
+            return {
+                'cif_name': cif_name,
+                'sources': {},
+                'summary': feature._compute_consensus_summary({}),
+            }
+
+        monkeypatch.setattr(feature, '_process_single_cif', process_one)
+        result = feature.process_feature({
+            'cif_files': [
+                {'name': 'first.cif', 'content': 'first'},
+                {'name': 'second.cif', 'content': 'second'},
+            ],
+        })
+
+        assert result['status'] == 'cancelled'
+        assert processed == ['first.cif']
+
+    def test_stream_returns_a_formatted_cancelled_result(self):
+        feature = StabilityConsensusAnalysisFeature()
+        feature.cancel()
+
+        events = list(feature.process_feature_stream({'cif_file': 'unused'}))
+        payload = json.loads(events[-1].split('data: ', 1)[1])
+
+        assert events[0].startswith('event: log\n')
+        assert payload['status'] == 'cancelled'
+        assert payload['downloadResultsJson'] is None
 
 
 if __name__ == '__main__':

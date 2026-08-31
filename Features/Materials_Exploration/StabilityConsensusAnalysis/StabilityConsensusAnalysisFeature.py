@@ -1,13 +1,19 @@
 import json
 import re
-from typing import Any, Dict, List, Optional
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List, Optional
+
 from pymatgen.core import Structure, Composition
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+
 from Features.BaseFeature import BaseFeature
-from Information_Units.Generators.GeneratorFactory import generator_factory
 from Information_Units.Databases.DatabaseFactory import database_factory
 from Information_Units.Predictors.PredictorFactory import predictor_factory
+
+
+class StabilityConsensusAnalysisCancelled(Exception):
+    """Raised internally when a user cancels an active analysis."""
 
 
 class StabilityConsensusAnalysisFeature(BaseFeature):
@@ -51,6 +57,23 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
     
     def __init__(self, logger=None):
         super().__init__("Stability Consensus Analysis", logger)
+        self._cancel_event = threading.Event()
+
+    def cancel(self) -> Dict[str, str]:
+        """Request cooperative termination of the active analysis."""
+        self._cancel_event.set()
+        if self.logger:
+            self.logger.log('Stability Consensus Analysis cancellation requested', 'warning')
+        return {
+            'status': 'cancelled',
+            'message': 'Cancellation requested. Stopping Stability Consensus Analysis.',
+        }
+
+    def _check_cancelled(self) -> None:
+        if self._cancel_event.is_set():
+            raise StabilityConsensusAnalysisCancelled(
+                'Stability Consensus Analysis was cancelled by the user.'
+            )
     
     def info(self):
         return "Stability Consensus Analysis: Query materials databases and run predictors to evaluate multi-source stability consensus"
@@ -106,11 +129,13 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         element_ref_cache: Dict[str, Optional[float]],
     ) -> Dict[str, Any]:
         """Process one CIF and return per-file result payload."""
+        self._check_cancelled()
         if self.logger:
             self.logger.log(f'Processing {cif_name}...', 'info')
 
         # Parse CIF and extract composition, space group
         structure = Structure.from_str(cif_content, fmt='cif')
+        self._check_cancelled()
         composition = structure.composition
         composition_formula = composition.reduced_formula
         mp_materials_id = self._extract_materials_project_id(cif_content)
@@ -150,6 +175,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         active_databases = inputs.get('active_databases', [])
         if active_databases:
+            self._check_cancelled()
             cache_bits = [composition_formula]
             if space_group_number is not None:
                 cache_bits.append(str(space_group_number))
@@ -167,6 +193,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     space_group_number,
                     mp_materials_id,
                 )
+                self._check_cancelled()
                 db_cache[cache_key] = db_results
                 # Annotate each source result with the CIF space group for UI transparency
                 for src_data in db_results.values():
@@ -176,6 +203,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         active_predictors = inputs.get('active_predictors', [])
         if active_predictors:
+            self._check_cancelled()
             element_reference_cifs = self._get_element_reference_cifs(
                 inputs.get('active_databases', []),
                 list(element_fractions.keys()),
@@ -187,6 +215,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 element_fractions,
                 element_reference_cifs,
             )
+            self._check_cancelled()
             result['sources'].update(predictor_results)
 
         result['summary'] = self._compute_consensus_summary(result['sources'])
@@ -208,6 +237,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         fallback_configs = [db for db in active_databases if db.get('value') != 'materialsproject']
 
         for symbol in element_symbols:
+            self._check_cancelled()
             if symbol in element_ref_cache:
                 cached = element_ref_cache[symbol]
                 if cached:
@@ -217,18 +247,22 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             found_cif: Optional[str] = None
             lookup_order = [mp_db_config] + fallback_configs
             for db_config in lookup_order:
+                self._check_cancelled()
                 db_key = db_config.get('value')
                 if db_key not in database_factory:
                     continue
                 try:
                     db_instance = database_factory[db_key](db_key, self.logger)
                     db_result = db_instance.retrieve({'target_compositions': symbol, 'batch_size': 1})
+                    self._check_cancelled()
                     cifs = db_result.get('cif_strings', []) if isinstance(db_result, dict) else []
                     if cifs:
                         found_cif = cifs[0]
                         if self.logger:
                             self.logger.log(f'Element reference found for {symbol} from {db_config.get("name", db_key)}', 'info')
                         break
+                except StabilityConsensusAnalysisCancelled:
+                    raise
                 except Exception as ref_err:
                     if self.logger:
                         self.logger.log(f'Element reference lookup failed for {symbol} in {db_key}: {str(ref_err)}', 'warning')
@@ -378,6 +412,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
     def process_feature(self, inputs):
         """Main processing pipeline for stability consensus analysis."""
         try:
+            self._check_cancelled()
             if self.logger:
                 self.logger.log('Initializing Stability Consensus Analysis...', 'info')
 
@@ -392,6 +427,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             db_cache: Dict[str, Dict[str, Any]] = {}
             element_ref_cache: Dict[str, Optional[float]] = {}
             for entry in cif_entries:
+                self._check_cancelled()
                 try:
                     results_per_cif.append(
                         self._process_single_cif(
@@ -402,6 +438,9 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                             element_ref_cache,
                         )
                     )
+                    self._check_cancelled()
+                except StabilityConsensusAnalysisCancelled:
+                    raise
                 except Exception as single_err:
                     if self.logger:
                         self.logger.log(f'Error in {entry["name"]}: {str(single_err)}', 'error')
@@ -429,7 +468,14 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 self.logger.log('Stability Consensus Analysis processing completed', 'info')
             
             return consensus_results
-        
+
+        except StabilityConsensusAnalysisCancelled as exc:
+            if self.logger:
+                self.logger.log(str(exc), 'warning')
+            return {
+                'status': 'cancelled',
+                'message': str(exc),
+            }
         except Exception as e:
             if self.logger:
                 self.logger.log(f'Error: {str(e)}', 'error')
@@ -437,9 +483,32 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'error': str(e),
                 'status': 'failed'
             }
-    
+
+    def process_feature_stream(self, inputs):
+        """Stream an initial event, then the formatted result.
+
+        Using the feature stream keeps this instance registered with the
+        backend cancellation endpoint for the full lifetime of the analysis.
+        """
+        start_event = {
+            'message': 'Stability Consensus Analysis started',
+            'level': 'info',
+        }
+        yield f"event: log\ndata: {json.dumps(start_event)}\n\n"
+
+        results = self.process_feature(inputs)
+        formatted = self.format_outputs(results)
+        yield f"event: result\ndata: {json.dumps(formatted, ensure_ascii=False)}\n\n"
+
     def format_outputs(self, results):
         """Format results for frontend (JSON string for download)."""
+        if results.get('status') == 'cancelled':
+            return {
+                'status': 'cancelled',
+                'message': results.get('message', 'Analysis cancelled.'),
+                'downloadResultsJson': None,
+            }
+
         if 'error' in results:
             return {
                 'error': results['error'],
@@ -470,6 +539,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         SPACE_GROUP_CAPABLE_DBS = {'alexandria', 'jarvisdft', 'mathub3d', 'aflow', 'cod'}
         
         for db_config in active_databases:
+            self._check_cancelled()
             db_key = db_config['value']
             db_name = db_config['name']
             
@@ -507,6 +577,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     db_inputs[metric_name] = [0.0, threshold]
 
                 db_result = db_instance.retrieve(db_inputs)
+                self._check_cancelled()
 
                 # If strict MP-ID query misses, fall back to composition-only MP lookup.
                 if db_key == 'materialsproject' and mp_materials_id and not db_result.get('cif_strings'):
@@ -517,6 +588,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         )
                     fallback_inputs = {'target_compositions': composition}
                     db_result = db_instance.retrieve(fallback_inputs)
+                    self._check_cancelled()
 
                 fallback_result = None
                 if metric_name and not db_result.get('cif_strings'):
@@ -525,6 +597,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         'target_compositions': composition,
                         'batch_size': 1,
                     })
+                    self._check_cancelled()
 
                 # Extract stability metrics
                 source_name = db_result.get('source', db_key).lower()
@@ -541,6 +614,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 if self.logger:
                     self.logger.log(f'{db_name}: Retrieved {len(db_result.get("cif_strings", []))} structures', 'info')
             
+            except StabilityConsensusAnalysisCancelled:
+                raise
             except Exception as e:
                 if self.logger:
                     self.logger.log(f'Error querying {db_name}: {str(e)}', 'error')
@@ -832,6 +907,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
         # Prepare predictor instances
         predictor_instances = []
         for pred_config in active_predictors:
+            self._check_cancelled()
             pred_key = pred_config['value']
             pred_name = pred_config['name']
             
@@ -848,6 +924,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
 
         def _run_single_predictor(pred_key: str, pred_name: str, pred_instance):
             try:
+                self._check_cancelled()
                 if self.logger:
                     self.logger.log(f'Running {pred_name}...', 'info')
 
@@ -871,6 +948,7 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                     relax_atoms=True,
                     relax_cell=True,
                 )
+                self._check_cancelled()
 
                 # Evaluate stability
                 source_name = pred_result.get('source', pred_key).lower()
@@ -889,6 +967,8 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                         self.logger.log(f'{pred_name}: {stability_data["stability"]}', 'info')
 
                 return source_name, stability_data
+            except StabilityConsensusAnalysisCancelled:
+                raise
             except Exception as e:
                 if self.logger:
                     self.logger.log(f'Error running {pred_name}: {str(e)}', 'error')
@@ -905,9 +985,12 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 for pred_key, pred_name, pred_instance in predictor_instances
             }
             for future in as_completed(future_map):
+                self._check_cancelled()
                 source_name, stability_data = future.result()
                 results[source_name] = stability_data
-        
+
+        self._check_cancelled()
+
         return results
     
     def _evaluate_predictor_stability(

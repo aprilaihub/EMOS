@@ -5,31 +5,48 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
         this.uploadedCifFiles = [];
         this.pendingFileReads = 0;
         this.selectedCifCount = 0;
+        this._abortController = null;
     }
 
     createInputsHTML() {
         return `
-            <div class="input-controls">
-                <div class="form-group">
-                    <label for="cifFile_${this.featureId}">Upload CIF File(s):</label>
-                    <input type="file" id="cifFile_${this.featureId}" accept=".cif" class="file-input" multiple>
-                    <small>Upload one or more crystal structure CIF files</small>
+            <div class="input-controls" style="align-items:center; gap:24px;">
+                <div style="width:min(100%, 640px); text-align:center;">
+                    <label for="cifFile_${this.featureId}" style="align-items:stretch; gap:8px;">
+                        <span>CIF Files</span>
+                        <input type="file" id="cifFile_${this.featureId}" accept=".cif" multiple style="box-sizing:border-box; flex:none; width:100%; text-align:left;">
+                    </label>
+                    <small style="display:block; margin-top:7px; color:#6c757d;">Upload one or more crystal structure CIF files</small>
                 </div>
-                
-                <div class="form-group">
-                    <label>Select Databases:</label>
-                    <div id="dbCheckboxes_${this.featureId}" class="checkbox-group">
-                        <label><input type="checkbox" name="database" value="materialsproject"> Materials Project</label>
-                        <label><input type="checkbox" name="database" value="alexandria"> Alexandria</label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Select Predictors:</label>
-                    <div id="predCheckboxes_${this.featureId}" class="checkbox-group">
-                        <label><input type="checkbox" name="predictor" value="mattersim"> MatterSim</label>
-                        <label><input type="checkbox" name="predictor" value="chgnet"> CHGNet</label>
-                    </div>
+
+                <div style="display:grid; grid-template-columns:1fr; gap:16px; width:min(100%, 520px);">
+                    <fieldset style="box-sizing:border-box; margin:0; padding:14px 16px 16px; border:1px solid #d9dee7; border-radius:8px; background:#fff;">
+                        <legend style="padding:0 7px; color:#495057; font-weight:600;">Databases</legend>
+                        <div id="dbCheckboxes_${this.featureId}" style="display:flex; flex-direction:column; gap:8px;">
+                            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                                <input type="checkbox" name="database" value="materialsproject" style="width:18px; height:18px; margin:0; padding:0;">
+                                <span style="text-align:left;">Materials Project</span>
+                            </label>
+                            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                                <input type="checkbox" name="database" value="alexandria" style="width:18px; height:18px; margin:0; padding:0;">
+                                <span style="text-align:left;">Alexandria</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset style="box-sizing:border-box; margin:0; padding:14px 16px 16px; border:1px solid #d9dee7; border-radius:8px; background:#fff;">
+                        <legend style="padding:0 7px; color:#495057; font-weight:600;">Predictors</legend>
+                        <div id="predCheckboxes_${this.featureId}" style="display:flex; flex-direction:column; gap:8px;">
+                            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                                <input type="checkbox" name="predictor" value="mattersim" style="width:18px; height:18px; margin:0; padding:0;">
+                                <span style="text-align:left;">MatterSim</span>
+                            </label>
+                            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                                <input type="checkbox" name="predictor" value="chgnet" style="width:18px; height:18px; margin:0; padding:0;">
+                                <span style="text-align:left;">CHGNet</span>
+                            </label>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
         `;
@@ -128,6 +145,101 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
 
     async processFeature() {
         throw new Error('Local fallback is not supported for this feature. Please start the Python backend.');
+    }
+
+    async callPythonBackend() {
+        const inputs = this.collectInputData();
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
+        const controller = new AbortController();
+        this._abortController = controller;
+
+        try {
+            const response = await fetch(`${backendUrl}/api/process/${this.featureId}/stream`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(inputs),
+                signal: controller.signal,
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            if (!response.body) {
+                throw new Error('The backend did not provide a response stream.');
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let finalResult = null;
+            let backendError = null;
+
+            const handleBlock = (block) => {
+                const lines = block.split('\n');
+                let eventType = 'message';
+                const dataLines = [];
+
+                for (const line of lines) {
+                    if (line.startsWith('event:')) {
+                        eventType = line.slice(6).trim();
+                    } else if (line.startsWith('data:')) {
+                        dataLines.push(line.slice(5).trimStart());
+                    }
+                }
+
+                if (dataLines.length === 0) return;
+
+                const rawData = dataLines.join('\n');
+                let eventData;
+                try {
+                    eventData = JSON.parse(rawData);
+                } catch (_) {
+                    eventData = { message: rawData };
+                }
+
+                if (eventType === 'result') {
+                    finalResult = eventData;
+                } else if (eventType === 'log') {
+                    this.addLog(eventData.message || '', eventData.level || 'info');
+                } else if (eventType === 'logs' && Array.isArray(eventData)) {
+                    eventData.forEach((entry) => {
+                        this.addLog(entry.message || '', entry.level || 'info');
+                    });
+                } else if (eventType === 'progress') {
+                    const progress = Math.max(0, Math.min(1, Number(eventData.progress) || 0));
+                    const progressFill = document.getElementById(`progressFill_${this.featureId}`);
+                    if (progressFill) progressFill.style.width = `${Math.round(progress * 100)}%`;
+                } else if (eventType === 'error') {
+                    backendError = eventData.message || 'Unknown backend error';
+                }
+            };
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+                const blocks = buffer.split('\n\n');
+                buffer = blocks.pop() || '';
+                blocks.filter(block => block.trim()).forEach(handleBlock);
+            }
+
+            buffer += decoder.decode().replace(/\r\n/g, '\n');
+            if (buffer.trim()) handleBlock(buffer);
+
+            if (finalResult) return finalResult;
+            if (this._cancelled) return { status: 'cancelled' };
+            throw new Error(backendError || 'The backend stream ended without a result.');
+        } catch (error) {
+            if (error.name === 'AbortError' && this._cancelled) {
+                return { status: 'cancelled' };
+            }
+            throw error;
+        } finally {
+            if (this._abortController === controller) {
+                this._abortController = null;
+            }
+        }
     }
 
     collectInputData() {
@@ -257,6 +369,16 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             return;
         }
 
+        if (finalResults.status === 'cancelled') {
+            if (resultsTable) resultsTable.style.display = 'none';
+            if (pendingMsg) {
+                pendingMsg.style.display = 'block';
+                pendingMsg.textContent = 'Analysis cancelled.';
+            }
+            if (plotDiv) plotDiv.innerHTML = '';
+            return;
+        }
+
         // Batch mode: render each CIF result as its own grouped section.
         if (Array.isArray(finalResults.results_per_cif) && finalResults.results_per_cif.length > 0) {
             if (resultsTable) resultsTable.style.display = 'block';
@@ -373,19 +495,34 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
 
         const backendUrl = window.EMOS_BACKEND_BASE_URL || window.BACKEND_BASE_URL || 'http://localhost:5001';
         try {
-            const resp = await fetch(`${backendUrl}/api/process/${this.featureId}/cancel`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            });
+            let response = null;
 
-            if (resp.ok) {
-                const data = await resp.json();
+            // The stream registers the feature before it starts processing. A
+            // very fast click can race that registration, so retry 404s briefly.
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+                response = await fetch(`${backendUrl}/api/process/${this.featureId}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (response.ok || response.status !== 404) break;
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            if (response?.ok) {
+                const data = await response.json();
                 this.addLog(`Backend: ${data.message || 'cancel acknowledged'}`, 'info');
             } else {
-                this.addLog(`Backend cancel returned HTTP ${resp.status}`, 'warning');
+                this.addLog(`Backend cancel returned HTTP ${response?.status || 'unknown'}`, 'warning');
             }
         } catch (err) {
             this.addLog(`Cancel request failed: ${err.message}`, 'error');
+        } finally {
+            // Stop waiting for the SSE response after the backend has received
+            // the cancellation signal. Backend work stops cooperatively.
+            if (this._abortController) {
+                this._abortController.abort();
+                this._abortController = null;
+            }
         }
     }
 }
