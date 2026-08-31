@@ -64,7 +64,7 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
 
                     <div class="output-item">
                         <strong>Stability Heatmap:</strong>
-                        <div id="stabilityHeatmap_${this.featureId}" style="margin-top:0.75rem; overflow-x:auto;"></div>
+                        <div id="stabilityHeatmap_${this.featureId}" style="width:100%; margin-top:0.75rem;"></div>
                     </div>
 
                     <div class="output-item">
@@ -287,12 +287,12 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
         const classifyResult = (sourceData) => {
             const stability = String(sourceData?.stability || '');
             if (stability.includes('✅')) {
-                return { label: 'Stable', color: '#cfe8d3', symbol: '✓', textColor: '#256235' };
+                return { label: 'Stable', color: '#cfe8d3' };
             }
             if (stability.includes('❌')) {
-                return { label: 'Unstable', color: '#f2cccc', symbol: '×', textColor: '#8a2d2d' };
+                return { label: 'Unstable', color: '#f2cccc' };
             }
-            return { label: 'Not found / error', color: '#e1e5e8', symbol: '—', textColor: '#52616b' };
+            return { label: 'Not found / error', color: '#e1e5e8' };
         };
 
         const renderHeatmap = (cifResults) => {
@@ -327,16 +327,17 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             const table = document.createElement('table');
             Object.assign(table.style, {
                 borderCollapse: 'separate',
-                borderSpacing: '4px',
-                minWidth: '100%',
-                width: 'max-content'
+                borderSpacing: '3px',
+                tableLayout: 'fixed',
+                width: '100%',
+                maxWidth: '100%'
             });
 
             const headerRow = document.createElement('tr');
             const sourceHeader = document.createElement('th');
             sourceHeader.textContent = 'Source';
             Object.assign(sourceHeader.style, {
-                minWidth: '150px',
+                width: '150px',
                 paddingRight: '12px',
                 textAlign: 'left'
             });
@@ -346,8 +347,10 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
                 const indexHeader = document.createElement('th');
                 indexHeader.textContent = String(index);
                 Object.assign(indexHeader.style, {
-                    minWidth: '44px',
-                    textAlign: 'center'
+                    padding: '0',
+                    overflow: 'hidden',
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap'
                 });
                 headerRow.appendChild(indexHeader);
             });
@@ -358,7 +361,7 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
                 const sourceCell = document.createElement('th');
                 sourceCell.textContent = sourceDisplayNames[source] || source;
                 Object.assign(sourceCell.style, {
-                    minWidth: '150px',
+                    width: '150px',
                     paddingRight: '12px',
                     textAlign: 'left',
                     whiteSpace: 'nowrap'
@@ -368,18 +371,13 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
                 cifResults.forEach((entry, index) => {
                     const classification = classifyResult((entry.sources || {})[source]);
                     const cell = document.createElement('td');
-                    cell.textContent = classification.symbol;
                     cell.title = `${index}: ${entry.cif_name || 'Unknown CIF'} — ${classification.label}`;
                     cell.setAttribute('aria-label', cell.title);
                     Object.assign(cell.style, {
-                        minWidth: '44px',
                         height: '34px',
                         padding: '0',
                         borderRadius: '4px',
-                        backgroundColor: classification.color,
-                        color: classification.textColor,
-                        fontWeight: '700',
-                        textAlign: 'center'
+                        backgroundColor: classification.color
                     });
                     row.appendChild(cell);
                 });
