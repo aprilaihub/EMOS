@@ -433,28 +433,6 @@ class TestConsensusSummary:
         assert summary['total_sources'] == 0
         assert 'Insufficient data' in summary['consensus']
 
-    def test_plot_data_includes_not_found_as_error_count(self):
-        """Test plot data tracks not_found entries as grey/error segments."""
-        feature = StabilityConsensusAnalysisFeature()
-
-        results_per_cif = [
-            {
-                'sources': {
-                    'materialsproject': {'stability': '✅ Stable'},
-                    'alexandria': {'stability': '⚠️ Not found'},
-                    'mattersim': {'stability': '❌ Unstable'},
-                }
-            }
-        ]
-
-        plot_data = feature._compute_source_plot_data(results_per_cif)
-
-        assert plot_data['materialsproject']['stable_count'] == 1
-        assert plot_data['alexandria']['error_count'] == 1
-        assert plot_data['alexandria']['error_pct'] == 100.0
-        assert plot_data['mattersim']['unstable_count'] == 1
-
-
 class TestInputExtraction:
     """Test input extraction from frontend data."""
     

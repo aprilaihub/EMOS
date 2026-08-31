@@ -153,7 +153,8 @@ O1 1.0 0.5 0.5 0.5
                 'consensus': '✅ All sources agree: Stable',
                 'stable_count': 1,
                 'unstable_count': 0
-            }
+            },
+            'plot_data': {'legacy': 'must not be downloaded'},
         }
         
         formatted = feature.format_outputs(results)
@@ -163,6 +164,8 @@ O1 1.0 0.5 0.5 0.5
         assert 'Al2O3' in formatted['downloadResultsJson']
         assert '✅ Stable' in formatted['downloadResultsJson']
         downloaded = json.loads(formatted['downloadResultsJson'])
+        assert 'plot_data' not in formatted
+        assert 'plot_data' not in downloaded
         mp_result = downloaded['sources']['materialsproject']
         assert mp_result['matched_entry_ids'] == ['mp-100', 'mp-200']
         assert mp_result['selected_entry_id'] == 'mp-200'

@@ -363,52 +363,6 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             'unstable_votes': unstable_votes,
         }
 
-    def _compute_source_plot_data(self, results_per_cif: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
-        """Aggregate stable/unstable counts and percentages for each source."""
-        aggregate: Dict[str, Dict[str, Any]] = {}
-
-        for entry in results_per_cif:
-            if entry.get('error'):
-                continue
-            for source, source_data in (entry.get('sources') or {}).items():
-                if source not in aggregate:
-                    aggregate[source] = {
-                        'stable_count': 0,
-                        'unstable_count': 0,
-                        'error_count': 0,
-                        'total': 0,
-                        'stable_pct': 0,
-                        'unstable_pct': 0,
-                        'error_pct': 0,
-                    }
-
-                stability = source_data.get('stability')
-                if not isinstance(stability, str):
-                    continue
-
-                if '✅' in stability:
-                    aggregate[source]['stable_count'] += 1
-                    aggregate[source]['total'] += 1
-                elif '❌' in stability:
-                    aggregate[source]['unstable_count'] += 1
-                    aggregate[source]['total'] += 1
-                else:
-                    aggregate[source]['error_count'] += 1
-                    aggregate[source]['total'] += 1
-
-        for source, stats in aggregate.items():
-            total = stats['total']
-            if total > 0:
-                stats['stable_pct'] = round((stats['stable_count'] * 100.0) / total, 1)
-                stats['unstable_pct'] = round((stats['unstable_count'] * 100.0) / total, 1)
-                stats['error_pct'] = round((stats['error_count'] * 100.0) / total, 1)
-            else:
-                stats['stable_pct'] = 0
-                stats['unstable_pct'] = 0
-                stats['error_pct'] = 0
-
-        return aggregate
-    
     def process_feature(self, inputs):
         """Main processing pipeline for stability consensus analysis."""
         try:
@@ -454,7 +408,6 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
             consensus_results = {
                 'results_per_cif': results_per_cif,
                 'batch_summary': self._compute_batch_summary(results_per_cif),
-                'plot_data': self._compute_source_plot_data(results_per_cif),
             }
 
             # Backward compatibility: expose first file result on top-level fields used by older UI code.
@@ -514,15 +467,19 @@ class StabilityConsensusAnalysisFeature(BaseFeature):
                 'error': results['error'],
                 'downloadResultsJson': None,
             }
-        
+
+        download_results = {
+            key: value for key, value in results.items()
+            if key != 'plot_data'
+        }
+
         return {
             'composition': results.get('composition'),
             'sources': results.get('sources', {}),
             'summary': results.get('summary', {}),
             'results_per_cif': results.get('results_per_cif', []),
             'batch_summary': results.get('batch_summary', {}),
-            'plot_data': results.get('plot_data', {}),
-            'downloadResultsJson': json.dumps(results, indent=2, ensure_ascii=False),
+            'downloadResultsJson': json.dumps(download_results, indent=2, ensure_ascii=False),
         }
     
     def _query_databases(
