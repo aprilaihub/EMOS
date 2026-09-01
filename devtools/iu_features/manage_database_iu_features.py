@@ -167,8 +167,8 @@ def _remove_module_entry(script_text: str, db_id: str) -> str:
 def _row_block_regex(db_id: str) -> re.Pattern[str]:
     return re.compile(
         rf"\n\s*<div class=\"iu-option-row\">\s*"
-        rf"<label><input type=\"checkbox\" ui-type=\"database\" value=\"{re.escape(db_id)}\">.*?</label>\s*"
-        rf"<button[\s\S]*?data-iu-feature=\"{re.escape(db_id)}\"[\s\S]*?</button>\s*"
+        rf"<span class=\"iu-option-name\">.*?</span>\s*"
+        rf"<button\b[^>]*data-iu-feature=\"{re.escape(db_id)}\"[^>]*>[\s\S]*?</button>\s*"
         rf"</div>",
         re.S,
     )
@@ -176,14 +176,14 @@ def _row_block_regex(db_id: str) -> re.Pattern[str]:
 
 def _plain_label_regex(db_id: str, display_name: str) -> re.Pattern[str]:
     return re.compile(
-        rf"(?m)^\s*<label><input type=\"checkbox\" ui-type=\"database\" value=\"{re.escape(db_id)}\">\s*{re.escape(display_name)}\s*</label>\s*$"
+        rf"(?m)^\s*<span class=\"iu-option-name\">\s*{re.escape(display_name)}\s*</span>\s*$"
     )
 
 
 def _build_button_row(db_id: str, display_name: str, description: str) -> str:
     return (
         "                            <div class=\"iu-option-row\">\n"
-        f"                                <label><input type=\"checkbox\" ui-type=\"database\" value=\"{db_id}\"> {display_name}</label>\n"
+        f"                                <span class=\"iu-option-name\">{display_name}</span>\n"
         "                                <button\n"
         "                                    class=\"iu-feature-btn\"\n"
         f"                                    data-iu-feature=\"{db_id}\"\n"
@@ -218,7 +218,7 @@ def _ensure_button_row(index_text: str, db_id: str, display_name: str, descripti
 
 def _remove_button_row(index_text: str, db_id: str, display_name: str) -> str:
     row_re = _row_block_regex(db_id)
-    plain_label = f'                            <label><input type="checkbox" ui-type="database" value="{db_id}"> {display_name}</label>'
+    plain_label = f'                            <span class="iu-option-name">{display_name}</span>'
 
     if row_re.search(index_text):
         return row_re.sub("\n" + plain_label, index_text, count=1)

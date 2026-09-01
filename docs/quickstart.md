@@ -26,9 +26,11 @@ Navigate to the EMOS application and choose from available features:
 - Band Structure (Feature ID: 12)
 - Thermal Management (Feature ID: 13)
 
-### Step 3: Configure Information Units
+### Step 3: Configure the Feature
 
-Select which databases, generators, and predictors to use:
+Enter the feature inputs. Features that use databases, generators, or predictors
+provide their own selectors in the feature panel. The Information Units catalogue
+opens standalone IU panels; it does not globally select units for every feature.
 
 **Common Configurations:**
 - **Database-heavy**: ICSD + Materials Project + JARVIS
@@ -47,7 +49,7 @@ Enter the required parameters. Each feature has specific input requirements.
 
 **Steps**:
 1. Select "Material Search" feature (ID: 1)
-2. Configure Information Units:
+2. Choose Information Units in the feature panel:
    - Databases: Materials Project, JARVIS
    - Predictors: M3gnet, Mattersim
 3. Input Parameters:
@@ -68,7 +70,7 @@ Enter the required parameters. Each feature has specific input requirements.
 
 **Steps**:
 1. Select "Interface Calculation" feature (ID: 10)
-2. Configure Information Units:
+2. Choose Information Units in the feature panel:
    - Databases: ICSD (for structure data)
    - Predictors: M3gnet, Deepmd
 3. Input Parameters:
@@ -91,7 +93,7 @@ Enter the required parameters. Each feature has specific input requirements.
 
 **Steps**:
 1. Select "Material Generation" feature (ID: 2)
-2. Configure Information Units:
+2. Choose Information Units in the feature panel:
    - Databases: Materials Project (for training data)
    - Generators: Mattergen, Gnome
    - Predictors: M3gnet (for property validation)
@@ -110,12 +112,15 @@ Enter the required parameters. Each feature has specific input requirements.
 
 ## Common Input Parameters
 
-### Universal Parameters
-All features accept these common parameters:
+### Information Unit Parameters
+
+Features with local Information Unit selectors commonly submit these parameters:
 
 - **active_databases**: List of database configurations
 - **active_generators**: List of generator configurations  
 - **active_predictors**: List of predictor configurations
+
+They are feature-specific and are not added to every request automatically.
 
 ### Feature-Specific Parameters
 
@@ -138,11 +143,11 @@ All features accept these common parameters:
 ## Understanding Results
 
 ### Result Structure
-All features return structured results with:
+Features return structured results appropriate to their workflow, commonly with:
 
 - **Primary Results**: Main computational outputs
 - **Metadata**: Processing information and parameters
-- **Information Unit Results**: Individual outputs from databases, generators, predictors
+- **Information Unit Results**: Individual IU outputs when the feature uses them
 - **Status Information**: Success indicators and warnings
 
 ### Interpreting Outputs
@@ -166,7 +171,7 @@ All features return structured results with:
 
 ### Information Unit Selection
 
-1. **Start Simple**: Begin with 1-2 information units per type
+1. **Start Simple**: In a feature's local selector, begin with 1-2 information units per type
 2. **Match Purpose**: Choose units that align with your research goals
 3. **Consider Speed**: More units = longer processing time
 4. **Validate Results**: Use multiple predictors for cross-validation

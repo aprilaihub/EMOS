@@ -217,6 +217,11 @@ def availability():
 
 @app.route('/api/process/toggle_IU', methods=["POST", "OPTIONS"])
 def toggle_IU():
+    """Legacy registry toggle retained for API compatibility.
+
+    The main UI no longer calls this endpoint; direct IU routes instantiate
+    transient instances when no registry entry exists.
+    """
     if request.method == 'OPTIONS':
         return ('', 204)
     try:

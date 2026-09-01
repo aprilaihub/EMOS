@@ -12,7 +12,6 @@ This feature provides cif similarity functionality within the EMOS platform.
 - `extract_inputs(input_data)`: Extracts and validates input parameters
 - `process_feature(inputs)`: Core feature processing logic
 - `format_outputs(results)`: Formats results to expected output format
-- `_process_information_units(inputs)`: Integrates with databases, generators, and predictors
 
 
 ## Input Parameters
@@ -29,5 +28,5 @@ This feature provides cif similarity functionality within the EMOS platform.
 
 See the base class documentation for detailed usage instructions.
 
-For integration with information units (Databases, Generators, Predictors), 
-the feature automatically processes active units and logs their operations.
+If this feature needs information units (Databases, Generators, or Predictors),
+add a feature-local selector and instantiate only the selected factory entries.

@@ -234,10 +234,8 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             document.querySelectorAll(`#predCheckboxes_${this.featureId} input[type="checkbox"]:checked`)
         ).map(cb => ({ value: cb.value, name: cb.parentElement.textContent.trim() }));
 
-        if (selectedDbs.length > 0 || selectedPreds.length > 0) {
-            inputs.active_databases = selectedDbs;
-            inputs.active_predictors = selectedPreds;
-        }
+        inputs.active_databases = selectedDbs;
+        inputs.active_predictors = selectedPreds;
 
         return inputs;
     }

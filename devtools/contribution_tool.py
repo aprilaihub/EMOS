@@ -61,7 +61,7 @@ class ContributionTool(
         if total_changes == 0:
             print("✓ No differences found!")
             print("  Metadata and filesystem are in sync.")
-            print("\nSyncing UI checkboxes from metadata...")
+            print("\nSyncing Information Unit UI from metadata...")
             self.update_information_unit_ui_lists()
             return
 
@@ -106,7 +106,7 @@ class ContributionTool(
 
         # ── Final UI sync (once, after all changes) ───────────────────
         print("\n" + "="*60)
-        print("Syncing UI checkboxes from metadata...")
+        print("Syncing Information Unit UI from metadata...")
         self.update_information_unit_ui_lists()
         print(f"\n✓ All {total_changes} change(s) completed successfully!")
 

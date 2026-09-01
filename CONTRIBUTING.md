@@ -221,9 +221,6 @@ def process_feature(self, inputs):
     """Main feature logic"""
     element = inputs.get('elementSymbol', '')
     
-    # Use information units
-    self._process_information_units(inputs)
-    
     # Your implementation
     results = your_analysis(element)
     
@@ -239,6 +236,10 @@ def format_outputs(self, results):
         'results': results.get('data', [])
     }
 ```
+
+If the feature uses Information Units, add selectors inside that feature's input
+UI and instantiate the selected factory entries explicitly. Do not rely on a
+global Information Unit selection.
 
 Edit `YourFeature.js` for custom UI behavior if needed.
 

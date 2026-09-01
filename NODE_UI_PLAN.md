@@ -15,12 +15,11 @@ A Blender-style node editor page for EMOS where users drag Information Units (da
 | `node-editor.js` | All logic: drag-and-drop, node creation, wiring, pan/zoom, execution |
 
 No backend changes. The node UI reuses the existing backend endpoints:
-- `POST /api/process/toggle_IU` — activate an IU before running
-- `POST /api/process/<feature_id>/stream` — SSE streaming (if we route through features)
-- Or direct calls to IU `.process()` via a new lightweight endpoint
+- `POST /api/process/iu/<iu_type>/<iu_id>` — direct IU execution
+- `POST /api/process/iu/<iu_type>/<iu_id>/stream` — direct streaming IU execution
 
-> **Decision point**: The current backend processes *Features* (which internally orchestrate IUs). The node editor bypasses features and orchestrates IUs directly from the frontend. We will need **one new backend endpoint** that accepts a single IU invocation (type + key + inputs) and streams results back via SSE. This avoids coupling the node UI to the Feature layer.
-> **ANSWER**: Ok, create a new backend endpoint that does not interfere with the Feature layer as is. 
+These endpoints instantiate an IU transiently when it is not already in the legacy
+registry, so the node editor does not require global IU activation.
 ---
 
 ## 2. Navigation Integration

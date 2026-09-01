@@ -601,38 +601,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.BACKEND_BASE_URL = BACKEND_BASE_URL; // optional exposure for debugging
     console.log('Backend base URL:', BACKEND_BASE_URL);
 
-    //Generator selection functionality
-    const checkboxes = document.querySelectorAll("input[type='checkbox']");
-
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", async function() {
-            const ui_type = this.getAttribute("ui-type");
-            const className = this.value; // use value attribute
-            const active = this.checked;
-
-            // Always log the local change first
-            console.log(`${ui_type} ${className} ${active ? 'checked' : 'unchecked'} locally`);
-
-            try {
-                const res = await fetch(`${BACKEND_BASE_URL}/api/process/toggle_IU`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ class_name: className, class_type: ui_type, active })
-                });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    console.warn(`Backend response not OK for ${className}: ${data?.message || data?.error || "Unknown error"}`);
-                    return;
-                }
-
-                console.log(`Backend success: ${data.message}`);
-            } catch (err) {
-                console.warn(`Backend unavailable for ${className}:`, err.message);
-            }
-        });
-    });
-    
     // Feature button functionality - SINGLE EVENT LISTENER
     featureButtons.forEach(button => {
         button.addEventListener('click', function() {

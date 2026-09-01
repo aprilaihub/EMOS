@@ -134,8 +134,8 @@ def generate_metadata_from_core(core_metadata_path="ui_data.json", output_path="
             },
             "features": {
                 "base_class": "BaseFeature", 
-                "methods": ["__init__", "info", "extract_inputs", "process_feature", "format_outputs", "_process_information_units"],
-                "imports": ["from Features.BaseFeature import BaseFeature", "from Information_Units.Generators.GeneratorFactory import generator_factory", "from Information_Units.Databases.DatabaseFactory import database_factory", "from Information_Units.Predictors.PredictorFactory import predictor_factory"]
+                "methods": ["__init__", "info", "extract_inputs", "process_feature", "format_outputs"],
+                "imports": ["from Features.BaseFeature import BaseFeature"]
             }
         }
     }

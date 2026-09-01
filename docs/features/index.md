@@ -4,9 +4,8 @@ Features are high-level workflows that combine multiple Information Units to sol
 
 Each feature follows a consistent workflow pattern:
 1. **Input Extraction**: Parse and validate user inputs
-2. **Information Unit Processing**: Activate selected databases, generators, and predictors
-3. **Feature-Specific Processing**: Execute domain-specific algorithms
-4. **Output Formatting**: Structure results for presentation
+2. **Feature-Specific Processing**: Execute domain-specific algorithms and any explicitly selected Information Units
+3. **Output Formatting**: Structure results for presentation
 
 ## Feature Architecture
 
@@ -58,32 +57,19 @@ def process(self, input_data: dict) -> dict:
 
 ### Information Unit Integration
 
-All features can utilize any combination of Information Units:
+Features that require Information Units expose feature-local selectors and process
+only those selections. The global Information Units catalogue is not a workflow-wide
+selection state. A database-enabled feature can use a pattern such as:
 
 ```python
-def _process_information_units(self, inputs):
-    """Standard pattern for processing Information Units"""
-    
-    # Process databases
+def process_feature(self, inputs):
+    results = []
     for db_config in inputs.get('active_databases', []):
         db_instance = database_factory[db_config['value']](
             db_config['value'], self.logger
         )
-        db_results = db_instance.retrieve(retrieve_inputs)
-    
-    # Process generators
-    for gen_config in inputs.get('active_generators', []):
-        gen_instance = generator_factory[gen_config['value']](
-            gen_config['value'], self.logger
-        )
-        gen_results = gen_instance.generate(generate_inputs)
-    
-    # Process predictors
-    for pred_config in inputs.get('active_predictors', []):
-        pred_instance = predictor_factory[pred_config['value']](
-            pred_config['value'], self.logger
-        )
-        pred_results = pred_instance.predict(predict_inputs)
+        results.append(db_instance.retrieve(retrieve_inputs))
+    return {'database_results': results}
 ```
 
 ## Adding New Features
@@ -92,7 +78,7 @@ The modular design makes it easy to add new features:
 
 1. **Implement BaseFeature**: Create new feature class
 2. **Register in Factory**: Add to `feature_factory` dictionary
-3. **Follow Patterns**: Use standard information unit processing
+3. **Add Local IU Selection When Needed**: Do not depend on global selection state
 4. **Document Interface**: Specify inputs, outputs, and behavior
 
 Example of adding a new feature:
@@ -107,16 +93,10 @@ class NewFeature(BaseFeature):
     
     def extract_inputs(self, input_data):
         return {
-            'parameter1': input_data.get('param1', 'default'),
-            'active_databases': input_data.get('active_databases', []),
-            'active_generators': input_data.get('active_generators', []),
-            'active_predictors': input_data.get('active_predictors', [])
+            'parameter1': input_data.get('param1', 'default')
         }
     
     def process_feature(self, inputs):
-        # Process information units
-        self._process_information_units(inputs)
-        
         # Feature-specific logic
         results = self._custom_processing(inputs)
         

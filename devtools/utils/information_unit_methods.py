@@ -55,7 +55,7 @@ class InformationUnitMethods:
         return metadata
 
     def build_information_unit_ui_rows(self, unit_type):
-        """Render IU option rows (checkbox + IU panel button) from metadata.json."""
+        """Render IU option rows (name + IU panel button) from metadata.json."""
         indent_row = " " * 28
         indent_label = " " * 32
         indent_button = " " * 32
@@ -76,7 +76,7 @@ class InformationUnitMethods:
 
             rows.append(
                 f"{indent_row}<div class=\"iu-option-row\">\n"
-                f"{indent_label}<label><input type=\"checkbox\" ui-type=\"{singular}\" value=\"{value_esc}\"> {label_esc}</label>\n"
+                f"{indent_label}<span class=\"iu-option-name\">{label_esc}</span>\n"
                 f"{indent_button}<button\n"
                 f"{indent_attr}class=\"iu-feature-btn\"\n"
                 f"{indent_attr}data-iu-feature=\"{value_esc}\"\n"
@@ -153,7 +153,7 @@ class InformationUnitMethods:
         )
 
     def update_information_unit_ui_lists(self):
-        """Rewrite index.html checkbox lists from metadata so UI matches backend"""
+        """Rewrite index.html IU lists from metadata so UI matches backend."""
         index_path = self.project_root / "index.html"
         if not index_path.exists():
             print("  ⚠ index.html not found; skipping UI update")
@@ -167,7 +167,7 @@ class InformationUnitMethods:
             print("  ⚠ Could not update Information Units section in index.html; please verify markup")
 
         index_path.write_text(content)
-        print("  ✓ Updated UI checkboxes in index.html")
+        print("  ✓ Updated Information Unit lists in index.html")
     
     def update_information_unit_factory_add(self, metadata, unit_type):
         """Add entry to Factory.py file"""

@@ -415,28 +415,52 @@ class BaseFeature {
         return element.value;
     }
 
-    // ── Property-mappings-driven generator inputs ─────────────────────
-    /**
-     * Return the list of currently-checked generator checkbox values
-     * from the sidebar (e.g. ["mattergen_dft_band_gap", "mattergen_space_group"]).
-     */
-    _getActiveGeneratorKeys() {
-        const checkboxes = document.querySelectorAll(
-            "#generatorsList input[type='checkbox']:checked"
-        );
-        return Array.from(checkboxes).map(cb => cb.value);
+    escapeHTML(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
+    // ── Property-mappings-driven generator inputs ─────────────────────
     /**
-     * Return the display label for a generator checkbox value by reading
-     * the text content of its parent <label> in the sidebar.
+     * Return the Information Units registered in the global catalogue.
+     * Features can use this catalogue to build their own local selectors.
      */
-    _getGeneratorDisplayName(genKey) {
-        const cb = document.querySelector(
-            `#generatorsList input[type='checkbox'][value='${genKey}']`
-        );
-        if (cb && cb.parentElement) {
-            return cb.parentElement.textContent.trim();
+    getInformationUnitOptions(iuType) {
+        const options = [];
+        const seen = new Set();
+
+        document.querySelectorAll(`.iu-feature-btn[data-iu-type="${iuType}"]`).forEach(button => {
+            const value = button.dataset.iuFeature;
+            if (!value || seen.has(value)) return;
+
+            seen.add(value);
+            options.push({
+                value,
+                label: button.dataset.iuName || value,
+            });
+        });
+
+        return options;
+    }
+
+    /** Normalize a feature-local generator selection into generator keys. */
+    _getActiveGeneratorKeys(activeGenerators = []) {
+        return activeGenerators
+            .map(generator => typeof generator === 'string' ? generator : generator?.value)
+            .filter(Boolean);
+    }
+
+    /** Return the display label for a generator in a feature-local selection. */
+    _getGeneratorDisplayName(genKey, activeGenerators = []) {
+        const selected = activeGenerators.find(generator => (
+            typeof generator === 'string' ? generator : generator?.value
+        ) === genKey);
+        if (selected && typeof selected !== 'string') {
+            return selected.name || selected.label || genKey;
         }
         // Fallback: prettify the key
         return genKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -478,7 +502,7 @@ class BaseFeature {
     }
 
     /**
-     * Build an HTML string that contains an <h4> section for each checked
+     * Build an HTML string that contains an <h4> section for each selected
      * generator, with input fields for every property the model conditions
     * on (derived from modular property mappings).
      *
@@ -487,20 +511,21 @@ class BaseFeature {
      *
      * Also renders shared generation parameters (batch_size) per generator.
      *
-    * @param {object} propertyMappings – the merged modular property mappings
+     * @param {object} propertyMappings – the merged modular property mappings
+     * @param {Array<string|object>} activeGenerators – feature-local selection
      * @returns {string} HTML
      */
-    buildGeneratorPropertyInputsHTML(propertyMappings) {
-        const activeKeys = this._getActiveGeneratorKeys();
+    buildGeneratorPropertyInputsHTML(propertyMappings, activeGenerators = []) {
+        const activeKeys = this._getActiveGeneratorKeys(activeGenerators);
         if (activeKeys.length === 0) {
-            return '<p class="mattergen-hint"><em>Select one or more generators from the sidebar to configure their parameters.</em></p>';
+            return '<p class="mattergen-hint"><em>Select one or more generators in this feature to configure their parameters.</em></p>';
         }
 
         const genProps = this._getGeneratorProperties(propertyMappings, activeKeys);
         let html = '';
 
         for (const gk of activeKeys) {
-            const displayName = this._getGeneratorDisplayName(gk);
+            const displayName = this._getGeneratorDisplayName(gk, activeGenerators);
             const props = genProps[gk];
 
             html += `<div class="generator-inputs-block" data-generator="${gk}">`;
@@ -568,8 +593,8 @@ class BaseFeature {
      *   ...
      * }
      */
-    collectGeneratorPropertyValues(propertyMappings) {
-        const activeKeys = this._getActiveGeneratorKeys();
+    collectGeneratorPropertyValues(propertyMappings, activeGenerators = []) {
+        const activeKeys = this._getActiveGeneratorKeys(activeGenerators);
         const genProps = this._getGeneratorProperties(propertyMappings, activeKeys);
         const result = {};
 
@@ -642,47 +667,6 @@ class BaseFeature {
             }
         });
         
-        // Collect active generators
-        const generatorCheckboxes = document.querySelectorAll("#generatorsList input[type='checkbox']:checked");
-        const activeGenerators = [];
-        generatorCheckboxes.forEach(checkbox => {
-            const generatorName = checkbox.parentElement.textContent.trim();
-            activeGenerators.push({
-                value: checkbox.value,
-                name: generatorName
-            });
-        });
-        inputs['active_generators'] = activeGenerators;
-        
-        // Collect active predictors
-        const predictorCheckboxes = document.querySelectorAll("#predictorsList input[type='checkbox']:checked");
-        const activePredictors = [];
-        predictorCheckboxes.forEach(checkbox => {
-            const predictorName = checkbox.parentElement.textContent.trim();
-            activePredictors.push({
-                value: checkbox.value,
-                name: predictorName
-            });
-        });
-        inputs['active_predictors'] = activePredictors;
-        
-        // Collect active databases
-        const databaseCheckboxes = document.querySelectorAll("#databasesList input[type='checkbox']:checked");
-        const activeDatabases = [];
-        databaseCheckboxes.forEach(checkbox => {
-            const databaseName = checkbox.parentElement.textContent.trim();
-            activeDatabases.push({
-                value: checkbox.value,
-                name: databaseName
-            });
-        });
-        inputs['active_databases'] = activeDatabases;
-        
-        // Collect generator-specific property inputs from property_mappings
-        if (_propertyMappingsCache) {
-            inputs['generator_inputs'] = this.collectGeneratorPropertyValues(_propertyMappingsCache);
-        }
-
         return inputs;
     }
 }

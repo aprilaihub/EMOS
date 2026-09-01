@@ -85,7 +85,8 @@ The modular design makes it easy to add new Information Units:
 
 1. **Implement Base Class**: Create new class inheriting from appropriate base
 2. **Register in Factory**: Add to corresponding factory dictionary
-3. **No Changes Required**: Existing Features automatically discover new units
+3. **Sync the IU Catalogue**: The contribution tooling adds its name and panel button
+4. **Integrate Where Needed**: Feature-local selectors can read the catalogue, while each feature owns compatibility and processing
 
 Example of adding a new database:
 
@@ -102,7 +103,7 @@ class NewDatabase(BaseDatabase):
 # 2. Register in factory
 database_factory["newdb"] = NewDatabase
 
-# 3. Automatically available in all Features
+# 3. Add it to the global catalogue; compatible features can expose it locally
 ```
 
 This modular approach ensures that EMOS can easily grow and adapt to new tools and databases as they become available.
