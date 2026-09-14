@@ -9,7 +9,6 @@ Welcome to the **EMOS (Electronic Materials Optimization System)** User Manual. 
    
    introduction
    overview
-   quickstart
 
 .. toctree::
    :maxdepth: 3

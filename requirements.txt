@@ -22,6 +22,7 @@ pandas==2.2.3
 
 # Materials Data
 pymatgen>=2024.6.0
+average-minimum-distance==1.6.1
 
 # Visualisation
 matplotlib>=3.8.0

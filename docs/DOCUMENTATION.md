@@ -17,7 +17,6 @@ docs/
 ├── index.rst                    # Main documentation index
 ├── introduction.md              # Getting started
 ├── overview.md                  # Platform overview
-├── quickstart.md                # Quick start guide
 ├── information_units/           # Information units documentation
 ├── features/                    # Features documentation
 ├── user_guide/                  # User tutorials and examples
@@ -58,7 +57,7 @@ sphinx-build -b html . _build/html
 **Markdown files** (.md):
 - Use for content-heavy sections (getting started, guides)
 - Easier to read and write
-- Example: `introduction.md`, `quickstart.md`
+- Example: `introduction.md`, `overview.md`
 
 **reStructuredText files** (.rst):
 - Use for index and structured references
@@ -83,7 +82,7 @@ sphinx-build -b html . _build/html
 
 The documentation is organized into these main sections:
 
-- **Getting Started**: Introduction, overview, quick start
+- **Getting Started**: Introduction, overview
 - **Information Units**: Databases, generators, predictors
 - **Features**: Materials exploration, electronics applications
 - **User Guide**: Tutorials, examples, best practices

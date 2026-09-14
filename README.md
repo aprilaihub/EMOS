@@ -15,8 +15,9 @@ EMOS is an open-source platform for electronics materials science research. Acce
 ## QUICK START
 
 ### Prerequisites
+- Python 3.10-3.12 (Python 3.11 recommended)
+- Docker + Docker Compose plugin (for container-backed model services)
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.8+ (for backend)
 
 ### Installation
 
@@ -34,22 +35,52 @@ Then activate the virtual environment:
 
 The setup script automatically installs all libraries from `requirements.txt`. See [setup/README.md](setup/README.md) for more details or manual setup instructions.
 
-### Run Locally
+### Run Locally (Baseline Reproducible Path)
 
-**Frontend:**
+1) Start container services (build images first):
+
 ```bash
-python -m http.server 8000
-# Visit http://localhost:8000
+docker compose up -d --build
 ```
 
-**Backend:**
+2) Start backend:
+
 ```bash
-cd backend
-python app.py
-# Runs on http://localhost:5000
+python backend/app.py
+# Runs on http://localhost:5001
 ```
 
-> **Note**: The Python backend server runs automatically on your local machine. On the live website, it runs automatically on Render.
+3) Open frontend:
+
+```bash
+# Linux
+xdg-open index.html
+
+# macOS
+open index.html
+```
+
+You can also open `index.html` directly from your file browser.
+
+### Standard Local Commands
+
+```bash
+bash setup/setup.sh
+source emos_env/bin/activate
+docker compose up -d --build
+python backend/app.py
+pytest tests/unit/test_backend_readiness_and_lambda.py tests/unit/test_node_editor_sse_parser.py -q
+pytest -m "network" -q
+sphinx-build -b html docs docs/_build/html
+```
+
+> **Note**: Backend default local port is `5001`.
+
+### Quick Troubleshooting
+
+- Re-run setup with `bash setup/setup.sh` and re-activate `source emos_env/bin/activate`.
+- If port `5001` is busy, run backend with `PORT=5002 python backend/app.py`.
+- If containers are stale, run `docker compose down` then `docker compose up -d --build`.
 
 ## PROJECT STRUCTURE
 

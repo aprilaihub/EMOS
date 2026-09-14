@@ -4,6 +4,8 @@ This directory contains scripts to easily set up a Python virtual environment an
 
 ## Quick Start
 
+Recommended Python: 3.11 (supported: 3.10-3.12)
+
 ### On macOS/Linux:
 ```bash
 bash setup/setup.sh
