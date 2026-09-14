@@ -6,17 +6,34 @@ The EMOS devtools automate UI generation and backend integration. Define your co
 
 ## Quick Start
 
-All contributions follow this workflow:
+### One-time local setup
+
+```bash
+bash setup/setup.sh
+source emos_env/bin/activate
+docker compose up -d --build
+python backend/app.py
+```
+
+Then open `index.html` in your browser.
+
+### Contribution flow (IU or Feature)
 
 1. **Edit** `devtools/ui_data.json` (ONE change only)
-2. **Run**: `python devtools/contribution_tool.py`
-3. **Implement** your code in the generated files
+2. **Run** `python devtools/contribution_tool.py`
+3. **Implement** your code in generated files
+4. **Update mapping/docs** for your new component
+5. **Run minimum checks** from the [Testing](#testing) section
+
+Need a concrete starter? See `docs/user_guide/tutorial_iu.md` and `docs/user_guide/tutorial_feature.md`.
 
 > ⚠️ **Important**: Make only ONE change at a time (add/remove one component per commit)
 
 ## Adding an Information Unit
 
 Information units are the building blocks: **Databases**, **Generators**, and **Predictors**.
+
+Tutorial reference: `docs/user_guide/tutorial_iu.md`.
 
 ### Example: Adding a Database
 
@@ -158,6 +175,8 @@ python devtools/iu_features/manage_iu_features.py --type predictor --remove <pre
 
 ## Adding a Feature
 
+Tutorial reference: `docs/user_guide/tutorial_feature.md`.
+
 Features are user-facing functionality that combines information units.
 
 ### Example: Adding a Feature
@@ -266,7 +285,7 @@ The tool automatically:
 - Use clear, descriptive display names
 - Write meaningful descriptions
 - Document your implementation in the component's README
-- Test before committing: `python backend/app.py`
+- Run minimum checks before committing (see [Testing](#testing))
 - Keep helper files in the component folder
 
 ❌ **DON'T:**
@@ -291,12 +310,17 @@ Information_Units/Databases/YourDatabase/
 Before committing:
 
 ```bash
-# 1. Start backend
+# 1) Run minimum deterministic tests
+pytest tests/unit/test_backend_readiness_and_lambda.py tests/unit/test_node_editor_sse_parser.py -q
+
+# 2) If your IU/Feature uses network APIs, run network tests
+pytest -m "network" -q
+
+# 3) Start backend for manual check
 python backend/app.py
 
-# 2. Open browser to http://localhost:5001
-# 3. Test your component
-# 4. Verify outputs are correct
+# 4) Open browser to your local UI (`index.html`)
+# 5) Test your new/changed component manually
 ```
 
 ## Submitting Your Contribution
@@ -313,6 +337,14 @@ Once your implementation is tested and working:
    - Clear description of what the component does
    - Any dependencies or setup needed
    - Reference to related issues (if applicable)
+
+### Minimum PR Checklist
+
+- [ ] Code is added/updated only for one IU or one Feature change
+- [ ] Component README is updated
+- [ ] Required mapping file is added/updated
+- [ ] Minimum tests were run locally
+- [ ] Manual local check was done with backend + `index.html`
 
 We review PRs regularly and will provide feedback if needed.
 
