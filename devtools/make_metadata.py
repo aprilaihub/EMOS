@@ -1,6 +1,6 @@
 """
 EMOS Core Utilities
-Converts ui_data.json to full metadata.json
+Converts source_data.json to full metadata.json
 
 Display names are the source of truth - everything else is derived automatically.
 """
@@ -76,9 +76,9 @@ def generate_feature_metadata(display_name, category, description, core_meta=Non
         "js_file_name": f"{folder_name}.js"
     }
 
-def generate_metadata_from_core(core_metadata_path="ui_data.json", output_path="metadata.json"):
+def generate_metadata_from_core(core_metadata_path="source_data.json", output_path="metadata.json"):
     """
-    Main function: Convert ui_data.json to full metadata.json
+    Main function: Convert source_data.json to full metadata.json
     
     Args:
         core_metadata_path: Path to the UI data file

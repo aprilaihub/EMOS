@@ -109,7 +109,7 @@ EMOS/
 │   └── conf.py, index.rst, ...
 │
 ├── devtools/                    # Development tools
-│   └── ui_data.json             # Component definitions
+│   └── source_data.json             # Component definitions
 │
 └── images/                      # Graphics and logos
 ```

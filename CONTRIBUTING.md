@@ -2,7 +2,7 @@
 
 Typical contributions to EMOS are either Information Units (IUs) or Features. Databases are IUs that retrieve candidate structures and metadata from external or curated sources. Generators are IUs that create new candidate materials, often guided by constraints or property targets. Predictors are IUs that estimate material properties from structure inputs. Materials Exploration features help users search, filter, and compare materials/design candidates across IUs. Electronics Application features focus on device-relevant analysis and property workflows for electronics-oriented use cases.
 
-The EMOS devtools automate UI generation and backend integration. Define your component in `devtools/ui_data.json`, run the contribution tool, and it generates functional templates. Then implement your Python-based algorithms—no frontend knowledge required.
+The EMOS devtools automate UI generation and backend integration. Define your component in `devtools/source_data.json`, run the contribution tool, and it generates functional templates. Then implement your Python-based algorithms—no frontend knowledge required.
 
 ## Quick Start
 
@@ -19,7 +19,7 @@ Then open `index.html` in your browser.
 
 ### Contribution flow (IU or Feature)
 
-1. **Edit** `devtools/ui_data.json` (ONE change only)
+1. **Edit** `devtools/source_data.json` (ONE change only)
 2. **Run** `python devtools/contribution_tool.py`
 3. **Implement** your code in generated files
 4. **Update mapping/docs** for your new component
@@ -37,7 +37,7 @@ Tutorial reference: `docs/user_guide/tutorial_iu.md`.
 
 ### Example: Adding a Database
 
-**1. Add one new database entry in `devtools/ui_data.json`:**
+**1. Add one new database entry in `devtools/source_data.json`:**
 
 In `information_units -> databases`, add exactly one new key/value line for your database display name and description.
 
@@ -196,7 +196,7 @@ Features are user-facing functionality that combines information units.
 
 **2. (Optional) Define custom inputs/outputs:**
 
-Available input types are defined in `devtools/ui_data.json` under `ui_input_types`. See `feature_inputs_outputs` for examples.
+Available input types are defined in `devtools/source_data.json` under `ui_input_types`. See `feature_inputs_outputs` for examples.
 
 ```json
 {
@@ -264,7 +264,7 @@ Edit `YourFeature.js` for custom UI behavior if needed.
 
 ## Removing Components
 
-**1. Delete the entry from `ui_data.json`**
+**1. Delete the entry from `source_data.json`**
 
 **2. Run contribution tool:**
 
@@ -290,7 +290,7 @@ The tool automatically:
 
 ❌ **DON'T:**
 - Add multiple components at once
-- Edit `metadata.json` directly (always use `ui_data.json`)
+- Edit `metadata.json` directly (always use `source_data.json`)
 
 ## File Organization
 

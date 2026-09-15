@@ -101,7 +101,7 @@
         contextMenu     = document.getElementById('neContextMenu');
 
         // Load data
-        uiData = await fetch('./devtools/ui_data.json').then(r => r.json()).catch(() => null);
+        uiData = await fetch('./devtools/source_data.json').then(r => r.json()).catch(() => null);
         await loadFactoryKeysFromMetadata();
         predictorPropsMap = await loadPredictorProperties();
 

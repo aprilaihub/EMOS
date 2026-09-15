@@ -6,7 +6,7 @@ This page provides a minimal, end-to-end toy Feature example you can add to EMOS
 
 Goal: add a tiny feature named **Toy Echo** that returns the input text in uppercase.
 
-### Step 1: Add one feature entry in `devtools/ui_data.json`
+### Step 1: Add one feature entry in `devtools/source_data.json`
 
 Under `features -> materials_exploration`, add one new key:
 

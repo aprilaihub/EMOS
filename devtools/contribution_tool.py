@@ -40,8 +40,8 @@ class ContributionTool(
         print("EMOS Contribution Tool")
         print("="*60 + "\n")
         
-        # Regenerate metadata from ui_data.json
-        print("Syncing metadata from ui_data.json...")
+        # Regenerate metadata from source_data.json
+        print("Syncing metadata from source_data.json...")
         generate_metadata_from_core()
         print("✓ Metadata updated\n")
         

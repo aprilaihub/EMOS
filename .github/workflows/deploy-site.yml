@@ -50,7 +50,7 @@ jobs:
 
           # Copy devtools data used by the Node Editor
           mkdir -p _site/devtools
-          cp devtools/ui_data.json devtools/metadata.json _site/devtools/
+          cp devtools/source_data.json devtools/metadata.json _site/devtools/
           
           # Copy Features and Information_Units directories (CRITICAL for functionality)
           cp -r Features/ _site/

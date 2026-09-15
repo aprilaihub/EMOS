@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Tuple
 ROOT = Path(__file__).resolve().parents[2]
 INDEX_HTML = ROOT / "index.html"
 SCRIPT_JS = ROOT / "script.js"
-UI_DATA_JSON = ROOT / "devtools" / "ui_data.json"
+UI_DATA_JSON = ROOT / "devtools" / "source_data.json"
 PRED_FACTORY_PY = ROOT / "Information_Units" / "Predictors" / "PredictorFactory.py"
 PRED_MAPPING_DIR = ROOT / "Information_Units" / "property_mappings" / "sources" / "predictors"
 IU_FEATURE_PRED_DIR = ROOT / "Features" / "IU_Features" / "Predictors"

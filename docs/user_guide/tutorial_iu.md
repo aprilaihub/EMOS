@@ -6,7 +6,7 @@ This page provides a minimal, end-to-end toy Information Unit (IU) example you c
 
 Goal: add a tiny database Information Unit (IU) named **Toy CIF Demo** that always returns one hardcoded CIF string.
 
-### Step 1: Add one database entry in `devtools/ui_data.json`
+### Step 1: Add one database entry in `devtools/source_data.json`
 
 Under `information_units -> databases`, add one new key:
 
