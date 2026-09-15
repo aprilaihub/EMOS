@@ -4,14 +4,14 @@ This page provides a minimal, end-to-end toy Information Unit (IU) example you c
 
 ## Toy Example: Add a Demo Database IU
 
-Goal: add a tiny database Information Unit (IU) named **Toy CIF Demo** that always returns one hardcoded CIF string.
+Goal: add a tiny database Information Unit (IU) named **Toy CIF Demo** that returns one CIF per requested batch item.
 
 ### Step 1: Add one database entry in `devtools/source_data.json`
 
 Under `information_units -> databases`, add one new key:
 
 ```json
-"Toy CIF Demo": "Tutorial IU that returns one hardcoded CIF string for testing"
+"Toy CIF Demo": "Tutorial IU that returns one hardcoded CIF per batch item for testing"
 ```
 
 ### Step 2: Generate scaffolding
@@ -34,6 +34,10 @@ Replace `retrieve()` with:
 def retrieve(self, inputs: dict) -> dict:
     queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
 
+    batch_size = int(inputs.get("batch_size", 1) or 1)
+    if batch_size < 1:
+        batch_size = 1
+
     cif_string = """data_toy_nacl
 _symmetry_space_group_name_H-M 'F m -3 m'
 _cell_length_a 5.6402
@@ -53,10 +57,12 @@ Na1 Na 0.0 0.0 0.0
 Cl1 Cl 0.5 0.5 0.5
 """
 
+    cif_strings = [cif_string] * batch_size
+
     return {
         "source": "toy_cif_demo",
         "queries": queries,
-        "cif_strings": [cif_string],
+        "cif_strings": cif_strings,
     }
 ```
 
@@ -106,6 +112,7 @@ Choose:
 
 1. Start backend: `python backend/app.py`
 2. Open the UI and run the new **Toy CIF Demo** IU.
-3. Confirm the result includes one CIF string.
+3. Set `batch_size` to `10` and run.
+4. Confirm the result includes 10 CIF strings (the same toy CIF repeated), and exports as 10 CIF files.
 
 This toy IU is intentionally simple and safe; once it works, use the same flow for real APIs.
