@@ -5,6 +5,7 @@ This script automates the frontend wiring needed for predictor IU features:
 - Adds/removes IU feature button rows in index.html
 - Adds/removes IU feature module entries in script.js
 - Creates/removes IU feature JS implementation files
+- Cleans up source property mapping and exclusive common properties on removal
 
 It assumes predictor IUs and property mappings already exist.
 """
@@ -18,6 +19,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+from property_mapping_cleanup import cleanup_removed_iu_property_mappings
 
 ROOT = Path(__file__).resolve().parents[2]
 INDEX_HTML = ROOT / "index.html"
@@ -988,7 +991,7 @@ def _apply_add(target: PredictorStatus, auto_yes: bool = False) -> None:
 def _apply_remove(target: PredictorStatus, auto_yes: bool = False) -> None:
     print(f"\nPreparing IU feature removal for: {target.pred_id} ({target.display_name})")
 
-    if not (target.has_button or target.has_module or target.has_feature_file):
+    if not (target.has_button or target.has_module or target.has_feature_file or target.mapping_exists):
         print("IU feature is not implemented. No changes made.")
         return
 
@@ -1010,6 +1013,8 @@ def _apply_remove(target: PredictorStatus, auto_yes: bool = False) -> None:
     if target.feature_file.exists():
         target.feature_file.unlink()
         print(f"Removed JS IU feature: {target.feature_file.relative_to(ROOT)}")
+
+    cleanup_removed_iu_property_mappings(ROOT, target.pred_id, "predictors")
 
     print("Removed IU feature wiring from index.html and script.js.")
 
