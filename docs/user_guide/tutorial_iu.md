@@ -8,6 +8,8 @@ Goal: add a tiny database Information Unit (IU) named **Toy CIF Demo** that retu
 
 ### Step 1: Add one database entry in `devtools/source_data.json`
 
+In this step, you register a new IU in the source-of-truth metadata so EMOS can derive its id, folder/class naming, and UI listing metadata.
+
 Under `information_units -> databases`, add one new key:
 
 ```json
@@ -15,6 +17,8 @@ Under `information_units -> databases`, add one new key:
 ```
 
 ### Step 2: Generate scaffolding
+
+In this step, EMOS generates the backend IU template files and updates factory wiring for your new database IU.
 
 ```bash
 python devtools/contribution_tool.py
@@ -25,7 +29,11 @@ It also creates a property mapping template at:
 
 `Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
 
+The script is interactive. When prompted to apply detected changes, confirm with `yes` (or `y`).
+
 ### Step 3: Implement the generated database class
+
+In this step, you replace the stub retrieval logic with a tiny toy implementation that returns CIF output in batch form.
 
 Open the generated file (expected path):
 
@@ -71,6 +79,8 @@ Cl1 Cl 0.5 0.5 0.5
 
 ### Step 4: Update the generated property mapping template
 
+In this step, you define which properties the UI should expose for filtering/display for this IU.
+
 Open:
 
 `Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
@@ -102,20 +112,52 @@ and update `properties` to include the fields you want exposed in the UI, for ex
 
 ### Step 5: Add IU feature button/panel wiring
 
+In this step, you add frontend wiring so the toy IU appears as a clickable panel in the Information Units UI.
+
 ```bash
 python devtools/iu_features/manage_iu_features.py
 ```
 
-Choose:
+This script is interactive. Choose:
 - IU type: `database`
 - Action: `add`
 - IU id: `toy_cif_demo`
 
 ### Step 6: Run and verify
 
+In this step, you run EMOS end-to-end and verify that one batch request returns multiple CIF outputs/files.
+
 1. Start backend: `python backend/app.py`
-2. Open the UI and run the new **Toy CIF Demo** IU.
-3. Set `batch_size` to `10` and run.
-4. Confirm the result includes 10 CIF strings (the same toy CIF repeated), and exports as 10 CIF files.
+2. Open the UI by opening `index.html` in your browser.
+3. In the Information Units section, open and run the new **Toy CIF Demo** IU.
+4. Set `batch_size` to `10` and run.
+5. Confirm the result includes 10 CIF strings (the same toy CIF repeated), and exports as 10 CIF files.
+
+## Remove the Toy IU (cleanup)
+
+When you are done testing, remove the toy IU in this order:
+
+1. Remove the IU feature implementation:
+
+   ```bash
+   python devtools/iu_features/manage_iu_features.py
+   ```
+
+   Choose:
+   - IU type: `database`
+   - Action: `remove`
+   - IU id: `toy_cif_demo`
+
+   This removes the IU feature JS/wiring and also cleans the source mapping plus exclusive entries in `common_properties.json`.
+
+2. Remove the IU entry from `devtools/source_data.json` under `information_units -> databases`.
+
+3. Run contribution tool to remove the IU backend scaffold/factory wiring:
+
+   ```bash
+   python devtools/contribution_tool.py
+   ```
+
+   Confirm the detected removal changes when prompted.
 
 This toy IU is intentionally simple and safe; once it works, use the same flow for real APIs.
