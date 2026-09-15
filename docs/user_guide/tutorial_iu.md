@@ -21,6 +21,9 @@ python devtools/contribution_tool.py
 ```
 
 This generates a new IU folder and updates the database factory.
+It also creates a property mapping template at:
+
+`Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
 
 ### Step 3: Implement the generated database class
 
@@ -66,13 +69,13 @@ Cl1 Cl 0.5 0.5 0.5
     }
 ```
 
-### Step 4: Add property mapping
+### Step 4: Update the generated property mapping template
 
-Create:
+Open:
 
 `Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
 
-With this minimal content:
+and update `properties` to include the fields you want exposed in the UI, for example:
 
 ```json
 {

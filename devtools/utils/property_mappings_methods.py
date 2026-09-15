@@ -143,6 +143,34 @@ class PropertyMappingsMethods:
                 print(f"  ⚠ Error deleting {mapping_path}: {e}")
         else:
             print(f"  ⚠ Mapping file not found: {mapping_path}")
+
+    def ensure_property_mapping_template_for_added_unit(
+        self,
+        source_name: str,
+        source_type: str,
+    ) -> None:
+        """Create a minimal source mapping template when adding a new IU.
+
+        Args:
+            source_name: IU/source id (e.g., 'aflow')
+            source_type: IU type folder (e.g., 'databases', 'generators', 'predictors')
+        """
+        mapping_path = self._get_source_mapping_path(source_name, source_type)
+
+        if mapping_path.exists():
+            print(f"  ✓ Property mapping already exists: {mapping_path.relative_to(self.project_root)}")
+            return
+
+        template = {
+            "description": f"Source-specific mappings for {source_name} ({source_type}).",
+            "version": "2.0",
+            "source_type": source_type,
+            "source": source_name,
+            "properties": {},
+        }
+
+        self._write_json(mapping_path, template)
+        print(f"  ✓ Created property mapping template: {mapping_path.relative_to(self.project_root)}")
     
     def cleanup_property_mappings_for_removed_unit(
         self,
