@@ -69,3 +69,62 @@ def test_completed_results_enable_node_and_aggregate_downloads():
     assert "node.resultRecord = createNodeResultRecord(node);" in source
     assert "downloadAllBtn.disabled = !hasCompletedResult();" in source
     assert 'id="neDownloadAllBtn"' in html
+
+
+def test_resized_nodes_resize_their_log_and_viewer_content():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "function resizeNodeContent(node, nodeHeight)" in source
+    assert "log.style.height" in source
+    assert "log.style.maxHeight" in source
+    assert "textContent.style.maxHeight" in source
+    assert "cifContainer.style.height" in source
+
+
+def test_filter_rules_compare_true_and_false_values():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "function parseBoolean(value)" in source
+    assert "const booleanValue = parseBoolean(raw);" in source
+    assert "const booleanThreshold = parseBoolean(rule.val);" in source
+
+
+def test_cif_viewer_uses_compositions_and_renders_an_atom_legend():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "function getCifComposition(cifString, index)" in source
+    assert "opt.textContent = getCifComposition(cif, i);" in source
+    assert "function renderCIFLegend(nodeId, elements)" in source
+    assert "colorscheme: 'Jmol'" in source
+
+
+def test_clearing_cif_viewer_output_also_removes_its_legend():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    reset = source[source.index("function resetViewerDisplay(node)") : source.index("function resetExecutionState", source.index("function resetViewerDisplay(node)"))]
+
+    assert "cif-legend-${node.id}" in reset
+    assert "legend.innerHTML = '';" in reset
+    assert "legend.hidden = true;" in reset
+
+
+def test_filter_requires_results_but_not_cif_input():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "label: 'CIF (optional)'" in source
+    assert "required: false" in source
+    assert "function getRequiredInputs(node)" in source
+    assert "Filter requires result data from a predictor." in source
+    assert "res?.cif_input" in source
+
+
+def test_pretty_text_viewer_exposes_selectable_result_fields():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "ne-text-pretty-toggle" in source
+    assert "function getPrettyFields(entries)" in source
+    assert "function collectPrettyFields(value, prefix, fields)" in source
+    assert "function renderPrettyFieldToggles(container, fields, node, data)" in source
+    assert "function needsPrettyFieldRender(container, fields)" in source
+    assert "function getMaterialName(entry, index)" in source
+    assert "field.replace('.', ' - ')" in source

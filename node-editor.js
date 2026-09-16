@@ -23,7 +23,7 @@
         predictor:   { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }],                           outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         cif_viewer:  { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }], outputs: [] },
         text_viewer: { inputs: [{ key: 'any_in',    label: 'Input',  type: PORT_TYPES.ANY    }], outputs: [] },
-        filter:      { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
+        filter:      { inputs: [{ key: 'cif_in',    label: 'CIF (optional)', type: PORT_TYPES.CIF, required: false }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         lambda:      { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
@@ -337,23 +337,7 @@
             resizeNode.el.style.height = newH + 'px';
             resizeNode.width  = newW;
             resizeNode.height = newH;
-            // If this is a CIF viewer node, resize the 3Dmol container to fill available space
-            if (resizeNode.key === 'cif_viewer') {
-                const cifContainer = resizeNode.el.querySelector('.ne-cif-viewer-container');
-                if (cifContainer) {
-                    // Compute available height: total node height minus header, progress, controls, footer, padding
-                    const header = resizeNode.el.querySelector('.ne-node-header');
-                    const controls = resizeNode.el.querySelector('.ne-cif-viewer-controls');
-                    const footer = resizeNode.el.querySelector('.ne-node-footer');
-                    const progress = resizeNode.el.querySelector('.ne-node-progress');
-                    const usedH = (header ? header.offsetHeight : 0) +
-                                  (progress ? progress.offsetHeight : 0) +
-                                  (controls ? controls.offsetHeight + 4 : 0) +
-                                  (footer ? footer.offsetHeight : 0) + 24; // padding
-                    const viewerH = Math.max(100, newH - usedH);
-                    cifContainer.style.height = viewerH + 'px';
-                }
-            }
+            resizeNodeContent(resizeNode, newH);
             updateWires();
             return;
         }
@@ -389,6 +373,41 @@
         if (wiringFrom) {
             // If we didn't land on a port, cancel wiring
             cancelWiring();
+        }
+    }
+
+    function resizeNodeContent(node, nodeHeight) {
+        const header = node.el.querySelector('.ne-node-header');
+        const progress = node.el.querySelector('.ne-node-progress');
+        const footer = node.el.querySelector('.ne-node-footer');
+        const body = node.el.querySelector('.ne-node-body');
+        if (!body) return;
+
+        const chromeHeight = (header?.offsetHeight || 0) +
+            (progress?.offsetHeight || 0) + (footer?.offsetHeight || 0);
+        const bodyHeight = Math.max(72, nodeHeight - chromeHeight);
+        body.style.height = `${bodyHeight}px`;
+        body.style.maxHeight = `${bodyHeight}px`;
+
+        const log = node.el.querySelector('.ne-node-log');
+        if (log) {
+            const logHeight = Math.max(52, Math.floor(bodyHeight * 0.45));
+            log.style.height = `${logHeight}px`;
+            log.style.maxHeight = `${logHeight}px`;
+        }
+
+        const textContent = node.el.querySelector('.ne-text-viewer-content');
+        if (textContent) textContent.style.maxHeight = `${Math.max(80, bodyHeight - 58)}px`;
+
+        const cifContainer = node.el.querySelector('.ne-cif-viewer-container');
+        if (cifContainer) {
+            const controls = node.el.querySelector('.ne-cif-viewer-controls');
+            const legend = node.el.querySelector('.ne-cif-legend');
+            const viewerHeight = Math.max(
+                100,
+                bodyHeight - (controls?.offsetHeight || 0) - (legend?.offsetHeight || 0) - 12,
+            );
+            cifContainer.style.height = `${viewerHeight}px`;
         }
     }
 
@@ -565,6 +584,13 @@
             notifyGraphChanged();
         });
         el.appendChild(body);
+
+        if (node.key === 'text_viewer') {
+            const prettyToggle = body.querySelector('.ne-text-pretty-toggle');
+            prettyToggle?.addEventListener('change', () => {
+                if (node.data != null) displayTextViewer(node, node.data, false);
+            });
+        }
 
         // Log area
         const log = document.createElement('div');
@@ -773,11 +799,18 @@
                 <select class="ne-cif-select" data-field="cif_select"><option value="">No data</option></select>
             </div>
             <div class="ne-cif-viewer-container" id="cif-viewer-${node.id}"></div>
+            <div class="ne-cif-legend" id="cif-legend-${node.id}" aria-label="Atom legend" hidden></div>
         `;
     }
 
     function buildTextViewerBody(node) {
-        return `<div class="ne-text-viewer-content" id="text-viewer-${node.id}">No data yet.</div>`;
+        return `
+            <label class="ne-text-pretty-control">
+                <input type="checkbox" class="ne-text-pretty-toggle"> Pretty
+            </label>
+            <div class="ne-text-viewer-fields" id="text-viewer-fields-${node.id}" hidden></div>
+            <div class="ne-text-viewer-content" id="text-viewer-${node.id}">No data yet.</div>
+        `;
     }
 
     function buildFilterBody(node) {
@@ -1352,9 +1385,13 @@ output_results = results`;
     }
 
     function hasAllInputConnections(node) {
-        return node.inputs.every(input => wires.some(w => (
+        return getRequiredInputs(node).every(input => wires.some(w => (
             w.toNode === node.id && w.toPort === input.key && nodes[w.fromNode]
         )));
+    }
+
+    function getRequiredInputs(node) {
+        return node.inputs.filter(input => input.required !== false);
     }
 
     function isConfiguredForExecution(node) {
@@ -1363,7 +1400,7 @@ output_results = results`;
 
     function isNodeReady(node) {
         if (!isConfiguredForExecution(node)) return false;
-        return node.inputs.every(input => {
+        return getRequiredInputs(node).every(input => {
             const wire = wires.find(w => w.toNode === node.id && w.toPort === input.key);
             const source = wire && nodes[wire.fromNode];
             return source && source.hasCompleted && !source.isStale;
@@ -1531,8 +1568,13 @@ output_results = results`;
         } else if (node.key === 'cif_viewer') {
             const select = node.el.querySelector('.ne-cif-select');
             const container = document.getElementById(`cif-viewer-${node.id}`);
+            const legend = document.getElementById(`cif-legend-${node.id}`);
             if (select) select.innerHTML = '<option value="">No data</option>';
             if (container) container.innerHTML = '';
+            if (legend) {
+                legend.innerHTML = '';
+                legend.hidden = true;
+            }
         }
     }
 
@@ -1823,18 +1865,23 @@ output_results = results`;
         const cifIn       = Array.isArray(cifArray) ? cifArray : [];
         const resultsList = (resultData && Array.isArray(resultData.results)) ? resultData.results : [];
 
+        if (!resultData || !Array.isArray(resultData.results)) {
+            throw new Error('Filter requires result data from a predictor.');
+        }
+
         const filteredCifs    = [];
         const filteredResults = [];
-        const total = Math.max(cifIn.length, resultsList.length);
+        const total = resultsList.length;
 
         for (let i = 0; i < total; i++) {
-            const cif  = cifIn[i]  ?? null;
-            const res  = resultsList[i] ?? null;
-            const props = res ? (res.properties || {}) : {};
+            const res = resultsList[i];
+            const cif = cifIn[i] ?? (typeof res?.cif_input === 'string' ? res.cif_input : null);
+            const props = res.properties || {};
 
             if (rules.length === 0 || rules.every(r => evaluateRule(props, r))) {
+                const outputIndex = filteredResults.length;
                 if (cif  !== null) filteredCifs.push(cif);
-                if (res  !== null) filteredResults.push({ ...res, index: filteredCifs.length - 1 });
+                filteredResults.push({ ...res, index: outputIndex });
             }
         }
 
@@ -1843,8 +1890,8 @@ output_results = results`;
             result_out: { source: resultData?.source || 'filter', results: filteredResults },
         };
 
-        const kept = filteredCifs.length;
-        addNodeLog(node.id, `Kept ${kept} / ${total} structure(s)`, kept > 0 ? 'success' : 'warning');
+        const kept = filteredResults.length;
+        addNodeLog(node.id, `Kept ${kept} / ${total} result(s)`, kept > 0 ? 'success' : 'warning');
     }
 
     function collectFilterRules(node) {
@@ -1863,6 +1910,13 @@ output_results = results`;
     function evaluateRule(properties, rule) {
         const raw = properties[rule.prop];
         if (raw === undefined || raw === null) return false;
+        const booleanValue = parseBoolean(raw);
+        const booleanThreshold = parseBoolean(rule.val);
+        if (booleanValue !== null && booleanThreshold !== null) {
+            return rule.op === '=' ? booleanValue === booleanThreshold
+                : rule.op === '!=' ? booleanValue !== booleanThreshold
+                : false;
+        }
         const numVal   = parseFloat(raw);
         const numThresh = parseFloat(rule.val);
         switch (rule.op) {
@@ -1878,6 +1932,16 @@ output_results = results`;
             case '<=': return isFinite(numVal) && isFinite(numThresh) && numVal <= numThresh;
             default:   return false;
         }
+    }
+
+    function parseBoolean(value) {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'string') {
+            const normalised = value.trim().toLowerCase();
+            if (normalised === 'true') return true;
+            if (normalised === 'false') return false;
+        }
+        return null;
     }
 
     // ── Topological sort (Kahn's algorithm) ──────────────────────
@@ -1989,10 +2053,10 @@ output_results = results`;
         const select = node.el.querySelector('.ne-cif-select');
         if (select) {
             select.innerHTML = '';
-            cifArray.forEach((_, i) => {
+            cifArray.forEach((cif, i) => {
                 const opt = document.createElement('option');
                 opt.value = i;
-                opt.textContent = `Structure ${i + 1}`;
+                opt.textContent = getCifComposition(cif, i);
                 select.appendChild(opt);
             });
             select.onchange = () => renderCIF(node.id, cifArray[parseInt(select.value)]);
@@ -2014,14 +2078,80 @@ output_results = results`;
                 backgroundColor: '#0a0a1e',
                 antialias: true,
             });
-            viewer.addModel(cifString, 'cif');
-            viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+            const model = viewer.addModel(cifString, 'cif');
+            viewer.setStyle({}, {
+                stick: { radius: 0.15, colorscheme: 'Jmol' },
+                sphere: { scale: 0.3, colorscheme: 'Jmol' },
+            });
             viewer.addUnitCell();
             viewer.zoomTo();
             viewer.render();
+            renderCIFLegend(nodeId, getCifElements(cifString, model));
         } catch (err) {
+            renderCIFLegend(nodeId, []);
             container.innerHTML = `<p style="color:#e57373; padding:8px; font-size:10px;">3Dmol error: ${err.message}</p>`;
         }
+    }
+
+    function getCifComposition(cifString, index) {
+        const formulaMatch = cifString.match(/_chemical_formula_(?:sum|structural)\s+(?:'([^']+)'|"([^"]+)"|(\S+))/i);
+        if (formulaMatch) return formulaMatch.slice(1).find(Boolean).replace(/\s+/g, '');
+
+        const dataMatch = cifString.match(/^data_([^\s]+)/mi);
+        if (dataMatch && dataMatch[1] && !/^generated/i.test(dataMatch[1])) {
+            return dataMatch[1].replace(/[_-]+/g, ' ');
+        }
+
+        const elements = getCifElements(cifString);
+        return elements.length ? elements.join('') : `Structure ${index + 1}`;
+    }
+
+    function getCifElements(cifString, model = null) {
+        const elements = new Set();
+        if (model?.selectedAtoms) {
+            model.selectedAtoms({}).forEach(atom => {
+                if (atom.elem) elements.add(String(atom.elem));
+            });
+        }
+        if (elements.size === 0) {
+            const atomLoop = cifString.match(/_atom_site_type_symbol[\s\S]*?(?=\n(?:loop_|data_|_[A-Za-z])|$)/i);
+            if (atomLoop) {
+                atomLoop[0].split('\n').forEach(line => {
+                    const match = line.trim().match(/^([A-Z][a-z]?)(?:\d+)?\s/);
+                    if (match) elements.add(match[1]);
+                });
+            }
+        }
+        return [...elements].sort();
+    }
+
+    function renderCIFLegend(nodeId, elements) {
+        const legend = document.getElementById(`cif-legend-${nodeId}`);
+        if (!legend) return;
+        legend.innerHTML = '';
+        legend.hidden = elements.length === 0;
+        elements.forEach(element => {
+            const item = document.createElement('span');
+            item.className = 'ne-cif-legend-item';
+            const swatch = document.createElement('span');
+            swatch.className = 'ne-cif-legend-swatch';
+            swatch.style.backgroundColor = getElementColor(element);
+            const label = document.createElement('span');
+            label.textContent = element;
+            item.append(swatch, label);
+            legend.appendChild(item);
+        });
+    }
+
+    function getElementColor(element) {
+        const colors = {
+            H: '#ffffff', C: '#909090', N: '#3050f8', O: '#ff0d0d', F: '#90e050',
+            Na: '#ab5cf2', Mg: '#8aff00', Al: '#bfa6a6', Si: '#f0c8a0', P: '#ff8000',
+            S: '#ffff30', Cl: '#1ff01f', K: '#8f40d4', Ca: '#3dff00', Fe: '#e06633',
+            Co: '#f090a0', Ni: '#50d050', Cu: '#c88033', Zn: '#7d80b0', Br: '#a62929',
+            I: '#940094',
+        };
+        return colors[element] || '#67c7d1';
     }
 
     function refreshCIFViewer(node) {
@@ -2045,24 +2175,133 @@ output_results = results`;
         if (cifString) renderCIF(node.id, cifString);
     }
 
-    function displayTextViewer(node, data) {
+    function displayTextViewer(node, data, logDisplay = true) {
         const container = document.getElementById(`text-viewer-${node.id}`);
         if (!container) return;
 
-        let text = '';
-        if (typeof data === 'string') {
-            text = data;
-        } else if (Array.isArray(data)) {
-            text = data.map((item, i) => {
-                if (typeof item === 'string') return `--- Item ${i + 1} ---\n${item}`;
-                return `--- Item ${i + 1} ---\n${JSON.stringify(item, null, 2)}`;
-            }).join('\n\n');
+        const prettyToggle = node.el.querySelector('.ne-text-pretty-toggle');
+        const fieldsContainer = document.getElementById(`text-viewer-fields-${node.id}`);
+        const entries = getTextViewerEntries(data);
+
+        if (!prettyToggle?.checked || entries.length === 0) {
+            if (fieldsContainer) {
+                fieldsContainer.hidden = true;
+                fieldsContainer.innerHTML = '';
+            }
+            container.textContent = formatTextViewerRaw(data);
         } else {
-            text = JSON.stringify(data, null, 2);
+            const availableFields = getPrettyFields(entries);
+            if (needsPrettyFieldRender(fieldsContainer, availableFields)) {
+                renderPrettyFieldToggles(fieldsContainer, availableFields, node, data);
+            } else {
+                fieldsContainer.hidden = false;
+            }
+            const selectedFields = [...fieldsContainer.querySelectorAll('input:checked')]
+                .map(input => input.value);
+            container.textContent = formatPrettyEntries(entries, selectedFields);
         }
 
-        container.textContent = text;
-        addNodeLog(node.id, 'Data displayed', 'success');
+        if (logDisplay) addNodeLog(node.id, 'Data displayed', 'success');
+    }
+
+    function formatTextViewerRaw(data) {
+        if (typeof data === 'string') return data;
+        if (Array.isArray(data)) {
+            return data.map((item, index) => (
+                `--- Item ${index + 1} ---\n${typeof item === 'string' ? item : JSON.stringify(item, null, 2)}`
+            )).join('\n\n');
+        }
+        return JSON.stringify(data, null, 2);
+    }
+
+    function getTextViewerEntries(data) {
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data?.results)) return data.results;
+        return [];
+    }
+
+    function getPrettyFields(entries) {
+        const fields = new Set();
+        entries.forEach(entry => {
+            collectPrettyFields(entry, '', fields);
+        });
+        return [...fields].sort();
+    }
+
+    function collectPrettyFields(value, prefix, fields) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) {
+            if (prefix && prefix !== 'cif_input') fields.add(prefix);
+            return;
+        }
+
+        Object.entries(value).forEach(([key, child]) => {
+            const field = prefix ? `${prefix}.${key}` : key;
+            if (field === 'cif_input') return;
+            if (child && typeof child === 'object' && !Array.isArray(child)) {
+                collectPrettyFields(child, field, fields);
+            } else {
+                fields.add(field);
+            }
+        });
+    }
+
+    function renderPrettyFieldToggles(container, fields, node, data) {
+        if (!container) return;
+        const previousSelection = new Set([...container.querySelectorAll('input:checked')].map(input => input.value));
+        container.innerHTML = '';
+        container.hidden = false;
+
+        fields.forEach(field => {
+            const label = document.createElement('label');
+            label.className = 'ne-text-field-toggle';
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.value = field;
+            input.checked = previousSelection.has(field);
+            input.addEventListener('change', () => displayTextViewer(node, data, false));
+            const text = document.createElement('span');
+            text.textContent = field.replace('.', ' - ');
+            label.append(input, text);
+            container.appendChild(label);
+        });
+    }
+
+    function needsPrettyFieldRender(container, fields) {
+        if (!container || container.hidden) return true;
+        const currentFields = [...container.querySelectorAll('input')].map(input => input.value);
+        return currentFields.length !== fields.length || currentFields.some((field, index) => field !== fields[index]);
+    }
+
+    function formatPrettyEntries(entries, selectedFields) {
+        return entries.map((entry, index) => {
+            const material = getMaterialName(entry, index);
+            const lines = [material];
+            selectedFields.forEach(field => {
+                const value = getPrettyFieldValue(entry, field);
+                if (value !== undefined) lines.push(`  ${field.replace('.', ' - ')}: ${formatPrettyValue(value)}`);
+            });
+            return lines.join('\n');
+        }).join('\n\n');
+    }
+
+    function getMaterialName(entry, index) {
+        if (typeof entry === 'string') return getCifComposition(entry, index);
+        if (entry && typeof entry === 'object') {
+            if (typeof entry.material_name === 'string') return entry.material_name;
+            if (typeof entry.formula === 'string') return entry.formula;
+            if (typeof entry.composition === 'string') return entry.composition;
+            if (typeof entry.cif_input === 'string') return getCifComposition(entry.cif_input, index);
+        }
+        return `Material ${index + 1}`;
+    }
+
+    function getPrettyFieldValue(entry, field) {
+        if (!entry || typeof entry !== 'object') return undefined;
+        return field.split('.').reduce((value, key) => value?.[key], entry);
+    }
+
+    function formatPrettyValue(value) {
+        return typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
     }
 
 })();

@@ -332,6 +332,7 @@ body {
     overflow-y: auto;
     max-height: 400px;
     flex: 1;
+    min-height: 0;
 }
 
 .ne-node-body label {
@@ -509,7 +510,84 @@ body {
     flex: 1;
 }
 
+.ne-cif-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 6px;
+    color: #cbd5e1;
+    font-size: 9px;
+}
+
+.ne-cif-legend[hidden] { display: none; }
+
+.ne-cif-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.ne-cif-legend-swatch {
+    width: 8px;
+    height: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
 /* ── Text Viewer specific ─────────────────────────────────────────── */
+.ne-text-pretty-control {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 7px !important;
+    color: #bfdbfe !important;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ne-text-pretty-control input {
+    width: auto;
+    margin: 0;
+    accent-color: #38bdf8;
+}
+
+.ne-text-viewer-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 4px;
+    margin-bottom: 7px;
+    padding: 6px;
+    border: 1px solid #334155;
+    border-radius: 3px;
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.ne-text-viewer-fields[hidden] { display: none; }
+
+.ne-text-field-toggle {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    margin: 0 !important;
+    color: #cbd5e1 !important;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.ne-text-field-toggle input {
+    width: auto;
+    margin: 0;
+    accent-color: #38bdf8;
+    flex: 0 0 auto;
+}
+
+.ne-text-field-toggle span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .ne-text-viewer-content {
     width: 100%;
     min-height: 80px;
