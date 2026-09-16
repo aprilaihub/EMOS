@@ -75,17 +75,32 @@
     let selectedNodeId = null;
 
     // Pipeline execution
-    let isRunning  = false;
-    let cancelFlag = false;
+    const executionState = {
+        status: 'idle', // idle | running | cancelling | finishing_after_cancel | paused | error | complete
+        plan: [],
+        nextIndex: 0,
+        runMode: 'process', // process | step
+        pauseReason: null, // breakpoint | step | cancellation
+        activeNodeId: null,
+        activeControl: null, // process | step | null
+        activeNodeCanCancel: false,
+        activeAttemptId: 0,
+        cancelledAttemptId: null,
+        finishAfterCurrent: false,
+        pausedNodeId: null,
+    };
     let activeAbortController = null;
     let activeRunId = null;  // Backend run_id for the currently executing node
+    let activeSseCancel = null;
 
     // Loaded data
     let uiData            = null;
     let predictorPropsMap = {};  // factoryKey → { runtimePropName: displayLabel }
 
     // DOM refs
-    let canvasContainer, canvas, wiresSvg, processBtn, cancelBtn, statusText, zoomText, contextMenu;
+    let canvasContainer, canvas, wiresSvg, processBtn, stepBtn, clearBtn, clearCanvasBtn;
+    let statusText, zoomText, contextMenu, confirmDialog, confirmTitle, confirmMessage;
+    let confirmAcceptBtn, confirmCancelBtn, confirmationResolver = null;
 
     // ═══════════════════════════════════════════════════════════════
     // INIT
@@ -95,10 +110,17 @@
         canvas          = document.getElementById('neCanvas');
         wiresSvg        = document.getElementById('neWiresSvg');
         processBtn      = document.getElementById('neProcessBtn');
-        cancelBtn       = document.getElementById('neCancelBtn');
+        stepBtn         = document.getElementById('neStepBtn');
+        clearBtn        = document.getElementById('neClearBtn');
+        clearCanvasBtn  = document.getElementById('neClearCanvasBtn');
         statusText      = document.getElementById('neStatusText');
         zoomText        = document.getElementById('neZoomText');
         contextMenu     = document.getElementById('neContextMenu');
+        confirmDialog   = document.getElementById('neConfirmDialog');
+        confirmTitle    = document.getElementById('neConfirmTitle');
+        confirmMessage  = document.getElementById('neConfirmMessage');
+        confirmAcceptBtn = document.getElementById('neConfirmAcceptBtn');
+        confirmCancelBtn = document.getElementById('neConfirmCancelBtn');
 
         // Load data
         uiData = await fetch('./devtools/ui_data.json').then(r => r.json()).catch(() => null);
@@ -108,6 +130,7 @@
         populateSidebar();
         bindEvents();
         applyTransform();
+        updateToolbar();
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -215,34 +238,42 @@
         document.addEventListener('keydown', onKeyDown);
 
         // Toolbar
-        processBtn.addEventListener('click', runPipeline);
-        cancelBtn.addEventListener('click', cancelPipeline);
+        processBtn.addEventListener('click', () => onExecutionControlClick('process'));
+        stepBtn.addEventListener('click', () => onExecutionControlClick('step'));
+        clearBtn.addEventListener('click', clearOutputsWithConfirmation);
+        clearCanvasBtn.addEventListener('click', clearCanvasWithConfirmation);
+        confirmAcceptBtn.addEventListener('click', () => settleConfirmation(true));
+        confirmCancelBtn.addEventListener('click', () => settleConfirmation(false));
+
+        // Input changes can make completed results stale without changing layout.
+        canvas.addEventListener('input', onNodeInputChanged);
+        canvas.addEventListener('change', onNodeInputChanged);
     }
 
-    async function cancelPipeline() {
-        cancelFlag = true;
-        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
+    function showConfirmation(title, message, confirmLabel) {
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        confirmAcceptBtn.textContent = confirmLabel;
+        confirmDialog.hidden = false;
+        confirmAcceptBtn.focus();
 
-        // Tell the backend to cancel the active IU (e.g. send cancel to MatterGen Docker)
-        if (activeRunId) {
-            try {
-                await fetch(`${backendUrl}/api/node/cancel/${activeRunId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-                console.log(`Cancel sent for run ${activeRunId}`);
-            } catch (err) {
-                console.warn('Cancel request failed:', err);
-            }
-        }
+        return new Promise(resolve => {
+            confirmationResolver = resolve;
+        });
+    }
 
-        // Also abort the SSE fetch to stop receiving events immediately
-        if (activeAbortController) activeAbortController.abort();
+    function settleConfirmation(accepted) {
+        if (!confirmationResolver) return;
+        const resolve = confirmationResolver;
+        confirmationResolver = null;
+        confirmDialog.hidden = true;
+        resolve(accepted);
     }
 
     // ── Drop → create node ───────────────────────────────────────
     function onCanvasDrop(e) {
         e.preventDefault();
+        if (!canEditGraph()) return;
         const raw = e.dataTransfer.getData('application/emos-node');
         if (!raw) return;
         const { type, key, name } = JSON.parse(raw);
@@ -404,6 +435,10 @@
 
     // ── Keyboard ─────────────────────────────────────────────────
     function onKeyDown(e) {
+        if (!confirmDialog.hidden && e.key === 'Escape') {
+            settleConfirmation(false);
+            return;
+        }
         if (e.key === 'Delete' || e.key === 'Backspace') {
             // Don't delete when typing in inputs
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
@@ -432,6 +467,10 @@
             inputs: schema.inputs.map(p => ({ ...p })),
             outputs: schema.outputs.map(p => ({ ...p })),
             data: null,   // output data after execution
+            portData: null,
+            hasCompleted: false,
+            isStale: false,
+            breakpointEnabled: false,
             el: null,
         };
 
@@ -445,6 +484,7 @@
         if (node.type === 'database' || node.type === 'generator') {
             populateNodePropertyFields(node);
         }
+        notifyGraphChanged();
         return node;
     }
 
@@ -464,6 +504,20 @@
         const header = document.createElement('div');
         header.className = 'ne-node-header';
         header.innerHTML = `<span class="ne-node-icon">${nodeIcon}</span><span class="ne-node-title">${node.name}</span>`;
+        const breakpointBtn = document.createElement('button');
+        breakpointBtn.type = 'button';
+        breakpointBtn.className = 'ne-breakpoint-led';
+        breakpointBtn.title = 'Pause after this node completes';
+        breakpointBtn.setAttribute('aria-label', 'Pause after this node completes');
+        breakpointBtn.setAttribute('aria-pressed', 'false');
+        breakpointBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        breakpointBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!canEditGraph()) return;
+            node.breakpointEnabled = !node.breakpointEnabled;
+            updateBreakpointButton(node);
+        });
+        header.appendChild(breakpointBtn);
         // X close button
         const closeBtn = document.createElement('span');
         closeBtn.className = 'ne-node-close';
@@ -474,6 +528,7 @@
         header.appendChild(closeBtn);
         header.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
+            if (!canEditGraph()) return;
             e.stopPropagation();
             selectNode(node.id);
             dragNode = node;
@@ -504,6 +559,8 @@
             } else if (action === 'remove-filter-rule') {
                 e.target.closest('.ne-filter-row').remove();
             }
+            markNodeAndDependentsStale(node.id);
+            notifyGraphChanged();
         });
         el.appendChild(body);
 
@@ -567,6 +624,7 @@
         const rh = document.createElement('div');
         rh.className = 'ne-resize-handle';
         rh.addEventListener('mousedown', (e) => {
+            if (!canEditGraph()) return;
             e.stopPropagation();
             resizeNode = node;
             resizeStartX = e.clientX;
@@ -825,11 +883,14 @@ output_results = results`;
 
     // ── Delete node ──────────────────────────────────────────────
     function deleteNode(id) {
+        if (!canEditGraph()) return;
         const node = nodes[id];
         if (!node) return;
+        const affectedNodeIds = new Set();
         // Remove connected wires
         wires = wires.filter(w => {
             if (w.fromNode === id || w.toNode === id) {
+                if (w.fromNode === id) affectedNodeIds.add(w.toNode);
                 removeWireEl(w.id);
                 return false;
             }
@@ -840,12 +901,15 @@ output_results = results`;
         if (selectedNodeId === id) selectedNodeId = null;
         updatePortConnectedStates();
         refreshAllFilterNodes();
+        affectedNodeIds.forEach(markNodeAndDependentsStale);
+        notifyGraphChanged();
     }
 
     // ═══════════════════════════════════════════════════════════════
     // WIRING
     // ═══════════════════════════════════════════════════════════════
     function startWiring(nodeId, portKey, portType, isOutput) {
+        if (!canEditGraph() || !isOutput) return;
         wiringFrom = { nodeId, portKey, portType, isOutput };
         // Create temp wire
         tempWirePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -894,6 +958,8 @@ output_results = results`;
         cancelWiring();
         updateWires();
         updatePortConnectedStates();
+        markNodeAndDependentsStale(to.nodeId);
+        notifyGraphChanged();
     }
 
     function cancelWiring() {
@@ -919,11 +985,14 @@ output_results = results`;
             path.style.pointerEvents = 'stroke';
             path.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (!canEditGraph()) return;
                 // Delete wire on click
                 wires = wires.filter(ww => ww.id !== w.id);
                 updateWires();
                 updatePortConnectedStates();
                 refreshAllFilterNodes();
+                markNodeAndDependentsStale(w.toNode);
+                notifyGraphChanged();
             });
             wiresSvg.appendChild(path);
         }
@@ -1011,134 +1080,508 @@ output_results = results`;
     // ═══════════════════════════════════════════════════════════════
     // PIPELINE EXECUTION
     // ═══════════════════════════════════════════════════════════════
-    async function runPipeline() {
-        if (isRunning) return;
+    function onExecutionControlClick(control) {
+        if (isExecutionActive()) {
+            if (executionState.activeControl === control) requestCancellation();
+            return;
+        }
+        startExecution(control);
+    }
 
-        // Topological sort
+    function isExecutionActive() {
+        return ['running', 'cancelling', 'finishing_after_cancel'].includes(executionState.status);
+    }
+
+    function canEditGraph() {
+        return !isExecutionActive();
+    }
+
+    function isCancellableNode(node) {
+        return node.type === 'generator' && node.key.startsWith('mattergen');
+    }
+
+    async function startExecution(runMode) {
+        restorePausedNodeState();
         const sorted = topologicalSort();
         if (!sorted) {
+            executionState.status = 'error';
             setStatus('Error: cycle detected in graph');
-            return;
-        }
-        if (sorted.length === 0) {
-            setStatus('No nodes to process');
+            updateToolbar();
             return;
         }
 
-        isRunning  = true;
-        cancelFlag = false;
-        processBtn.disabled = true;
-        cancelBtn.style.display = '';
-        setStatus('Running pipeline...');
+        executionState.plan = sorted;
+        executionState.nextIndex = 0;
+        executionState.runMode = runMode;
+        executionState.pauseReason = null;
+        executionState.finishAfterCurrent = false;
+        executionState.cancelledAttemptId = null;
 
-        // Clear all node states
-        for (const n of Object.values(nodes)) {
-            setNodeState(n.id, '');
-            n.data = null;
-            n.portData = null;
-            clearNodeLog(n.id);
+        const firstNode = getNextEligibleNode();
+        if (!firstNode) {
+            finishOrReportNoEligibleNodes();
+            return;
         }
 
-        // Mark all as waiting
-        for (const nid of sorted) {
-            setNodeState(nid, 'waiting');
-        }
+        executionState.status = 'running';
+        executionState.activeControl = runMode;
+        markPendingNodes();
+        updateToolbar();
 
-        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
-
-        for (const nodeId of sorted) {
-            if (cancelFlag) {
-                setNodeState(nodeId, '');
-                setStatus('Cancelled');
+        while (executionState.status === 'running') {
+            const node = getNextEligibleNode();
+            if (!node) {
+                finishOrReportNoEligibleNodes();
                 break;
             }
 
-            const node = nodes[nodeId];
-            if (!node) continue;
-
-            // Skip nodes with no wire connections at all
-            const isConnected = wires.some(w => w.fromNode === nodeId || w.toNode === nodeId);
-            if (!isConnected) continue;
-
-            // Viewers don't execute on the backend — they just display data from upstream
-            if (node.type === 'viewer') {
-                displayViewerData(node);
-                setNodeState(nodeId, 'done');
-                continue;
-            }
-
-            // Filter nodes execute client-side
-            if (node.key === 'filter') {
-                setNodeState(nodeId, 'running');
-                try {
-                    executeFilterNode(node);
-                    setNodeState(nodeId, 'done');
-                    setNodeProgress(nodeId, 100);
-                } catch (err) {
-                    setNodeState(nodeId, 'error');
-                    addNodeLog(nodeId, `Error: ${err.message}`, 'error');
-                    setStatus(`Error at ${node.name}: ${err.message}`);
-                    break;
-                }
-                continue;
-            }
-
-            setNodeState(nodeId, 'running');
-            addNodeLog(nodeId, `Starting ${node.name}...`, 'info');
-            setStatus(`Running: ${node.name}`);
+            executionState.activeNodeId = node.id;
+            executionState.activeNodeCanCancel = isCancellableNode(node);
+            const attemptId = ++executionState.activeAttemptId;
+            let result;
+            let finishedAfterCancellation = false;
 
             try {
-                // Gather upstream data from incoming wires
-                const upstreamData = getUpstreamData(nodeId);
-
-                // Collect user inputs from the node's UI fields
-                const userInputs = collectNodeInputs(node);
-
-                const payload = {
-                    type: node.type,
-                    key:  node.key,
-                    inputs: userInputs,
-                    upstream: upstreamData,
-                };
-
-                // Execute via SSE
-                const result = await executeNodeSSE(backendUrl, nodeId, payload);
-
-                // Lambda and other multi-output utility nodes return {cif_out, result_out}
-                if (node.key === 'lambda') {
-                    node.portData = result;
-                } else {
-                    node.data = result;
-                }
-                setNodeState(nodeId, 'done');
-                addNodeLog(nodeId, 'Done ✓', 'success');
-                setNodeProgress(nodeId, 100);
-
+                result = await executeScheduledNode(node, attemptId);
+                finishedAfterCancellation = executionState.status === 'finishing_after_cancel';
             } catch (err) {
-                if (cancelFlag) {
-                    setNodeState(nodeId, '');
-                    setStatus('Cancelled');
+                if (executionState.cancelledAttemptId === attemptId) {
+                    clearNodeOutput(node);
+                    node.hasCompleted = false;
+                    node.isStale = false;
+                    setNodeState(node.id, 'pending');
+                    pauseExecution('cancellation', `Cancelled ${node.name}; ready to continue.`);
                 } else {
-                    setNodeState(nodeId, 'error');
-                    addNodeLog(nodeId, `Error: ${err.message}`, 'error');
+                    node.hasCompleted = false;
+                    setNodeState(node.id, 'error');
+                    addNodeLog(node.id, `Error: ${err.message}`, 'error');
+                    executionState.status = 'error';
+                    executionState.activeControl = null;
                     setStatus(`Error at ${node.name}: ${err.message}`);
                 }
-                break; // Stop on first error
+                break;
+            } finally {
+                if (executionState.activeAttemptId === attemptId) {
+                    executionState.activeNodeId = null;
+                    executionState.activeNodeCanCancel = false;
+                    executionState.finishAfterCurrent = false;
+                }
+            }
+
+            if (executionState.cancelledAttemptId === attemptId) {
+                clearNodeOutput(node);
+                node.hasCompleted = false;
+                node.isStale = false;
+                setNodeState(node.id, 'pending');
+                pauseExecution('cancellation', `Cancelled ${node.name}; ready to continue.`);
+                break;
+            }
+
+            if (executionState.status !== 'running' && !finishedAfterCancellation) break;
+
+            completeNode(node, result);
+
+            if (finishedAfterCancellation) {
+                pauseExecution('cancellation', `Paused after ${node.name}.`, node.id);
+                break;
+            }
+
+            if (!getNextEligibleNode()) {
+                finishOrReportNoEligibleNodes();
+                break;
+            }
+
+            if (node.breakpointEnabled) {
+                pauseExecution('breakpoint', `Paused after breakpoint: ${node.name}`, node.id);
+                break;
+            }
+
+            if (runMode === 'step') {
+                pauseExecution('step', `Step complete: ${node.name}`, node.id);
+                break;
             }
         }
 
-        // After pipeline: trigger viewer display for downstream viewers
-        for (const nodeId of sorted) {
+        updateToolbar();
+    }
+
+    async function executeScheduledNode(node, attemptId) {
+        prepareNodeForExecution(node);
+        setNodeState(node.id, 'running');
+        const { completed, total } = getProgressCounts();
+        setStatus(`Processing (${completed}/${total}): ${node.name}`);
+        updateToolbar();
+
+        if (node.type === 'viewer') {
+            displayViewerData(node);
+            return null;
+        }
+
+        if (node.key === 'filter') {
+            executeFilterNode(node);
+            setNodeProgress(node.id, 100);
+            return null;
+        }
+
+        addNodeLog(node.id, `Starting ${node.name}...`, 'info');
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
+        const payload = {
+            type: node.type,
+            key: node.key,
+            inputs: collectNodeInputs(node),
+            upstream: getUpstreamData(node.id),
+        };
+        return executeNodeSSE(backendUrl, node.id, payload, attemptId);
+    }
+
+    function prepareNodeForExecution(node) {
+        if (node.isStale || !node.hasCompleted) clearNodeOutput(node);
+        node.hasCompleted = false;
+        node.isStale = false;
+    }
+
+    function completeNode(node, result) {
+        if (node.key === 'lambda') {
+            node.portData = result;
+        } else if (node.type !== 'viewer' && node.key !== 'filter') {
+            node.data = result;
+        }
+        node.hasCompleted = true;
+        node.isStale = false;
+        setNodeState(node.id, 'done');
+        addNodeLog(node.id, 'Done', 'success');
+        setNodeProgress(node.id, 100);
+        setStatus(`Completed ${node.name}`);
+    }
+
+    function requestCancellation() {
+        if (executionState.status !== 'running') return;
+        const node = nodes[executionState.activeNodeId];
+        if (!node) return;
+
+        if (!executionState.activeNodeCanCancel) {
+            executionState.finishAfterCurrent = true;
+            executionState.status = 'finishing_after_cancel';
+            setStatus(`Finishing ${node.name} before pausing...`);
+            updateToolbar();
+            return;
+        }
+
+        executionState.status = 'cancelling';
+        executionState.cancelledAttemptId = executionState.activeAttemptId;
+        clearNodeOutput(node);
+        node.hasCompleted = false;
+        node.isStale = false;
+        setNodeState(node.id, 'pending');
+        setStatus(`Cancelling ${node.name}...`);
+        updateToolbar();
+
+        const runId = activeRunId;
+        if (runId) sendBackendCancel(runId);
+        if (activeSseCancel) activeSseCancel();
+        else if (activeAbortController) activeAbortController.abort();
+    }
+
+    async function sendBackendCancel(runId) {
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
+        try {
+            await fetch(`${backendUrl}/api/node/cancel/${runId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+        } catch (err) {
+            console.warn('Cancel request failed:', err);
+        }
+    }
+
+    function pauseExecution(reason, message, pausedNodeId = null) {
+        executionState.status = 'paused';
+        executionState.pauseReason = reason;
+        executionState.pausedNodeId = pausedNodeId;
+        if (executionState.pausedNodeId && nodes[executionState.pausedNodeId]) {
+            setNodeState(executionState.pausedNodeId, 'paused');
+        }
+        executionState.activeControl = null;
+        executionState.activeNodeCanCancel = false;
+        setStatus(message);
+        markPendingNodes();
+    }
+
+    function finishOrReportNoEligibleNodes() {
+        const { completed, total } = getProgressCounts();
+        if (total > 0 && completed === total) {
+            executionState.status = 'complete';
+            executionState.pauseReason = null;
+            executionState.activeControl = null;
+            setStatus(`Pipeline complete (${completed}/${total})`);
+        } else if (total === 0) {
+            executionState.status = 'idle';
+            executionState.activeControl = null;
+            setStatus('No eligible nodes to process');
+        } else {
+            executionState.status = 'paused';
+            executionState.pauseReason = 'waiting';
+            executionState.activeControl = null;
+            setStatus(`Waiting for required inputs (${completed}/${total})`);
+        }
+        markPendingNodes();
+        updateToolbar();
+    }
+
+    function getExecutionPlan() {
+        const sorted = topologicalSort();
+        return sorted || [];
+    }
+
+    function hasAllInputConnections(node) {
+        return node.inputs.every(input => wires.some(w => (
+            w.toNode === node.id && w.toPort === input.key && nodes[w.fromNode]
+        )));
+    }
+
+    function isConfiguredForExecution(node) {
+        return node.inputs.length === 0 || hasAllInputConnections(node);
+    }
+
+    function isNodeReady(node) {
+        if (!isConfiguredForExecution(node)) return false;
+        return node.inputs.every(input => {
+            const wire = wires.find(w => w.toNode === node.id && w.toPort === input.key);
+            const source = wire && nodes[wire.fromNode];
+            return source && source.hasCompleted && !source.isStale;
+        });
+    }
+
+    function isNodePending(node) {
+        return !node.hasCompleted || node.isStale;
+    }
+
+    function getNextEligibleNode() {
+        const plan = executionState.plan.length ? executionState.plan : getExecutionPlan();
+        for (let index = 0; index < plan.length; index++) {
+            const node = nodes[plan[index]];
+            if (node && isNodePending(node) && isNodeReady(node)) {
+                executionState.nextIndex = index;
+                return node;
+            }
+        }
+        return null;
+    }
+
+    function getProgressCounts() {
+        const plan = getExecutionPlan();
+        const executableNodes = plan.map(id => nodes[id]).filter(node => node && isConfiguredForExecution(node));
+        return {
+            completed: executableNodes.filter(node => node.hasCompleted && !node.isStale).length,
+            total: executableNodes.length,
+        };
+    }
+
+    function hasExecutionWork() {
+        return getNextEligibleNode() !== null;
+    }
+
+    function markPendingNodes() {
+        for (const nodeId of getExecutionPlan()) {
             const node = nodes[nodeId];
-            if (node && node.type === 'viewer' && wires.some(w => w.toNode === nodeId)) {
-                displayViewerData(node);
+            if (node && isConfiguredForExecution(node) && isNodePending(node) && node.id !== executionState.activeNodeId) {
+                setNodeState(node.id, node.isStale ? 'stale' : 'pending');
             }
         }
+    }
 
-        isRunning = false;
-        processBtn.disabled = false;
-        cancelBtn.style.display = 'none';
-        if (!cancelFlag) setStatus('Pipeline complete');
+    function restorePausedNodeState() {
+        const pausedNode = nodes[executionState.pausedNodeId];
+        if (pausedNode) {
+            if (pausedNode.hasCompleted) {
+                setNodeState(pausedNode.id, pausedNode.isStale ? 'stale' : 'done');
+            } else {
+                setNodeState(pausedNode.id, 'pending');
+            }
+        }
+        executionState.pausedNodeId = null;
+    }
+
+    function markNodeAndDependentsStale(nodeId) {
+        const queue = [nodeId];
+        const visited = new Set();
+
+        while (queue.length > 0) {
+            const currentId = queue.shift();
+            if (visited.has(currentId)) continue;
+            visited.add(currentId);
+
+            const node = nodes[currentId];
+            if (node && (node.hasCompleted || node.data != null || node.portData != null)) {
+                node.isStale = true;
+                setNodeState(currentId, 'stale');
+            }
+            for (const wire of wires) {
+                if (wire.fromNode === currentId) queue.push(wire.toNode);
+            }
+        }
+    }
+
+    function onNodeInputChanged(event) {
+        if (!canEditGraph()) return;
+        const field = event.target.closest('[data-field]');
+        const nodeEl = event.target.closest('.ne-node');
+        if (!nodeEl) return;
+        const node = nodes[nodeEl.dataset.nodeId];
+        const isFilterRule = node?.key === 'filter' && event.target.closest('.ne-filter-row');
+        if ((!field && !isFilterRule) || !node || node.type === 'viewer') return;
+        markNodeAndDependentsStale(node.id);
+        notifyGraphChanged();
+    }
+
+    function notifyGraphChanged() {
+        if (isExecutionActive()) return;
+        executionState.plan = [];
+        executionState.nextIndex = 0;
+
+        if (['complete', 'error'].includes(executionState.status) && hasExecutionWork()) {
+            executionState.status = 'paused';
+            executionState.pauseReason = 'graph_changed';
+            setStatus('Graph changed; ready to continue.');
+        }
+        markPendingNodes();
+        updateToolbar();
+    }
+
+    async function clearOutputsWithConfirmation() {
+        if (isExecutionActive() || !hasRuntimeData()) return;
+        const accepted = await showConfirmation(
+            'Clear outputs?',
+            'This removes all displayed node outputs, logs, progress, and execution history. The graph and node settings remain.',
+            'Clear outputs',
+        );
+        if (!accepted) return;
+
+        for (const node of Object.values(nodes)) clearNodeRuntime(node);
+        resetExecutionState('idle');
+        setStatus('Outputs cleared.');
+        markPendingNodes();
+        updateToolbar();
+    }
+
+    async function clearCanvasWithConfirmation() {
+        if (isExecutionActive() || Object.keys(nodes).length === 0) return;
+        const nodeCount = Object.keys(nodes).length;
+        const wireCount = wires.length;
+        const accepted = await showConfirmation(
+            'Clear canvas?',
+            `This removes ${nodeCount} node${nodeCount === 1 ? '' : 's'} and ${wireCount} connection${wireCount === 1 ? '' : 's'}. This cannot be undone.`,
+            'Clear canvas',
+        );
+        if (!accepted) return;
+
+        cancelWiring();
+        Object.values(nodes).forEach(node => node.el.remove());
+        wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
+        nodes = {};
+        wires = [];
+        nextNodeId = 1;
+        nextWireId = 1;
+        selectedNodeId = null;
+        resetExecutionState('idle');
+        setStatus('Canvas cleared.');
+        updateToolbar();
+    }
+
+    function clearNodeOutput(node) {
+        node.data = null;
+        node.portData = null;
+        node.resultRecord = null;
+        setNodeProgress(node.id, 0);
+        resetViewerDisplay(node);
+    }
+
+    function clearNodeRuntime(node) {
+        clearNodeOutput(node);
+        node.hasCompleted = false;
+        node.isStale = false;
+        clearNodeLog(node.id);
+        setNodeState(node.id, isConfiguredForExecution(node) ? 'pending' : '');
+    }
+
+    function resetViewerDisplay(node) {
+        if (node.key === 'text_viewer') {
+            const content = document.getElementById(`text-viewer-${node.id}`);
+            if (content) content.textContent = 'No data yet.';
+        } else if (node.key === 'cif_viewer') {
+            const select = node.el.querySelector('.ne-cif-select');
+            const container = document.getElementById(`cif-viewer-${node.id}`);
+            if (select) select.innerHTML = '<option value="">No data</option>';
+            if (container) container.innerHTML = '';
+        }
+    }
+
+    function resetExecutionState(status) {
+        executionState.status = status;
+        executionState.plan = [];
+        executionState.nextIndex = 0;
+        executionState.runMode = 'process';
+        executionState.pauseReason = null;
+        executionState.activeNodeId = null;
+        executionState.activeControl = null;
+        executionState.activeNodeCanCancel = false;
+        executionState.cancelledAttemptId = null;
+        executionState.finishAfterCurrent = false;
+        executionState.pausedNodeId = null;
+        activeAbortController = null;
+        activeRunId = null;
+        activeSseCancel = null;
+    }
+
+    function hasRuntimeData() {
+        if (executionState.status !== 'idle') return true;
+        return Object.values(nodes).some(node => (
+            node.hasCompleted || node.isStale || node.data != null || node.portData != null ||
+            document.getElementById(`node-log-${node.id}`)?.childElementCount > 0
+        ));
+    }
+
+    function updateToolbar() {
+        if (!processBtn) return;
+        const { completed, total } = getProgressCounts();
+        const active = isExecutionActive();
+        const hasWork = !active && hasExecutionWork();
+        const isComplete = executionState.status === 'complete' && !hasWork;
+        const isError = executionState.status === 'error';
+
+        if (active) {
+            const processIsActive = executionState.activeControl === 'process';
+            const stepIsActive = executionState.activeControl === 'step';
+            const activeLabel = executionState.status === 'finishing_after_cancel'
+                ? 'Finishing current node'
+                : `Cancel (${completed}/${total})`;
+
+            processBtn.textContent = processIsActive ? activeLabel : 'Process';
+            stepBtn.textContent = stepIsActive ? activeLabel : 'Step Increment';
+            processBtn.disabled = !processIsActive || executionState.status !== 'running';
+            stepBtn.disabled = !stepIsActive || executionState.status !== 'running';
+        } else {
+            const processLabel = executionState.status === 'paused'
+                ? `Continue (${completed}/${total})`
+                : 'Process';
+            processBtn.textContent = processLabel;
+            stepBtn.textContent = 'Step Increment';
+            processBtn.disabled = isComplete || isError || !hasWork;
+            stepBtn.disabled = isComplete || isError || !hasWork;
+        }
+
+        clearBtn.disabled = active || !hasRuntimeData();
+        clearCanvasBtn.disabled = active || Object.keys(nodes).length === 0;
+    }
+
+    function updateBreakpointButton(node) {
+        const button = node.el?.querySelector('.ne-breakpoint-led');
+        if (!button) return;
+        button.classList.toggle('enabled', node.breakpointEnabled);
+        button.setAttribute('aria-pressed', String(node.breakpointEnabled));
+        button.title = node.breakpointEnabled
+            ? 'Breakpoint enabled: pause after this node completes'
+            : 'Pause after this node completes';
     }
 
     function getUpstreamData(nodeId) {
@@ -1159,11 +1602,40 @@ output_results = results`;
         return data;
     }
 
-    function executeNodeSSE(backendUrl, nodeId, payload) {
+    function executeNodeSSE(backendUrl, nodeId, payload, attemptId) {
         return new Promise((resolve, reject) => {
             const ctrl = new AbortController();
+            let reader = null;
+            let settled = false;
             activeAbortController = ctrl;
             activeRunId = null;  // Will be set from the first SSE event
+
+            function cleanup() {
+                if (executionState.activeAttemptId !== attemptId) return;
+                activeAbortController = null;
+                activeRunId = null;
+                activeSseCancel = null;
+            }
+
+            function resolveOnce(result) {
+                if (settled) return;
+                settled = true;
+                cleanup();
+                resolve(result);
+            }
+
+            function rejectOnce(error) {
+                if (settled) return;
+                settled = true;
+                cleanup();
+                reject(error);
+            }
+
+            activeSseCancel = () => {
+                ctrl.abort();
+                if (reader) reader.cancel().catch(() => {});
+                rejectOnce(new Error('Cancelled'));
+            };
 
             fetch(`${backendUrl}/api/node/run`, {
                 method: 'POST',
@@ -1172,7 +1644,11 @@ output_results = results`;
                 signal: ctrl.signal,
             }).then(response => {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const reader = response.body.getReader();
+                reader = response.body.getReader();
+                if (settled) {
+                    reader.cancel().catch(() => {});
+                    return;
+                }
                 const decoder = new TextDecoder();
                 let buffer = '';
                 let result = null;
@@ -1181,10 +1657,8 @@ output_results = results`;
                 function read() {
                     reader.read().then(({ done, value }) => {
                         if (done) {
-                            activeAbortController = null;
-                            activeRunId = null;
-                            if (result != null) resolve(result);
-                            else reject(new Error('No result received'));
+                            if (result != null) resolveOnce(result);
+                            else rejectOnce(new Error('No result received'));
                             return;
                         }
                         buffer += decoder.decode(value, { stream: true });
@@ -1197,6 +1671,10 @@ output_results = results`;
                                 continue;
                             }
                             if (line.startsWith('data: ')) {
+                                if (settled || executionState.cancelledAttemptId === attemptId) {
+                                    currentEvent = 'log';
+                                    continue;
+                                }
                                 const dataStr = line.slice(6);
                                 try {
                                     const data = JSON.parse(dataStr);
@@ -1212,8 +1690,8 @@ output_results = results`;
                                     } else if (currentEvent === 'result') {
                                         result = data;
                                     } else if (currentEvent === 'error') {
-                                        reject(new Error(data.message || 'Unknown error'));
-                                        reader.cancel();
+                                        rejectOnce(new Error(data.message || 'Unknown error'));
+                                        reader.cancel().catch(() => {});
                                         return;
                                     }
                                 } catch (e) {
@@ -1224,17 +1702,14 @@ output_results = results`;
                         }
                         read();
                     }).catch(err => {
-                        activeAbortController = null;
-                        activeRunId = null;
-                        if (err.name === 'AbortError') reject(new Error('Cancelled'));
-                        else reject(err);
+                        if (err.name === 'AbortError') rejectOnce(new Error('Cancelled'));
+                        else rejectOnce(err);
                     });
                 }
                 read();
             }).catch(err => {
-                activeAbortController = null;
-                activeRunId = null;
-                reject(err);
+                if (err.name === 'AbortError') rejectOnce(new Error('Cancelled'));
+                else rejectOnce(err);
             });
         });
     }
@@ -1342,7 +1817,10 @@ output_results = results`;
     function setNodeState(nodeId, state) {
         const node = nodes[nodeId];
         if (!node) return;
-        node.el.classList.remove('state-waiting', 'state-running', 'state-done', 'state-error');
+        node.el.classList.remove(
+            'state-waiting', 'state-running', 'state-done', 'state-error',
+            'state-pending', 'state-stale', 'state-paused',
+        );
         if (state) node.el.classList.add('state-' + state);
     }
 
