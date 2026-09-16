@@ -591,6 +591,8 @@ body {
 .ne-clear-btn:hover { background: #765d25; }
 .ne-clear-canvas-btn { background: #7f1d1d; border-color: #b91c1c; color: #fff; }
 .ne-clear-canvas-btn:hover { background: #991b1b; }
+.ne-download-all-btn { background: #0f766e; border-color: #14b8a6; color: #ecfeff; }
+.ne-download-all-btn:hover { background: #0d9488; }
 
 .ne-cancel-btn {
     background: #c62828;
@@ -693,6 +695,29 @@ body {
 .ne-dialog-cancel:hover { background: #475569; }
 .ne-dialog-confirm { background: #b91c1c; color: #fff; }
 .ne-dialog-confirm:hover { background: #dc2626; }
+
+/* ── Node Result Downloads ───────────────────────────────────────── */
+.ne-node-download-btn {
+    margin-left: auto;
+    padding: 3px 7px;
+    border: 1px solid #3b82f6;
+    border-radius: 3px;
+    background: rgba(30, 64, 175, 0.2);
+    color: #bfdbfe;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+.ne-node-download-btn:hover { background: rgba(30, 64, 175, 0.45); }
+
+.ne-node-download-btn:disabled {
+    border-color: #3f4652;
+    background: transparent;
+    color: #6b7280;
+    cursor: not-allowed;
+}
 
 /* ── Scrollbar styling ────────────────────────────────────────────── */
 .ne-sidebar::-webkit-scrollbar,

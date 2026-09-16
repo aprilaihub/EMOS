@@ -98,7 +98,7 @@
     let predictorPropsMap = {};  // factoryKey → { runtimePropName: displayLabel }
 
     // DOM refs
-    let canvasContainer, canvas, wiresSvg, processBtn, stepBtn, clearBtn, clearCanvasBtn;
+    let canvasContainer, canvas, wiresSvg, processBtn, stepBtn, clearBtn, clearCanvasBtn, downloadAllBtn;
     let statusText, zoomText, contextMenu, confirmDialog, confirmTitle, confirmMessage;
     let confirmAcceptBtn, confirmCancelBtn, confirmationResolver = null;
 
@@ -113,6 +113,7 @@
         stepBtn         = document.getElementById('neStepBtn');
         clearBtn        = document.getElementById('neClearBtn');
         clearCanvasBtn  = document.getElementById('neClearCanvasBtn');
+        downloadAllBtn  = document.getElementById('neDownloadAllBtn');
         statusText      = document.getElementById('neStatusText');
         zoomText        = document.getElementById('neZoomText');
         contextMenu     = document.getElementById('neContextMenu');
@@ -242,6 +243,7 @@
         stepBtn.addEventListener('click', () => onExecutionControlClick('step'));
         clearBtn.addEventListener('click', clearOutputsWithConfirmation);
         clearCanvasBtn.addEventListener('click', clearCanvasWithConfirmation);
+        downloadAllBtn.addEventListener('click', downloadAllResults);
         confirmAcceptBtn.addEventListener('click', () => settleConfirmation(true));
         confirmCancelBtn.addEventListener('click', () => settleConfirmation(false));
 
@@ -573,6 +575,20 @@
         // Footer (ports)
         const footer = document.createElement('div');
         footer.className = 'ne-node-footer';
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.type = 'button';
+        downloadBtn.className = 'ne-node-download-btn';
+        downloadBtn.title = 'Download node result as JSON';
+        downloadBtn.setAttribute('aria-label', 'Download node result as JSON');
+        downloadBtn.textContent = 'Download';
+        downloadBtn.disabled = true;
+        downloadBtn.addEventListener('mousedown', e => e.stopPropagation());
+        downloadBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            downloadNodeResult(node);
+        });
+        footer.appendChild(downloadBtn);
 
         // Input ports (left edge — absolutely positioned)
         for (let i = 0; i < node.inputs.length; i++) {
@@ -1248,10 +1264,12 @@ output_results = results`;
         }
         node.hasCompleted = true;
         node.isStale = false;
+        node.resultRecord = createNodeResultRecord(node);
         setNodeState(node.id, 'done');
         addNodeLog(node.id, 'Done', 'success');
         setNodeProgress(node.id, 100);
         setStatus(`Completed ${node.name}`);
+        updateNodeDownloadButton(node);
     }
 
     function requestCancellation() {
@@ -1415,6 +1433,7 @@ output_results = results`;
             if (node && (node.hasCompleted || node.data != null || node.portData != null)) {
                 node.isStale = true;
                 setNodeState(currentId, 'stale');
+                updateNodeDownloadButton(node);
             }
             for (const wire of wires) {
                 if (wire.fromNode === currentId) queue.push(wire.toNode);
@@ -1494,6 +1513,7 @@ output_results = results`;
         node.resultRecord = null;
         setNodeProgress(node.id, 0);
         resetViewerDisplay(node);
+        updateNodeDownloadButton(node);
     }
 
     function clearNodeRuntime(node) {
@@ -1572,6 +1592,7 @@ output_results = results`;
 
         clearBtn.disabled = active || !hasRuntimeData();
         clearCanvasBtn.disabled = active || Object.keys(nodes).length === 0;
+        downloadAllBtn.disabled = !hasCompletedResult();
     }
 
     function updateBreakpointButton(node) {
@@ -1582,6 +1603,82 @@ output_results = results`;
         button.title = node.breakpointEnabled
             ? 'Breakpoint enabled: pause after this node completes'
             : 'Pause after this node completes';
+    }
+
+    function hasCompletedResult() {
+        return Object.values(nodes).some(node => node.hasCompleted && !node.isStale && node.resultRecord);
+    }
+
+    function updateNodeDownloadButton(node) {
+        const button = node.el?.querySelector('.ne-node-download-btn');
+        if (button) button.disabled = !(node.hasCompleted && !node.isStale && node.resultRecord);
+        updateToolbar();
+    }
+
+    function createNodeResultRecord(node) {
+        return {
+            nodeId: node.id,
+            type: node.type,
+            key: node.key,
+            name: node.name,
+            status: 'complete',
+            inputs: collectNodeInputs(node),
+            upstream: getUpstreamData(node.id),
+            result: node.portData ?? node.data,
+            completedAt: new Date().toISOString(),
+        };
+    }
+
+    function downloadNodeResult(node) {
+        if (!node.resultRecord || node.isStale) return;
+        downloadJson(`emos-node-${node.id}-result.json`, node.resultRecord);
+    }
+
+    function downloadAllResults() {
+        const results = Object.values(nodes)
+            .filter(node => node.hasCompleted && !node.isStale && node.resultRecord)
+            .map(node => node.resultRecord);
+        if (results.length === 0) return;
+
+        downloadJson('emos-pipeline-results.json', {
+            exportedAt: new Date().toISOString(),
+            status: executionState.status,
+            executionPlan: getExecutionPlan(),
+            progress: getProgressCounts(),
+            graph: {
+                nodes: Object.values(nodes).map(node => ({
+                    id: node.id,
+                    type: node.type,
+                    key: node.key,
+                    name: node.name,
+                    x: node.x,
+                    y: node.y,
+                    breakpointEnabled: node.breakpointEnabled,
+                    inputs: collectNodeInputs(node),
+                })),
+                connections: wires.map(wire => ({ ...wire })),
+            },
+            results,
+        });
+    }
+
+    function downloadJson(filename, value) {
+        let json;
+        try {
+            json = JSON.stringify(value, null, 2);
+        } catch (err) {
+            setStatus(`Could not prepare JSON download: ${err.message}`);
+            return;
+        }
+
+        const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
     function getUpstreamData(nodeId) {
@@ -1868,6 +1965,7 @@ output_results = results`;
             return;
         }
 
+        node.data = data;
         if (node.key === 'cif_viewer') {
             displayCIFViewer(node, data);
         } else if (node.key === 'text_viewer') {

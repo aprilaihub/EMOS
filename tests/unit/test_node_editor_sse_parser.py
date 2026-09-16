@@ -56,3 +56,16 @@ def test_runtime_and_canvas_clears_require_confirmation():
     assert "showConfirmation(" in source
     assert 'id="neConfirmDialog"' in html
     assert 'id="neClearCanvasBtn"' in html
+
+
+def test_completed_results_enable_node_and_aggregate_downloads():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+
+    assert "function createNodeResultRecord(node)" in source
+    assert "function downloadNodeResult(node)" in source
+    assert "function downloadAllResults()" in source
+    assert "function downloadJson(filename, value)" in source
+    assert "node.resultRecord = createNodeResultRecord(node);" in source
+    assert "downloadAllBtn.disabled = !hasCompletedResult();" in source
+    assert 'id="neDownloadAllBtn"' in html
