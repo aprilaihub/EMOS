@@ -1,10 +1,10 @@
-# Toy IU Tutorial
+# Demo IU Tutorial
 
-This page provides a minimal, end-to-end toy Information Unit (IU) example you can add to EMOS.
+This page provides a minimal, end-to-end demo Information Unit (IU) example you can add to EMOS.
 
-## Toy Example: Add a Demo Database IU
+## Demo Example: Add a Database IU
 
-Goal: add a tiny database Information Unit (IU) named **Toy CIF Demo** that returns one CIF per requested batch item.
+Goal: add a tiny database Information Unit (IU) named **CIF Demo** that returns one CIF per requested batch item.
 
 ### Step 1: Add one database entry in `devtools/source_data.json`
 
@@ -13,7 +13,7 @@ In this step, you register a new IU in the source-of-truth metadata so EMOS can 
 Under `information_units -> databases`, add one new key:
 
 ```json
-"Toy CIF Demo": "Tutorial IU that returns one hardcoded CIF per batch item for testing"
+"CIF Demo": "Tutorial IU that returns one hardcoded CIF per batch item for testing"
 ```
 
 ### Step 2: Generate scaffolding
@@ -27,17 +27,17 @@ python devtools/contribution_tool.py
 This generates a new IU folder and updates the database factory.
 It also creates a property mapping template at:
 
-`Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
+`Information_Units/property_mappings/sources/databases/cif_demo.json`
 
 The script is interactive. When prompted to apply detected changes, confirm with `yes` (or `y`).
 
 ### Step 3: Implement the generated database class
 
-In this step, you replace the stub retrieval logic with a tiny toy implementation that returns CIF output in batch form.
+In this step, you replace the stub retrieval logic with a small demo implementation that returns CIF output in batch form.
 
 Open the generated file (expected path):
 
-`Information_Units/Databases/ToyCifDemo/ToyCifDemoDatabase.py`
+`Information_Units/Databases/CifDemo/CifDemoDatabase.py`
 
 Replace `retrieve()` with:
 
@@ -49,7 +49,7 @@ def retrieve(self, inputs: dict) -> dict:
     if batch_size < 1:
         batch_size = 1
 
-    cif_string = """data_toy_nacl
+    cif_string = """data_demo_nacl
 _symmetry_space_group_name_H-M 'F m -3 m'
 _cell_length_a 5.6402
 _cell_length_b 5.6402
@@ -71,7 +71,7 @@ Cl1 Cl 0.5 0.5 0.5
     cif_strings = [cif_string] * batch_size
 
     return {
-        "source": "toy_cif_demo",
+        "source": "cif_demo",
         "queries": queries,
         "cif_strings": cif_strings,
     }
@@ -83,16 +83,16 @@ In this step, you define which properties the UI should expose for filtering/dis
 
 Open:
 
-`Information_Units/property_mappings/sources/databases/toy_cif_demo.json`
+`Information_Units/property_mappings/sources/databases/cif_demo.json`
 
 and update `properties` to include the fields you want exposed in the UI, for example:
 
 ```json
 {
-  "description": "Source-specific mappings for toy_cif_demo (databases).",
+  "description": "Source-specific mappings for cif_demo (databases).",
   "version": "2.0",
   "source_type": "databases",
-  "source": "toy_cif_demo",
+  "source": "cif_demo",
   "properties": {
     "chemical_formula_descriptive": {
       "name": "chemical_formula_descriptive",
@@ -112,7 +112,7 @@ and update `properties` to include the fields you want exposed in the UI, for ex
 
 ### Step 5: Add IU feature button/panel wiring
 
-In this step, you add frontend wiring so the toy IU appears as a clickable panel in the Information Units UI.
+In this step, you add frontend wiring so the demo IU appears as a clickable panel in the Information Units UI.
 
 ```bash
 python devtools/iu_features/manage_iu_features.py
@@ -121,7 +121,7 @@ python devtools/iu_features/manage_iu_features.py
 This script is interactive. Choose:
 - IU type: `database`
 - Action: `add`
-- IU id: `toy_cif_demo`
+- IU id: `cif_demo`
 
 ### Step 6: Run and verify
 
@@ -129,13 +129,15 @@ In this step, you run EMOS end-to-end and verify that one batch request returns 
 
 1. Start backend: `python backend/app.py`
 2. Open the UI by opening `index.html` in your browser.
-3. In the Information Units section, open and run the new **Toy CIF Demo** IU.
+3. In the Information Units section, open and run the new **CIF Demo** IU.
 4. Set `batch_size` to `10` and run.
-5. Confirm the result includes 10 CIF strings (the same toy CIF repeated), and exports as 10 CIF files.
+5. Confirm the result includes 10 CIF strings (the same demo CIF repeated), and exports as 10 CIF files.
 
-## Remove the Toy IU (cleanup)
+> **Optional Docker execution:** Developers are welcome to run the IU's `retrieve()` function in a Docker container instead of directly in the host environment. This can help avoid library or dependency conflicts, and it can keep model execution and its dependencies isolated for privacy-sensitive workflows. Make sure the container exposes the inputs and outputs required by the IU and follows the same batch response contract described above.
 
-When you are done testing, remove the toy IU in this order:
+## Remove the Demo IU (cleanup)
+
+When you are done testing, remove the demo IU in this order:
 
 1. Remove the IU feature implementation:
 
@@ -146,11 +148,11 @@ When you are done testing, remove the toy IU in this order:
    Choose:
    - IU type: `database`
    - Action: `remove`
-   - IU id: `toy_cif_demo`
+  - IU id: `cif_demo`
 
    This removes the IU feature JS/wiring and also cleans the source mapping plus exclusive entries in `common_properties.json`.
 
-2. Remove the IU entry from `devtools/source_data.json` under `information_units -> databases`.
+2. Remove the IU entry for **CIF Demo** from `devtools/source_data.json` under `information_units -> databases`.
 
 3. Run contribution tool to remove the IU backend scaffold/factory wiring:
 
@@ -160,4 +162,4 @@ When you are done testing, remove the toy IU in this order:
 
    Confirm the detected removal changes when prompted.
 
-This toy IU is intentionally simple and safe; once it works, use the same flow for real APIs.
+This demo IU is intentionally simple and safe; once it works, use the same flow for real APIs.
