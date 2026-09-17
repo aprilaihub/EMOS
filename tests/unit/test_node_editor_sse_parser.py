@@ -128,3 +128,152 @@ def test_pretty_text_viewer_exposes_selectable_result_fields():
     assert "function needsPrettyFieldRender(container, fields)" in source
     assert "function getMaterialName(entry, index)" in source
     assert "field.replace('.', ' - ')" in source
+
+
+def test_feature_nodes_are_metadata_driven_and_use_existing_feature_api():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+
+    assert "let FEATURE_DEFINITIONS = {}" in source
+    assert "function populateFeatureSidebar(category, containerId)" in source
+    assert "function getFeatureNodeSchema(feature)" in source
+    assert "function buildFeatureNodeBody(node)" in source
+    assert "async function executeFeatureNode(backendUrl, node)" in source
+    assert "${backendUrl}/api/process/${node.key}" in source
+    assert 'id="sidebarMaterialsFeatures"' in html
+    assert 'id="sidebarElectronicsFeatures"' in html
+
+
+def test_feature_cif_inputs_and_local_iu_selectors_have_adapters():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "data-feature-field-type=\"iu_checkbox_group\"" in source
+    assert "el.dataset.featureFieldType === 'iu_checkbox_group'" in source
+    assert "inputs[cifField.name] = cifStrings;" in source
+    assert "inputs.labels = cifStrings.map" in source
+    assert "outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }]" in source
+    assert "node.portData = { result_out: result };" in source
+
+
+def test_splitter_creates_outputs_from_top_level_result_fields_only():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+
+    assert "splitter:" in source
+    assert "function executeSplitterNode(node)" in source
+    assert "function getSplitterOutputDescriptors(value, inputWire)" in source
+    assert "function getFeatureSplitterOutputs(feature, value)" in source
+    assert "function getRuntimeSplitterOutputs(value)" in source
+    assert "function isCifStringList(value)" in source
+    assert "sourceNode?.type === 'feature'" in source
+    assert "feature?.outputs || []" in source
+    assert "[{ key: 'split_cif', label: 'CIF', type: PORT_TYPES.CIF, value }]" in source
+    assert "function updateDynamicOutputPorts(node, desiredOutputs)" in source
+    assert "function syncSplitterHeight(node)" in source
+    assert "const requiredHeight = Math.max(132, 72 + (portCount - 1) * 24);" in source
+    assert "function renderOutputPorts(node)" in source
+    assert "wrapper.append(label, port);" in source
+    assert "Object.keys(item).forEach(key => keys.add(key));" in source
+    assert "data-node-key=\"splitter\"" in html
+
+
+def test_output_labels_are_inside_nodes_before_right_edge_pins():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+
+    assert "width: type === 'feature' ? 360 : 320" in source
+    assert "wrapper.append(label, port);" in source
+    assert "min-width: 300px;" in css
+    assert "right: -6px;" in css
+    assert "justify-content: flex-end;" in css
+    assert "padding: 8px 28px;" in css
+
+
+def test_splitter_logs_raw_input_before_its_done_log():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    splitter = source[source.index("function executeSplitterNode(node)") : source.index("function getSplitterInputWire", source.index("function executeSplitterNode(node)"))]
+    assert "clearNodeLog(node.id);" in splitter
+    assert "addNodeLog(node.id, formatSplitterInput(input), 'raw');" in splitter
+    assert "function formatSplitterInput(input)" in source
+
+
+def test_tree_splitter_and_merger_are_registered_local_utilities():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+
+    assert "tree_splitter:" in source
+    assert "merger:" in source
+    assert "function executeTreeSplitterNode(node)" in source
+    assert "function updateTreeSplitterOutputs(node)" in source
+    assert "function removeTreeSplitterOutput(node, output)" not in source
+    assert "ne-dynamic-output-remove" not in source
+    assert "function executeMergerNode(node)" in source
+    assert "function addMergerInput(node)" in source
+    assert "function refreshMergerInputLabels(nodeId)" in source
+    assert "function renderInputPorts(node, container = node.el)" in source
+    assert "function getMergerInputs(node)" in source
+    assert "function getMergerInputConnections(node)" in source
+    assert "getMergerInputConnections(node).length >= 2" in source
+    assert "origin?.key === 'tree_splitter' && originOutput?.label" in source
+    assert ": origin?.name || input.defaultLabel || input.label;" in source
+    assert "originOutput.label.replace(/\\s*>\\s*/g, ' - ')" in source
+    assert "Merge pairs requires all connected lists to have the same length." in source
+    assert "result = connectedInputs.flatMap(input => input.value);" in source
+    assert "Object.fromEntries(connectedInputs.map(input => [input.name, input.value[index]]))" in source
+    assert "const outputType = splitterPortType(null, result);" in source
+    assert "label: outputType === PORT_TYPES.CIF ? 'CIF' : 'Result'" in source
+    assert "<label><span>Merge pairs</span><input type=\"radio\"" in source
+    assert "data-node-key=\"tree_splitter\"" in html
+    assert "data-node-key=\"merger\"" in html
+
+
+def test_processing_status_has_an_animated_indicator():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+
+    assert "statusText.classList.toggle('ne-status-processing', active);" in source
+    assert ".ne-status-processing::after" in css
+    assert "@keyframes ne-processing-dots" in css
+
+
+def test_tree_splitter_and_merger_controls_override_shared_input_sizing():
+    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+
+    assert ".ne-node-body .ne-tree-splitter-entry input" in css
+    assert ".ne-node-body .ne-merger-mode input" in css
+    assert "min-width: 14px;" in css
+    assert "justify-content: space-between;" in css
+
+
+def test_pretty_labels_wrap_and_merger_options_stay_close_to_radios():
+    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+
+    assert "grid-template-columns: repeat(2, max-content);" in css
+    assert "justify-content: flex-start;" in css
+    assert "grid-template-columns: minmax(0, 1fr);" in css
+    assert "white-space: normal;" in css
+    assert "overflow-wrap: anywhere;" in css
+
+
+def test_running_nodes_show_the_provided_spinner_next_to_their_titles():
+    project_root = Path(__file__).parents[2]
+    source = (project_root / "node-editor.js").read_text()
+    css = (project_root / "node-editor.css").read_text()
+    spinner = (project_root / "images" / "ball-triangle.svg").read_text()
+
+    assert "ne-node-title-wrap" in source
+    assert 'src="images/ball-triangle.svg"' in source
+    assert ".ne-node.state-running .ne-node-spinner" in css
+    assert "<animate" in spinner
+
+
+def test_feature_metadata_matches_current_runtime_names():
+    metadata = (Path(__file__).parents[2] / "devtools/ui_data.json").read_text()
+
+    assert '"name": "active_databases"' in metadata
+    assert '"name": "active_predictors"' in metadata
+    assert '"name": "cif_strings"' in metadata
+    assert '"name": "numberOfGatePoints"' in metadata
+    assert '"name": "channelWidthNm"' not in metadata
+    assert '"name": "cifFiles"' not in metadata

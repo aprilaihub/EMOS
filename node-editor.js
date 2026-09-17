@@ -25,8 +25,13 @@
         text_viewer: { inputs: [{ key: 'any_in',    label: 'Input',  type: PORT_TYPES.ANY    }], outputs: [] },
         filter:      { inputs: [{ key: 'cif_in',    label: 'CIF (optional)', type: PORT_TYPES.CIF, required: false }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
+        splitter:    { inputs: [{ key: 'any_in', label: 'Input', type: PORT_TYPES.ANY }], outputs: [] },
+        tree_splitter: { inputs: [{ key: 'any_in', label: 'Input', type: PORT_TYPES.ANY }], outputs: [] },
+        merger:      { inputs: [{ key: 'input_one', label: 'Input 1', type: PORT_TYPES.ANY, required: false }, { key: 'input_two', label: 'Input 2', type: PORT_TYPES.ANY, required: false }],
+                   outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         lambda:      { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
+        feature:     { inputs: [], outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
     };
 
     // ── Factory key mapping ──────────────────────────────────────────
@@ -35,15 +40,21 @@
     let DATABASE_FACTORY_KEYS  = {};  // display_name → factory id
     let GENERATOR_FACTORY_KEYS = {};  // display_name → factory id
     let PREDICTOR_FACTORY_KEYS = {};  // display_name → factory id
+    let FEATURE_DEFINITIONS = {};      // feature id → generated metadata
 
     async function loadFactoryKeysFromMetadata() {
         try {
             const meta = await fetch('./devtools/metadata.json').then(r => r.json());
             const ius  = meta.information_units || {};
 
-            for (const entry of (ius.databases  || [])) DATABASE_FACTORY_KEYS[entry.display_name]  = entry.id;
-            for (const entry of (ius.generators  || [])) GENERATOR_FACTORY_KEYS[entry.display_name] = entry.id;
-            for (const entry of (ius.predictors  || [])) PREDICTOR_FACTORY_KEYS[entry.display_name] = entry.id;
+            for (const entry of (ius.databases || [])) DATABASE_FACTORY_KEYS[entry.display_name] = entry.id;
+            for (const entry of (ius.generators || [])) GENERATOR_FACTORY_KEYS[entry.display_name] = entry.id;
+            for (const entry of (ius.predictors || [])) PREDICTOR_FACTORY_KEYS[entry.display_name] = entry.id;
+
+            const features = meta.features || {};
+            for (const category of Object.values(features)) {
+                for (const entry of category || []) FEATURE_DEFINITIONS[String(entry.id)] = entry;
+            }
         } catch (e) {
             console.warn('Could not load factory keys from metadata.json:', e);
         }
@@ -162,6 +173,9 @@
             predContainer.appendChild(makeSidebarItem('predictor', key, name, desc));
         }
 
+        populateFeatureSidebar('materials_exploration', 'sidebarMaterialsFeatures');
+        populateFeatureSidebar('electronics_application', 'sidebarElectronicsFeatures');
+
         // Bind drag events on hardcoded sidebar items (viewers, utility)
         document.querySelectorAll('.ne-sidebar-item[data-node-type="viewer"], .ne-sidebar-item[data-node-type="utility"]').forEach(el => {
             el.addEventListener('dragstart', (e) => {
@@ -174,6 +188,25 @@
                 e.dataTransfer.effectAllowed = 'copy';
             });
         });
+    }
+
+    function populateFeatureSidebar(category, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const features = Object.values(FEATURE_DEFINITIONS)
+            .filter(feature => feature.folder_path?.includes(
+                category === 'materials_exploration' ? 'Materials_Exploration' : 'Electronics_Application'
+            ))
+            .sort((a, b) => Number(a.id) - Number(b.id));
+
+        for (const feature of features) {
+            container.appendChild(makeSidebarItem(
+                'feature',
+                String(feature.id),
+                feature.display_name,
+                feature.description,
+            ));
+        }
     }
 
     // ── Load predictor property mappings ────────────────────────
@@ -475,23 +508,29 @@
     // ═══════════════════════════════════════════════════════════════
     function createNode(type, key, name, x, y) {
         const id = 'node_' + (nextNodeId++);
-        // Determine schema; viewers and utility nodes use their key as schema key
+        // Determine schema; viewers and utility nodes use their key as schema key.
         const schemaKey = (type === 'viewer' || type === 'utility') ? key : type;
-        const schema = NODE_SCHEMAS[schemaKey];
+        const baseSchema = NODE_SCHEMAS[schemaKey];
+        const featureDefinition = type === 'feature' ? FEATURE_DEFINITIONS[key] : null;
+        const schema = featureDefinition ? getFeatureNodeSchema(featureDefinition) : baseSchema;
         if (!schema) { console.error('Unknown schema:', schemaKey); return; }
 
         const node = {
             id, type, key, name,
             x, y,
-            width: 240,
+            width: type === 'feature' ? 360 : 320,
             height: null, // auto
-            inputs: schema.inputs.map(p => ({ ...p })),
+            inputs: schema.inputs.map(p => ({ ...p, defaultLabel: p.label })),
             outputs: schema.outputs.map(p => ({ ...p })),
             data: null,   // output data after execution
             portData: null,
             hasCompleted: false,
             isStale: false,
             breakpointEnabled: false,
+            featureDefinition,
+            treeInput: null,
+            treeEntries: [],
+            treeSelections: new Set(),
             el: null,
         };
 
@@ -514,17 +553,24 @@
         el.className = 'ne-node';
         el.dataset.nodeId = node.id;
         el.dataset.type   = node.type;
+        el.dataset.nodeKey = node.key;
         el.style.width    = node.width + 'px';
 
         // Icon
-        const iconByKey  = { cif_viewer: '👁️', text_viewer: '📝', filter: '⛗️', lambda: 'λ' };
-        const iconByType = { database: '📁', generator: '⚙️', predictor: '🔮', viewer: '👁️', utility: '🔧' };
+        const iconByKey  = { cif_viewer: '👁️', text_viewer: '📝', filter: '⛗️', splitter: '⇄', tree_splitter: '⌘', merger: '⇆', lambda: 'λ' };
+        const iconByType = { database: '📁', generator: '⚙️', predictor: '🔮', feature: '◆', viewer: '👁️', utility: '🔧' };
         const nodeIcon = iconByKey[node.key] || iconByType[node.type] || '📦';
 
         // Header
         const header = document.createElement('div');
         header.className = 'ne-node-header';
-        header.innerHTML = `<span class="ne-node-icon">${nodeIcon}</span><span class="ne-node-title">${node.name}</span>`;
+        header.innerHTML = `
+            <span class="ne-node-icon">${nodeIcon}</span>
+            <span class="ne-node-title-wrap">
+                <span class="ne-node-title">${escapeHTML(node.name)}</span>
+                <img class="ne-node-spinner" src="images/ball-triangle.svg" alt="" aria-hidden="true">
+            </span>
+        `;
         const breakpointBtn = document.createElement('button');
         breakpointBtn.type = 'button';
         breakpointBtn.className = 'ne-breakpoint-led';
@@ -579,6 +625,8 @@
                 addFilterRule(node.id);
             } else if (action === 'remove-filter-rule') {
                 e.target.closest('.ne-filter-row').remove();
+            } else if (action === 'add-merger-input') {
+                addMergerInput(node);
             }
             markNodeAndDependentsStale(node.id);
             notifyGraphChanged();
@@ -617,25 +665,7 @@
         footer.appendChild(downloadBtn);
 
         // Input ports (left edge — absolutely positioned)
-        for (let i = 0; i < node.inputs.length; i++) {
-            const p = node.inputs[i];
-            const pw = document.createElement('div');
-            pw.className = 'ne-port-wrap ne-port-input';
-            pw.style.top = `calc(50% + ${(i - (node.inputs.length - 1) / 2) * 24}px)`;
-            const port = document.createElement('div');
-            port.className = 'ne-port';
-            port.dataset.portKey  = p.key;
-            port.dataset.portData = p.type;
-            port.dataset.portDir  = 'input';
-            port.addEventListener('mousedown', (e) => { e.stopPropagation(); startWiring(node.id, p.key, p.type, false); });
-            port.addEventListener('mouseup',   (e) => { e.stopPropagation(); endWiring(node.id, p.key, p.type, false); });
-            const label = document.createElement('span');
-            label.className = 'ne-port-label ne-port-label-input';
-            label.textContent = p.label;
-            pw.appendChild(port);
-            pw.appendChild(label);
-            el.appendChild(pw);
-        }
+        renderInputPorts(node, el);
 
         // Output ports (right edge — absolutely positioned)
         for (let i = 0; i < node.outputs.length; i++) {
@@ -684,7 +714,11 @@
         if (node.key === 'cif_viewer')  return buildCIFViewerBody(node);
         if (node.key === 'text_viewer') return buildTextViewerBody(node);
         if (node.key === 'filter')      return buildFilterBody(node);
+        if (node.key === 'splitter')    return buildSplitterBody(node);
+        if (node.key === 'tree_splitter') return buildTreeSplitterBody(node);
+        if (node.key === 'merger')       return buildMergerBody(node);
         if (node.key === 'lambda')      return buildLambdaBody(node);
+        if (node.type === 'feature')    return buildFeatureNodeBody(node);
 
         // For IU nodes, auto-generate fields from property_mappings
         let html = '';
@@ -704,6 +738,92 @@
         }
 
         return html;
+    }
+
+    function getFeatureNodeSchema(feature) {
+        const acceptsCif = (feature.inputs || []).some(input => input.type === 'file' && /cif/i.test(input.name));
+        return {
+            inputs: acceptsCif ? [{ key: 'cif_in', label: 'CIF', type: PORT_TYPES.CIF }] : [],
+            outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }],
+        };
+    }
+
+    function buildFeatureNodeBody(node) {
+        const feature = node.featureDefinition;
+        if (!feature) return '<p class="ne-feature-note">Feature metadata is unavailable.</p>';
+
+        let html = '<div class="ne-feature-fields">';
+        if (feature.display_name === 'MOSFET evaluator') {
+            html += '<p class="ne-feature-note">This feature currently uses simulation parameters only.</p>';
+        }
+        for (const input of feature.inputs || []) {
+            if (input.type === 'file' && /cif/i.test(input.name)) {
+                html += '<p class="ne-feature-note">Connect CIF data to the input port.</p>';
+                continue;
+            }
+            html += buildFeatureFieldHTML(input);
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function buildFeatureFieldHTML(input) {
+        const fieldName = `feature_${input.name}`;
+        const label = escapeHTML(input.display_name || input.name);
+        const description = escapeHTML(input.description || input.display_name || input.name);
+        const required = input.required ? ' required' : '';
+        const defaultValue = input.default ?? '';
+
+        if (input.type === 'iu_checkbox_group') {
+            return buildFeatureOptionGroup(input);
+        }
+        if (input.type === 'select') {
+            const options = (input.options || []).map(option => (
+                `<option value="${escapeHTML(option.value)}"${option.value === defaultValue ? ' selected' : ''}>${escapeHTML(option.text || option.value)}</option>`
+            )).join('');
+            return `<label title="${description}">${label}<select data-field="${fieldName}"${required}>${options}</select></label>`;
+        }
+        if (input.type === 'checkbox') {
+            return `<label class="ne-feature-checkbox" title="${description}"><input type="checkbox" data-field="${fieldName}"${defaultValue ? ' checked' : ''}>${label}</label>`;
+        }
+        if (input.type === 'number') {
+            const min = input.min !== undefined ? ` min="${input.min}"` : '';
+            const max = input.max !== undefined ? ` max="${input.max}"` : '';
+            const step = input.step !== undefined ? ` step="${input.step}"` : ' step="any"';
+            return `<label title="${description}">${label}<input type="number" data-field="${fieldName}" value="${escapeHTML(defaultValue)}"${min}${max}${step}${required}></label>`;
+        }
+        if (input.type === 'json') {
+            return `<label title="${description}">${label}<textarea data-field="${fieldName}" placeholder="${escapeHTML(input.placeholder || '')}"${required}></textarea></label>`;
+        }
+        return `<label title="${description}">${label}<input type="text" data-field="${fieldName}" value="${escapeHTML(defaultValue)}" placeholder="${escapeHTML(input.placeholder || '')}"${required}></label>`;
+    }
+
+    function buildFeatureOptionGroup(input) {
+        const options = getFeatureGroupOptions(input);
+        const choices = options.map(option => (
+            `<label class="ne-feature-option"><input type="checkbox" data-field="feature_${escapeHTML(input.name)}" data-feature-field-type="iu_checkbox_group" value="${escapeHTML(option.value)}">${escapeHTML(option.text)}</label>`
+        )).join('');
+        return `<fieldset class="ne-feature-options"><legend>${escapeHTML(input.display_name || input.name)}</legend>${choices || '<span class="ne-feature-note">No compatible Information Units are registered.</span>'}</fieldset>`;
+    }
+
+    function getFeatureGroupOptions(input) {
+        if (Array.isArray(input.options) && input.options.length > 0) {
+            return input.options.map(option => ({
+                value: String(option.value),
+                text: option.text || option.value,
+            }));
+        }
+
+        const factoryKeys = input.iu_type === 'generator' ? GENERATOR_FACTORY_KEYS
+            : input.iu_type === 'predictor' ? PREDICTOR_FACTORY_KEYS
+            : DATABASE_FACTORY_KEYS;
+        return Object.entries(factoryKeys).map(([text, value]) => ({ value, text }));
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+        }[char]));
     }
 
     // Fetch the per-source property mapping + common definitions and inject fields.
@@ -811,6 +931,45 @@
             <div class="ne-text-viewer-fields" id="text-viewer-fields-${node.id}" hidden></div>
             <div class="ne-text-viewer-content" id="text-viewer-${node.id}">No data yet.</div>
         `;
+    }
+
+    function buildSplitterBody(node) {
+        return `<p class="ne-splitter-status" id="splitter-status-${node.id}">Connect a result to create outputs for its top-level fields.</p>`;
+    }
+
+    function buildTreeSplitterBody(node) {
+        return `<div class="ne-tree-splitter" id="tree-splitter-${node.id}"><p class="ne-splitter-status">Connect a result to choose fields from its dictionary tree.</p></div>`;
+    }
+
+    function buildMergerBody(node) {
+        return `
+            <fieldset class="ne-merger-mode">
+                <legend>Mode</legend>
+                <label><span>Append</span><input type="radio" name="merger-mode-${node.id}" data-field="merge_mode" value="append" checked></label>
+                <label><span>Merge pairs</span><input type="radio" name="merger-mode-${node.id}" data-field="merge_mode" value="merge"></label>
+            </fieldset>
+            <p class="ne-merger-status">Connect two lists to merge them.</p>
+            <button class="ne-add-merger-input" type="button" data-action="add-merger-input">+ Add input</button>
+        `;
+    }
+
+    function addMergerInput(node) {
+        if (node.key !== 'merger') return;
+        const nextIndex = node.inputs.length + 1;
+        const label = `Input ${nextIndex}`;
+        node.inputs.push({
+            key: `input_${nextIndex}`,
+            label,
+            defaultLabel: label,
+            type: PORT_TYPES.ANY,
+            required: false,
+        });
+        node.el.querySelectorAll('.ne-port-wrap.ne-port-input').forEach(port => port.remove());
+        renderInputPorts(node);
+        syncPortDrivenNodeHeight(node);
+        updateWires();
+        updatePortConnectedStates();
+        notifyGraphChanged();
     }
 
     function buildFilterBody(node) {
@@ -950,6 +1109,7 @@ output_results = results`;
         if (selectedNodeId === id) selectedNodeId = null;
         updatePortConnectedStates();
         refreshAllFilterNodes();
+        affectedNodeIds.forEach(refreshMergerInputLabels);
         affectedNodeIds.forEach(markNodeAndDependentsStale);
         notifyGraphChanged();
     }
@@ -1005,6 +1165,7 @@ output_results = results`;
         wires.push(wire);
 
         cancelWiring();
+        refreshMergerInputLabels(to.nodeId);
         updateWires();
         updatePortConnectedStates();
         markNodeAndDependentsStale(to.nodeId);
@@ -1014,6 +1175,62 @@ output_results = results`;
     function cancelWiring() {
         wiringFrom = null;
         if (tempWirePath) { tempWirePath.remove(); tempWirePath = null; }
+    }
+
+    function renderInputPorts(node, container = node.el) {
+        if (!container) return;
+        for (let index = 0; index < node.inputs.length; index++) {
+            const input = node.inputs[index];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ne-port-wrap ne-port-input';
+            wrapper.style.top = `calc(50% + ${(index - (node.inputs.length - 1) / 2) * 24}px)`;
+            const port = document.createElement('div');
+            port.className = 'ne-port';
+            port.dataset.portKey = input.key;
+            port.dataset.portData = input.type;
+            port.dataset.portDir = 'input';
+            port.addEventListener('mousedown', event => {
+                event.stopPropagation();
+                startWiring(node.id, input.key, input.type, false);
+            });
+            port.addEventListener('mouseup', event => {
+                event.stopPropagation();
+                endWiring(node.id, input.key, input.type, false);
+            });
+            const label = document.createElement('span');
+            label.className = 'ne-port-label ne-port-label-input';
+            label.textContent = input.label;
+            wrapper.append(port, label);
+            container.appendChild(wrapper);
+        }
+    }
+
+    function refreshMergerInputLabels(nodeId) {
+        const node = nodes[nodeId];
+        if (!node || node.key !== 'merger') return;
+
+        node.inputs.forEach(input => {
+            const wire = wires.find(candidate => candidate.toNode === node.id && candidate.toPort === input.key);
+            const origin = wire && nodes[wire.fromNode];
+            const originOutput = origin?.outputs.find(output => output.key === wire?.fromPort);
+            input.label = origin?.key === 'tree_splitter' && originOutput?.label
+                ? originOutput.label.replace(/\s*>\s*/g, ' - ')
+                : origin?.name || input.defaultLabel || input.label;
+        });
+        node.el.querySelectorAll('.ne-port-wrap.ne-port-input').forEach(port => port.remove());
+        renderInputPorts(node);
+        syncPortDrivenNodeHeight(node);
+        updatePortConnectedStates();
+    }
+
+    function syncPortDrivenNodeHeight(node) {
+        const portCount = Math.max(node.inputs.length, node.outputs.length, 1);
+        const requiredHeight = Math.max(132, 72 + (portCount - 1) * 24);
+        if (node.el.offsetHeight >= requiredHeight) return;
+
+        node.height = requiredHeight;
+        node.el.style.height = `${requiredHeight}px`;
+        resizeNodeContent(node, requiredHeight);
     }
 
     // ── Wire rendering ───────────────────────────────────────────
@@ -1037,6 +1254,7 @@ output_results = results`;
                 if (!canEditGraph()) return;
                 // Delete wire on click
                 wires = wires.filter(ww => ww.id !== w.id);
+                refreshMergerInputLabels(w.toNode);
                 updateWires();
                 updatePortConnectedStates();
                 refreshAllFilterNodes();
@@ -1111,18 +1329,50 @@ output_results = results`;
     // COLLECT NODE INPUTS
     // ═══════════════════════════════════════════════════════════════
     function collectNodeInputs(node) {
+        if (node.type === 'feature') return collectFeatureNodeInputs(node);
         const inputs = {};
         const fields = node.el.querySelectorAll('[data-field]');
         fields.forEach(el => {
             const key = el.dataset.field;
             if (el.type === 'checkbox') {
                 inputs[key] = el.checked;
+            } else if (el.type === 'radio') {
+                if (el.checked) inputs[key] = el.value;
             } else if (el.type === 'number') {
                 if (el.value !== '') inputs[key] = parseFloat(el.value);
             } else {
                 if (el.value !== '') inputs[key] = el.value;
             }
         });
+        return inputs;
+    }
+
+    function collectFeatureNodeInputs(node) {
+        const inputs = {};
+        const groupValues = new Map();
+
+        node.el.querySelectorAll('[data-field^="feature_"]').forEach(el => {
+            const key = el.dataset.field.slice('feature_'.length);
+            if (el.dataset.featureFieldType === 'iu_checkbox_group') {
+                if (!groupValues.has(key)) groupValues.set(key, []);
+                if (el.checked) {
+                    groupValues.get(key).push({
+                        value: el.value,
+                        name: el.closest('label')?.textContent.trim() || el.value,
+                    });
+                }
+                return;
+            }
+            if (el.type === 'checkbox') {
+                inputs[key] = el.checked;
+            } else if (el.type === 'number') {
+                if (el.value !== '') inputs[key] = Number(el.value);
+            } else if (el.value !== '') {
+                inputs[key] = el.value;
+            }
+        });
+
+        groupValues.forEach((value, key) => { inputs[key] = value; });
         return inputs;
     }
 
@@ -1260,6 +1510,7 @@ output_results = results`;
         const { completed, total } = getProgressCounts();
         setStatus(`Processing (${completed}/${total}): ${node.name}`);
         updateToolbar();
+        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
 
         if (node.type === 'viewer') {
             displayViewerData(node);
@@ -1272,8 +1523,29 @@ output_results = results`;
             return null;
         }
 
+        if (node.key === 'splitter') {
+            executeSplitterNode(node);
+            setNodeProgress(node.id, 100);
+            return null;
+        }
+
+        if (node.key === 'tree_splitter') {
+            executeTreeSplitterNode(node);
+            setNodeProgress(node.id, 100);
+            return null;
+        }
+
+        if (node.key === 'merger') {
+            const result = executeMergerNode(node);
+            setNodeProgress(node.id, 100);
+            return result;
+        }
+
+        if (node.type === 'feature') {
+            return executeFeatureNode(backendUrl, node);
+        }
+
         addNodeLog(node.id, `Starting ${node.name}...`, 'info');
-        const backendUrl = window.EMOS_BACKEND_BASE_URL || 'http://localhost:5001';
         const payload = {
             type: node.type,
             key: node.key,
@@ -1281,6 +1553,52 @@ output_results = results`;
             upstream: getUpstreamData(node.id),
         };
         return executeNodeSSE(backendUrl, node.id, payload, attemptId);
+    }
+
+    async function executeFeatureNode(backendUrl, node) {
+        const response = await fetch(`${backendUrl}/api/process/${node.key}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildFeatureRequest(node)),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const payload = await response.json();
+        (payload.logs || []).forEach(entry => {
+            addNodeLog(node.id, entry.message || JSON.stringify(entry), entry.level || 'info');
+        });
+        if (payload.error) throw new Error(payload.error);
+
+        const result = payload.results;
+        if (result?.error || result?.status === 'error' || result?.status === 'failed') {
+            throw new Error(result.error || result.message || 'Feature processing failed.');
+        }
+        return result;
+    }
+
+    function buildFeatureRequest(node) {
+        const inputs = collectFeatureNodeInputs(node);
+        for (const input of node.featureDefinition?.inputs || []) {
+            if (input.type !== 'json' || typeof inputs[input.name] !== 'string' || !inputs[input.name].trim()) continue;
+            try {
+                inputs[input.name] = JSON.parse(inputs[input.name]);
+            } catch (_) {
+                throw new Error(`${input.display_name || input.name} must be valid JSON.`);
+            }
+        }
+        const cifInput = getUpstreamData(node.id).cif_in;
+        const cifStrings = Array.isArray(cifInput) ? cifInput : cifInput ? [cifInput] : [];
+        const cifField = (node.featureDefinition?.inputs || []).find(input => (
+            input.type === 'file' && /cif/i.test(input.name)
+        ));
+
+        if (cifField) {
+            inputs[cifField.name] = cifStrings;
+            if (cifField.name === 'cif_strings') {
+                inputs.labels = cifStrings.map((content, index) => getCifComposition(content, index));
+            }
+        }
+        return inputs;
     }
 
     function prepareNodeForExecution(node) {
@@ -1292,6 +1610,9 @@ output_results = results`;
     function completeNode(node, result) {
         if (node.key === 'lambda') {
             node.portData = result;
+        } else if (node.type === 'feature') {
+            node.portData = { result_out: result };
+            node.data = result;
         } else if (node.type !== 'viewer' && node.key !== 'filter') {
             node.data = result;
         }
@@ -1303,6 +1624,389 @@ output_results = results`;
         setNodeProgress(node.id, 100);
         setStatus(`Completed ${node.name}`);
         updateNodeDownloadButton(node);
+    }
+
+    function executeSplitterNode(node) {
+        const inputWire = getSplitterInputWire(node);
+        const input = getUpstreamData(node.id).any_in;
+        clearNodeLog(node.id);
+        addNodeLog(node.id, formatSplitterInput(input), 'raw');
+        const outputs = getSplitterOutputDescriptors(input, inputWire);
+        node.portData = Object.fromEntries(outputs.map(output => [output.key, output.value]));
+        updateDynamicOutputPorts(node, outputs);
+        const status = document.getElementById(`splitter-status-${node.id}`);
+        if (status) {
+            status.textContent = outputs.length
+                ? `Created ${outputs.length} output${outputs.length === 1 ? '' : 's'}.`
+                : 'No top-level fields found in the result.';
+        }
+    }
+
+    function formatSplitterInput(input) {
+        if (input === undefined) return 'undefined';
+        try {
+            return JSON.stringify(input, null, 2);
+        } catch (_) {
+            return String(input);
+        }
+    }
+
+    function getSplitterInputWire(node) {
+        return wires.find(wire => wire.toNode === node.id && wire.toPort === 'any_in') || null;
+    }
+
+    function getSplitterOutputDescriptors(value, inputWire) {
+        const sourceNode = inputWire ? nodes[inputWire.fromNode] : null;
+        if (sourceNode?.type === 'feature' && inputWire.fromPort === 'result_out') {
+            return getFeatureSplitterOutputs(sourceNode.featureDefinition, value);
+        }
+        return getRuntimeSplitterOutputs(value);
+    }
+
+    function getFeatureSplitterOutputs(feature, value) {
+        return (feature?.outputs || []).map(output => ({
+            key: splitterPortKey(output.name),
+            label: output.display_name || displaySplitterKey(output.name),
+            type: splitterPortType(output.type, value?.[output.name]),
+            value: value?.[output.name],
+        }));
+    }
+
+    function getRuntimeSplitterOutputs(value) {
+        if (isCifStringList(value)) {
+            return [{ key: 'split_cif', label: 'CIF', type: PORT_TYPES.CIF, value }];
+        }
+
+        if (Array.isArray(value)) {
+            const keys = new Set();
+            value.forEach(item => {
+                if (item && typeof item === 'object' && !Array.isArray(item)) {
+                    Object.keys(item).forEach(key => keys.add(key));
+                }
+            });
+            if (keys.size > 0) {
+                return [...keys].map(key => {
+                    const values = value.map(item => (
+                        item && typeof item === 'object' && !Array.isArray(item) ? item[key] ?? null : null
+                    ));
+                    return {
+                        key: splitterPortKey(key),
+                        label: displaySplitterKey(key),
+                        type: splitterPortType(null, values),
+                        value: values,
+                    };
+                });
+            }
+            return [{ key: 'split_items', label: 'Items', type: splitterPortType(null, value), value }];
+        }
+
+        if (value && typeof value === 'object') {
+            return Object.entries(value).map(([key, entry]) => ({
+                key: splitterPortKey(key),
+                label: displaySplitterKey(key),
+                type: splitterPortType(null, entry),
+                value: entry,
+            }));
+        }
+
+        if (isCifString(value)) {
+            return [{ key: 'split_cif', label: 'CIF', type: PORT_TYPES.CIF, value: [value] }];
+        }
+        return value === undefined ? [] : [{ key: 'split_value', label: 'Value', type: PORT_TYPES.RESULT, value }];
+    }
+
+    function splitterPortKey(key) {
+        return `split_${String(key).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+    }
+
+    function displaySplitterKey(key) {
+        return String(key).replace(/[_-]+/g, ' ');
+    }
+
+    function splitterPortType(metadataType, value) {
+        if (metadataType === PORT_TYPES.CIF || isCifString(value) || isCifStringList(value)) return PORT_TYPES.CIF;
+        return PORT_TYPES.RESULT;
+    }
+
+    function isCifString(value) {
+        return typeof value === 'string' && /(?:^|\n)\s*data_|_chemical_formula_|_atom_site_/im.test(value);
+    }
+
+    function isCifStringList(value) {
+        return Array.isArray(value) && value.length > 0 && value.every(isCifString);
+    }
+
+    function updateDynamicOutputPorts(node, desiredOutputs) {
+        const currentKeys = node.outputs.map(output => output.key);
+        const outputsChanged = currentKeys.length !== desiredOutputs.length || currentKeys.some((key, index) => (
+            key !== desiredOutputs[index].key ||
+            node.outputs[index].type !== desiredOutputs[index].type ||
+            node.outputs[index].label !== desiredOutputs[index].label
+        ));
+
+        if (!outputsChanged) {
+            syncSplitterHeight(node);
+            return;
+        }
+
+        const disconnectedNodeIds = new Set();
+
+        wires = wires.filter(wire => {
+            if (wire.fromNode !== node.id) return true;
+            const output = desiredOutputs.find(candidate => candidate.key === wire.fromPort);
+            const input = nodes[wire.toNode]?.inputs.find(candidate => candidate.key === wire.toPort);
+            if (!output || !input || !PORT_COMPAT[output.type]?.includes(input.type)) {
+                disconnectedNodeIds.add(wire.toNode);
+                removeWireEl(wire.id);
+                return false;
+            }
+            wire.type = output.type;
+            return true;
+        });
+        node.outputs = desiredOutputs;
+        node.el.querySelectorAll('.ne-port-wrap.ne-port-output').forEach(port => port.remove());
+        renderOutputPorts(node);
+        syncSplitterHeight(node);
+        updateWires();
+        updatePortConnectedStates();
+        disconnectedNodeIds.forEach(markNodeAndDependentsStale);
+    }
+
+    function syncSplitterHeight(node) {
+        const portCount = Math.max(node.inputs.length, node.outputs.length, 1);
+        const requiredHeight = Math.max(132, 72 + (portCount - 1) * 24);
+        const currentHeight = node.el.offsetHeight;
+        if (currentHeight >= requiredHeight) return;
+
+        node.height = requiredHeight;
+        node.el.style.height = `${requiredHeight}px`;
+        resizeNodeContent(node, requiredHeight);
+    }
+
+    function renderOutputPorts(node) {
+        for (let index = 0; index < node.outputs.length; index++) {
+            const output = node.outputs[index];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ne-port-wrap ne-port-output';
+            wrapper.style.top = `calc(50% + ${(index - (node.outputs.length - 1) / 2) * 24}px)`;
+            const port = document.createElement('div');
+            port.className = 'ne-port';
+            port.dataset.portKey = output.key;
+            port.dataset.portData = output.type;
+            port.dataset.portDir = 'output';
+            port.addEventListener('mousedown', (event) => {
+                event.stopPropagation();
+                startWiring(node.id, output.key, output.type, true);
+            });
+            port.addEventListener('mouseup', (event) => {
+                event.stopPropagation();
+                endWiring(node.id, output.key, output.type, true);
+            });
+            const label = document.createElement('span');
+            label.className = 'ne-port-label ne-port-label-output';
+            label.textContent = output.label;
+            wrapper.append(label, port);
+            node.el.appendChild(wrapper);
+        }
+    }
+
+    function executeTreeSplitterNode(node) {
+        const input = getUpstreamData(node.id).any_in;
+        node.treeInput = input;
+        node.treeEntries = buildTreeSplitterEntries(input);
+        const validSelections = new Set(node.treeEntries.map(entry => entry.id));
+        node.treeSelections = new Set([...node.treeSelections].filter(id => validSelections.has(id)));
+        renderTreeSplitter(node);
+        updateTreeSplitterOutputs(node);
+    }
+
+    function buildTreeSplitterEntries(value) {
+        const entries = [];
+        collectTreeSplitterEntries(value, [], 0, entries);
+        return entries;
+    }
+
+    function collectTreeSplitterEntries(value, path, depth, entries) {
+        if (Array.isArray(value)) {
+            const objectItems = value.filter(item => isPlainObject(item));
+            if (objectItems.length === 0) return;
+            const keys = new Set();
+            objectItems.forEach(item => Object.keys(item).forEach(key => keys.add(key)));
+            [...keys].sort().forEach(key => {
+                const childPath = [...path, key];
+                const childValues = objectItems.map(item => item[key]);
+                addTreeSplitterEntry(childPath, depth, childValues, entries);
+                collectTreeSplitterEntries(childValues, childPath, depth + 1, entries);
+            });
+            return;
+        }
+
+        if (!isPlainObject(value)) return;
+        Object.keys(value).sort().forEach(key => {
+            const childPath = [...path, key];
+            const childValue = value[key];
+            addTreeSplitterEntry(childPath, depth, childValue, entries);
+            collectTreeSplitterEntries(childValue, childPath, depth + 1, entries);
+        });
+    }
+
+    function addTreeSplitterEntry(path, depth, value, entries) {
+        const id = JSON.stringify(path);
+        if (entries.some(entry => entry.id === id)) return;
+        entries.push({
+            id,
+            path,
+            depth,
+            label: String(path[path.length - 1]),
+            value,
+        });
+    }
+
+    function isPlainObject(value) {
+        return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+    }
+
+    function renderTreeSplitter(node) {
+        const container = document.getElementById(`tree-splitter-${node.id}`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (node.treeEntries.length === 0) {
+            container.innerHTML = '<p class="ne-splitter-status">The input has no dictionary fields to select.</p>';
+            return;
+        }
+
+        const tree = document.createElement('div');
+        tree.className = 'ne-tree-splitter-list';
+        node.treeEntries.forEach(entry => {
+            const label = document.createElement('label');
+            label.className = 'ne-tree-splitter-entry';
+            label.style.paddingLeft = `${entry.depth * 16}px`;
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = node.treeSelections.has(entry.id);
+            checkbox.dataset.treePath = entry.id;
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) node.treeSelections.add(entry.id);
+                else node.treeSelections.delete(entry.id);
+                updateTreeSplitterOutputs(node);
+                notifyGraphChanged();
+            });
+            const text = document.createElement('span');
+            text.textContent = entry.label;
+            label.append(checkbox, text);
+            tree.appendChild(label);
+        });
+        container.appendChild(tree);
+    }
+
+    function updateTreeSplitterOutputs(node) {
+        const entriesById = new Map(node.treeEntries.map(entry => [entry.id, entry]));
+        const outputs = [...node.treeSelections]
+            .map(id => entriesById.get(id))
+            .filter(Boolean)
+            .map(entry => {
+                const value = getTreeSplitterValue(node.treeInput, entry.path);
+                return {
+                    key: treeSplitterPortKey(entry.path),
+                    label: entry.path.join(' > '),
+                    type: splitterPortType(null, value),
+                    value,
+                };
+            });
+
+        node.portData = Object.fromEntries(outputs.map(output => [output.key, output.value]));
+        updateDynamicOutputPorts(node, outputs);
+        syncTreeSplitterSelections(node);
+    }
+
+    function getTreeSplitterValue(value, path) {
+        if (path.length === 0) return value;
+        if (Array.isArray(value)) return value.map(item => getTreeSplitterValue(item, path));
+        if (!isPlainObject(value)) return null;
+        return getTreeSplitterValue(value[path[0]], path.slice(1));
+    }
+
+    function treeSplitterPortKey(path) {
+        return `tree_${path.map(key => encodeURIComponent(key).replace(/%/g, '_')).join('__')}`;
+    }
+
+    function syncTreeSplitterSelections(node) {
+        node.el.querySelectorAll('.ne-tree-splitter-entry input[data-tree-path]').forEach(checkbox => {
+            checkbox.checked = node.treeSelections.has(checkbox.dataset.treePath);
+        });
+    }
+
+    function executeMergerNode(node) {
+        const connectedInputs = getMergerInputs(node);
+        if (connectedInputs.length < 2) {
+            throw new Error('Merger requires at least two connected list inputs.');
+        }
+
+        const mode = collectNodeInputs(node).merge_mode || 'append';
+        let result;
+        if (mode === 'merge') {
+            const expectedLength = connectedInputs[0].value.length;
+            if (connectedInputs.some(input => input.value.length !== expectedLength)) {
+                throw new Error('Merge pairs requires all connected lists to have the same length.');
+            }
+            result = Array.from({ length: expectedLength }, (_, index) => (
+                Object.fromEntries(connectedInputs.map(input => [input.name, input.value[index]]))
+            ));
+        } else {
+            result = connectedInputs.flatMap(input => input.value);
+        }
+
+        const outputType = splitterPortType(null, result);
+        node.portData = { result_out: result };
+        updateDynamicOutputPorts(node, [{
+            key: 'result_out',
+            label: outputType === PORT_TYPES.CIF ? 'CIF' : 'Result',
+            type: outputType,
+        }]);
+        const status = node.el.querySelector('.ne-merger-status');
+        if (status) {
+            status.textContent = mode === 'merge'
+                ? `Merged ${result.length} matching row${result.length === 1 ? '' : 's'} from ${connectedInputs.length} inputs.`
+                : `Appended ${result.length} item${result.length === 1 ? '' : 's'} from ${connectedInputs.length} inputs.`;
+        }
+        return result;
+    }
+
+    function getMergerInputs(node) {
+        const upstream = getUpstreamData(node.id);
+        const usedNames = new Map();
+        const inputs = [];
+
+        for (const input of node.inputs) {
+            const value = upstream[input.key];
+            if (value === undefined) continue;
+            if (!Array.isArray(value)) {
+                throw new Error(`${input.label} must provide a list.`);
+            }
+            inputs.push({
+                key: input.key,
+                name: uniqueMergerInputName(input.label, usedNames),
+                value,
+            });
+        }
+        return inputs;
+    }
+
+    function getMergerInputConnections(node) {
+        if (node.key !== 'merger') return [];
+        return node.inputs.map(input => {
+            const wire = wires.find(candidate => candidate.toNode === node.id && candidate.toPort === input.key);
+            const source = wire && nodes[wire.fromNode];
+            return wire && source ? { input, source } : null;
+        }).filter(Boolean);
+    }
+
+    function uniqueMergerInputName(name, usedNames) {
+        const base = String(name || 'Input');
+        const count = (usedNames.get(base) || 0) + 1;
+        usedNames.set(base, count);
+        return count === 1 ? base : `${base} ${count}`;
     }
 
     function requestCancellation() {
@@ -1395,11 +2099,15 @@ output_results = results`;
     }
 
     function isConfiguredForExecution(node) {
+        if (node.key === 'merger') return getMergerInputConnections(node).length >= 2;
         return node.inputs.length === 0 || hasAllInputConnections(node);
     }
 
     function isNodeReady(node) {
         if (!isConfiguredForExecution(node)) return false;
+        if (node.key === 'merger') {
+            return getMergerInputConnections(node).every(({ source }) => source.hasCompleted && !source.isStale);
+        }
         return getRequiredInputs(node).every(input => {
             const wire = wires.find(w => w.toNode === node.id && w.toPort === input.key);
             const source = wire && nodes[wire.fromNode];
@@ -1635,6 +2343,7 @@ output_results = results`;
         clearBtn.disabled = active || !hasRuntimeData();
         clearCanvasBtn.disabled = active || Object.keys(nodes).length === 0;
         downloadAllBtn.disabled = !hasCompletedResult();
+        statusText.classList.toggle('ne-status-processing', active);
     }
 
     function updateBreakpointButton(node) {
@@ -1666,7 +2375,7 @@ output_results = results`;
             status: 'complete',
             inputs: collectNodeInputs(node),
             upstream: getUpstreamData(node.id),
-            result: node.portData ?? node.data,
+            result: node.data ?? node.portData,
             completedAt: new Date().toISOString(),
         };
     }
