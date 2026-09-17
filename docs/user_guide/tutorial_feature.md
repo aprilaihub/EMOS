@@ -1,17 +1,17 @@
-# Toy Feature Tutorial
+# Feature Tutorial
 
-This page provides a minimal, end-to-end toy Feature example you can add to EMOS.
+This page provides a minimal, end-to-end demo Feature example you can add to EMOS.
 
-## Toy Example: Add a Demo Feature
+## Demo Example: Add a Feature
 
-Goal: add a tiny feature named **Toy Echo** that returns the input text in uppercase.
+Goal: add a small feature named **Demo Echo** that repeats a selected message, returns it in uppercase, and reports a result link.
 
 ### Step 1: Add one feature entry in `devtools/source_data.json`
 
 Under `features -> materials_exploration`, add one new key:
 
 ```json
-"Toy Echo": "Tutorial feature that echoes user text in uppercase"
+"Demo Echo": "Demo feature that echoes user text in uppercase and reports its length"
 ```
 
 ### Step 2 (optional): Define simple feature I/O
@@ -19,14 +19,27 @@ Under `features -> materials_exploration`, add one new key:
 Under `feature_inputs_outputs`, add:
 
 ```json
-"Toy Echo": {
+"Demo Echo": {
   "inputs": [
     {
       "name": "message",
       "display_name": "Message",
-      "type": "text",
+      "type": "select",
       "required": true,
-      "placeholder": "type something"
+      "options": [
+        {"value": "hello", "text": "Hello"},
+        {"value": "welcome", "text": "Welcome"}
+      ],
+      "default": "hello"
+    },
+    {
+      "name": "repeat_count",
+      "display_name": "Repeat Count",
+      "type": "number",
+      "required": true,
+      "min": 1,
+      "max": 10,
+      "default": 1
     }
   ],
   "outputs": [
@@ -34,6 +47,11 @@ Under `feature_inputs_outputs`, add:
       "name": "result",
       "display_name": "Result",
       "type": "text"
+    },
+    {
+      "name": "report",
+      "display_name": "Report",
+      "type": "link"
     }
   ]
 }
@@ -47,39 +65,42 @@ python devtools/contribution_tool.py
 
 Expected generated files include:
 
-- `Features/Materials_Exploration/ToyEcho/ToyEchoFeature.py`
-- `Features/Materials_Exploration/ToyEcho/ToyEcho.js`
+- `Features/Materials_Exploration/DemoEcho/DemoEchoFeature.py`
+- `Features/Materials_Exploration/DemoEcho/DemoEcho.js`
 
 ### Step 4: Implement the generated feature class
 
-Open `Features/Materials_Exploration/ToyEcho/ToyEchoFeature.py` and keep these methods minimal:
+Open `Features/Materials_Exploration/DemoEcho/DemoEchoFeature.py` and keep these methods minimal:
 
 ```python
 def extract_inputs(self, input_data):
     return {
-        'message': input_data.get('message', '')
+      'message': input_data.get('message', ''),
+      'repeat_count': input_data.get('repeat_count', 1),
     }
 
 def process_feature(self, inputs):
     message = str(inputs.get('message', ''))
+    repeat_count = int(inputs.get('repeat_count', 1))
+    repeated_message = message * max(repeat_count, 1)
     return {
         'status': 'completed',
-        'original': message,
-        'result': message.upper(),
+      'result': repeated_message.upper(),
+      'report': '/reports/demo_echo.txt',
     }
 
 def format_outputs(self, results):
     return {
         'status': results.get('status', 'unknown'),
-        'original': results.get('original', ''),
         'result': results.get('result', ''),
+        'report': results.get('report', ''),
     }
 ```
 
 ### Step 5: Run and verify
 
 1. Start backend: `python backend/app.py`
-2. Open EMOS, launch **Toy Echo**, and enter text.
-3. Confirm output `result` is uppercase.
+2. Open EMOS, launch **Demo Echo**, select a message, and set a repeat count.
+3. Confirm output `result` is uppercase and `report` is shown as a link.
 
-This toy Feature gives a complete contribution path (metadata -> generated files -> implementation -> UI run) with minimal logic.
+This demo Feature gives a complete contribution path (metadata -> generated files -> implementation -> UI run) with minimal logic.
