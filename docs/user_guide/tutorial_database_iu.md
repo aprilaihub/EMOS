@@ -101,10 +101,6 @@ and update `properties` to include the fields you want exposed in the UI, for ex
     "elements": {
       "name": "elements",
       "retrievable": true
-    },
-    "id": {
-      "name": "id",
-      "retrievable": true
     }
   }
 }

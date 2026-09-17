@@ -4,7 +4,7 @@ This page provides a minimal, end-to-end demo Predictor Information Unit (IU) ex
 
 ## Demo Example: Add a CIF Predictor IU
 
-Goal: add a small predictor Information Unit (IU) named **CIF Demo Predictor** that returns one prediction for each input CIF.
+Goal: add a small predictor Information Unit (IU) named **CIF Demo Predictor** that returns numerical demo properties for each input CIF.
 
 ### Step 1: Add one predictor entry in `devtools/source_data.json`
 
@@ -33,26 +33,29 @@ The script is interactive. When prompted to apply detected changes, confirm with
 
 ### Step 3: Implement the generated predictor class
 
-In this step, you replace the stub prediction logic with a small implementation that returns one result for each input CIF string.
+In this step, you replace the stub prediction logic with a small implementation that returns numerical demo properties for each input CIF string.
 
 Open the generated file (expected path):
 
 `Information_Units/Predictors/CifDemoPredictor/CifDemoPredictorPredictor.py`
+
+No additional library is required for this demo.
 
 Replace `predict()` with:
 
 ```python
 def predict(self, input_data: list[str]) -> dict:
     results = []
+    number_of_inputs = max(len(input_data), 1)
 
     for index, cif_input in enumerate(input_data):
+        fraction = index / max(number_of_inputs - 1, 1)
         results.append({
             "index": index,
             "status": "success",
             "properties": {
-              "chemical_formula_descriptive": "NaCl",
-              "elements": ["Na", "Cl"],
-              "id": f"cif_demo_{index}",
+              "band_gap": round(0.0 + 5.0 * fraction, 3),
+              "formation_energy": round(-3.0 + 4.0 * fraction, 3),
             },
             "warnings": [],
             "error": None,
@@ -82,16 +85,12 @@ and update `properties` to include the fields you want exposed in the UI, for ex
   "source_type": "predictors",
   "source": "cif_demo_predictor",
   "properties": {
-    "chemical_formula_descriptive": {
-      "name": "chemical_formula_descriptive",
+    "band_gap": {
+      "name": "band_gap",
       "retrievable": true
     },
-    "elements": {
-      "name": "elements",
-      "retrievable": true
-    },
-    "id": {
-      "name": "id",
+    "formation_energy": {
+      "name": "formation_energy",
       "retrievable": true
     }
   }
@@ -119,7 +118,7 @@ In this step, you run EMOS end-to-end and verify that one prediction request ret
 2. Open the UI by opening `index.html` in your browser.
 3. In the Information Units section, open and run the new **CIF Demo Predictor** IU.
 4. Upload 10 CIF files, including the CIF from the database tutorial, and run.
-5. Confirm the result includes 10 prediction records, each with `chemical_formula_descriptive`, `elements`, `id`, `status`, and the original `cif_input`.
+5. Confirm the result includes 10 prediction records, with `band_gap` values distributed from `0.0` to `5.0` and `formation_energy` values distributed from `-3.0` to `1.0`.
 
 > **Optional Docker execution:** Developers are welcome to run the IU's `predict()` function in a Docker container instead of directly in the host environment. This can help avoid library or dependency conflicts, and it can keep model execution and its dependencies isolated for privacy-sensitive workflows. Make sure the container exposes the inputs and outputs required by the IU and follows the same prediction response contract described above.
 
