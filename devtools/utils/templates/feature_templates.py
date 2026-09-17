@@ -81,7 +81,10 @@ def generate_js_outputs_html(outputs, class_name):
     for out in outputs:
         output_name = out.get('name', '')
         display_name = out.get('display_name', output_name)
-        lines.append(f"                <div class=\"output-item\">\n                    <strong>{display_name}:</strong> <span id=\"{output_name}_${{this.featureId}}\">Pending...</span>\n                </div>")
+        output_type = out.get('type', 'text')
+        element = 'a' if output_type in ('link', 'file') else 'span'
+        attributes = ' style="display:none" download' if element == 'a' else ''
+        lines.append(f"                <div class=\"output-item\">\n                    <strong>{display_name}:</strong> <{element} id=\"{output_name}_${{this.featureId}}\"{attributes}>Pending...</{element}>\n                </div>")
     
     return '\n'.join(lines)
 
@@ -121,9 +124,20 @@ def generate_js_updateOutputs(outputs):
     # Generate update for each output field
     for out in outputs:
         output_name = out.get('name', '')
-        lines.append(f"        if (finalResults.{output_name}) {{")
-        lines.append(f"            document.getElementById(`{output_name}_${{this.featureId}}`).textContent = finalResults.{output_name};")
-        lines.append("        }")
+        output_type = out.get('type', 'text')
+        if output_type in ('link', 'file'):
+            lines.append(f"        const {output_name}El = document.getElementById(`{output_name}_${{this.featureId}}`);")
+            lines.append(f"        if ({output_name}El && finalResults.{output_name} !== undefined) {{")
+            lines.append(f"            const {output_name}Data = typeof finalResults.{output_name} === 'string' ? finalResults.{output_name} : JSON.stringify(finalResults.{output_name}, null, 2);")
+            lines.append(f"            {output_name}El.href = URL.createObjectURL(new Blob([{output_name}Data], {{ type: 'application/json' }}));")
+            lines.append(f"            {output_name}El.download = '{output_name}.json';")
+            lines.append(f"            {output_name}El.textContent = 'Download JSON';")
+            lines.append(f"            {output_name}El.style.display = ''; ")
+            lines.append("        }")
+        else:
+            lines.append(f"        if (finalResults.{output_name}) {{")
+            lines.append(f"            document.getElementById(`{output_name}_${{this.featureId}}`).textContent = finalResults.{output_name};")
+            lines.append("        }")
     
     lines.append("    }")
     

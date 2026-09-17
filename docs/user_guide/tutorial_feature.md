@@ -4,14 +4,14 @@ This page provides a minimal, end-to-end demo Feature example you can add to EMO
 
 ## Demo Example: Add a Feature
 
-Goal: add a small feature named **Demo Echo** that repeats a selected message, returns it in uppercase, and reports a result link.
+Goal: add a small feature named **Demo Echo** that repeats a selected message, returns it in uppercase, and provides a downloadable JSON report.
 
 ### Step 1: Add one feature entry in `devtools/source_data.json`
 
 Under `features -> materials_exploration`, add one new key:
 
 ```json
-"Demo Echo": "Demo feature that echoes user text in uppercase and reports its length"
+"Demo Echo": "Demo feature that echoes user text in uppercase and provides a downloadable JSON report"
 ```
 
 ### Step 2 (optional): Define simple feature I/O
@@ -86,7 +86,11 @@ def process_feature(self, inputs):
     return {
         'status': 'completed',
       'result': repeated_message.upper(),
-      'report': '/reports/demo_echo.txt',
+      'report': {
+        'message': message,
+        'repeat_count': repeat_count,
+        'result': repeated_message.upper(),
+      },
     }
 
 def format_outputs(self, results):
@@ -101,6 +105,6 @@ def format_outputs(self, results):
 
 1. Start backend: `python backend/app.py`
 2. Open EMOS, launch **Demo Echo**, select a message, and set a repeat count.
-3. Confirm output `result` is uppercase and `report` is shown as a link.
+3. Confirm output `result` is uppercase and `report` appears as a **Download JSON** link.
 
 This demo Feature gives a complete contribution path (metadata -> generated files -> implementation -> UI run) with minimal logic.
