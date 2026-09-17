@@ -107,4 +107,24 @@ def format_outputs(self, results):
 2. Open EMOS, launch **Demo Echo**, select a message, and set a repeat count.
 3. Confirm output `result` is uppercase and `report` appears as a **Download JSON** link.
 
+> **Optional Docker execution and updates:** Developers are welcome to implement and run the feature in a Docker container if they prefer to isolate dependencies or keep execution private. The feature input and output definitions in `devtools/source_data.json` do not need to be updated when only the implementation changes; update them when the feature's interface changes.
+
+## Remove the Demo Feature (cleanup)
+
+When you are done testing, remove the demo feature in this order:
+
+1. Remove the feature entry for **Demo Echo** from `devtools/source_data.json` under `features -> materials_exploration`.
+2. Remove the **Demo Echo** input and output definition from `feature_inputs_outputs` in `devtools/source_data.json`.
+3. Run the contribution tool to remove the generated feature scaffolding and UI wiring:
+
+  ```bash
+  python devtools/contribution_tool.py
+  ```
+
+  Confirm the detected removal changes when prompted.
+
+4. Confirm that the generated files have been removed:
+  - `Features/Materials_Exploration/DemoEcho/DemoEchoFeature.py`
+  - `Features/Materials_Exploration/DemoEcho/DemoEcho.js`
+
 This demo Feature gives a complete contribution path (metadata -> generated files -> implementation -> UI run) with minimal logic.
