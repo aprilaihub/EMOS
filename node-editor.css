@@ -853,6 +853,10 @@ body {
 .ne-step-btn:hover { background: #1976d2; }
 .ne-clear-btn { background: #5f4b1d; border-color: #8b6a22; color: #fef3c7; }
 .ne-clear-btn:hover { background: #765d25; }
+.ne-save-graph-btn { background: #0f766e; border-color: #14b8a6; color: #ecfeff; }
+.ne-save-graph-btn:hover { background: #0d9488; }
+.ne-load-graph-btn { background: #1d4ed8; border-color: #3b82f6; color: #eff6ff; }
+.ne-load-graph-btn:hover { background: #2563eb; }
 .ne-clear-canvas-btn { background: #7f1d1d; border-color: #b91c1c; color: #fff; }
 .ne-clear-canvas-btn:hover { background: #991b1b; }
 .ne-download-all-btn { background: #0f766e; border-color: #14b8a6; color: #ecfeff; }

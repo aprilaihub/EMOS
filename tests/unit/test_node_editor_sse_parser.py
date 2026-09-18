@@ -71,6 +71,43 @@ def test_completed_results_enable_node_and_aggregate_downloads():
     assert 'id="neDownloadAllBtn"' in html
 
 
+def test_graph_configuration_and_layout_can_be_saved_and_loaded_without_results():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+
+    assert "const GRAPH_FILE_FORMAT = 'emos-node-graph';" in source
+    assert "const GRAPH_FILE_VERSION = 1;" in source
+    assert "function saveGraph()" in source
+    assert "function createGraphFile()" in source
+    assert "function serializeGraphNode(node)" in source
+    assert "function loadGraphFromFile(event)" in source
+    assert "async function loadGraph(graph)" in source
+    assert "function validateGraphFile(graph)" in source
+    assert "function restoreGraphConnections(connections)" in source
+    assert "function clearGraphWithoutConfirmation()" in source
+    assert "Runtime results are not restored." in source
+    assert "nodes: Object.values(nodes).map(serializeGraphNode)" in source
+    assert "connections: wires.map(wire => ({" in source
+    assert 'id="neSaveGraphBtn"' in html
+    assert 'id="neLoadGraphBtn"' in html
+    assert 'id="neLoadGraphInput"' in html
+
+
+def test_graph_save_load_preserves_dynamic_node_configuration():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    assert "configuration.filterRules = serializeFilterRules(node);" in source
+    assert "configuration.treeSelections = [...node.treeSelections];" in source
+    assert "configuration.inputs = node.inputs.map(input => ({" in source
+    assert "configuration.outputPorts = node.outputs.map(output => ({" in source
+    assert "function serializeFilterRules(node)" in source
+    assert "function restoreMergerInputs(node, inputs)" in source
+    assert "function restoreDynamicOutputPorts(node, outputs)" in source
+    assert "function restoreFilterRules(node, rules)" in source
+    assert "node.treeSelections = new Set((configuration.treeSelections || [])" in source
+    assert "...node.prettyFieldSelections" in source
+
+
 def test_resized_nodes_resize_their_log_and_viewer_content():
     source = (Path(__file__).parents[2] / "node-editor.js").read_text()
 

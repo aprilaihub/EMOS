@@ -15,6 +15,9 @@
         [PORT_TYPES.RESULT]: [PORT_TYPES.RESULT, PORT_TYPES.ANY],
         [PORT_TYPES.ANY]:    [PORT_TYPES.CIF, PORT_TYPES.RESULT, PORT_TYPES.ANY],
     };
+    const GRAPH_FILE_FORMAT = 'emos-node-graph';
+    const GRAPH_FILE_VERSION = 1;
+    const DYNAMIC_OUTPUT_NODE_KEYS = new Set(['splitter', 'tree_splitter', 'merger']);
 
     // Node definitions — ports schema per category
     const NODE_SCHEMAS = {
@@ -110,6 +113,7 @@
 
     // DOM refs
     let canvasContainer, canvas, wiresSvg, processBtn, stepBtn, clearBtn, clearCanvasBtn, downloadAllBtn;
+    let saveGraphBtn, loadGraphBtn, loadGraphInput;
     let statusText, zoomText, contextMenu, confirmDialog, confirmTitle, confirmMessage;
     let confirmAcceptBtn, confirmCancelBtn, confirmationResolver = null;
 
@@ -125,6 +129,9 @@
         clearBtn        = document.getElementById('neClearBtn');
         clearCanvasBtn  = document.getElementById('neClearCanvasBtn');
         downloadAllBtn  = document.getElementById('neDownloadAllBtn');
+        saveGraphBtn    = document.getElementById('neSaveGraphBtn');
+        loadGraphBtn    = document.getElementById('neLoadGraphBtn');
+        loadGraphInput  = document.getElementById('neLoadGraphInput');
         statusText      = document.getElementById('neStatusText');
         zoomText        = document.getElementById('neZoomText');
         contextMenu     = document.getElementById('neContextMenu');
@@ -277,6 +284,9 @@
         clearBtn.addEventListener('click', clearOutputsWithConfirmation);
         clearCanvasBtn.addEventListener('click', clearCanvasWithConfirmation);
         downloadAllBtn.addEventListener('click', downloadAllResults);
+        saveGraphBtn.addEventListener('click', saveGraph);
+        loadGraphBtn.addEventListener('click', () => loadGraphInput.click());
+        loadGraphInput.addEventListener('change', loadGraphFromFile);
         confirmAcceptBtn.addEventListener('click', () => settleConfirmation(true));
         confirmCancelBtn.addEventListener('click', () => settleConfirmation(false));
 
@@ -506,8 +516,10 @@
     // ═══════════════════════════════════════════════════════════════
     // NODE CREATION
     // ═══════════════════════════════════════════════════════════════
-    function createNode(type, key, name, x, y) {
-        const id = 'node_' + (nextNodeId++);
+    function createNode(type, key, name, x, y, options = {}) {
+        const id = options.id || 'node_' + (nextNodeId++);
+        if (options.id) reserveNodeId(id);
+        if (nodes[id]) return null;
         // Determine schema; viewers and utility nodes use their key as schema key.
         const schemaKey = (type === 'viewer' || type === 'utility') ? key : type;
         const baseSchema = NODE_SCHEMAS[schemaKey];
@@ -531,6 +543,8 @@
             treeInput: null,
             treeEntries: [],
             treeSelections: new Set(),
+            prettyFieldSelections: [],
+            propertyFieldsReady: Promise.resolve(),
             el: null,
         };
 
@@ -539,13 +553,18 @@
         node.el = el;
         canvas.appendChild(el);
         positionNodeEl(node);
-        selectNode(id);
+        if (!options.suppressSelection) selectNode(id);
         // Populate property fields async after element is in the DOM
         if (node.type === 'database' || node.type === 'generator') {
-            populateNodePropertyFields(node);
+            node.propertyFieldsReady = populateNodePropertyFields(node);
         }
-        notifyGraphChanged();
+        if (!options.suppressGraphChanged) notifyGraphChanged();
         return node;
+    }
+
+    function reserveNodeId(id) {
+        const match = /^node_(\d+)$/.exec(id);
+        if (match) nextNodeId = Math.max(nextNodeId, Number(match[1]) + 1);
     }
 
     function renderNode(node) {
@@ -636,6 +655,7 @@
         if (node.key === 'text_viewer') {
             const prettyToggle = body.querySelector('.ne-text-pretty-toggle');
             prettyToggle?.addEventListener('change', () => {
+                node.prettyFieldSelections = getTextViewerSelectedFields(node);
                 if (node.data != null) displayTextViewer(node, node.data, false);
             });
         }
@@ -828,6 +848,7 @@
 
     // Fetch the per-source property mapping + common definitions and inject fields.
     async function populateNodePropertyFields(node) {
+        if (nodes[node.id] !== node) return;
         const container = document.getElementById(`prop-fields-${node.id}`);
         if (!container) return;
 
@@ -841,9 +862,12 @@
                 fetch('./Information_Units/property_mappings/common_properties.json').then(r => r.json()).catch(() => ({ properties: {} })),
             ]);
         } catch (e) {
+            if (nodes[node.id] !== node) return;
             container.innerHTML = `<p style="color:#666; font-size:10px;">No property filters available.</p>`;
             return;
         }
+
+        if (nodes[node.id] !== node) return;
 
         const props  = sourceMapping.properties || {};
         const common = commonProperties.properties || {};
@@ -2341,6 +2365,8 @@ output_results = results`;
         }
 
         clearBtn.disabled = active || !hasRuntimeData();
+        saveGraphBtn.disabled = active || Object.keys(nodes).length === 0;
+        loadGraphBtn.disabled = active;
         clearCanvasBtn.disabled = active || Object.keys(nodes).length === 0;
         downloadAllBtn.disabled = !hasCompletedResult();
         statusText.classList.toggle('ne-status-processing', active);
@@ -2383,6 +2409,311 @@ output_results = results`;
     function downloadNodeResult(node) {
         if (!node.resultRecord || node.isStale) return;
         downloadJson(`emos-node-${node.id}-result.json`, node.resultRecord);
+    }
+
+    function saveGraph() {
+        if (isExecutionActive() || Object.keys(nodes).length === 0) return;
+        downloadJson('emos-node-graph.json', createGraphFile());
+        const count = Object.keys(nodes).length;
+        setStatus(`Saved graph configuration with ${count} node${count === 1 ? '' : 's'}.`);
+    }
+
+    function createGraphFile() {
+        return {
+            format: GRAPH_FILE_FORMAT,
+            version: GRAPH_FILE_VERSION,
+            savedAt: new Date().toISOString(),
+            canvas: { panX, panY, zoom },
+            nodes: Object.values(nodes).map(serializeGraphNode),
+            connections: wires.map(wire => ({
+                fromNode: wire.fromNode,
+                fromPort: wire.fromPort,
+                toNode: wire.toNode,
+                toPort: wire.toPort,
+            })),
+        };
+    }
+
+    function serializeGraphNode(node) {
+        const configuration = { fields: serializeGraphFields(node) };
+
+        if (node.key === 'filter') configuration.filterRules = serializeFilterRules(node);
+        if (node.key === 'tree_splitter') configuration.treeSelections = [...node.treeSelections];
+        if (node.key === 'merger') {
+            configuration.inputs = node.inputs.map(input => ({
+                key: input.key,
+                defaultLabel: input.defaultLabel || input.label,
+                type: input.type,
+            }));
+        }
+        if (node.key === 'text_viewer') {
+            configuration.textViewer = {
+                pretty: Boolean(node.el.querySelector('.ne-text-pretty-toggle')?.checked),
+                selectedFields: getTextViewerSelectedFields(node),
+            };
+        }
+        if (DYNAMIC_OUTPUT_NODE_KEYS.has(node.key)) {
+            configuration.outputPorts = node.outputs.map(output => ({
+                key: output.key,
+                label: output.label,
+                type: output.type,
+            }));
+        }
+
+        return {
+            id: node.id,
+            type: node.type,
+            key: node.key,
+            name: node.name,
+            x: node.x,
+            y: node.y,
+            width: node.width,
+            height: node.height,
+            breakpointEnabled: node.breakpointEnabled,
+            configuration,
+        };
+    }
+
+    function serializeGraphFields(node) {
+        return [...node.el.querySelectorAll('[data-field]')]
+            .filter(field => !(node.key === 'cif_viewer' && field.dataset.field === 'cif_select'))
+            .map(field => ({
+                name: field.dataset.field,
+                value: field.value,
+                checked: ['checkbox', 'radio'].includes(field.type) ? field.checked : undefined,
+            }));
+    }
+
+    function getTextViewerSelectedFields(node) {
+        const fields = [...node.el.querySelectorAll('.ne-text-viewer-fields input')];
+        return fields.length > 0
+            ? fields.filter(field => field.checked).map(field => field.value)
+            : [...node.prettyFieldSelections];
+    }
+
+    function serializeFilterRules(node) {
+        return [...node.el.querySelectorAll('.ne-filter-row')].map(row => ({
+            prop: row.querySelector('.ne-filter-prop-select')?.value || '',
+            op: row.querySelector('.ne-filter-op-select')?.value || '=',
+            val: row.querySelector('.ne-filter-value')?.value || '',
+        }));
+    }
+
+    async function loadGraphFromFile(event) {
+        const [file] = event.target.files || [];
+        event.target.value = '';
+        if (!file || isExecutionActive()) return;
+
+        try {
+            const graph = JSON.parse(await file.text());
+            await loadGraph(graph);
+        } catch (error) {
+            setStatus(`Could not load graph: ${error.message}`);
+        }
+    }
+
+    async function loadGraph(graph) {
+        const validationError = validateGraphFile(graph);
+        if (validationError) throw new Error(validationError);
+
+        const accepted = Object.keys(nodes).length === 0 || await showConfirmation(
+            'Load graph?',
+            'This replaces the current graph configuration and layout. Runtime results are not restored.',
+            'Load graph',
+        );
+        if (!accepted) return;
+
+        clearGraphWithoutConfirmation();
+        const loadedNodes = [];
+        for (const savedNode of graph.nodes) {
+            const node = createNode(
+                savedNode.type,
+                savedNode.key,
+                savedNode.name,
+                savedNode.x,
+                savedNode.y,
+                { id: savedNode.id, suppressSelection: true, suppressGraphChanged: true },
+            );
+            if (!node) throw new Error(`Could not create saved node "${savedNode.name}".`);
+            loadedNodes.push({ node, savedNode });
+        }
+
+        await Promise.all(loadedNodes.map(({ node }) => node.propertyFieldsReady));
+        loadedNodes.forEach(({ node, savedNode }) => restoreGraphNode(node, savedNode));
+        restoreGraphConnections(graph.connections);
+
+        const canvasState = graph.canvas || {};
+        panX = Number.isFinite(canvasState.panX) ? canvasState.panX : 0;
+        panY = Number.isFinite(canvasState.panY) ? canvasState.panY : 0;
+        zoom = Number.isFinite(canvasState.zoom) ? Math.min(3, Math.max(0.2, canvasState.zoom)) : 1;
+        applyTransform();
+        updateWires();
+        updatePortConnectedStates();
+        refreshAllFilterNodes();
+        loadedNodes.forEach(({ node, savedNode }) => {
+            if (node.key === 'filter') restoreFilterRules(node, savedNode.configuration?.filterRules);
+        });
+        Object.values(nodes).forEach(node => {
+            clearNodeRuntime(node);
+            refreshMergerInputLabels(node.id);
+        });
+        resetExecutionState('idle');
+        selectNode(null);
+        notifyGraphChanged();
+        setStatus(`Loaded graph configuration with ${loadedNodes.length} node${loadedNodes.length === 1 ? '' : 's'}.`);
+    }
+
+    function validateGraphFile(graph) {
+        if (!graph || typeof graph !== 'object') return 'The selected file is not a graph document.';
+        if (graph.format !== GRAPH_FILE_FORMAT) return 'This file is not an EMOS node graph.';
+        if (graph.version !== GRAPH_FILE_VERSION) return `Graph file version ${graph.version ?? 'unknown'} is not supported.`;
+        if (!Array.isArray(graph.nodes) || !Array.isArray(graph.connections)) return 'The graph file is missing nodes or connections.';
+
+        const ids = new Set();
+        for (const savedNode of graph.nodes) {
+            if (!savedNode || typeof savedNode !== 'object' || !savedNode.id || !savedNode.type || !savedNode.key || !savedNode.name) {
+                return 'The graph file contains an invalid node.';
+            }
+            if (ids.has(savedNode.id)) return `The graph file contains duplicate node ID "${savedNode.id}".`;
+            ids.add(savedNode.id);
+            if (!getSavedNodeSchema(savedNode)) return `Node "${savedNode.name}" is no longer available.`;
+        }
+        return null;
+    }
+
+    function getSavedNodeSchema(savedNode) {
+        if (savedNode.type === 'feature') return FEATURE_DEFINITIONS[savedNode.key] ? getFeatureNodeSchema(FEATURE_DEFINITIONS[savedNode.key]) : null;
+        const schemaKey = (savedNode.type === 'viewer' || savedNode.type === 'utility') ? savedNode.key : savedNode.type;
+        return NODE_SCHEMAS[schemaKey] || null;
+    }
+
+    function restoreGraphNode(node, savedNode) {
+        const configuration = savedNode.configuration || {};
+        node.breakpointEnabled = Boolean(savedNode.breakpointEnabled);
+        node.width = normalizeGraphDimension(savedNode.width, node.width, 200);
+        node.height = Number.isFinite(savedNode.height) ? Math.max(100, savedNode.height) : null;
+        node.el.style.width = `${node.width}px`;
+        if (node.height) {
+            node.el.style.height = `${node.height}px`;
+            resizeNodeContent(node, node.height);
+        }
+
+        if (node.key === 'merger') restoreMergerInputs(node, configuration.inputs);
+        if (DYNAMIC_OUTPUT_NODE_KEYS.has(node.key)) restoreDynamicOutputPorts(node, configuration.outputPorts);
+        restoreGraphFields(node, configuration.fields);
+        if (node.key === 'tree_splitter') node.treeSelections = new Set((configuration.treeSelections || []).filter(value => typeof value === 'string'));
+        if (node.key === 'text_viewer') restoreTextViewerConfiguration(node, configuration.textViewer);
+        updateBreakpointButton(node);
+    }
+
+    function normalizeGraphDimension(value, fallback, minimum) {
+        return Number.isFinite(value) ? Math.max(minimum, value) : fallback;
+    }
+
+    function restoreGraphFields(node, fields) {
+        for (const savedField of fields || []) {
+            if (!savedField || typeof savedField.name !== 'string') continue;
+            const matchingFields = [...node.el.querySelectorAll(`[data-field="${CSS.escape(savedField.name)}"]`)];
+            matchingFields.forEach(field => {
+                if (['checkbox', 'radio'].includes(field.type)) {
+                    const isValueSpecific = field.type === 'radio' || field.dataset.featureFieldType === 'iu_checkbox_group';
+                    if (savedField.checked !== undefined && (!isValueSpecific || field.value === savedField.value)) {
+                        field.checked = Boolean(savedField.checked);
+                    }
+                } else if (savedField.value !== undefined) {
+                    field.value = String(savedField.value);
+                }
+            });
+        }
+    }
+
+    function restoreFilterRules(node, rules) {
+        const container = node.el.querySelector(`#filter-rules-${node.id}`);
+        if (!container || !Array.isArray(rules)) return;
+        container.innerHTML = '';
+        rules.forEach(rule => {
+            addFilterRule(node.id);
+            const row = container.lastElementChild;
+            if (!row) return;
+            const property = row.querySelector('.ne-filter-prop-select');
+            const operator = row.querySelector('.ne-filter-op-select');
+            const value = row.querySelector('.ne-filter-value');
+            if (property && rule.prop !== undefined) property.value = String(rule.prop);
+            if (operator && rule.op !== undefined) operator.value = String(rule.op);
+            if (value && rule.val !== undefined) value.value = String(rule.val);
+        });
+    }
+
+    function restoreMergerInputs(node, inputs) {
+        if (!Array.isArray(inputs) || inputs.length < 2) return;
+        const restoredInputs = inputs.filter(input => input && typeof input.key === 'string').map((input, index) => ({
+            key: input.key,
+            label: input.defaultLabel || `Input ${index + 1}`,
+            defaultLabel: input.defaultLabel || `Input ${index + 1}`,
+            type: PORT_COMPAT[input.type] ? input.type : PORT_TYPES.ANY,
+            required: false,
+        }));
+        if (restoredInputs.length < 2) return;
+        node.inputs = restoredInputs;
+        node.el.querySelectorAll('.ne-port-wrap.ne-port-input').forEach(port => port.remove());
+        renderInputPorts(node);
+        syncPortDrivenNodeHeight(node);
+    }
+
+    function restoreDynamicOutputPorts(node, outputs) {
+        if (!Array.isArray(outputs)) return;
+        const restoredOutputs = outputs.filter(output => (
+            output && typeof output.key === 'string' && typeof output.label === 'string' && PORT_COMPAT[output.type]
+        )).map(output => ({ key: output.key, label: output.label, type: output.type }));
+        if (node.key !== 'merger' && restoredOutputs.length === 0) return;
+        node.outputs = restoredOutputs;
+        node.el.querySelectorAll('.ne-port-wrap.ne-port-output').forEach(port => port.remove());
+        renderOutputPorts(node);
+        syncPortDrivenNodeHeight(node);
+    }
+
+    function restoreTextViewerConfiguration(node, textViewer) {
+        if (!textViewer || typeof textViewer !== 'object') return;
+        node.prettyFieldSelections = Array.isArray(textViewer.selectedFields)
+            ? textViewer.selectedFields.filter(value => typeof value === 'string')
+            : [];
+        const prettyToggle = node.el.querySelector('.ne-text-pretty-toggle');
+        if (prettyToggle) prettyToggle.checked = Boolean(textViewer.pretty);
+    }
+
+    function restoreGraphConnections(connections) {
+        const usedInputPorts = new Set();
+        let restoredWireCount = 0;
+        for (const connection of connections) {
+            if (!connection || usedInputPorts.has(`${connection.toNode}:${connection.toPort}`)) continue;
+            const fromNode = nodes[connection.fromNode];
+            const toNode = nodes[connection.toNode];
+            const output = fromNode?.outputs.find(port => port.key === connection.fromPort);
+            const input = toNode?.inputs.find(port => port.key === connection.toPort);
+            if (!fromNode || !toNode || !output || !input || !PORT_COMPAT[output.type]?.includes(input.type)) continue;
+            wires.push({
+                id: `wire_${++restoredWireCount}`,
+                fromNode: fromNode.id,
+                fromPort: output.key,
+                toNode: toNode.id,
+                toPort: input.key,
+                type: output.type,
+            });
+            usedInputPorts.add(`${connection.toNode}:${connection.toPort}`);
+        }
+        nextWireId = restoredWireCount + 1;
+    }
+
+    function clearGraphWithoutConfirmation() {
+        cancelWiring();
+        Object.values(nodes).forEach(node => node.el.remove());
+        wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
+        nodes = {};
+        wires = [];
+        nextNodeId = 1;
+        nextWireId = 1;
+        selectedNodeId = null;
+        resetExecutionState('idle');
     }
 
     function downloadAllResults() {
@@ -2956,7 +3287,10 @@ output_results = results`;
 
     function renderPrettyFieldToggles(container, fields, node, data) {
         if (!container) return;
-        const previousSelection = new Set([...container.querySelectorAll('input:checked')].map(input => input.value));
+        const previousSelection = new Set([
+            ...node.prettyFieldSelections,
+            ...[...container.querySelectorAll('input:checked')].map(input => input.value),
+        ]);
         container.innerHTML = '';
         container.hidden = false;
 
@@ -2967,7 +3301,10 @@ output_results = results`;
             input.type = 'checkbox';
             input.value = field;
             input.checked = previousSelection.has(field);
-            input.addEventListener('change', () => displayTextViewer(node, data, false));
+            input.addEventListener('change', () => {
+                node.prettyFieldSelections = getTextViewerSelectedFields(node);
+                displayTextViewer(node, data, false);
+            });
             const text = document.createElement('span');
             text.textContent = field.replace('.', ' - ');
             label.append(input, text);
