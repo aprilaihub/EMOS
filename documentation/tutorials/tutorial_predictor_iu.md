@@ -2,6 +2,8 @@
 
 This page provides a minimal, end-to-end demo Predictor Information Unit (IU) example you can add to EMOS.
 
+Before implementing a predictor IU, read the [required IU data contracts](iu-data-contracts.md).
+
 ## Demo Example: Add a CIF Predictor IU
 
 Goal: add a small predictor Information Unit (IU) named **CIF Demo Predictor** that returns numerical demo properties for each input CIF.

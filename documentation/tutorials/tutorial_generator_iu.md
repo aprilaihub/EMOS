@@ -2,6 +2,8 @@
 
 This page provides a minimal, end-to-end demo Generator Information Unit (IU) example you can add to EMOS.
 
+Before implementing a generator IU, read the [required IU data contracts](iu-data-contracts.md).
+
 ## Demo Example: Add a CIF Generator IU
 
 Goal: add a small generator Information Unit (IU) named **CIF Demo Generator** that returns CIF structures in response to a requested batch size.

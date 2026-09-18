@@ -2,6 +2,8 @@
 
 This page provides a minimal, end-to-end demo Database Information Unit (IU) example you can add to EMOS.
 
+Before implementing a database IU, read the [required IU data contracts](iu-data-contracts.md).
+
 ## Demo Example: Add a CIF Database IU
 
 Goal: add a small database Information Unit (IU) named **CIF Demo** that returns one CIF per requested batch item.
