@@ -44,51 +44,127 @@
             opacity: 0.9;
         }
         
-        .doc-navigation {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .doc-nav-item {
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            text-decoration: none;
-            color: #495057;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        
-        .doc-nav-item:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-        }
-        
-        .doc-nav-item.external {
-            background: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-        
-        .doc-nav-item.external:hover {
-            background: #218838;
-            border-color: #218838;
-        }
-        
-        .documentation-frame {
-            width: 100%;
+        .doc-layout {
+            display: grid;
+            grid-template-columns: 250px minmax(0, 1fr);
             height: calc(100% - 140px);
-            border: none;
+        }
+
+        .doc-sidebar {
+            overflow-y: auto;
+            padding: 24px 14px;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .doc-sidebar h2 {
+            margin: 0 12px 16px;
+            color: #263238;
+            font-size: 1rem;
+        }
+
+        .doc-sidebar-section {
+            margin: 18px 0 8px;
+            padding: 0 12px;
+            color: #6c757d;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .doc-nav-item {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px 12px;
+            border: 0;
+            border-radius: 5px;
+            background: transparent;
+            color: #495057;
+            text-align: left;
+            text-decoration: none;
+            font-size: 0.88rem;
+            cursor: pointer;
+        }
+
+        .doc-nav-item:hover,
+        .doc-nav-item.active {
+            background: #e6e9ff;
+            color: #405de6;
+        }
+        
+        .documentation-content {
+            width: 100%;
+            height: 100%;
+            padding: 32px clamp(20px, 5vw, 72px);
+            box-sizing: border-box;
+            overflow-y: auto;
             background: white;
+            color: #263238;
+            line-height: 1.7;
+        }
+
+        .documentation-content h1,
+        .documentation-content h2,
+        .documentation-content h3 {
+            color: #263238;
+            line-height: 1.25;
+            margin-top: 1.6em;
+        }
+
+        .documentation-content h1 {
+            margin-top: 0;
+        }
+
+        .documentation-content a {
+            color: #405de6;
+        }
+
+        .documentation-content pre {
+            overflow-x: auto;
+            padding: 16px;
+            border-radius: 6px;
+            background: #f4f6f8;
+        }
+
+        .documentation-content code {
+            padding: 2px 4px;
+            border-radius: 3px;
+            background: #f0f2f4;
+        }
+
+        .documentation-content pre code {
+            padding: 0;
+            background: transparent;
+        }
+
+        .documentation-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .documentation-content th,
+        .documentation-content td {
+            padding: 8px 10px;
+            border: 1px solid #dfe3e6;
+            text-align: left;
+        }
+
+        .documentation-content th {
+            background: #f4f6f8;
+        }
+
+        .documentation-content blockquote {
+            margin-left: 0;
+            padding-left: 16px;
+            border-left: 4px solid #667eea;
+            color: #5f6b72;
+        }
+
+        .documentation-content .loading-message {
+            height: 200px;
         }
         
         .loading-message {
@@ -151,13 +227,32 @@
                 font-size: 1rem;
             }
             
-            .doc-navigation {
-                padding: 10px;
-                gap: 10px;
+            .doc-layout {
+                display: block;
+                height: calc(100% - 140px);
             }
-            
+
+            .doc-sidebar {
+                max-height: 190px;
+                border-right: 0;
+                border-bottom: 1px solid #e9ecef;
+                padding: 12px;
+            }
+
+            .doc-sidebar h2 {
+                display: none;
+            }
+
+            .doc-sidebar-section {
+                display: inline-block;
+                margin: 8px 4px 4px;
+            }
+
             .doc-nav-item {
-                padding: 6px 12px;
+                display: inline-block;
+                width: auto;
+                margin: 2px;
+                padding: 6px 9px;
                 font-size: 0.8rem;
             }
         }
@@ -194,147 +289,106 @@
                 <p>Comprehensive documentation for the Electronic Materials Ontology System</p>
             </div>
             
-            <div class="doc-navigation">
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('introduction.html')">📋 Introduction</a>
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('quickstart.html')">🚀 Quick Start</a>
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('information_units/index.html')">🔧 Information Units</a>
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('features/index.html')">⚡ Features</a>
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('user_guide/index.html')">📖 User Guide</a>
-                <a href="#" class="doc-nav-item" onclick="loadDocSection('reference/index.html')">📚 Reference</a>
-                <a href="#" class="doc-nav-item external" target="_blank" id="fullDocsLink">🔗 Full Documentation</a>
+            <div class="doc-layout">
+                <aside class="doc-sidebar" aria-label="Documentation contents">
+                    <h2>Contents</h2>
+                    <div class="doc-sidebar-section">Overview</div>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/index.md">Introduction</a>
+                    <div class="doc-sidebar-section">Information Units</div>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/information-units.md">All Information Units</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/information-units/databases/index.md">Databases</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/information-units/generators/index.md">Generators</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/information-units/predictors/index.md">Predictors</a>
+                    <div class="doc-sidebar-section">Features</div>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/features.md">All Features</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/features/materials-exploration/index.md">Materials Exploration</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/features/electronics-application/index.md">Electronics Application</a>
+                    <div class="doc-sidebar-section">Contribution</div>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/tutorials/index.md">Tutorials</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/tutorials/tutorial_database_iu.md">Database IU</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/tutorials/tutorial_generator_iu.md">Generator IU</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/tutorials/tutorial_predictor_iu.md">Predictor IU</a>
+                    <a href="#" class="doc-nav-item" data-doc="documentation/tutorials/tutorial_feature.md">Feature</a>
+                </aside>
+                <main id="documentationContent" class="documentation-content" aria-live="polite"></main>
             </div>
-            
-            <iframe id="documentationFrame" class="documentation-frame" src=""></iframe>
         </div>
     </div>
 
     <script src="navigation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        // Documentation page functionality - Auto-detect environment
-        function getDocumentationBasePath() {
-            const hostname = window.location.hostname;
-            const isGitHubPages = hostname.includes('github.io');
-            const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
-            
-            if (isGitHubPages) {
-                // GitHub Pages: docs are copied to docs/ during deployment
-                return 'docs';
-            } else {
-                // Local development: docs are in docs/_build/html/
-                return 'docs/_build/html';
-            }
-        }
-        
-        const DOC_BASE_PATH = getDocumentationBasePath();
-        let currentDocPath = `${DOC_BASE_PATH}/index.html`;
-        
-        console.log('Documentation environment detected:', {
-            hostname: window.location.hostname,
-            basePath: DOC_BASE_PATH,
-            initialPath: currentDocPath
-        });
-        
-        function loadDocSection(section) {
-            const frame = document.getElementById('documentationFrame');
-            const newPath = `${DOC_BASE_PATH}/${section}`;
-            
-            // Show loading state
-            showLoading();
-            
-            // Load the new section
-            frame.src = newPath;
-            currentDocPath = newPath;
-            
-            // Update active nav item
-            updateActiveNavItem(section);
-        }
-        
-        function showLoading() {
-            const frame = document.getElementById('documentationFrame');
-            frame.style.opacity = '0.5';
-        }
-        
-        function hideLoading() {
-            const frame = document.getElementById('documentationFrame');
-            frame.style.opacity = '1';
-        }
-        
-        function updateActiveNavItem(section) {
-            // Remove active class from all nav items
-            document.querySelectorAll('.doc-nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Add active class to clicked item (would need more specific logic for exact matching)
-            event.target.classList.add('active');
-        }
-        
-        function showError() {
-            const frame = document.getElementById('documentationFrame');
-            frame.innerHTML = `
+        let currentDocPath = 'documentation/index.md';
+
+        function showError(message) {
+            document.getElementById('documentationContent').innerHTML = `
                 <div class="error-message">
-                    <h3>⚠️ Documentation Not Available</h3>
-                    <p>Unable to load the documentation. This might happen if:</p>
-                    <ul style="text-align: left; display: inline-block;">
-                        <li>The documentation server is not running</li>
-                        <li>The documentation files haven't been built yet</li>
-                        <li>There's a network connection issue</li>
-                    </ul>
-                    <button class="retry-btn" onclick="location.reload()">Retry</button>
+                    <h3>Documentation Not Available</h3>
+                    <p>${message}</p>
+                    <p>Open EMOS through a local web server so Markdown files can be loaded.</p>
                 </div>
             `;
         }
-        
-        // Handle iframe load events
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial iframe source and external link
-            const frame = document.getElementById('documentationFrame');
-            const fullDocsLink = document.getElementById('fullDocsLink');
-            
-            frame.src = currentDocPath;
-            fullDocsLink.href = currentDocPath;
-            
-            console.log('Documentation initialized with path:', currentDocPath);
-            
-            frame.addEventListener('load', function() {
-                hideLoading();
+
+        function updateActiveNavItem(path) {
+            document.querySelectorAll('.doc-nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.doc === path);
             });
-            
-            frame.addEventListener('error', function() {
-                showError();
-            });
-            
-            // Handle the case where the iframe fails to load initially
-            setTimeout(function() {
-                try {
-                    // Check if iframe has loaded content
-                    if (!frame.contentDocument && frame.style.opacity !== '1') {
-                        showError();
-                    }
-                } catch (e) {
-                    // Cross-origin error might occur, this is normal
-                    hideLoading();
+        }
+
+        function rewriteMarkdownLinks(container, sourcePath) {
+            const sourceUrl = new URL(sourcePath, window.location.href);
+            container.querySelectorAll('a[href]').forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || /^(https?:|mailto:|javascript:)/i.test(href)) {
+                    return;
                 }
-            }, 5000);
-        });
-        
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            // Press 'h' to go to home/introduction
-            if (event.key === 'h' && !event.ctrlKey && !event.metaKey) {
-                loadDocSection('introduction.html');
-                event.preventDefault();
+
+                const resolved = new URL(href, sourceUrl).pathname;
+                if (resolved.endsWith('.md')) {
+                    link.dataset.doc = resolved.replace(/^\//, '');
+                    link.href = '#';
+                }
+            });
+        }
+
+        async function loadDocSection(path) {
+            const content = document.getElementById('documentationContent');
+            currentDocPath = path;
+            content.innerHTML = '<div class="loading-message">Loading documentation...</div>';
+            updateActiveNavItem(path);
+
+            try {
+                const response = await fetch(path);
+                if (!response.ok) {
+                    throw new Error(`Could not load ${path}`);
+                }
+                const markdown = await response.text();
+                content.innerHTML = marked.parse(markdown);
+                rewriteMarkdownLinks(content, path);
+                content.scrollTop = 0;
+            } catch (error) {
+                showError(error.message);
             }
-            // Press 'f' to go to features
-            else if (event.key === 'f' && !event.ctrlKey && !event.metaKey) {
-                loadDocSection('features/index.html');
-                event.preventDefault();
-            }
-            // Press 'u' to go to user guide
-            else if (event.key === 'u' && !event.ctrlKey && !event.metaKey) {
-                loadDocSection('user_guide/index.html');
-                event.preventDefault();
-            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.doc-nav-item').forEach(item => {
+                item.addEventListener('click', event => {
+                    event.preventDefault();
+                    loadDocSection(item.dataset.doc);
+                });
+            });
+
+            document.getElementById('documentationContent').addEventListener('click', event => {
+                const link = event.target.closest('a[data-doc]');
+                if (link) {
+                    event.preventDefault();
+                    loadDocSection(link.dataset.doc);
+                }
+            });
+
+            loadDocSection(currentDocPath);
         });
     </script>
 </body>
