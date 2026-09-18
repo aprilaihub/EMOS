@@ -22,22 +22,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install Sphinx dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install sphinx==8.2.3 sphinx_rtd_theme==3.0.2 myst-parser==4.0.1
-
-      - name: Build Sphinx documentation
-        run: |
-          cd docs
-          sphinx-build -b html . _build/html
-          cd ..
-
       - name: Prepare site for deployment
         run: |
           # Create deployment directory
@@ -59,8 +43,8 @@ jobs:
           # Copy backend files (for reference, though not used on GitHub Pages)
           cp -r backend/ _site/
           
-          # Copy built Sphinx documentation
-          cp -r docs/_build/html _site/docs
+          # Copy Markdown documentation used by documentation.html
+          cp -r documentation/ _site/documentation/
           
           # Copy additional files that might be needed
           cp test-backend.html _site/ 2>/dev/null || true

@@ -71,7 +71,7 @@ docker compose up -d --build
 python backend/app.py
 pytest tests/unit/test_backend_readiness_and_lambda.py tests/unit/test_node_editor_sse_parser.py -q
 pytest -m "network" -q
-sphinx-build -b html docs docs/_build/html
+python -m http.server 8000
 ```
 
 > **Note**: Backend default local port is `5001`.
@@ -104,9 +104,11 @@ EMOS/
 ├── backend/                     # Flask backend server
 │   └── app.py                   # Flask API routes
 │
-├── docs/                        # Documentation (Sphinx)
-│   ├── DOCUMENTATION.md         # Documentation framework guide
-│   └── conf.py, index.rst, ...
+├── documentation/               # Markdown documentation
+│   ├── index.md                 # Documentation introduction
+│   ├── information-units/       # IU pages
+│   ├── features/                # Feature pages
+│   └── tutorials/               # Contribution tutorials
 │
 ├── devtools/                    # Development tools
 │   └── source_data.json             # Component definitions
@@ -119,13 +121,13 @@ EMOS/
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Backend**: Python, Flask
 - **Architecture**: Modular component-based structure
-- **Documentation**: Sphinx with Read the Docs theme
+- **Documentation**: Markdown files shown in `documentation.html`
 - **UI/UX**: Responsive design with glassmorphism effects
 
 ## NEXT STEPS
 
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add features and information units
-- **Documentation**: Explore detailed docs in [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)
+- **Documentation**: Open [documentation.html](documentation.html) or read the [Markdown documentation](documentation/index.md)
 - **GitHub**: https://github.com/aprilaihub/EMOS
 
 ## LICENSE
