@@ -1,0 +1,161 @@
+# Database IU Tutorial
+
+This page provides a minimal, end-to-end demo Database Information Unit (IU) example you can add to EMOS.
+
+## Demo Example: Add a CIF Database IU
+
+Goal: add a small database Information Unit (IU) named **CIF Demo** that returns one CIF per requested batch item.
+
+### Step 1: Add one database entry in `devtools/source_data.json`
+
+In this step, you register a new IU in the source-of-truth metadata so EMOS can derive its id, folder/class naming, and UI listing metadata.
+
+Under `information_units -> databases`, add one new key:
+
+```json
+"CIF Demo": "Demo database that returns one hardcoded CIF per batch item for testing"
+```
+
+### Step 2: Generate scaffolding
+
+In this step, EMOS generates the backend IU template files and updates factory wiring for your new database IU.
+
+```bash
+python devtools/contribution_tool.py
+```
+
+This generates a new IU folder and updates the database factory.
+It also creates a property mapping template at:
+
+`Information_Units/property_mappings/sources/databases/cif_demo.json`
+
+The script is interactive. When prompted to apply detected changes, confirm with `yes` (or `y`).
+
+### Step 3: Implement the generated database class
+
+In this step, you replace the stub retrieval logic with a small implementation that returns CIF output in batch form.
+
+Open the generated file (expected path):
+
+`Information_Units/Databases/CifDemo/CifDemoDatabase.py`
+
+Replace `retrieve()` with:
+
+```python
+def retrieve(self, inputs: dict) -> dict:
+    queries = {k: v for k, v in inputs.items() if v is not None and v != ''}
+
+    batch_size = int(inputs.get("batch_size", 1) or 1)
+    if batch_size < 1:
+        batch_size = 1
+
+    cif_string = """data_demo_nacl
+_symmetry_space_group_name_H-M 'F m -3 m'
+_cell_length_a 5.6402
+_cell_length_b 5.6402
+_cell_length_c 5.6402
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_symmetry_Int_Tables_number 225
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Na1 Na 0.0 0.0 0.0
+Cl1 Cl 0.5 0.5 0.5
+"""
+
+    cif_strings = [cif_string] * batch_size
+
+    return {
+        "source": "cif_demo",
+        "queries": queries,
+        "cif_strings": cif_strings,
+    }
+```
+
+### Step 4: Update the generated property mapping template
+
+In this step, you define which properties the UI should expose for filtering and display for this IU.
+
+Open:
+
+`Information_Units/property_mappings/sources/databases/cif_demo.json`
+
+and update `properties` to include the fields you want exposed in the UI, for example:
+
+```json
+{
+  "description": "Source-specific mappings for cif_demo (databases).",
+  "version": "2.0",
+  "source_type": "databases",
+  "source": "cif_demo",
+  "properties": {
+    "chemical_formula_descriptive": {
+      "name": "chemical_formula_descriptive",
+      "retrievable": true
+    },
+    "elements": {
+      "name": "elements",
+      "retrievable": true
+    }
+  }
+}
+```
+
+### Step 5: Add IU feature button/panel wiring
+
+In this step, you add frontend wiring so the database IU appears as a clickable panel in the Information Units UI.
+
+```bash
+python devtools/iu_features/manage_iu_features.py
+```
+
+This script is interactive. Choose:
+- IU type: `database`
+- Action: `add`
+- IU id: `cif_demo`
+
+### Step 6: Run and verify
+
+In this step, you run EMOS end-to-end and verify that one batch request returns multiple CIF outputs/files.
+
+1. Start backend: `python backend/app.py`
+2. Open the UI by opening `index.html` in your browser.
+3. In the Information Units section, open and run the new **CIF Demo Database** IU.
+4. Set `batch_size` to `10` and run.
+5. Confirm the result includes 10 CIF strings (the same demo CIF repeated), and exports as 10 CIF files.
+
+> **Optional Docker execution:** Developers are welcome to run the IU's `retrieve()` function in a Docker container instead of directly in the host environment. This can help avoid library or dependency conflicts, and it can keep model execution and its dependencies isolated for privacy-sensitive workflows. Make sure the container exposes the inputs and outputs required by the IU and follows the same batch response contract described above.
+
+## Remove the Database IU (cleanup)
+
+When you are done testing, remove the database IU in this order:
+
+1. Remove the IU feature implementation:
+
+   ```bash
+   python devtools/iu_features/manage_iu_features.py
+   ```
+
+   Choose:
+   - IU type: `database`
+   - Action: `remove`
+  - IU id: `cif_demo`
+
+   This removes the IU feature JS/wiring and also cleans the source mapping plus exclusive entries in `common_properties.json`.
+
+2. Remove the IU entry for **CIF Demo** from `devtools/source_data.json` under `information_units -> databases`.
+
+3. Run contribution tool to remove the IU backend scaffold/factory wiring:
+
+   ```bash
+   python devtools/contribution_tool.py
+   ```
+
+   Confirm the detected removal changes when prompted.
+
+This demo database IU is intentionally simple and safe; once it works, use the same flow for real APIs.
