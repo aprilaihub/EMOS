@@ -6,4 +6,11 @@
 
 Provides pretrained GBFS workflow predictions for material properties.
 
-Read the [Python implementation](../../../Information_Units/Predictors/Gbfs/GbfsPredictor.py) for the current inputs, outputs, and behavior.
+## Inputs
+
+- `inputs: list[str]` containing CIF strings
+
+## Outputs
+
+- Per-structure results include `index`, `cif_input`, `status`, `warnings`, and `error`
+- Properties include `bandgap`, `dielectric`, `e_form`, `is_metal`, `mob_n`, and `mob_p`

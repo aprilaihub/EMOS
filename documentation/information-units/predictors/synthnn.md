@@ -6,4 +6,12 @@
 
 Predicts material synthesizability from crystal structure inputs.
 
-Read the [Python implementation](../../../Information_Units/Predictors/Synthnn/SynthnnPredictor.py) for the current inputs, outputs, and behavior.
+## Inputs
+
+- `input_data: list[str]` containing CIF strings
+
+## Outputs
+
+- `source: "synthnn"`
+- `results: list[dict]`
+- Each result includes `index`, `cif_input`, `status`, `warnings`, `error`, `synthesizable`, and `synthesizability_score`

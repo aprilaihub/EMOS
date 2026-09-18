@@ -6,4 +6,16 @@
 
 Predicts energy, force, stress, and relaxation results for crystal structures.
 
-Read the [Python implementation](../../../Information_Units/Predictors/Chgnet/ChgnetPredictor.py) for the current inputs, outputs, and behavior.
+## Inputs
+
+- `input_data: list[str]` containing CIF strings
+- Optional energy, force, stress, and relaxation flags
+- `fmax: float` (default: `0.1`)
+- `max_steps: int` (default: `500`)
+
+## Outputs
+
+- `source: "chgnet"`
+- `results: list[dict]`
+- Each result includes `index`, `cif_input`, `status`, `properties`, `warnings`, and `error`
+- Properties may include energy, forces, stress, and relaxed structure data

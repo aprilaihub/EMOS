@@ -6,4 +6,13 @@
 
 Computes pointwise distance distribution descriptors for crystal structures.
 
-Read the [Python implementation](../../../Information_Units/Predictors/Pdd/PddPredictor.py) for the current inputs, outputs, and behavior.
+## Inputs
+
+- `input_data: list[str]` containing CIF strings
+- `k: int` (default: `100`)
+
+## Outputs
+
+- `source: "pdd"`
+- `results: list[dict]`
+- Each result includes `index`, `cif_input`, `status`, `warnings`, `error`, `pdd_vector`, and `pdd_matrix`
