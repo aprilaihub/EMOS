@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="39.578693mm"
+   height="40.632519mm"
+   viewBox="0 0 39.578693 40.632519"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="download_icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="2.0841365"
+     inkscape:cx="41.743906"
+     inkscape:cy="95.24328"
+     inkscape:window-width="1920"
+     inkscape:window-height="1176"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid846"
+       originx="-46.089504"
+       originy="-82.793445" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-46.089504,-82.793448)">
+    <g
+       id="g3141"
+       style="stroke:#585858;stroke-opacity:1">
+      <path
+         style="fill:none;fill-opacity:0.928895;stroke:#585858;stroke-width:5.57569;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.4;stroke-dasharray:none;stroke-opacity:1;stop-color:#000000"
+         d="m 48.877349,110.38723 v 10.25089 h 34.003003 v -10.21277 0 0"
+         id="path790" />
+      <path
+         style="fill:none;fill-opacity:0.928895;stroke:#585858;stroke-width:6.657;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.4;stroke-dasharray:none;stroke-opacity:1;stop-color:#000000"
+         d="m 65.856765,86.121948 v 23.897102 0"
+         id="path848" />
+      <path
+         style="fill:none;fill-opacity:0.928895;stroke:#585858;stroke-width:6.657;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.4;stroke-dasharray:none;stroke-opacity:1;stop-color:#000000"
+         d="m 53.908799,102.18485 11.912039,8.23634 11.988442,-8.27091 v 0"
+         id="path1576" />
+    </g>
+  </g>
+</svg>

@@ -675,7 +675,11 @@
         downloadBtn.className = 'ne-node-download-btn';
         downloadBtn.title = 'Download node result as JSON';
         downloadBtn.setAttribute('aria-label', 'Download node result as JSON');
-        downloadBtn.textContent = 'Download';
+        const downloadIcon = document.createElement('img');
+        downloadIcon.src = 'images/download_icon.svg';
+        downloadIcon.alt = '';
+        downloadIcon.setAttribute('aria-hidden', 'true');
+        downloadBtn.appendChild(downloadIcon);
         downloadBtn.disabled = true;
         downloadBtn.addEventListener('mousedown', e => e.stopPropagation());
         downloadBtn.addEventListener('click', e => {

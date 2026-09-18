@@ -983,25 +983,31 @@ body {
 /* ── Node Result Downloads ───────────────────────────────────────── */
 .ne-node-download-btn {
     margin-left: auto;
-    padding: 3px 7px;
-    border: 1px solid #3b82f6;
-    border-radius: 3px;
-    background: rgba(30, 64, 175, 0.2);
-    color: #bfdbfe;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    border: 0;
+    background: transparent;
     cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    line-height: 1.2;
+    display: grid;
+    place-items: center;
 }
 
-.ne-node-download-btn:hover { background: rgba(30, 64, 175, 0.45); }
+.ne-node-download-btn:hover { background: transparent; }
+
+.ne-node-download-btn img {
+    display: block;
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
+}
 
 .ne-node-download-btn:disabled {
-    border-color: #3f4652;
     background: transparent;
-    color: #6b7280;
     cursor: not-allowed;
 }
+
+.ne-node-download-btn:disabled img { opacity: 0.35; }
 
 /* ── Scrollbar styling ────────────────────────────────────────────── */
 .ne-sidebar::-webkit-scrollbar,
