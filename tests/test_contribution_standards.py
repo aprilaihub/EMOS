@@ -3,7 +3,7 @@ Contribution standards compliance tests.
 
 These are fast, offline, structural checks that every Information Unit (IU)
 and Feature must satisfy per CONTRIBUTING.md and
-documentation/tutorials/iu-data-contracts.md. They use static source
+docs/tutorials/iu-data-contracts.md. They use static source
 inspection (``ast``) rather than importing modules, so they never require
 heavy/optional runtime dependencies (pymatgen, torch, etc.) to be installed
 and are safe to run on every contribution/PR.

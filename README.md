@@ -104,7 +104,7 @@ EMOS/
 ├── backend/                     # Flask backend server
 │   └── app.py                   # Flask API routes
 │
-├── documentation/               # Markdown documentation
+├── docs/                        # Markdown documentation
 │   ├── index.md                 # Documentation introduction
 │   ├── information-units/       # IU pages
 │   ├── features/                # Feature pages
@@ -127,7 +127,7 @@ EMOS/
 ## NEXT STEPS
 
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add features and information units
-- **Documentation**: Open [documentation.html](documentation.html) or read the [Markdown documentation](documentation/index.md)
+- **Documentation**: Open [documentation.html](documentation.html) or read the [Markdown documentation](docs/index.md)
 - **GitHub**: https://github.com/aprilaihub/EMOS
 
 ## LICENSE

@@ -25,7 +25,7 @@ for result in output["results"]:
 
 ## Output Format
 
-Follows the standard predictor contract (see [documentation/tutorials/iu-data-contracts.md](../../../documentation/tutorials/iu-data-contracts.md)):
+Follows the standard predictor contract (see [docs/tutorials/iu-data-contracts.md](../../../docs/tutorials/iu-data-contracts.md)):
 
 ```python
 {

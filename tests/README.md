@@ -12,7 +12,7 @@ predictor result fields, and checks representative invalid payloads are rejected
 Run it separately with:
 
 ```bash
-pytest -q testing/test_iu_data_contracts.py
+pytest -q tests/test_iu_data_contracts.py
 ```
 
 ## Contribution standards test
@@ -35,5 +35,5 @@ Features must subclass `BaseFeature` and implement `info`, `extract_inputs`, `pr
 Run it separately with:
 
 ```bash
-pytest -q testing/test_contribution_standards.py
+pytest -q tests/test_contribution_standards.py
 ```

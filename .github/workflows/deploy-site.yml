@@ -44,7 +44,7 @@ jobs:
           cp -r backend/ _site/
           
           # Copy Markdown documentation used by documentation.html
-          cp -r documentation/ _site/documentation/
+          cp -r docs/ _site/docs/
           
           # Copy additional files that might be needed
           cp test-backend.html _site/ 2>/dev/null || true
