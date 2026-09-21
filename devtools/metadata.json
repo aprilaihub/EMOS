@@ -212,98 +212,72 @@
         "js_file_name": "DatabaseExtractor.js",
         "inputs": [
           {
-            "name": "databaseSource",
-            "display_name": "Database Source",
-            "type": "select",
+            "name": "active_databases",
+            "display_name": "Databases",
+            "type": "iu_checkbox_group",
+            "iu_type": "database",
             "required": true,
-            "options": [
-              {
-                "value": "all",
-                "text": "All Databases"
-              },
-              {
-                "value": "materialsproject",
-                "text": "Materials Project"
-              },
-              {
-                "value": "oqmd",
-                "text": "OQMD"
-              },
-              {
-                "value": "aflow",
-                "text": "AFLOW"
-              },
-              {
-                "value": "crystallography",
-                "text": "Crystallography DB"
-              }
-            ],
-            "default": "all",
-            "description": "Database source for extraction"
+            "description": "Databases queried by the extractor"
           },
           {
-            "name": "extractionType",
-            "display_name": "Extraction Type",
-            "type": "select",
-            "required": true,
-            "options": [
-              {
-                "value": "properties",
-                "text": "Material Properties"
-              },
-              {
-                "value": "structures",
-                "text": "Crystal Structures"
-              },
-              {
-                "value": "thermodynamics",
-                "text": "Thermodynamic Data"
-              },
-              {
-                "value": "experimental",
-                "text": "Experimental Data"
-              }
-            ],
-            "default": "properties",
-            "description": "Type of data to extract"
-          },
-          {
-            "name": "filterCriteria",
-            "display_name": "Filter Criteria",
-            "type": "text",
-            "required": false,
-            "placeholder": "e.g., space_group=225, bandgap>1.0",
-            "description": "Filter criteria for extraction"
-          },
-          {
-            "name": "maxEntries",
-            "display_name": "Maximum Entries",
+            "name": "batch_size",
+            "display_name": "Max Batch Size / Database",
             "type": "number",
             "required": false,
             "min": 1,
             "max": 10000,
             "step": 1,
-            "default": 1000,
-            "description": "Maximum number of entries to extract"
+            "default": 100,
+            "description": "Maximum CIF entries requested from each selected database"
           },
           {
-            "name": "configFile",
-            "display_name": "Configuration File",
-            "type": "file",
+            "name": "retrieval_mode",
+            "display_name": "Retrieval Mode",
+            "type": "select",
             "required": false,
-            "accept": ".json,.yaml",
-            "description": "Optional configuration file"
+            "options": [
+              {
+                "value": "lenient",
+                "text": "Lenient"
+              },
+              {
+                "value": "strict",
+                "text": "Strict"
+              }
+            ],
+            "default": "lenient",
+            "description": "Whether a database is skipped when it cannot query a selected property"
           },
           {
-            "name": "includeMetadata",
-            "display_name": "Include Metadata",
-            "type": "checkbox",
+            "name": "target_compositions",
+            "display_name": "Target Compositions",
+            "type": "text",
             "required": false,
-            "default": true,
-            "description": "Include metadata in extraction"
+            "placeholder": "e.g., Fe, Al2O3",
+            "description": "Optional composition query passed to selected databases"
+          },
+          {
+            "name": "query_values",
+            "display_name": "Property Filters (JSON)",
+            "type": "json",
+            "required": false,
+            "placeholder": "{\"bandgap\": [1, 3]}",
+            "description": "Optional JSON object of property filters; its keys select properties for extraction"
           }
         ],
         "outputs": [
+          {
+            "name": "status",
+            "display_name": "Status",
+            "type": "text",
+            "description": "Extraction completion status"
+          },
+          {
+            "name": "message",
+            "display_name": "Message",
+            "type": "text",
+            "description": "Extraction summary message"
+          },
           {
             "name": "recordsExtracted",
             "display_name": "Records Extracted",
@@ -331,8 +305,26 @@
           {
             "name": "downloadPackage",
             "display_name": "Download Package",
-            "type": "link",
-            "description": "Download extracted data package"
+            "type": "text",
+            "description": "Availability of the extraction JSON payload"
+          },
+          {
+            "name": "databaseCount",
+            "display_name": "Databases Queried",
+            "type": "number",
+            "description": "Number of databases included in the result"
+          },
+          {
+            "name": "skippedDatabaseCount",
+            "display_name": "Skipped Databases",
+            "type": "number",
+            "description": "Number of databases skipped during extraction"
+          },
+          {
+            "name": "extraction",
+            "display_name": "Extraction Details",
+            "type": "json",
+            "description": "Complete extraction result grouped by database"
           }
         ]
       },
@@ -347,21 +339,103 @@
         "js_file_name": "StabilityConsensusAnalysis.js",
         "inputs": [
           {
-            "name": "cifFiles",
+            "name": "cif_files",
             "display_name": "CIF Files",
             "type": "file",
             "required": true,
             "accept": ".cif",
             "multiple": true,
-            "description": "Browse and upload one or more CIF files for stability consensus analysis"
+            "description": "One or more CIF structures to analyse"
+          },
+          {
+            "name": "active_databases",
+            "display_name": "Databases",
+            "type": "iu_checkbox_group",
+            "required": false,
+            "options": [
+              {
+                "value": "materialsproject",
+                "text": "Materials Project"
+              },
+              {
+                "value": "alexandria",
+                "text": "Alexandria"
+              }
+            ],
+            "description": "Optional database sources used for stability evidence"
+          },
+          {
+            "name": "active_predictors",
+            "display_name": "Predictors",
+            "type": "iu_checkbox_group",
+            "required": false,
+            "options": [
+              {
+                "value": "mattersim",
+                "text": "MatterSim"
+              },
+              {
+                "value": "chgnet",
+                "text": "CHGNet"
+              }
+            ],
+            "description": "Optional predictors used for stability evidence"
           }
         ],
         "outputs": [
           {
+            "name": "status",
+            "display_name": "Status",
+            "type": "text",
+            "description": "Analysis status when cancelled or failed"
+          },
+          {
+            "name": "message",
+            "display_name": "Message",
+            "type": "text",
+            "description": "Analysis message when cancelled"
+          },
+          {
+            "name": "error",
+            "display_name": "Error",
+            "type": "text",
+            "description": "Error message when analysis cannot complete"
+          },
+          {
+            "name": "composition",
+            "display_name": "Composition",
+            "type": "text",
+            "description": "Composition of the first successful CIF result"
+          },
+          {
+            "name": "sources",
+            "display_name": "Sources",
+            "type": "json",
+            "description": "Source-level evidence for the first successful CIF result"
+          },
+          {
+            "name": "summary",
+            "display_name": "Summary",
+            "type": "json",
+            "description": "Consensus summary for the first successful CIF result"
+          },
+          {
+            "name": "results_per_cif",
+            "display_name": "Results Per CIF",
+            "type": "json",
+            "description": "Stability results for every supplied CIF"
+          },
+          {
+            "name": "batch_summary",
+            "display_name": "Batch Summary",
+            "type": "json",
+            "description": "Aggregate stability counts across the CIF batch"
+          },
+          {
             "name": "downloadResultsJson",
             "display_name": "Download Results (JSON)",
-            "type": "link",
-            "description": "Download JSON file containing stability consensus analysis results"
+            "type": "json",
+            "description": "Serialized detailed stability report"
           }
         ]
       },
@@ -376,13 +450,13 @@
         "js_file_name": "CifSimilarity.js",
         "inputs": [
           {
-            "name": "cifFiles",
+            "name": "cif_strings",
             "display_name": "CIF Files",
             "type": "file",
             "required": true,
             "accept": ".cif",
             "multiple": true,
-            "description": "Upload two or more CIF files for similarity comparison"
+            "description": "Two or more CIF structures for similarity comparison"
           },
           {
             "name": "distanceMetric",
@@ -416,10 +490,46 @@
         ],
         "outputs": [
           {
-            "name": "distanceMatrix",
+            "name": "status",
+            "display_name": "Status",
+            "type": "text",
+            "description": "Similarity completion status"
+          },
+          {
+            "name": "message",
+            "display_name": "Message",
+            "type": "text",
+            "description": "Similarity summary message"
+          },
+          {
+            "name": "labels",
+            "display_name": "Labels",
+            "type": "json",
+            "description": "Labels for valid CIF structures"
+          },
+          {
+            "name": "distance_matrix",
             "display_name": "Distance Matrix",
             "type": "table",
             "description": "Pairwise distance matrix calculated using the selected metric"
+          },
+          {
+            "name": "k",
+            "display_name": "Neighbourhood Size",
+            "type": "number",
+            "description": "Descriptor neighbourhood size used in the comparison"
+          },
+          {
+            "name": "distance_metric",
+            "display_name": "Distance Metric",
+            "type": "text",
+            "description": "Metric used in the completed comparison"
+          },
+          {
+            "name": "failed",
+            "display_name": "Failed Structures",
+            "type": "json",
+            "description": "CIF structures that could not be compared"
           }
         ]
       }
@@ -429,110 +539,83 @@
         "id": 4,
         "name": "MOSFET evaluator",
         "display_name": "MOSFET evaluator",
-        "description": "Evaluate MOSFET performance from uploaded CIF files and simulation parameters",
+        "description": "Evaluate MOSFET transport from simulation parameters",
         "folder_path": "Features/Electronics_Application/MosfetEvaluator",
         "class_name": "MosfetEvaluatorFeature",
         "file_name": "MosfetEvaluatorFeature.py",
         "js_file_name": "MosfetEvaluator.js",
         "inputs": [
           {
-            "name": "cifFiles",
-            "display_name": "CIF Files",
-            "type": "file",
-            "required": true,
-            "accept": ".cif",
-            "multiple": true,
-            "description": "Browse and upload one or more CIF files for MOSFET evaluation"
-          },
-          {
-            "name": "deviceType",
-            "display_name": "Device Type",
-            "type": "select",
-            "required": true,
-            "options": [
-              {
-                "value": "nmos",
-                "text": "NMOS"
-              },
-              {
-                "value": "pmos",
-                "text": "PMOS"
-              }
-            ],
-            "default": "nmos",
-            "description": "MOSFET device polarity"
-          },
-          {
             "name": "channelLengthNm",
             "display_name": "Channel Length (nm)",
             "type": "number",
-            "required": true,
+            "required": false,
             "min": 1,
             "max": 1000,
             "step": 0.1,
-            "default": 45,
-            "description": "Channel length for simulation"
+            "default": 14,
+            "description": "Channel length"
           },
           {
-            "name": "channelWidthNm",
-            "display_name": "Channel Width (nm)",
+            "name": "sourceDrainLengthNm",
+            "display_name": "Source/Drain Length (nm)",
             "type": "number",
-            "required": true,
-            "min": 1,
-            "max": 100000,
+            "required": false,
+            "min": 0.1,
+            "max": 1000,
             "step": 0.1,
-            "default": 1000,
-            "description": "Channel width for simulation"
+            "default": 4,
+            "description": "Length of each source and drain region"
           },
           {
             "name": "oxideThicknessNm",
             "display_name": "Oxide Thickness (nm)",
             "type": "number",
-            "required": true,
+            "required": false,
             "min": 0.1,
             "max": 100,
             "step": 0.1,
-            "default": 1.5,
+            "default": 1,
             "description": "Gate oxide thickness"
           },
           {
-            "name": "supplyVoltageVdd",
-            "display_name": "Supply Voltage VDD (V)",
-            "type": "number",
-            "required": true,
-            "min": 0.1,
-            "max": 5,
-            "step": 0.01,
-            "default": 1.0,
-            "description": "Supply voltage"
-          },
-          {
-            "name": "gateWorkFunctionEv",
-            "display_name": "Gate Work Function (eV)",
+            "name": "channelThicknessNm",
+            "display_name": "Channel Thickness (nm)",
             "type": "number",
             "required": false,
-            "min": 3,
-            "max": 6,
-            "step": 0.01,
-            "default": 4.5,
-            "description": "Gate work function"
+            "min": 0.1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 4,
+            "description": "Channel thickness"
           },
           {
-            "name": "sourceDrainDopingCm3",
-            "display_name": "Source/Drain Doping (cm^-3)",
+            "name": "dxM",
+            "display_name": "Mesh dx (m)",
             "type": "number",
-            "required": true,
-            "min": 1000000000000000,
-            "max": 1e+22,
-            "step": 1000000000000000,
-            "default": 1e+20,
-            "description": "Source and drain doping concentration"
+            "required": false,
+            "min": 1e-12,
+            "max": 1e-06,
+            "step": 1e-12,
+            "default": 5e-10,
+            "description": "Horizontal mesh spacing"
+          },
+          {
+            "name": "dyM",
+            "display_name": "Mesh dy (m)",
+            "type": "number",
+            "required": false,
+            "min": 1e-12,
+            "max": 1e-06,
+            "step": 1e-12,
+            "default": 5e-10,
+            "description": "Vertical mesh spacing"
           },
           {
             "name": "temperatureK",
             "display_name": "Temperature (K)",
             "type": "number",
-            "required": true,
+            "required": false,
             "min": 77,
             "max": 1000,
             "step": 1,
@@ -540,88 +623,423 @@
             "description": "Simulation temperature"
           },
           {
+            "name": "gateWorkFunctionEv",
+            "display_name": "Gate Work Function (eV)",
+            "type": "number",
+            "required": false,
+            "min": 2,
+            "max": 8,
+            "step": 0.01,
+            "default": 3.65,
+            "description": "Gate work function"
+          },
+          {
+            "name": "sdWorkFunctionEv",
+            "display_name": "Source/Drain Work Function (eV)",
+            "type": "number",
+            "required": false,
+            "min": -10,
+            "max": 10,
+            "step": 0.01,
+            "default": 0,
+            "description": "Source and drain work function"
+          },
+          {
+            "name": "channelDopingCm3",
+            "display_name": "Channel Doping (cm^-3)",
+            "type": "number",
+            "required": false,
+            "min": -1e+22,
+            "max": 1e+22,
+            "step": 100000000000000.0,
+            "default": -1000000000000000.0,
+            "description": "Channel doping concentration"
+          },
+          {
+            "name": "sourceDrainDopingCm3",
+            "display_name": "Source/Drain Doping (cm^-3)",
+            "type": "number",
+            "required": false,
+            "min": 1000000000000000.0,
+            "max": 1e+22,
+            "step": 100000000000000.0,
+            "default": 1e+20,
+            "description": "Source and drain doping concentration"
+          },
+          {
             "name": "drainVoltageVd",
             "display_name": "Drain Voltage VD (V)",
             "type": "number",
-            "required": true,
+            "required": false,
             "min": 0,
             "max": 5,
             "step": 0.01,
-            "default": 1.0,
-            "description": "Drain voltage"
+            "default": 0.7,
+            "description": "Legacy drain voltage value"
           },
           {
             "name": "gateVoltageSweepStartV",
             "display_name": "Gate Sweep Start (V)",
             "type": "number",
-            "required": true,
-            "min": -5,
-            "max": 5,
+            "required": false,
+            "min": -10,
+            "max": 10,
             "step": 0.01,
-            "default": 0.0,
-            "description": "Start voltage for gate sweep"
+            "default": 0,
+            "description": "Starting gate voltage"
           },
           {
             "name": "gateVoltageSweepStopV",
             "display_name": "Gate Sweep Stop (V)",
             "type": "number",
-            "required": true,
-            "min": -5,
-            "max": 5,
+            "required": false,
+            "min": -10,
+            "max": 10,
             "step": 0.01,
-            "default": 1.5,
-            "description": "Stop voltage for gate sweep"
+            "default": 0.7,
+            "description": "Ending gate voltage"
           },
           {
-            "name": "gateVoltageSweepStepV",
-            "display_name": "Gate Sweep Step (V)",
+            "name": "numberOfGatePoints",
+            "display_name": "Gate Sweep Points",
             "type": "number",
-            "required": true,
-            "min": 0.001,
-            "max": 1,
-            "step": 0.001,
-            "default": 0.05,
-            "description": "Step size for gate sweep"
+            "required": false,
+            "min": 2,
+            "max": 500,
+            "step": 1,
+            "default": 14,
+            "description": "Number of gate-voltage samples"
           },
           {
-            "name": "validateBandGap",
-            "display_name": "Validate Band Gap from CIF",
-            "type": "checkbox",
+            "name": "drainVoltageSweepStartV",
+            "display_name": "Drain Sweep Start (V)",
+            "type": "number",
             "required": false,
-            "default": true,
-            "description": "Validate band gap using uploaded CIF files"
+            "min": -10,
+            "max": 10,
+            "step": 0.01,
+            "default": 0,
+            "description": "Starting drain voltage"
           },
           {
-            "name": "validateElectronMobility",
-            "display_name": "Validate Electron Mobility from CIF",
-            "type": "checkbox",
+            "name": "drainVoltageSweepStopV",
+            "display_name": "Drain Sweep Stop (V)",
+            "type": "number",
             "required": false,
-            "default": true,
-            "description": "Validate electron mobility using uploaded CIF files"
+            "min": -10,
+            "max": 10,
+            "step": 0.01,
+            "default": 0.7,
+            "description": "Ending drain voltage"
           },
           {
-            "name": "validateHoleMobility",
-            "display_name": "Validate Hole Mobility from CIF",
-            "type": "checkbox",
+            "name": "numberOfDrainPoints",
+            "display_name": "Drain Sweep Points",
+            "type": "number",
             "required": false,
-            "default": true,
-            "description": "Validate hole mobility using uploaded CIF files"
+            "min": 2,
+            "max": 500,
+            "step": 1,
+            "default": 13,
+            "description": "Number of drain-voltage samples"
           },
           {
-            "name": "validateDielectricConstant",
-            "display_name": "Validate Dielectric Constant from CIF",
-            "type": "checkbox",
+            "name": "channelNc",
+            "display_name": "Channel Nc",
+            "type": "number",
             "required": false,
-            "default": true,
-            "description": "Validate dielectric constant using uploaded CIF files"
+            "min": 0,
+            "max": 1e+30,
+            "step": 1e+20,
+            "default": 2.8e+25,
+            "description": "Channel conduction-band effective density of states"
+          },
+          {
+            "name": "channelNv",
+            "display_name": "Channel Nv",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 1e+30,
+            "step": 1e+20,
+            "default": 1.04e+25,
+            "description": "Channel valence-band effective density of states"
+          },
+          {
+            "name": "channelEpsRel",
+            "display_name": "Channel Relative Permittivity",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 11.9,
+            "description": "Channel relative permittivity"
+          },
+          {
+            "name": "channelUn",
+            "display_name": "Channel Electron Mobility",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 10,
+            "step": 0.0001,
+            "default": 0.15,
+            "description": "Channel electron mobility"
+          },
+          {
+            "name": "channelUp",
+            "display_name": "Channel Hole Mobility",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 10,
+            "step": 0.0001,
+            "default": 0.0475,
+            "description": "Channel hole mobility"
+          },
+          {
+            "name": "channelXiEv",
+            "display_name": "Channel Electron Affinity (eV)",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 10,
+            "step": 0.01,
+            "default": 4.05,
+            "description": "Channel electron affinity"
+          },
+          {
+            "name": "channelEgEv",
+            "display_name": "Channel Band Gap (eV)",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 20,
+            "step": 0.01,
+            "default": 1.12,
+            "description": "Channel band gap"
+          },
+          {
+            "name": "channelVsatN",
+            "display_name": "Channel Electron Saturation Velocity",
+            "type": "number",
+            "required": false,
+            "min": 1000.0,
+            "max": 100000000.0,
+            "step": 1000.0,
+            "default": 200000.0,
+            "description": "Channel electron saturation velocity"
+          },
+          {
+            "name": "channelVsatP",
+            "display_name": "Channel Hole Saturation Velocity",
+            "type": "number",
+            "required": false,
+            "min": 1000.0,
+            "max": 100000000.0,
+            "step": 1000.0,
+            "default": 200000.0,
+            "description": "Channel hole saturation velocity"
+          },
+          {
+            "name": "channelPowN",
+            "display_name": "Channel Electron Saturation Exponent",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "default": 2,
+            "description": "Channel electron saturation exponent"
+          },
+          {
+            "name": "channelPowP",
+            "display_name": "Channel Hole Saturation Exponent",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "default": 1,
+            "description": "Channel hole saturation exponent"
+          },
+          {
+            "name": "insulatorNc",
+            "display_name": "Insulator Nc",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 1e+30,
+            "step": 1,
+            "default": 1,
+            "description": "Insulator conduction-band effective density of states"
+          },
+          {
+            "name": "insulatorNv",
+            "display_name": "Insulator Nv",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 1e+30,
+            "step": 1,
+            "default": 1,
+            "description": "Insulator valence-band effective density of states"
+          },
+          {
+            "name": "insulatorEpsRel",
+            "display_name": "Insulator Relative Permittivity",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 1000,
+            "step": 0.1,
+            "default": 3.9,
+            "description": "Insulator relative permittivity"
+          },
+          {
+            "name": "insulatorUn",
+            "display_name": "Insulator Electron Mobility",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 10,
+            "step": 0.0001,
+            "default": 0.001,
+            "description": "Insulator electron mobility"
+          },
+          {
+            "name": "insulatorUp",
+            "display_name": "Insulator Hole Mobility",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 10,
+            "step": 0.0001,
+            "default": 0.001,
+            "description": "Insulator hole mobility"
+          },
+          {
+            "name": "insulatorXiEv",
+            "display_name": "Insulator Electron Affinity (eV)",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 20,
+            "step": 0.01,
+            "default": 0.9,
+            "description": "Insulator electron affinity"
+          },
+          {
+            "name": "insulatorEgEv",
+            "display_name": "Insulator Band Gap (eV)",
+            "type": "number",
+            "required": false,
+            "min": 0,
+            "max": 30,
+            "step": 0.01,
+            "default": 9,
+            "description": "Insulator band gap"
+          },
+          {
+            "name": "insulatorVsatN",
+            "display_name": "Insulator Electron Saturation Velocity",
+            "type": "number",
+            "required": false,
+            "min": 1000.0,
+            "max": 100000000.0,
+            "step": 1000.0,
+            "default": 200000.0,
+            "description": "Insulator electron saturation velocity"
+          },
+          {
+            "name": "insulatorVsatP",
+            "display_name": "Insulator Hole Saturation Velocity",
+            "type": "number",
+            "required": false,
+            "min": 1000.0,
+            "max": 100000000.0,
+            "step": 1000.0,
+            "default": 200000.0,
+            "description": "Insulator hole saturation velocity"
+          },
+          {
+            "name": "insulatorPowN",
+            "display_name": "Insulator Electron Saturation Exponent",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "default": 2,
+            "description": "Insulator electron saturation exponent"
+          },
+          {
+            "name": "insulatorPowP",
+            "display_name": "Insulator Hole Saturation Exponent",
+            "type": "number",
+            "required": false,
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "default": 1,
+            "description": "Insulator hole saturation exponent"
           }
         ],
         "outputs": [
           {
-            "name": "downloadResultsJson",
-            "display_name": "Download Results (JSON)",
-            "type": "link",
-            "description": "Download JSON file containing MOSFET simulation performance for each uploaded CIF file"
+            "name": "status",
+            "display_name": "Status",
+            "type": "text",
+            "description": "MOSFET solver completion status"
+          },
+          {
+            "name": "error",
+            "display_name": "Error",
+            "type": "text",
+            "description": "Error message when the solver does not produce results"
+          },
+          {
+            "name": "key_metrics",
+            "display_name": "Key Metrics",
+            "type": "json",
+            "description": "On/off current and threshold-voltage metrics"
+          },
+          {
+            "name": "J_uA_per_um",
+            "display_name": "Current Density",
+            "type": "table",
+            "description": "Drain current density over the bias sweep"
+          },
+          {
+            "name": "Vgs_V",
+            "display_name": "Gate Voltages",
+            "type": "json",
+            "description": "Gate-voltage sweep values"
+          },
+          {
+            "name": "Vds_V",
+            "display_name": "Drain Voltages",
+            "type": "json",
+            "description": "Drain-voltage sweep values"
+          },
+          {
+            "name": "Q_C_per_m",
+            "display_name": "Charge Density",
+            "type": "table",
+            "description": "Charge density over the bias sweep"
+          },
+          {
+            "name": "json_filename",
+            "display_name": "Results Filename",
+            "type": "text",
+            "description": "Generated JSON result filename"
+          },
+          {
+            "name": "json_path",
+            "display_name": "Results Path",
+            "type": "text",
+            "description": "Backend path for the generated JSON result"
           }
         ]
       }

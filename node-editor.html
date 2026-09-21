@@ -106,6 +106,13 @@
                 <h3>🔮 Predictors</h3>
                 <div class="ne-sidebar-items" id="sidebarPredictors"></div>
             </div>
+            <div class="ne-sidebar-section" data-category="features">
+                <h3>◆ Features</h3>
+                <h4 class="ne-sidebar-subheading">Materials Exploration</h4>
+                <div class="ne-sidebar-items" id="sidebarMaterialsFeatures"></div>
+                <h4 class="ne-sidebar-subheading">Electronics Application</h4>
+                <div class="ne-sidebar-items" id="sidebarElectronicsFeatures"></div>
+            </div>
             <div class="ne-sidebar-section" data-category="viewers">
                 <h3>👁️ Viewers</h3>
                 <div class="ne-sidebar-items">
@@ -130,6 +137,21 @@
                         Filter
                     </div>
                     <div class="ne-sidebar-item" draggable="true"
+                        data-node-type="utility" data-node-key="splitter"
+                        title="Split the top-level fields of a result into separate outputs">
+                        Splitter
+                    </div>
+                    <div class="ne-sidebar-item" draggable="true"
+                        data-node-type="utility" data-node-key="tree_splitter"
+                        title="Select nested result fields and create one output for each selection">
+                        Tree Splitter
+                    </div>
+                    <div class="ne-sidebar-item" draggable="true"
+                        data-node-type="utility" data-node-key="merger"
+                        title="Append two lists or merge matching list items into paired dictionaries">
+                        Merger
+                    </div>
+                    <div class="ne-sidebar-item" draggable="true"
                          data-node-type="utility" data-node-key="lambda"
                          title="Custom Python transform — runs on the server">
                         Lambda
@@ -148,12 +170,20 @@
             <!-- Bottom Toolbar -->
             <div class="ne-toolbar" id="neToolbar">
                 <button class="ne-toolbar-btn ne-process-btn" id="neProcessBtn" title="Execute pipeline">
-                    ▶ Process
+                    Process
                 </button>
-                <button class="ne-toolbar-btn ne-cancel-btn" id="neCancelBtn" title="Cancel execution" style="display:none;">
-                    ✕ Cancel
+                <button class="ne-toolbar-btn ne-step-btn" id="neStepBtn" title="Execute the next eligible node">
+                    Step Increment
                 </button>
+                <button class="ne-toolbar-btn ne-clear-btn" id="neClearBtn" title="Clear node outputs and execution history" disabled>Clear</button>
                 <span class="ne-toolbar-status" id="neStatusText">Ready</span>
+                <div class="ne-toolbar-actions">
+                    <button class="ne-toolbar-btn ne-save-graph-btn" id="neSaveGraphBtn" title="Save graph configuration and layout" disabled>Save Graph</button>
+                    <button class="ne-toolbar-btn ne-load-graph-btn" id="neLoadGraphBtn" title="Load graph configuration and layout">Load Graph</button>
+                    <input id="neLoadGraphInput" type="file" accept=".emosgraph,application/json,.json" hidden>
+                    <button class="ne-toolbar-btn ne-clear-canvas-btn" id="neClearCanvasBtn" title="Clear all nodes and connections" disabled>Clear Canvas</button>
+                    <button class="ne-toolbar-btn ne-download-all-btn" id="neDownloadAllBtn" title="Download all retained node results" disabled>Download All Results</button>
+                </div>
                 <span class="ne-toolbar-zoom" id="neZoomText">100%</span>
             </div>
         </main>
@@ -162,6 +192,17 @@
     <!-- Context Menu (right-click) -->
     <div class="ne-context-menu" id="neContextMenu" style="display:none;">
         <div class="ne-context-item" data-action="delete">🗑 Delete Node</div>
+    </div>
+
+    <div class="ne-confirm-dialog" id="neConfirmDialog" role="dialog" aria-modal="true" aria-labelledby="neConfirmTitle" hidden>
+        <div class="ne-confirm-card">
+            <h2 id="neConfirmTitle">Confirm action</h2>
+            <p id="neConfirmMessage"></p>
+            <div class="ne-confirm-actions">
+                <button class="ne-toolbar-btn ne-dialog-cancel" id="neConfirmCancelBtn">Cancel</button>
+                <button class="ne-toolbar-btn ne-dialog-confirm" id="neConfirmAcceptBtn">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <script src="navigation.js"></script>

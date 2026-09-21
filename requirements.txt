@@ -17,11 +17,13 @@ requests==2.31.0
 
 # Core Scientific Computing
 numpy>=1.26.0
-scipy>=1.11.0
+scipy>=1.11.0,<1.17.0
 pandas==2.2.3
 
 # Materials Data
 pymatgen>=2024.6.0
+average-minimum-distance==1.6.1
+matminer==0.9.3
 
 # Visualisation
 matplotlib>=3.8.0

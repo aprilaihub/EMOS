@@ -10,6 +10,19 @@ bash setup/setup.sh
 source emos_env/bin/activate
 ```
 
+The setup script selects a non-Conda Python by default. To choose a specific
+system or Homebrew Python, provide its full path:
+
+```bash
+EMOS_PYTHON=/usr/bin/python3 bash setup/setup.sh
+```
+
+On Ubuntu/Debian, install virtual-environment support before running setup:
+
+```bash
+sudo apt install python3-venv
+```
+
 ### On Windows:
 ```cmd
 setup\setup.bat
@@ -29,7 +42,7 @@ If you prefer to set up manually:
 
 ```bash
 # Create virtual environment
-python3 -m venv emos_env
+/usr/bin/python3 -m venv emos_env
 
 # Activate it
 source emos_env/bin/activate  # macOS/Linux
