@@ -2417,7 +2417,7 @@ output_results = results`;
 
     function saveGraph() {
         if (isExecutionActive() || Object.keys(nodes).length === 0) return;
-        downloadJson('emos-node-graph.json', createGraphFile());
+        downloadJson('emos-node-graph.emosgraph', createGraphFile());
         const count = Object.keys(nodes).length;
         setStatus(`Saved graph configuration with ${count} node${count === 1 ? '' : 's'}.`);
     }

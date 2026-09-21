@@ -101,6 +101,8 @@ def test_graph_configuration_and_layout_can_be_saved_and_loaded_without_results(
     assert 'id="neSaveGraphBtn"' in html
     assert 'id="neLoadGraphBtn"' in html
     assert 'id="neLoadGraphInput"' in html
+    assert "emos-node-graph.emosgraph" in source
+    assert 'accept=".emosgraph,application/json,.json"' in html
 
 
 def test_graph_save_load_preserves_dynamic_node_configuration():
