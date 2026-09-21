@@ -14,6 +14,16 @@ def test_sse_event_type_survives_stream_chunk_boundaries():
     ]
 
 
+def test_sse_done_event_completes_the_node_without_waiting_for_eof():
+    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+
+    done_handler = source.index("} else if (currentEvent === 'done') {")
+    done_block = source[done_handler : done_handler + 300]
+
+    assert "resolveOnce(result)" in done_block
+    assert "reader.cancel()" in done_block
+
+
 def test_execution_controls_use_a_persisted_sequential_scheduler():
     source = (Path(__file__).parents[2] / "node-editor.js").read_text()
 

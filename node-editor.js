@@ -2822,7 +2822,10 @@ output_results = results`;
 
             fetch(`${backendUrl}/api/node/run`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Accept': 'text/event-stream',
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(payload),
                 signal: ctrl.signal,
             }).then(response => {
@@ -2874,6 +2877,11 @@ output_results = results`;
                                         result = data;
                                     } else if (currentEvent === 'error') {
                                         rejectOnce(new Error(data.message || 'Unknown error'));
+                                        reader.cancel().catch(() => {});
+                                        return;
+                                    } else if (currentEvent === 'done') {
+                                        if (result != null) resolveOnce(result);
+                                        else rejectOnce(new Error('No result received'));
                                         reader.cancel().catch(() => {});
                                         return;
                                     }
