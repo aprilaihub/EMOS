@@ -1,39 +1,36 @@
-# Testing fixtures
+# Tests
 
-This folder contains the contribution standards test and shared CIF fixtures.
+The tests are grouped by what they check.
 
-## IU data-contract test
+## Standards
 
-`test_iu_data_contracts.py` checks the documented IU input and output schemas
-without importing or running external services or models. It verifies required
-keys and value types for database, generator, and predictor payloads, including
-predictor result fields, and checks representative invalid payloads are rejected.
+`standards/` checks whether a new Information Unit or Feature is set up
+correctly in EMOS. It checks that each contribution:
 
-Run it separately with:
+- Has a non-empty `README.md` and an `__init__.py` file.
+- Uses the expected class and file name.
+- Has one matching entry in `devtools/metadata.json`.
+- Inherits from the correct base class.
+- Implements the required methods and input parameter names.
+
+Run these checks before submitting a new contribution:
 
 ```bash
-pytest -q tests/test_iu_data_contracts.py
+pytest -q tests/standards
 ```
 
-## Contribution standards test
+## Contracts
 
-`test_contribution_standards.py` uses static source inspection and checks every
-registered contribution for:
+`contracts/` checks the expected shape of data passed between Information
+Units. It checks that:
 
-- A non-empty `README.md` and an `__init__.py` file.
-- The expected class and file name.
-- Exactly one matching entry in `devtools/metadata.json`.
+- Database, generator, and predictor inputs contain the required fields.
+- Database, generator, and predictor outputs contain the required fields.
+- Values have the expected types, such as text, lists, and numbers.
+- Missing or invalid fields are rejected.
 
-Information Units are checked by type:
-
-- Databases subclass `BaseDatabase` and implement `retrieve(inputs)`.
-- Generators subclass `BaseGenerator` and implement `generate(inputs)`.
-- Predictors subclass `BasePredictor` and implement `predict(input_data)`.
-
-Features must subclass `BaseFeature` and implement `info`, `extract_inputs`, `process_feature`, and `format_outputs`. The CIF files support separate predictor and service tests.
-
-Run it separately with:
+Run these checks when changing shared input or output data:
 
 ```bash
-pytest -q tests/test_contribution_standards.py
+pytest -q tests/contracts
 ```
