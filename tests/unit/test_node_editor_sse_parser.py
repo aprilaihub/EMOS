@@ -4,6 +4,12 @@ from pathlib import Path
 FRONTEND_ROOT = Path(__file__).parents[2] / "frontend"
 
 
+def test_relocated_frontend_assets_exist():
+    assert (FRONTEND_ROOT / "index.html").is_file()
+    assert (FRONTEND_ROOT / "images" / "logo_name.svg").is_file()
+    assert (FRONTEND_ROOT / "images" / "ball-triangle.svg").is_file()
+
+
 def test_sse_event_type_survives_stream_chunk_boundaries():
     """Large result data can arrive in later reads than its event header."""
     source = (FRONTEND_ROOT / "node-editor.js").read_text()
