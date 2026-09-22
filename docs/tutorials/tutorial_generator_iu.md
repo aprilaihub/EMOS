@@ -134,6 +134,16 @@ In this step, you run EMOS end-to-end and verify that one generation request ret
 
 > **Optional Docker execution:** Developers are welcome to run the IU's `generate()` function in a Docker container instead of directly in the host environment. This can help avoid library or dependency conflicts, and it can keep model execution and its dependencies isolated for privacy-sensitive workflows. Make sure the container exposes the inputs and outputs required by the IU and follows the same generation response contract described above.
 
+### Step 7: Run the contribution tests
+
+Run the existing standards and IU contract tests before submitting the contribution:
+
+```bash
+pytest -q tests/standards tests/iu_contracts
+```
+
+The standards tests check the contribution's files, class and file names, metadata entries, inheritance, and required method signatures. The IU contract tests check that the documented input and output shapes use the required fields and value types.
+
 ## Remove the Generator IU (cleanup)
 
 When you are done testing, remove the generator IU in this order:
