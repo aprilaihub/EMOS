@@ -40,8 +40,8 @@ class ContributionTool(
         print("EMOS Contribution Tool")
         print("="*60 + "\n")
         
-        # Regenerate metadata from ui_data.json
-        print("Syncing metadata from ui_data.json...")
+        # Regenerate metadata from source_data.json
+        print("Syncing metadata from source_data.json...")
         generate_metadata_from_core()
         print("✓ Metadata updated\n")
         
@@ -126,10 +126,12 @@ class ContributionTool(
         print(f"  - {change_info['path']}/README.md")
         print(f"  - {change_info['path']}/__init__.py")
         print(f"  - {change_info['path']}/{meta['file_name']}")
+        print(f"  - Information_Units/property_mappings/sources/{unit_type}/{meta['id']}.json")
         print(f"  - Update {unit_type.capitalize()[:-1]}Factory.py")
 
         print("\n🔨 Creating templates...\n")
         metadata = self.create_information_unit_templates(change_info)
+        self.ensure_property_mapping_template_for_added_unit(meta['id'], unit_type)
         self.update_information_unit_factory_add(metadata, unit_type)
         print("\n✓ Addition completed successfully!")
 

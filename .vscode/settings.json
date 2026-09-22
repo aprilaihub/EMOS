@@ -13,7 +13,6 @@
         "**/*.pyc",
         "emos_env/**",
         "setup/emos_env/**",
-        ".git/**",
-        "docs/_build/**"
+        ".git/**"
     ]
 }

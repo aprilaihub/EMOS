@@ -525,7 +525,7 @@ class GbfsPredictor(BasePredictor):
             f"pre-trained model and scaler trained on GBFS workflow data."
         )
 
-    def predict(self, inputs: list[str]) -> dict[str, Any]:
+    def predict(self, input_data: list[str]) -> dict[str, Any]:
         """
         Predict ALL 6 properties from crystal structure data.
         
@@ -547,7 +547,7 @@ class GbfsPredictor(BasePredictor):
            c. Apply inverse log10 transformation for mobility predictions
         
         Args:
-            inputs (list[str]): CIF string inputs.
+            input_data (list[str]): CIF string inputs.
                 
         Returns:
             dict[str, Any]: Prediction payload with shape:
@@ -575,7 +575,7 @@ class GbfsPredictor(BasePredictor):
         if self.logger:
             self.logger.log("Running multi-property GBFS prediction", 'info')
 
-        cif_strings = self._extract_cif_strings(inputs)
+        cif_strings = self._extract_cif_strings(input_data)
         if not cif_strings:
             return {
                 "source": self.source,

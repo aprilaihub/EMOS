@@ -14,7 +14,7 @@ REM Check if Python is installed
 python --version >nul 2>&1
 if errorlevel 1 (
     echo Error: Python is not installed or not in PATH
-    echo Please install Python 3.8 or higher
+    echo Please install Python 3.10-3.12 (3.11 recommended)
     pause
     exit /b 1
 )

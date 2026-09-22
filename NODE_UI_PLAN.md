@@ -229,7 +229,7 @@ This endpoint:
 ## 12. Implementation Order
 
 ### Phase 1 — Static Shell
-1. Create `node-editor.html` with nav, canvas container, sidebar (populated from `ui_data.json` categories), and bottom toolbar.
+1. Create `node-editor.html` with nav, canvas container, sidebar (populated from `source_data.json` categories), and bottom toolbar.
 2. Create `node-editor.css` with layout, dark theme, grid background.
 3. Add "Node UI" link to all nav menus.
 
@@ -273,7 +273,7 @@ This endpoint:
 - `backend/app.py` existing endpoints — untouched (we add one new endpoint).
 - `index.html`, `script.js`, `styles.css` — only change is adding the nav link.
 - Feature architecture (`BaseFeature.py/js`, Feature subclasses) — untouched.
-- `property_mappings.json`, `ui_data.json` — read-only (sidebar populated from `ui_data.json`).
+- `property_mappings.json`, `source_data.json` — read-only (sidebar populated from `source_data.json`).
 - Docker/deployment files — untouched.
 
 ---
@@ -347,10 +347,10 @@ Can users delete individual nodes from the canvas? If yes:
 ### G. Sidebar population: hardcoded vs dynamic
 The sidebar lists databases, generators, and predictors. Should it:
 - **Option A:** Be hardcoded in `node-editor.html` (like `index.html` does today with checkbox lists)?
-- **Option B:** Fetch `ui_data.json` at page load and dynamically build the sidebar?
+- **Option B:** Fetch `source_data.json` at page load and dynamically build the sidebar?
 
 Option B is more maintainable but adds an async fetch on page load.
-***ANSWER***: go with option B, fetch it from ui_data
+***ANSWER***: go with option B, fetch it from source_data
 
 ### H. Port type `any` on Text Viewer
 The text viewer accepts `any` input. Should it also accept CIF strings (showing raw CIF text), or should the type system distinguish between `cif`, `result`, and a generic `any` that matches everything?
@@ -403,7 +403,7 @@ The new `/api/node/run` endpoint goes into the existing `backend/app.py` file (a
 ### O. property_mappings.json loading on the node page
 The node editor page needs to load `property_mappings.json` to auto-generate input fields. The current `BaseFeature.js` loads it via a `<script>` tag or fetch. For the node editor:
 - I'll fetch it from `Information_Units/property_mappings.json` (relative URL) at page load, same as the existing app does.
-- The sidebar will be built from `devtools/ui_data.json`.
+- The sidebar will be built from `devtools/source_data.json`.
 - Both are fetched client-side. **Correct?**
 ***ANSWER***: Sounds correct, but do whatever is most efficient for running the app
 

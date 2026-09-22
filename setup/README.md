@@ -80,4 +80,3 @@ pip install -r requirements.txt
 - Version consistency across all developers
 - Easy to reproduce environment on any machine
 - New developers run one setup command and get everything
-
