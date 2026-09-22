@@ -154,7 +154,7 @@ class InformationUnitMethods:
 
     def update_information_unit_ui_lists(self):
         """Rewrite index.html IU lists from metadata so UI matches backend."""
-        index_path = self.project_root / "index.html"
+        index_path = self.project_root / "frontend" / "index.html"
         if not index_path.exists():
             print("  ⚠ index.html not found; skipping UI update")
             return

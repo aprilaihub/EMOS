@@ -1,9 +1,12 @@
 from pathlib import Path
 
 
+FRONTEND_ROOT = Path(__file__).parents[2] / "frontend"
+
+
 def test_sse_event_type_survives_stream_chunk_boundaries():
     """Large result data can arrive in later reads than its event header."""
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     event_declaration = source.index("let currentEvent = 'log';")
     read_function = source.index("function read()", event_declaration)
@@ -15,7 +18,7 @@ def test_sse_event_type_survives_stream_chunk_boundaries():
 
 
 def test_sse_done_event_completes_the_node_without_waiting_for_eof():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     done_handler = source.index("} else if (currentEvent === 'done') {")
     done_block = source[done_handler : done_handler + 300]
@@ -25,7 +28,7 @@ def test_sse_done_event_completes_the_node_without_waiting_for_eof():
 
 
 def test_execution_controls_use_a_persisted_sequential_scheduler():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "const executionState = {" in source
     assert "async function startExecution(runMode)" in source
@@ -35,7 +38,7 @@ def test_execution_controls_use_a_persisted_sequential_scheduler():
 
 
 def test_breakpoints_pause_after_their_node_completes():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     completion = source.index("completeNode(node, result);")
     breakpoint = source.index("if (node.breakpointEnabled)", completion)
@@ -45,7 +48,7 @@ def test_breakpoints_pause_after_their_node_completes():
 
 
 def test_cancellation_preserves_prior_results_and_retries_active_node():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     cancellation = source.index("function requestCancellation()")
     active_cancel = source[cancellation : source.index("async function sendBackendCancel", cancellation)]
@@ -58,8 +61,8 @@ def test_cancellation_preserves_prior_results_and_retries_active_node():
 
 
 def test_runtime_and_canvas_clears_require_confirmation():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "async function clearOutputsWithConfirmation()" in source
     assert "async function clearCanvasWithConfirmation()" in source
@@ -69,8 +72,8 @@ def test_runtime_and_canvas_clears_require_confirmation():
 
 
 def test_completed_results_enable_node_and_aggregate_downloads():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "function createNodeResultRecord(node)" in source
     assert "function downloadNodeResult(node)" in source
@@ -82,8 +85,8 @@ def test_completed_results_enable_node_and_aggregate_downloads():
 
 
 def test_graph_configuration_and_layout_can_be_saved_and_loaded_without_results():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "const GRAPH_FILE_FORMAT = 'emos-node-graph';" in source
     assert "const GRAPH_FILE_VERSION = 1;" in source
@@ -106,7 +109,7 @@ def test_graph_configuration_and_layout_can_be_saved_and_loaded_without_results(
 
 
 def test_graph_save_load_preserves_dynamic_node_configuration():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "configuration.filterRules = serializeFilterRules(node);" in source
     assert "configuration.treeSelections = [...node.treeSelections];" in source
@@ -121,7 +124,7 @@ def test_graph_save_load_preserves_dynamic_node_configuration():
 
 
 def test_resized_nodes_resize_their_log_and_viewer_content():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "function resizeNodeContent(node, nodeHeight)" in source
     assert "log.style.height" in source
@@ -131,7 +134,7 @@ def test_resized_nodes_resize_their_log_and_viewer_content():
 
 
 def test_filter_rules_compare_true_and_false_values():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "function parseBoolean(value)" in source
     assert "const booleanValue = parseBoolean(raw);" in source
@@ -139,7 +142,7 @@ def test_filter_rules_compare_true_and_false_values():
 
 
 def test_cif_viewer_uses_compositions_and_renders_an_atom_legend():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "function getCifComposition(cifString, index)" in source
     assert "opt.textContent = getCifComposition(cif, i);" in source
@@ -148,7 +151,7 @@ def test_cif_viewer_uses_compositions_and_renders_an_atom_legend():
 
 
 def test_clearing_cif_viewer_output_also_removes_its_legend():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     reset = source[source.index("function resetViewerDisplay(node)") : source.index("function resetExecutionState", source.index("function resetViewerDisplay(node)"))]
 
@@ -158,7 +161,7 @@ def test_clearing_cif_viewer_output_also_removes_its_legend():
 
 
 def test_filter_requires_results_but_not_cif_input():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "label: 'CIF (optional)'" in source
     assert "required: false" in source
@@ -168,7 +171,7 @@ def test_filter_requires_results_but_not_cif_input():
 
 
 def test_pretty_text_viewer_exposes_selectable_result_fields():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "ne-text-pretty-toggle" in source
     assert "function getPrettyFields(entries)" in source
@@ -180,8 +183,8 @@ def test_pretty_text_viewer_exposes_selectable_result_fields():
 
 
 def test_feature_nodes_are_metadata_driven_and_use_existing_feature_api():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "let FEATURE_DEFINITIONS = {}" in source
     assert "function populateFeatureSidebar(category, containerId)" in source
@@ -194,7 +197,7 @@ def test_feature_nodes_are_metadata_driven_and_use_existing_feature_api():
 
 
 def test_feature_cif_inputs_and_local_iu_selectors_have_adapters():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     assert "data-feature-field-type=\"iu_checkbox_group\"" in source
     assert "el.dataset.featureFieldType === 'iu_checkbox_group'" in source
@@ -205,8 +208,8 @@ def test_feature_cif_inputs_and_local_iu_selectors_have_adapters():
 
 
 def test_splitter_creates_outputs_from_top_level_result_fields_only():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "splitter:" in source
     assert "function executeSplitterNode(node)" in source
@@ -227,8 +230,8 @@ def test_splitter_creates_outputs_from_top_level_result_fields_only():
 
 
 def test_output_labels_are_inside_nodes_before_right_edge_pins():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    css = (FRONTEND_ROOT / "node-editor.css").read_text()
 
     assert "width: type === 'feature' ? 360 : 320" in source
     assert "wrapper.append(label, port);" in source
@@ -239,7 +242,7 @@ def test_output_labels_are_inside_nodes_before_right_edge_pins():
 
 
 def test_splitter_logs_raw_input_before_its_done_log():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
 
     splitter = source[source.index("function executeSplitterNode(node)") : source.index("function getSplitterInputWire", source.index("function executeSplitterNode(node)"))]
     assert "clearNodeLog(node.id);" in splitter
@@ -248,8 +251,8 @@ def test_splitter_logs_raw_input_before_its_done_log():
 
 
 def test_tree_splitter_and_merger_are_registered_local_utilities():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    html = (Path(__file__).parents[2] / "node-editor.html").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    html = (FRONTEND_ROOT / "node-editor.html").read_text()
 
     assert "tree_splitter:" in source
     assert "merger:" in source
@@ -278,8 +281,8 @@ def test_tree_splitter_and_merger_are_registered_local_utilities():
 
 
 def test_processing_status_has_an_animated_indicator():
-    source = (Path(__file__).parents[2] / "node-editor.js").read_text()
-    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+    source = (FRONTEND_ROOT / "node-editor.js").read_text()
+    css = (FRONTEND_ROOT / "node-editor.css").read_text()
 
     assert "statusText.classList.toggle('ne-status-processing', active);" in source
     assert ".ne-status-processing::after" in css
@@ -287,7 +290,7 @@ def test_processing_status_has_an_animated_indicator():
 
 
 def test_tree_splitter_and_merger_controls_override_shared_input_sizing():
-    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+    css = (FRONTEND_ROOT / "node-editor.css").read_text()
 
     assert ".ne-node-body .ne-tree-splitter-entry input" in css
     assert ".ne-node-body .ne-merger-mode input" in css
@@ -296,7 +299,7 @@ def test_tree_splitter_and_merger_controls_override_shared_input_sizing():
 
 
 def test_pretty_labels_wrap_and_merger_options_stay_close_to_radios():
-    css = (Path(__file__).parents[2] / "node-editor.css").read_text()
+    css = (FRONTEND_ROOT / "node-editor.css").read_text()
 
     assert "grid-template-columns: repeat(2, max-content);" in css
     assert "justify-content: flex-start;" in css
@@ -306,7 +309,7 @@ def test_pretty_labels_wrap_and_merger_options_stay_close_to_radios():
 
 
 def test_running_nodes_show_the_provided_spinner_next_to_their_titles():
-    project_root = Path(__file__).parents[2]
+    project_root = FRONTEND_ROOT
     source = (project_root / "node-editor.js").read_text()
     css = (project_root / "node-editor.css").read_text()
     spinner = (project_root / "images" / "ball-triangle.svg").read_text()
@@ -318,7 +321,7 @@ def test_running_nodes_show_the_provided_spinner_next_to_their_titles():
 
 
 def test_feature_metadata_matches_current_runtime_names():
-    metadata = (Path(__file__).parents[2] / "devtools/ui_data.json").read_text()
+    metadata = (FRONTEND_ROOT.parent / "devtools/metadata.json").read_text()
 
     assert '"name": "active_databases"' in metadata
     assert '"name": "active_predictors"' in metadata

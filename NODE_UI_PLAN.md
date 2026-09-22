@@ -10,9 +10,9 @@ A Blender-style node editor page for EMOS where users drag Information Units (da
 
 | File | Purpose |
 |------|---------|
-| `node-editor.html` | Page shell: nav menu, canvas, sidebar, Process button |
-| `node-editor.css` | All styles for the node editor (grid, nodes, wires, sidebar, etc.) |
-| `node-editor.js` | All logic: drag-and-drop, node creation, wiring, pan/zoom, execution |
+| `frontend/node-editor.html` | Page shell: nav menu, canvas, sidebar, Process button |
+| `frontend/node-editor.css` | All styles for the node editor (grid, nodes, wires, sidebar, etc.) |
+| `frontend/node-editor.js` | All logic: drag-and-drop, node creation, wiring, pan/zoom, execution |
 
 No backend changes. The node UI reuses the existing backend endpoints:
 - `POST /api/process/iu/<iu_type>/<iu_id>` — direct IU execution
@@ -24,7 +24,7 @@ registry, so the node editor does not require global IU activation.
 
 ## 2. Navigation Integration
 
-Add `"Node UI"` link to the `<ul class="nav-links">` in **every** page's nav menu (`index.html`, `about.html`, `team.html`, `documentation.html`, `node-editor.html`).
+Add `"Node UI"` link to the `<ul class="nav-links">` in **every** page's nav menu (`frontend/index.html`, `frontend/about.html`, `frontend/team.html`, `frontend/documentation.html`, `frontend/node-editor.html`).
 
 ```html
 <li><a href="node-editor.html">Node UI</a></li>
@@ -32,7 +32,7 @@ Add `"Node UI"` link to the `<ul class="nav-links">` in **every** page's nav men
 
 ---
 
-## 3. Page Layout (`node-editor.html`)
+## 3. Page Layout (`frontend/node-editor.html`)
 
 ```
 ┌─────────────────────────────────────────────────────┬──────────────┐
@@ -229,8 +229,8 @@ This endpoint:
 ## 12. Implementation Order
 
 ### Phase 1 — Static Shell
-1. Create `node-editor.html` with nav, canvas container, sidebar (populated from `source_data.json` categories), and bottom toolbar.
-2. Create `node-editor.css` with layout, dark theme, grid background.
+1. Create `frontend/node-editor.html` with nav, canvas container, sidebar (populated from `source_data.json` categories), and bottom toolbar.
+2. Create `frontend/node-editor.css` with layout, dark theme, grid background.
 3. Add "Node UI" link to all nav menus.
 
 ### Phase 2 — Node Creation & Dragging
@@ -271,7 +271,7 @@ This endpoint:
 ## 13. What We Do NOT Change
 
 - `backend/app.py` existing endpoints — untouched (we add one new endpoint).
-- `index.html`, `script.js`, `styles.css` — only change is adding the nav link.
+- `frontend/index.html`, `frontend/script.js`, `frontend/styles.css` — only change is adding the nav link.
 - Feature architecture (`BaseFeature.py/js`, Feature subclasses) — untouched.
 - `property_mappings.json`, `source_data.json` — read-only (sidebar populated from `source_data.json`).
 - Docker/deployment files — untouched.
@@ -346,7 +346,7 @@ Can users delete individual nodes from the canvas? If yes:
 
 ### G. Sidebar population: hardcoded vs dynamic
 The sidebar lists databases, generators, and predictors. Should it:
-- **Option A:** Be hardcoded in `node-editor.html` (like `index.html` does today with checkbox lists)?
+- **Option A:** Be hardcoded in `frontend/node-editor.html` (like `frontend/index.html` does today with checkbox lists)?
 - **Option B:** Fetch `source_data.json` at page load and dynamically build the sidebar?
 
 Option B is more maintainable but adds an async fetch on page load.

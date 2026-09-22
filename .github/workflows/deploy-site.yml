@@ -27,10 +27,8 @@ jobs:
           # Create deployment directory
           mkdir -p _site
           
-          # Copy main website files
-          cp index.html about.html team.html documentation.html node-editor.html _site/
-          cp styles.css navigation.css navigation.js script.js node-editor.css node-editor.js _site/
-          cp -r images/ _site/
+          # Copy the flat frontend source into the deployment root so public URLs stay unchanged
+          cp -r frontend/. _site/
 
           # Copy devtools data used by the Node Editor
           mkdir -p _site/devtools
@@ -52,6 +50,7 @@ jobs:
           
           # List contents to verify
           echo "Site contents:"
+          test -f _site/index.html
           find _site -type f -name "*.js" | head -20
           echo "Feature files:"
           find _site/Features -name "*.js" 2>/dev/null | head -10 || echo "No Features directory found"

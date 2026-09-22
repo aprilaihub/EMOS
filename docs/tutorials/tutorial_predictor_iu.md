@@ -117,7 +117,7 @@ This script is interactive. Choose:
 In this step, you run EMOS end-to-end and verify that one prediction request returns one result for every input CIF.
 
 1. Start backend: `python backend/app.py`
-2. Open the UI by opening `index.html` in your browser.
+2. Build the local frontend preview as described in the main README, then open `http://localhost:8000` in your browser.
 3. In the Information Units section, open and run the new **CIF Demo Predictor** IU.
 4. Upload 10 CIF files, including the CIF from the database tutorial, and run.
 5. Confirm the result includes 10 prediction records, with `band_gap` values distributed from `0.0` to `5.0` and `formation_energy` values distributed from `-3.0` to `1.0`.

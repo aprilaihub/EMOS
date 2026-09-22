@@ -50,17 +50,18 @@ python backend/app.py
 # Runs on http://localhost:5001
 ```
 
-3) Open frontend:
+3) Build and open the local frontend preview:
 
 ```bash
-# Linux
-xdg-open index.html
-
-# macOS
-open index.html
+rm -rf _site
+mkdir _site
+cp -r frontend/. _site/
+cp -r Features Information_Units backend devtools docs _site/
+python -m http.server 8000 --directory _site
 ```
 
-You can also open `index.html` directly from your file browser.
+Then open http://localhost:8000 in your browser. This assembles the same flat
+site layout used by the GitHub Pages deployment.
 
 ### Standard Local Commands
 
@@ -71,7 +72,7 @@ docker compose up -d --build
 python backend/app.py
 pytest tests/unit/test_backend_readiness_and_lambda.py tests/unit/test_node_editor_sse_parser.py -q
 pytest -m "network" -q
-python -m http.server 8000
+python -m http.server 8000 --directory _site
 ```
 
 > **Note**: Backend default local port is `5001`.
@@ -86,9 +87,11 @@ python -m http.server 8000
 
 ```
 EMOS/
-├── index.html                    # Main application interface
-├── script.js                     # JavaScript functionality & feature loading
-├── styles.css                    # Application styling
+├── frontend/                     # Static web application
+│   ├── index.html                # Main application interface
+│   ├── script.js                 # JavaScript functionality & feature loading
+│   ├── styles.css                # Application styling
+│   └── images/                   # Frontend graphics and logos
 ├── requirements.txt              # Python dependencies
 │
 ├── Features/                     # Feature implementations
@@ -113,7 +116,6 @@ EMOS/
 ├── devtools/                    # Development tools
 │   └── source_data.json             # Component definitions
 │
-└── images/                      # Graphics and logos
 ```
 
 ## TECHNOLOGY STACK
@@ -121,15 +123,15 @@ EMOS/
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Backend**: Python, Flask
 - **Architecture**: Modular component-based structure
-- **Documentation**: Markdown files shown in `documentation.html`
+- **Documentation**: Markdown files shown in `frontend/documentation.html`
 - **UI/UX**: Responsive design with glassmorphism effects
 
 ## NEXT STEPS
 
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add features and information units
-- **Documentation**: Open [documentation.html](documentation.html) or read the [Markdown documentation](docs/index.md)
+- **Documentation**: Open [frontend/documentation.html](frontend/documentation.html) or read the [Markdown documentation](docs/index.md)
 - **GitHub**: https://github.com/aprilaihub/EMOS
 
 ## LICENSE
 
-Licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+Licensed under the Apache License 2.0 - see [LICENSE](LICENSE) for details.

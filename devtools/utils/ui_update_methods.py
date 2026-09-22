@@ -1,4 +1,4 @@
-"""Methods for updating UI files (index.html, script.js)"""
+"""Methods for updating frontend UI files."""
 
 import re
 
@@ -7,8 +7,8 @@ class UIUpdateMethods:
     """Methods for updating UI components based on metadata"""
     
     def update_feature_ui_buttons(self):
-        """Update feature buttons in index.html based on metadata.json"""
-        index_path = self.project_root / "index.html"
+        """Update feature buttons in frontend/index.html based on metadata.json"""
+        index_path = self.project_root / "frontend" / "index.html"
         if not index_path.exists():
             print("  ⚠ index.html not found; skipping UI button update")
             return
@@ -49,8 +49,8 @@ class UIUpdateMethods:
         return indent + indent.join(buttons) + "\n" + " " * 28
     
     def update_feature_ui_scripts(self):
-        """Update feature mappings in script.js based on metadata.json"""
-        script_path = self.project_root / "script.js"
+        """Update feature mappings in frontend/script.js based on metadata.json"""
+        script_path = self.project_root / "frontend" / "script.js"
         if not script_path.exists():
             print("  ⚠ script.js not found; skipping UI script update")
             return

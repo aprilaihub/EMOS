@@ -127,7 +127,7 @@ This script is interactive. Choose:
 In this step, you run EMOS end-to-end and verify that one generation request returns multiple CIF outputs/files.
 
 1. Start backend: `python backend/app.py`
-2. Open the UI by opening `index.html` in your browser.
+2. Build the local frontend preview as described in the main README, then open `http://localhost:8000` in your browser.
 3. In the Information Units section, open and run the new **CIF Demo Generator** IU.
 4. Set `num_structures` to `10` and run.
 5. Confirm the result includes 10 CIF strings (the same demo CIF repeated), and exports as 10 CIF files.

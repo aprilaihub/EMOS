@@ -2,8 +2,8 @@
 """Interactive utility to add/remove predictor IU features.
 
 This script automates the frontend wiring needed for predictor IU features:
-- Adds/removes IU feature button rows in index.html
-- Adds/removes IU feature module entries in script.js
+- Adds/removes IU feature button rows in frontend/index.html
+- Adds/removes IU feature module entries in frontend/script.js
 - Creates/removes IU feature JS implementation files
 - Cleans up source property mapping and exclusive common properties on removal
 
@@ -23,8 +23,9 @@ from typing import Dict, List, Optional, Tuple
 from property_mapping_cleanup import cleanup_removed_iu_property_mappings
 
 ROOT = Path(__file__).resolve().parents[2]
-INDEX_HTML = ROOT / "index.html"
-SCRIPT_JS = ROOT / "script.js"
+FRONTEND_ROOT = ROOT / "frontend"
+INDEX_HTML = FRONTEND_ROOT / "index.html"
+SCRIPT_JS = FRONTEND_ROOT / "script.js"
 UI_DATA_JSON = ROOT / "devtools" / "source_data.json"
 PRED_FACTORY_PY = ROOT / "Information_Units" / "Predictors" / "PredictorFactory.py"
 PRED_MAPPING_DIR = ROOT / "Information_Units" / "property_mappings" / "sources" / "predictors"
