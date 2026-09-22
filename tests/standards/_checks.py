@@ -10,6 +10,9 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 with (REPO_ROOT / "devtools" / "metadata.json").open(encoding="utf-8") as metadata_file:
     METADATA = json.load(metadata_file)
 
+with (REPO_ROOT / "devtools" / "source_data.json").open(encoding="utf-8") as source_data_file:
+    SOURCE_DATA = json.load(source_data_file)
+
 
 IU_KIND_INFO = {
     "Databases": {"type_suffix": "Database", "base_class": "BaseDatabase", "action_method": "retrieve", "action_param": "inputs", "metadata_key": "databases"},
@@ -73,6 +76,28 @@ def metadata_entries_for_feature(category, folder_name):
     entries = METADATA.get("features", {}).get(category.lower(), [])
     expected_path = f"Features/{category}/{folder_name}"
     return [entry for entry in entries if entry.get("folder_path") == expected_path]
+
+
+def _normalized_name(value):
+    return "".join(character.lower() for character in value if character.isalnum())
+
+
+def source_data_entries_for_iu(kind, folder_name):
+    entries = SOURCE_DATA.get("information_units", {}).get(kind.lower(), {})
+    return [
+        (display_name, description)
+        for display_name, description in entries.items()
+        if _normalized_name(display_name) == _normalized_name(folder_name)
+    ]
+
+
+def source_data_entries_for_feature(category, folder_name):
+    entries = SOURCE_DATA.get("features", {}).get(category.lower(), {})
+    return [
+        (display_name, description)
+        for display_name, description in entries.items()
+        if _normalized_name(display_name) == _normalized_name(folder_name)
+    ]
 
 
 def find_class_node(file_path, class_name):

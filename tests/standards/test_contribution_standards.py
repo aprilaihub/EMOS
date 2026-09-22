@@ -19,6 +19,8 @@ from ._checks import (
     metadata_entries_for_feature,
     metadata_entries_for_iu,
     own_method_node,
+    source_data_entries_for_feature,
+    source_data_entries_for_iu,
 )
 
 
@@ -70,6 +72,19 @@ class TestContributionMetadata:
         entries = metadata_entries_for_feature(category, folder_name)
         assert len(entries) == 1, f"Features/{category}/{folder_name} must have exactly one metadata entry"
         assert entries[0]["class_name"] == feature_class_name(folder_name)
+
+
+@pytest.mark.unit
+class TestContributionSourceData:
+    @pytest.mark.parametrize("kind,folder_name", IU_CONTRIBUTIONS)
+    def test_iu_has_exactly_one_source_data_entry(self, kind, folder_name):
+        entries = source_data_entries_for_iu(kind, folder_name)
+        assert len(entries) == 1, f"{kind}/{folder_name} must have exactly one source_data.json entry"
+
+    @pytest.mark.parametrize("category,folder_name", FEATURE_CONTRIBUTIONS)
+    def test_feature_has_exactly_one_source_data_entry(self, category, folder_name):
+        entries = source_data_entries_for_feature(category, folder_name)
+        assert len(entries) == 1, f"Features/{category}/{folder_name} must have exactly one source_data.json entry"
 
 
 @pytest.mark.unit
