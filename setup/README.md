@@ -4,12 +4,23 @@ This directory contains scripts to easily set up a Python virtual environment an
 
 ## Quick Start
 
-Recommended Python: 3.11 (supported: 3.10-3.12)
-
 ### On macOS/Linux:
 ```bash
 bash setup/setup.sh
 source emos_env/bin/activate
+```
+
+The setup script selects a non-Conda Python by default. To choose a specific
+system or Homebrew Python, provide its full path:
+
+```bash
+EMOS_PYTHON=/usr/bin/python3 bash setup/setup.sh
+```
+
+On Ubuntu/Debian, install virtual-environment support before running setup:
+
+```bash
+sudo apt install python3-venv
 ```
 
 ### On Windows:
@@ -31,7 +42,7 @@ If you prefer to set up manually:
 
 ```bash
 # Create virtual environment
-python3 -m venv emos_env
+/usr/bin/python3 -m venv emos_env
 
 # Activate it
 source emos_env/bin/activate  # macOS/Linux
@@ -69,4 +80,3 @@ pip install -r requirements.txt
 - Version consistency across all developers
 - Easy to reproduce environment on any machine
 - New developers run one setup command and get everything
-

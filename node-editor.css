@@ -97,8 +97,19 @@ body {
 [data-category="databases"] .ne-sidebar-item   { border-left: 3px solid #4fc3f7; }
 [data-category="generators"] .ne-sidebar-item   { border-left: 3px solid #81c784; }
 [data-category="predictors"] .ne-sidebar-item   { border-left: 3px solid #ffb74d; }
+[data-category="features"] .ne-sidebar-item     { border-left: 3px solid #a78bfa; }
 [data-category="viewers"] .ne-sidebar-item       { border-left: 3px solid #ce93d8; }
 [data-category="utility"] .ne-sidebar-item       { border-left: 3px solid #f06292; }
+
+.ne-sidebar-subheading {
+    margin: 0;
+    padding: 5px 16px 3px;
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
 
 /* ── Canvas Container ─────────────────────────────────────────────── */
 .ne-canvas-container {
@@ -136,7 +147,7 @@ body {
 /* ── Nodes ─────────────────────────────────────────────────────────── */
 .ne-node {
     position: absolute;
-    min-width: 220px;
+    min-width: 300px;
     background: #1e1e38;
     border: 1px solid #333;
     border-radius: 6px;
@@ -158,6 +169,9 @@ body {
 .ne-node.state-running  { border-color: #4fc3f7; box-shadow: 0 0 12px rgba(79, 195, 247, 0.4); }
 .ne-node.state-done     { border-color: #81c784; }
 .ne-node.state-error    { border-color: #e57373; box-shadow: 0 0 12px rgba(229, 115, 115, 0.4); }
+.ne-node.state-pending  { border-color: #607d8b; }
+.ne-node.state-stale    { border-color: #ffb74d; box-shadow: 0 0 10px rgba(255, 183, 77, 0.25); }
+.ne-node.state-paused   { border-color: #facc15; box-shadow: 0 0 12px rgba(250, 204, 21, 0.32); }
 
 /* Node Header */
 .ne-node-header {
@@ -176,7 +190,52 @@ body {
 .ne-node-header:active { cursor: grabbing; }
 
 .ne-node-header .ne-node-icon { font-size: 14px; }
-.ne-node-header .ne-node-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ne-node-header .ne-node-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    flex: 1;
+}
+
+.ne-node-header .ne-node-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ne-node-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+}
+
+.ne-node.state-running .ne-node-spinner { display: block; }
+
+.ne-breakpoint-led {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #6b7280;
+    border-radius: 50%;
+    background: #111827;
+    cursor: pointer;
+    flex: 0 0 auto;
+    padding: 0;
+}
+
+.ne-breakpoint-led:hover,
+.ne-breakpoint-led:focus-visible {
+    border-color: #f8fafc;
+    outline: none;
+}
+
+.ne-breakpoint-led.enabled {
+    background: #dc2626;
+    border-color: #fecaca;
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.85);
+}
 
 /* Close button on header */
 .ne-node-close {
@@ -204,6 +263,7 @@ body {
 .ne-node[data-type="database"]  .ne-node-header { background: linear-gradient(135deg, #0d47a1, #1565c0); }
 .ne-node[data-type="generator"] .ne-node-header { background: linear-gradient(135deg, #1b5e20, #2e7d32); }
 .ne-node[data-type="predictor"] .ne-node-header { background: linear-gradient(135deg, #e65100, #ef6c00); }
+.ne-node[data-type="feature"]   .ne-node-header { background: linear-gradient(135deg, #5b21b6, #7c3aed); }
 .ne-node[data-type="viewer"]    .ne-node-header { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
 .ne-node[data-type="utility"]   .ne-node-header { background: linear-gradient(135deg, #880e4f, #ad1457); }
 
@@ -272,6 +332,103 @@ body {
 
 .ne-add-filter-btn:hover { background: rgba(240, 98, 146, 0.2); }
 
+/* ── Splitter and Merger nodes ───────────────────────────────────── */
+.ne-splitter-status,
+.ne-merger-status {
+    margin: 0;
+    color: #cbd5e1;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.ne-tree-splitter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 260px;
+    overflow: auto;
+    padding: 4px 0;
+}
+
+.ne-tree-splitter-entry {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    margin: 0 !important;
+    color: #dbeafe !important;
+    cursor: pointer;
+}
+
+.ne-node-body .ne-tree-splitter-entry input,
+.ne-node-body .ne-merger-mode input {
+    width: auto;
+    min-width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: #38bdf8;
+    flex: 0 0 auto;
+}
+
+.ne-tree-splitter-entry span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ne-merger-mode {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 5px 4px;
+    margin: 0 0 8px;
+    padding: 7px;
+    border: 1px solid #5d3d68;
+    border-radius: 3px;
+}
+
+.ne-merger-mode legend {
+    padding: 0 4px;
+    color: #f0abfc;
+    font-size: 10px;
+}
+
+.ne-node-body .ne-merger-mode label {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    width: auto;
+    margin: 0 !important;
+    color: #fce7f3 !important;
+    cursor: pointer;
+}
+
+.ne-node-body .ne-merger-mode label span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ne-add-merger-input {
+    width: 100%;
+    margin-top: 2px;
+    padding: 4px 6px;
+    border: 1px dashed #f0abfc;
+    border-radius: 3px;
+    background: rgba(168, 85, 247, 0.1);
+    color: #f0abfc;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+}
+
+.ne-add-merger-input:hover { background: rgba(168, 85, 247, 0.22); }
+
+.ne-node[data-node-key="merger"] .ne-node-body {
+    padding-inline: 76px;
+}
+
 /* ── Lambda node ──────────────────────────────────────────────────── */
 .ne-lambda-code {
     width: 100%;
@@ -301,11 +458,12 @@ body {
 
 /* Node Body */
 .ne-node-body {
-    padding: 8px 12px;
+    padding: 8px 28px;
     font-size: 11px;
     overflow-y: auto;
     max-height: 400px;
     flex: 1;
+    min-height: 0;
 }
 
 .ne-node-body label {
@@ -340,6 +498,51 @@ body {
     appearance: textfield;
 }
 
+/* ── Feature nodes ───────────────────────────────────────────────── */
+.ne-feature-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ne-feature-note {
+    margin: 0;
+    color: #a5b4fc;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.ne-feature-checkbox,
+.ne-feature-option {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    margin: 0 !important;
+    cursor: pointer;
+}
+
+.ne-feature-checkbox input,
+.ne-feature-option input {
+    width: auto;
+    margin: 0;
+    accent-color: #a78bfa;
+}
+
+.ne-feature-options {
+    display: grid;
+    gap: 4px;
+    margin: 2px 0 0;
+    padding: 7px;
+    border: 1px solid #4c3b75;
+    border-radius: 3px;
+}
+
+.ne-feature-options legend {
+    padding: 0 4px;
+    color: #c4b5fd;
+    font-size: 10px;
+}
+
 /* Node Footer (ports row) */
 .ne-node-footer {
     display: flex;
@@ -361,11 +564,13 @@ body {
 }
 
 .ne-port-wrap.ne-port-input {
-    left: -7px;
+    left: -6px;
 }
 
 .ne-port-wrap.ne-port-output {
-    right: -7px;
+    right: -6px;
+    justify-content: flex-end;
+    max-width: calc(100% - 12px);
 }
 
 .ne-port {
@@ -405,6 +610,8 @@ body {
     color: #888;
     white-space: nowrap;
     pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ne-port-label-input {
@@ -412,7 +619,8 @@ body {
 }
 
 .ne-port-label-output {
-    margin-right: 2px;
+    margin-right: 0;
+    text-align: right;
 }
 
 /* ── Wires (SVG paths) ────────────────────────────────────────────── */
@@ -483,7 +691,84 @@ body {
     flex: 1;
 }
 
+.ne-cif-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 6px;
+    color: #cbd5e1;
+    font-size: 9px;
+}
+
+.ne-cif-legend[hidden] { display: none; }
+
+.ne-cif-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.ne-cif-legend-swatch {
+    width: 8px;
+    height: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
 /* ── Text Viewer specific ─────────────────────────────────────────── */
+.ne-text-pretty-control {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 7px !important;
+    color: #bfdbfe !important;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ne-text-pretty-control input {
+    width: auto;
+    margin: 0;
+    accent-color: #38bdf8;
+}
+
+.ne-text-viewer-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    margin-bottom: 7px;
+    padding: 6px;
+    border: 1px solid #334155;
+    border-radius: 3px;
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.ne-text-viewer-fields[hidden] { display: none; }
+
+.ne-text-field-toggle {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 0 !important;
+    color: #cbd5e1 !important;
+    cursor: pointer;
+}
+
+.ne-text-field-toggle input {
+    width: auto;
+    margin: 0;
+    accent-color: #38bdf8;
+    flex: 0 0 auto;
+}
+
+.ne-text-field-toggle span {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 .ne-text-viewer-content {
     width: 100%;
     min-height: 80px;
@@ -521,6 +806,11 @@ body {
 .ne-node-log .log-warning { color: #ffb74d; }
 .ne-node-log .log-error   { color: #e57373; }
 .ne-node-log .log-success { color: #81c784; }
+.ne-node-log .log-raw {
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
 
 /* ── Bottom Toolbar ───────────────────────────────────────────────── */
 .ne-toolbar {
@@ -528,19 +818,20 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 44px;
+    min-height: 44px;
     background: rgba(22, 33, 62, 0.95);
     border-top: 1px solid #0f3460;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 12px;
+    flex-wrap: wrap;
+    padding: 6px 16px;
+    gap: 8px;
     z-index: 20;
 }
 
 .ne-toolbar-btn {
     padding: 6px 16px;
-    border: none;
+    border: 1px solid transparent;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
@@ -550,6 +841,7 @@ body {
 }
 
 .ne-toolbar-btn:active { transform: scale(0.96); }
+.ne-toolbar-btn:disabled { background: #3f4652; border-color: #525b67; color: #9ca3af; cursor: not-allowed; transform: none; }
 
 .ne-process-btn {
     background: #2e7d32;
@@ -557,7 +849,18 @@ body {
 }
 
 .ne-process-btn:hover { background: #388e3c; }
-.ne-process-btn:disabled { background: #555; cursor: not-allowed; }
+.ne-step-btn { background: #1565c0; color: #fff; }
+.ne-step-btn:hover { background: #1976d2; }
+.ne-clear-btn { background: #5f4b1d; border-color: #8b6a22; color: #fef3c7; }
+.ne-clear-btn:hover { background: #765d25; }
+.ne-save-graph-btn { background: #0f766e; border-color: #14b8a6; color: #ecfeff; }
+.ne-save-graph-btn:hover { background: #0d9488; }
+.ne-load-graph-btn { background: #1d4ed8; border-color: #3b82f6; color: #eff6ff; }
+.ne-load-graph-btn:hover { background: #2563eb; }
+.ne-clear-canvas-btn { background: #7f1d1d; border-color: #b91c1c; color: #fff; }
+.ne-clear-canvas-btn:hover { background: #991b1b; }
+.ne-download-all-btn { background: #0f766e; border-color: #14b8a6; color: #ecfeff; }
+.ne-download-all-btn:hover { background: #0d9488; }
 
 .ne-cancel-btn {
     background: #c62828;
@@ -570,6 +873,29 @@ body {
     flex: 1;
     font-size: 11px;
     color: #888;
+}
+
+.ne-status-processing::after {
+    content: '...';
+    display: inline-block;
+    width: 0;
+    overflow: hidden;
+    vertical-align: bottom;
+    animation: ne-processing-dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes ne-processing-dots {
+    0% { width: 0; }
+    25% { width: 0.35em; }
+    50% { width: 0.7em; }
+    75%, 100% { width: 1.05em; }
+}
+
+.ne-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
 }
 
 .ne-toolbar-zoom {
@@ -602,6 +928,86 @@ body {
     background: rgba(233, 69, 96, 0.2);
     color: #fff;
 }
+
+/* ── Confirmation Dialog ─────────────────────────────────────────── */
+.ne-confirm-dialog[hidden] { display: none; }
+
+.ne-confirm-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(4, 8, 20, 0.72);
+}
+
+.ne-confirm-card {
+    width: min(420px, 100%);
+    padding: 20px;
+    border: 1px solid #31527e;
+    border-radius: 6px;
+    background: #16213e;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.48);
+}
+
+.ne-confirm-card h2 {
+    font-size: 16px;
+    color: #f8fafc;
+}
+
+.ne-confirm-card p {
+    margin-top: 10px;
+    color: #cbd5e1;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.ne-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.ne-dialog-cancel {
+    background: #334155;
+    border-color: #475569;
+    color: #f8fafc;
+}
+
+.ne-dialog-cancel:hover { background: #475569; }
+.ne-dialog-confirm { background: #b91c1c; color: #fff; }
+.ne-dialog-confirm:hover { background: #dc2626; }
+
+/* ── Node Result Downloads ───────────────────────────────────────── */
+.ne-node-download-btn {
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.ne-node-download-btn:hover { background: transparent; }
+
+.ne-node-download-btn img {
+    display: block;
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
+}
+
+.ne-node-download-btn:disabled {
+    background: transparent;
+    cursor: not-allowed;
+}
+
+.ne-node-download-btn:disabled img { opacity: 0.35; }
 
 /* ── Scrollbar styling ────────────────────────────────────────────── */
 .ne-sidebar::-webkit-scrollbar,
@@ -652,5 +1058,24 @@ body {
     }
     .ne-sidebar.open {
         left: 0;
+    }
+
+    .ne-toolbar {
+        align-content: center;
+        padding: 6px 10px;
+    }
+
+    .ne-toolbar-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .ne-toolbar-status {
+        flex-basis: 100%;
+        order: 3;
+    }
+
+    .ne-toolbar-zoom {
+        margin-left: auto;
     }
 }
