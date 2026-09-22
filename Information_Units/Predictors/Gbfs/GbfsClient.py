@@ -3,7 +3,7 @@
 from Information_Units.Predictors.ContainerPredictorClient import ContainerPredictorClient
 
 
-class GbfsPredictor(ContainerPredictorClient):
+class GbfsClient(ContainerPredictorClient):
     source = "gbfs"
     service_name = "gbfs"
     api_url_env = "GBFS_PRED_API_URL"
@@ -22,4 +22,4 @@ class GbfsPredictor(ContainerPredictorClient):
         super().__init__(predictor_name, logger)
 
 
-GbfsClient = GbfsPredictor
+GbfsPredictor = GbfsClient

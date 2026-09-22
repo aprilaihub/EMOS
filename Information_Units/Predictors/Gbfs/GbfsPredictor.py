@@ -1,4 +1,12 @@
 from Information_Units.Predictors.BasePredictor import BasePredictor
+from Information_Units.Predictors.Gbfs.GbfsClient import GbfsClient
+
+
+class GbfsPredictor(GbfsClient):
+    """Host-facing GBFS IU backed by the GBFS prediction container."""
+
+    def predict(self, input_data: list[str]) -> dict:
+        return super().predict(input_data)
 
 import os
 import joblib
@@ -44,7 +52,7 @@ except ImportError:
 _API_LOGGER = logging.getLogger("gbfs_api")
 
 # One model bundle per container process. GbfsPredictor loads every property.
-_API_PREDICTOR: Optional['GbfsPredictor'] = None
+_API_PREDICTOR: Optional['GbfsContainerPredictor'] = None
 
 # -----------------------------
 # GLOBAL CACHE
@@ -377,7 +385,7 @@ def generate_features(structure, composition, feature_list, nan_strategy="raise"
 # CLASS INTEGRATION
 # -----------------------------
 
-class GbfsPredictor(BasePredictor):
+class GbfsContainerPredictor(BasePredictor):
     """
     GBFS-based property predictor using LightGBM models with matminer features.
     
@@ -409,7 +417,7 @@ class GbfsPredictor(BasePredictor):
         """
         if os.getenv("EMOS_GBFS_CONTAINER") != "1":
             raise RuntimeError(
-                "GbfsPredictor is container-only; use GbfsClient from host code"
+                "GbfsContainerPredictor is container-only; use GbfsPredictor from host code"
             )
         super().__init__(predictor_name, logger)
         self.source = "gbfs"
@@ -866,12 +874,12 @@ if FASTAPI_AVAILABLE:
         )
 
     # Helper functions
-    def _get_or_load_predictor() -> GbfsPredictor:
+    def _get_or_load_predictor() -> GbfsContainerPredictor:
         """Load the all-property model bundle once per container process."""
         global _API_PREDICTOR
         if _API_PREDICTOR is None:
             _API_LOGGER.info("Loading GBFS model bundle...")
-            _API_PREDICTOR = GbfsPredictor(
+            _API_PREDICTOR = GbfsContainerPredictor(
                 predictor_name="gbfs",
                 model_dir=None,
                 logger=None

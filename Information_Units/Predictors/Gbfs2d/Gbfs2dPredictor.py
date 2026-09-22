@@ -1,4 +1,12 @@
 from Information_Units.Predictors.BasePredictor import BasePredictor
+from Information_Units.Predictors.Gbfs2d.Gbfs2dClient import Gbfs2dClient
+
+
+class Gbfs2dPredictor(Gbfs2dClient):
+    """Host-facing GBFS-2D IU backed by the GBFS-2D prediction container."""
+
+    def predict(self, input_data: list[str]) -> dict:
+        return super().predict(input_data)
 
 import os
 import joblib
@@ -45,7 +53,7 @@ except ImportError:
 _API_LOGGER = logging.getLogger("gbfs2d_api")
 
 # One model bundle per container process. Gbfs2dPredictor loads every property.
-_API_PREDICTOR: Optional['Gbfs2dPredictor'] = None
+_API_PREDICTOR: Optional['Gbfs2dContainerPredictor'] = None
 
 # Global vdW cache
 _VDW_CACHE: Dict[str, bool] = {}
@@ -427,7 +435,7 @@ def generate_features(structure, composition, feature_list, nan_strategy="raise"
 # CLASS INTEGRATION
 # ========================
 
-class Gbfs2dPredictor(BasePredictor):
+class Gbfs2dContainerPredictor(BasePredictor):
     """
     GBFS-2D: Property predictor for 2D layered materials using LightGBM models.
     
@@ -460,7 +468,7 @@ class Gbfs2dPredictor(BasePredictor):
         """
         if os.getenv("EMOS_GBFS2D_CONTAINER") != "1":
             raise RuntimeError(
-                "Gbfs2dPredictor is container-only; use Gbfs2dClient from host code"
+                "Gbfs2dContainerPredictor is container-only; use Gbfs2dPredictor from host code"
             )
         super().__init__(predictor_name, logger)
         self.source = "gbfs-2d"
@@ -893,12 +901,12 @@ if FASTAPI_AVAILABLE:
         )
 
     # Helper functions
-    def _get_or_load_predictor() -> Gbfs2dPredictor:
+    def _get_or_load_predictor() -> Gbfs2dContainerPredictor:
         """Load the all-property model bundle once per container process."""
         global _API_PREDICTOR
         if _API_PREDICTOR is None:
             _API_LOGGER.info("Loading GBFS-2D model bundle...")
-            _API_PREDICTOR = Gbfs2dPredictor(
+            _API_PREDICTOR = Gbfs2dContainerPredictor(
                 predictor_name="gbfs_2d",
                 model_dir=None,
                 logger=None

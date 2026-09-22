@@ -5,7 +5,7 @@ from typing import Any
 from Information_Units.Predictors.ContainerPredictorClient import ContainerPredictorClient
 
 
-class Gbfs2dPredictor(ContainerPredictorClient):
+class Gbfs2dClient(ContainerPredictorClient):
     source = "gbfs-2d"
     service_name = "gbfs-2d"
     api_url_env = "GBFS2D_API_URL"
@@ -24,4 +24,4 @@ class Gbfs2dPredictor(ContainerPredictorClient):
         properties["is_vdw_layered"] = bool(payload.get("is_vdw_layered", False))
 
 
-Gbfs2dClient = Gbfs2dPredictor
+Gbfs2dPredictor = Gbfs2dClient

@@ -168,8 +168,9 @@ class Gbfs2dIUFeature extends BaseFeature {
 
     async _renderPropertyDefs() {
         try {
+            const mappingId = this.iuId === 'gbfs_2d' ? 'gbfs2d' : this.iuId;
             const [mappingRes, commonRes] = await Promise.all([
-                fetch(`./Information_Units/property_mappings/sources/predictors/${this.iuId}.json`),
+                fetch(`./Information_Units/property_mappings/sources/predictors/${mappingId}.json`),
                 fetch('./Information_Units/property_mappings/common_properties.json').catch(() => null),
             ]);
             if (!mappingRes.ok) throw new Error(`${this.iuId} mapping HTTP ${mappingRes.status}`);
