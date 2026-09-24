@@ -34,7 +34,8 @@ kubectl describe pod -n eidf204ns -l emos.ai/gpu-model=true
 ```
 
 The GPU services request one GPU each. GBFS and GBFS2D are deployed without a
-GPU because their models use scikit-learn/LightGBM and matminer.
+GPU because their models use scikit-learn/LightGBM and matminer. All pod
+templates include the VM's required Kueue queue label.
 
 ## Connect the EMOS backend
 

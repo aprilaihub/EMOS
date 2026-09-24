@@ -206,6 +206,7 @@ spec:
     metadata:
       labels:
         app: emos-gbfs
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
     spec:
       containers:
         - name: gbfs
@@ -252,6 +253,7 @@ spec:
     metadata:
       labels:
         app: emos-gbfs2d
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
     spec:
       containers:
         - name: gbfs2d
