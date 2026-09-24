@@ -44,6 +44,8 @@ RUN uv venv .venv --python 3.10 \
 # Make the uv venv the default Python for all subsequent commands
 ENV VIRTUAL_ENV=/app/mattergen/.venv
 ENV PATH="/app/mattergen/.venv/bin:${PATH}"
+ENV MATTERGEN_DEVICE=cuda
+ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 # ── Install the FastAPI server deps into the same venv ─────────────────────
 WORKDIR /app

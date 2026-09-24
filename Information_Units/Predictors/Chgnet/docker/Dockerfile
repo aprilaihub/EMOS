@@ -6,6 +6,9 @@ WORKDIR /app
 
 RUN conda create -n chgnet python=3.11 -y \
     && conda run -n chgnet pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cu118 \
+        "torch==2.5.1" \
+    && conda run -n chgnet pip install --no-cache-dir \
         "chgnet==0.4.0" \
         "ase==3.27.0" \
         pymatgen \
@@ -17,6 +20,8 @@ RUN conda run -n chgnet pip install --no-cache-dir -r /app/requirements.txt
 COPY chgnet_api.py /app/chgnet_api.py
 
 EXPOSE 8000
+
+ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 HEALTHCHECK --interval=300s --timeout=10s --retries=2 --start-period=60s \
     CMD conda run -n chgnet python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import os
+import inspect
 import tempfile
 import traceback
 from pathlib import Path
@@ -43,10 +44,24 @@ from ase.io import read as ase_read, write as ase_write
 from ase.optimize import BFGS
 
 from mattersim.forcefield import MatterSimCalculator
+import torch
 
 # Pre-load the calculator once at startup
+REQUESTED_DEVICE = os.getenv("MATTERSIM_DEVICE", "auto").lower()
+if REQUESTED_DEVICE == "auto":
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+elif REQUESTED_DEVICE == "cuda" and not torch.cuda.is_available():
+    logger.warning("CUDA was requested but is unavailable; using CPU")
+    DEVICE = "cpu"
+else:
+    DEVICE = REQUESTED_DEVICE
+
+calculator_kwargs = {}
+if "device" in inspect.signature(MatterSimCalculator).parameters:
+    calculator_kwargs["device"] = DEVICE
+
 logger.info("Loading MatterSim calculator...")
-_calculator = MatterSimCalculator()
+_calculator = MatterSimCalculator(**calculator_kwargs)
 logger.info("MatterSim calculator loaded successfully")
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,285 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emos-mattergen
+  namespace: eidf204ns
+  labels:
+    app: emos-mattergen
+    emos.ai/gpu-model: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-mattergen
+  template:
+    metadata:
+      labels:
+        app: emos-mattergen
+        emos.ai/gpu-model: "true"
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
+    spec:
+      containers:
+        - name: mattergen
+          image: atishdixit16/emos-mattergen:gpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MATTERGEN_DEVICE
+              value: cuda
+            - name: CUDA_DEVICE_ORDER
+              value: PCI_BUS_ID
+          resources:
+            requests:
+              nvidia.com/gpu: "1"
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: 16Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 60
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-mattergen
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-mattergen
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emos-chgnet
+  namespace: eidf204ns
+  labels:
+    app: emos-chgnet
+    emos.ai/gpu-model: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-chgnet
+  template:
+    metadata:
+      labels:
+        app: emos-chgnet
+        emos.ai/gpu-model: "true"
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
+    spec:
+      containers:
+        - name: chgnet
+          image: atishdixit16/emos-chgnet:gpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: CHGNET_DEVICE
+              value: cuda
+          resources:
+            requests:
+              nvidia.com/gpu: "1"
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: 16Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 60
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-chgnet
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-chgnet
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emos-mattersim
+  namespace: eidf204ns
+  labels:
+    app: emos-mattersim
+    emos.ai/gpu-model: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-mattersim
+  template:
+    metadata:
+      labels:
+        app: emos-mattersim
+        emos.ai/gpu-model: "true"
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
+    spec:
+      containers:
+        - name: mattersim
+          image: atishdixit16/emos-mattersim:gpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MATTERSIM_DEVICE
+              value: cuda
+          resources:
+            requests:
+              nvidia.com/gpu: "1"
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: 16Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 60
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-mattersim
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-mattersim
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emos-gbfs
+  namespace: eidf204ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-gbfs
+  template:
+    metadata:
+      labels:
+        app: emos-gbfs
+    spec:
+      containers:
+        - name: gbfs
+          image: atishdixit16/emos-gbfs:cpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-gbfs
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-gbfs
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emos-gbfs2d
+  namespace: eidf204ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-gbfs2d
+  template:
+    metadata:
+      labels:
+        app: emos-gbfs2d
+    spec:
+      containers:
+        - name: gbfs2d
+          image: atishdixit16/emos-gbfs2d:cpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-gbfs2d
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-gbfs2d
+  ports:
+    - port: 8000
+      targetPort: 8000
