@@ -136,6 +136,10 @@ _jobs: dict[str, dict] = {}
 # Per-job cancellation flags — checked by the generation thread
 _cancel_flags: dict[str, threading.Event] = {}
 
+_prepared_models: dict[str, tuple[object, MatterGenCheckpointInfo]] = {}
+_prepared_models_lock = threading.Lock()
+_generation_lock = threading.Lock()
+
 
 class GenerationCancelledError(Exception):
     """Raised inside a generation thread when the user cancels."""
@@ -155,6 +159,76 @@ def _structure_to_cif(structure: Structure) -> str:
     """Convert a pymatgen Structure to a CIF-format string."""
     cifstr=structure.to(fmt='cif')
     return cifstr
+
+
+def _get_prepared_model(req: GenerateRequest, log) -> tuple[object, MatterGenCheckpointInfo]:
+    """Load each checkpoint and its GemNet model once per process."""
+    model_key = (
+        f"hf:{req.pretrained_name}"
+        if req.pretrained_name is not None
+        else f"path:{Path(req.model_path).resolve()}"
+    )
+    with _prepared_models_lock:
+        cached = _prepared_models.get(model_key)
+        if cached is not None:
+            log("Reusing cached MatterGen model")
+            return cached
+
+        config_overrides = [
+            "++lightning_module.diffusion_module.model."
+            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
+        ]
+        t0 = time.time()
+        if req.pretrained_name is not None:
+            log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
+            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
+                req.pretrained_name,
+                config_overrides=config_overrides,
+            )
+        else:
+            log(f"Loading local checkpoint: {req.model_path}")
+            checkpoint_info = MatterGenCheckpointInfo(
+                model_path=Path(req.model_path).resolve(),
+                load_epoch="last",
+                config_overrides=config_overrides,
+                strict_checkpoint_loading=True,
+            )
+
+        model_holder = CrystalGenerator(
+            checkpoint_info=checkpoint_info,
+            batch_size=1,
+            num_batches=1,
+            properties_to_condition_on={},
+            record_trajectories=False,
+        )
+        model = model_holder.model
+        _prepared_models[model_key] = (model, checkpoint_info)
+        log(f"MatterGen model prepared and cached in {time.time() - t0:.1f}s")
+        return model, checkpoint_info
+
+
+def _create_generator(
+    req: GenerateRequest,
+    model: object,
+    checkpoint_info: MatterGenCheckpointInfo,
+    progress_callback=None,
+) -> CrystalGenerator:
+    """Create request settings around an already-loaded model."""
+    return CrystalGenerator(
+        checkpoint_info=checkpoint_info,
+        properties_to_condition_on=req.properties_to_condition_on or {},
+        batch_size=req.batch_size,
+        num_batches=req.num_batches,
+        record_trajectories=req.record_trajectories,
+        diffusion_guidance_factor=(
+            req.diffusion_guidance_factor
+            if req.diffusion_guidance_factor is not None
+            else 0.0
+        ),
+        target_compositions_dict=req.target_compositions or [],
+        progress_callback=progress_callback,
+        _model=model,
+    )
 
 
 def _run_generation(job_id: str, req: GenerateRequest) -> None:
@@ -185,52 +259,14 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
         else:
             _log("No conditioning properties (unconditional generation)")
 
-        config_overrides = [
-            "++lightning_module.diffusion_module.model."
-            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
-        ]
-
         t0 = time.time()
-
-        if req.pretrained_name is not None:
-            _log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
-            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
-                req.pretrained_name,
-                config_overrides=config_overrides,
-            )
-        else:
-            _log(f"Loading local checkpoint: {req.model_path}")
-            checkpoint_info = MatterGenCheckpointInfo(
-                model_path=Path(req.model_path).resolve(),
-                load_epoch="last",
-                config_overrides=config_overrides,
-                strict_checkpoint_loading=True,
-            )
-
-        t_load = time.time() - t0
-        _log(f"Checkpoint loaded in {t_load:.1f}s")
-
-        guidance = (
-            req.diffusion_guidance_factor
-            if req.diffusion_guidance_factor is not None
-            else 0.0
-        )
-        _log(f"Creating CrystalGenerator (guidance_factor={guidance}, "
-             f"record_trajectories={req.record_trajectories})")
-
-        generator = CrystalGenerator(
-            checkpoint_info=checkpoint_info,
-            properties_to_condition_on=properties,
-            batch_size=req.batch_size,
-            num_batches=req.num_batches,
-            record_trajectories=req.record_trajectories,
-            diffusion_guidance_factor=guidance,
-            target_compositions_dict=req.target_compositions or [],
-        )
+        model, checkpoint_info = _get_prepared_model(req, _log)
+        generator = _create_generator(req, model, checkpoint_info)
 
         _log("Starting diffusion generation...")
         t1 = time.time()
-        structures: list[Structure] = generator.generate(output_dir=output_path)
+        with _generation_lock:
+            structures: list[Structure] = generator.generate(output_dir=output_path)
         t_gen = time.time() - t1
         _log(f"Generation complete: {len(structures)} structure(s) in {t_gen:.1f}s")
 
@@ -420,38 +456,8 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         else:
             _log("No conditioning properties (unconditional generation)")
 
-        config_overrides = [
-            "++lightning_module.diffusion_module.model."
-            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
-        ]
-
         t0 = time.time()
-
-        if req.pretrained_name is not None:
-            _log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
-            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
-                req.pretrained_name,
-                config_overrides=config_overrides,
-            )
-        else:
-            _log(f"Loading local checkpoint: {req.model_path}")
-            checkpoint_info = MatterGenCheckpointInfo(
-                model_path=Path(req.model_path).resolve(),
-                load_epoch="last",
-                config_overrides=config_overrides,
-                strict_checkpoint_loading=True,
-            )
-
-        t_load = time.time() - t0
-        _log(f"Checkpoint loaded in {t_load:.1f}s")
-
-        guidance = (
-            req.diffusion_guidance_factor
-            if req.diffusion_guidance_factor is not None
-            else 0.0
-        )
-        _log(f"Creating CrystalGenerator (guidance_factor={guidance}, "
-             f"record_trajectories={req.record_trajectories})")
+        model, checkpoint_info = _get_prepared_model(req, _log)
 
         # ── tqdm monkeypatch ──────────────────────────────────────────
         # MatterGen uses two tqdm bars:
@@ -546,21 +552,18 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
                 "message": msg,
             })
 
-        generator = CrystalGenerator(
-            checkpoint_info=checkpoint_info,
-            properties_to_condition_on=properties,
-            batch_size=req.batch_size,
-            num_batches=req.num_batches,
-            record_trajectories=req.record_trajectories,
-            diffusion_guidance_factor=guidance,
-            target_compositions_dict=req.target_compositions or [],
+        generator = _create_generator(
+            req,
+            model,
+            checkpoint_info,
             progress_callback=_progress_callback,
         )
 
         _log("Starting diffusion generation...")
         t1 = time.time()
         try:
-            structures: list[Structure] = generator.generate(output_dir=output_path)
+            with _generation_lock:
+                structures: list[Structure] = generator.generate(output_dir=output_path)
         finally:
             # ── Restore original tqdm so we don't leak the patch ──────
             _tqdm_module.tqdm = _original_tqdm

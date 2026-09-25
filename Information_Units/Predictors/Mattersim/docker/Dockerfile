@@ -18,6 +18,9 @@ RUN conda create -n mattersim python=3.13 -y \
         "mattersim==1.2.1" \
         "ase==3.27.0" \
         pymatgen \
+    && conda run -n mattersim pip install --no-cache-dir --no-deps \
+        --index-url https://download.pytorch.org/whl/cu118 \
+        "torch==2.5.1" \
     && conda clean -afy
 
 # ── Install FastAPI server dependencies ───────────────────────────────────
