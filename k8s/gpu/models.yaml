@@ -44,12 +44,19 @@ spec:
               port: 8000
             initialDelaySeconds: 60
             periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               path: /health
               port: 8000
             initialDelaySeconds: 120
             periodSeconds: 60
+            # Preloading the model is CPU-bound and can briefly stall the
+            # event loop's health responses; tolerate that instead of
+            # restarting mid-preload (was causing a restart loop).
+            timeoutSeconds: 30
+            failureThreshold: 10
       # Requests a full (non-MIG) A100-40GB, per EIDF admin guidance
       nodeSelector:
         nvidia.com/gpu.product: NVIDIA-A100-SXM4-40GB
