@@ -64,6 +64,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Default model preloaded at container startup — see _preload_default_model()
+# below. Moves the slow (CPU-bound) checkpoint/architecture build out of the
+# request path so the first /generate call doesn't pay that cost.
+MATTERGEN_PRELOAD_MODEL = os.getenv("MATTERGEN_PRELOAD_MODEL", "mattergen_base")
+
 # Generation output goes to a temporary directory that is cleaned up after
 # each request — no persistent disk writes for CIF files.
 
@@ -229,6 +234,25 @@ def _create_generator(
         progress_callback=progress_callback,
         _model=model,
     )
+
+
+@app.on_event("startup")
+def _preload_default_model() -> None:
+    """Warm the default model in a background thread so pod readiness isn't
+    blocked, while ensuring the first /generate request hits a warm cache."""
+    if not MATTERGEN_PRELOAD_MODEL:
+        return
+
+    def _worker() -> None:
+        preload_req = GenerateRequest(pretrained_name=MATTERGEN_PRELOAD_MODEL)
+        try:
+            _get_prepared_model(preload_req, lambda msg, level="info": logger.log(
+                getattr(logging, level.upper(), logging.INFO), f"[preload] {msg}"
+            ))
+        except Exception:
+            logger.exception("MatterGen preload failed for %s", MATTERGEN_PRELOAD_MODEL)
+
+    threading.Thread(target=_worker, name="mattergen-preload", daemon=True).start()
 
 
 def _run_generation(job_id: str, req: GenerateRequest) -> None:
