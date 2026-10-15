@@ -64,10 +64,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Default model preloaded at container startup — see _preload_default_model()
-# below. Moves the slow (CPU-bound) checkpoint/architecture build out of the
-# request path so the first /generate call doesn't pay that cost.
-MATTERGEN_PRELOAD_MODEL = os.getenv("MATTERGEN_PRELOAD_MODEL", "mattergen_base")
+# Models preloaded at container startup — see _preload_models() below.
+# Keep this configurable because each prepared model remains in process memory.
+# MATTERGEN_PRELOAD_MODELS is a comma-separated list; the legacy singular
+# MATTERGEN_PRELOAD_MODEL variable remains supported for deployments that use it.
+_DEFAULT_PRELOAD_MODELS = "mattergen_base"
+MATTERGEN_PRELOAD_MODELS = os.getenv("MATTERGEN_PRELOAD_MODELS", "").strip()
+if not MATTERGEN_PRELOAD_MODELS:
+    MATTERGEN_PRELOAD_MODELS = os.getenv("MATTERGEN_PRELOAD_MODEL", _DEFAULT_PRELOAD_MODELS)
+PRELOAD_MODELS = tuple(model.strip() for model in MATTERGEN_PRELOAD_MODELS.split(",") if model.strip())
 
 # Generation output goes to a temporary directory that is cleaned up after
 # each request — no persistent disk writes for CIF files.
@@ -144,6 +149,7 @@ _cancel_flags: dict[str, threading.Event] = {}
 _prepared_models: dict[str, tuple[object, MatterGenCheckpointInfo]] = {}
 _prepared_models_lock = threading.Lock()
 _generation_lock = threading.Lock()
+_preload_complete = threading.Event()
 
 
 class GenerationCancelledError(Exception):
@@ -237,20 +243,24 @@ def _create_generator(
 
 
 @app.on_event("startup")
-def _preload_default_model() -> None:
-    """Warm the default model in a background thread so pod readiness isn't
-    blocked, while ensuring the first /generate request hits a warm cache."""
-    if not MATTERGEN_PRELOAD_MODEL:
+def _preload_models() -> None:
+    """Warm configured models in the background during server startup."""
+    if not PRELOAD_MODELS:
+        _preload_complete.set()
         return
 
     def _worker() -> None:
-        preload_req = GenerateRequest(pretrained_name=MATTERGEN_PRELOAD_MODEL)
         try:
-            _get_prepared_model(preload_req, lambda msg, level="info": logger.log(
-                getattr(logging, level.upper(), logging.INFO), f"[preload] {msg}"
-            ))
-        except Exception:
-            logger.exception("MatterGen preload failed for %s", MATTERGEN_PRELOAD_MODEL)
+            for model_name in PRELOAD_MODELS:
+                preload_req = GenerateRequest(pretrained_name=model_name)
+                try:
+                    _get_prepared_model(preload_req, lambda msg, level="info": logger.log(
+                        getattr(logging, level.upper(), logging.INFO), f"[preload:{model_name}] {msg}"
+                    ))
+                except Exception:
+                    logger.exception("MatterGen preload failed for %s", model_name)
+        finally:
+            _preload_complete.set()
 
     threading.Thread(target=_worker, name="mattergen-preload", daemon=True).start()
 
@@ -344,6 +354,13 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
 def health():
     logger.debug("Mattergen service health check requested")
     return {"status": "ok", "service": "mattergen", "message": "Mattergen OK"}
+
+
+@app.get("/ready")
+def ready():
+    if not _preload_complete.is_set():
+        raise HTTPException(status_code=503, detail="MatterGen models are still preloading")
+    return {"status": "ready", "service": "mattergen"}
 
 
 @app.get("/info")

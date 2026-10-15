@@ -27,20 +27,22 @@ spec:
           env:
             - name: MATTERGEN_DEVICE
               value: cuda
+            - name: MATTERGEN_PRELOAD_MODELS
+              value: mattergen_base,mp_20_base,chemical_system,chemical_system_energy_above_hull,dft_band_gap,dft_mag_density,dft_mag_density_hhi_score,ml_bulk_modulus,space_group
             - name: CUDA_DEVICE_ORDER
               value: PCI_BUS_ID
           resources:
             requests:
               nvidia.com/gpu: "1"
               cpu: "2"
-              memory: 8Gi
+              memory: 32Gi
             limits:
               nvidia.com/gpu: "1"
               cpu: "4"
-              memory: 16Gi
+              memory: 32Gi
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ready
               port: 8000
             initialDelaySeconds: 60
             periodSeconds: 30
