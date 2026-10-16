@@ -41,8 +41,10 @@ spec:
               cpu: "4"
               memory: 32Gi
           readinessProbe:
+            # Kueue evicts pods that stay unready during the long model preload.
+            # /ready remains available for manual verification after startup.
             httpGet:
-              path: /ready
+              path: /health
               port: 8000
             initialDelaySeconds: 60
             periodSeconds: 30
