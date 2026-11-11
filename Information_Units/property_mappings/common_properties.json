@@ -535,8 +535,9 @@
     },
     "diffusion_guidance_factor": {
       "type": "float",
-      "description": "Diffusion guidance factor",
-      "category": "generator"
+      "description": "Diffusion guidance factor (1=guided)",
+      "category": "generator",
+      "unit": "dimensionless"
     },
     "dos_ef": {
       "type": "float",
