@@ -11,6 +11,10 @@
     "hull_distance": {
       "name": "energy_above_hull",
       "range_support": false
+    },
+    "diffusion_guidance_factor": {
+      "name": "diffusion_guidance_factor",
+      "range_support": false
     }
   }
 }

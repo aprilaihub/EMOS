@@ -892,6 +892,8 @@ def _run_generator(key, inputs, run_entry=None):
                     props[prop_name] = float(v)
                 except (ValueError, TypeError):
                     props[prop_name] = v
+        if 'diffusion_guidance_factor' in props:
+            gen_inputs['diffusion_guidance_factor'] = props.pop('diffusion_guidance_factor')
         if props:
             gen_inputs['properties_to_condition_on'] = props
 

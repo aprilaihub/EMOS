@@ -533,6 +533,11 @@
       "category": "electronic",
       "unit": "dimensionless"
     },
+    "diffusion_guidance_factor": {
+      "type": "float",
+      "description": "Diffusion guidance factor",
+      "category": "generator"
+    },
     "dos_ef": {
       "type": "float",
       "description": "Density of states at Fermi level (PBEsol)",
