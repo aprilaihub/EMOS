@@ -16,16 +16,23 @@
     <script>
     // EMOS Intelligent Backend Detection System (same as index.html)
     (async function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const portParam = urlParams.get('backend_port');
+        const port = portParam ?? localStorage.getItem('emos_backend_port') ?? '5001';
+        if (!/^\d+$/.test(port) || Number(port) < 1 || Number(port) > 65535) {
+            alert('Invalid backend_port. Use a port between 1 and 65535.');
+            throw new Error('Invalid backend_port: ' + port);
+        }
+        if (portParam !== null) localStorage.setItem('emos_backend_port', port);
         const BACKENDS = {
-            local: 'http://localhost:5001',
+            local: `http://localhost:${port}`,
             render: 'https://emos-backend.onrender.com'
         };
 
         let selectedBackend = 'render';
         let detectionMethod = 'default';
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const backendParam = urlParams.get('backend');
+        const backendParam = urlParams.get('backend') || (portParam !== null ? 'local' : null);
 
         if (backendParam && BACKENDS[backendParam]) {
             selectedBackend = backendParam;
@@ -39,7 +46,8 @@
             }
         }
 
-        if (detectionMethod === 'default' || detectionMethod === 'saved_preference') {
+        if (detectionMethod === 'default' ||
+            (detectionMethod === 'saved_preference' && !(selectedBackend === 'local' && localStorage.getItem('emos_backend_port')))) {
             try {
                 const response = await fetch(BACKENDS.local + '/api/health', {
                     method: 'GET',
@@ -60,7 +68,7 @@
 
         window.EMOS_BACKEND_BASE_URL = BACKENDS[selectedBackend];
         console.log(`🔌 Backend: ${selectedBackend} (${BACKENDS[selectedBackend]}) [${detectionMethod}]`);
-    })();
+    })().catch(console.error);
     </script>
 </head>
 <body>
