@@ -993,7 +993,7 @@ def _run_predictor(key, inputs, upstream, run_entry=None):
 
     # All predictors accept a list[str] of CIF strings in a single batch call
     pred_cls = predictor_factory[key]
-    pred = pred_cls(key, logger)
+    pred = pred_cls(key, logger=logger)
     result = pred.predict(cif_array)
 
     yield _sse_event('log', {'message': f'Prediction complete for {len(cif_array)} structure(s)', 'level': 'info'})
