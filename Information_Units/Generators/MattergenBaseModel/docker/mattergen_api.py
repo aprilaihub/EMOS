@@ -510,73 +510,11 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         import tqdm as _tqdm_module
         import tqdm.auto as _tqdm_auto_module
 
-        _original_tqdm = _tqdm_module.tqdm
-        _original_auto_tqdm = _tqdm_auto_module.tqdm
-
         total_batches = req.num_batches
         _current_batch = [0]  # mutable counter for the outer batch loop
 
-        class _StreamingTqdm(_original_tqdm):
-            """Drop-in tqdm replacement that pushes progress events to the SSE queue."""
-
-            def __init__(self, *args, **kwargs):
-                # Throttle: only push an SSE event every N seconds
-                self._last_sse_time = 0.0
-                self._sse_interval = 2.0  # seconds between SSE pushes
-                self._is_inner = False
-                super().__init__(*args, **kwargs)
-                # Heuristic: the inner (denoising) loop has total >= 100
-                # while the outer (batch) loop has total == num_batches (small)
-                if self.total is not None and self.total >= 100:
-                    self._is_inner = True
-
-            def update(self, n=1):
-                super().update(n)
-                # Check for cancellation on every step
-                _check_cancelled()
-                if not self._is_inner:
-                    # Outer batch loop — track which batch we're on
-                    _current_batch[0] = self.n
-                    return
-                # Inner denoising loop — push throttled progress events
-                now = time.time()
-                if now - self._last_sse_time < self._sse_interval:
-                    return
-                self._last_sse_time = now
-                step = self.n
-                total = self.total or 1
-                pct = step / total
-                # Compose overall progress: combine batch index + inner step
-                batch_frac = (_current_batch[0]) / max(total_batches, 1)
-                inner_frac = pct / max(total_batches, 1)
-                overall = min(batch_frac + inner_frac, 1.0)
-                elapsed = self.format_dict.get("elapsed", 0) or 0
-                rate = self.format_dict.get("rate", None)
-                if rate and rate > 0:
-                    remaining = (total - step) / rate
-                    eta_str = f"{remaining:.0f}s remaining"
-                else:
-                    eta_str = "estimating…"
-                batch_label = f"Batch {_current_batch[0]+1}/{total_batches}" if total_batches > 1 else "Diffusion"
-                msg = f"{batch_label} step {step}/{total} ({pct*100:.0f}%) — {eta_str}"
-                logger.info(f"[{job_id}] step progress: {msg}")
-                progress_queue.put({
-                    "event": "progress",
-                    "progress": round(overall, 4),
-                    "message": msg,
-                })
-
-        # Patch tqdm in the modules MatterGen imports it from
-        _tqdm_module.tqdm = _StreamingTqdm
-        _tqdm_auto_module.tqdm = _StreamingTqdm
-
-        # Also patch into the specific MatterGen modules that already imported tqdm
         import mattergen.diffusion.sampling.pc_sampler as _pc_mod
         import mattergen.generator as _gen_mod
-        _pc_mod_orig_tqdm = getattr(_pc_mod, 'tqdm', None)
-        _gen_mod_orig_tqdm = getattr(_gen_mod, 'tqdm', None)
-        _pc_mod.tqdm = _StreamingTqdm
-        _gen_mod.tqdm = _StreamingTqdm
 
         # Progress callback — fires per-batch from draw_samples_from_sampler
         def _progress_callback(progress: float = 0.0, **kwargs):
@@ -593,26 +531,88 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
                 "message": msg,
             })
 
-        generator = _create_generator(
-            req,
-            model,
-            checkpoint_info,
-            progress_callback=_progress_callback,
-        )
-
-        _log("Starting diffusion generation...")
         t1 = time.time()
-        try:
-            with _generation_lock:
+        # The tqdm patches are process-wide, so keep them inside the generation lock.
+        with _generation_lock:
+            _original_tqdm = _tqdm_module.tqdm
+            _original_auto_tqdm = _tqdm_auto_module.tqdm
+            _pc_mod_orig_tqdm = getattr(_pc_mod, 'tqdm', None)
+            _gen_mod_orig_tqdm = getattr(_gen_mod, 'tqdm', None)
+
+            class _StreamingTqdm(_original_tqdm):
+                """Drop-in tqdm replacement that pushes progress events to the SSE queue."""
+
+                def __init__(self, *args, **kwargs):
+                    # Throttle: only push an SSE event every N seconds
+                    self._last_sse_time = 0.0
+                    self._sse_interval = 2.0  # seconds between SSE pushes
+                    self._is_inner = False
+                    super().__init__(*args, **kwargs)
+                    # Heuristic: the inner (denoising) loop has total >= 100
+                    # while the outer (batch) loop has total == num_batches (small)
+                    if self.total is not None and self.total >= 100:
+                        self._is_inner = True
+
+                def update(self, n=1):
+                    super().update(n)
+                    # Check for cancellation on every step
+                    _check_cancelled()
+                    if not self._is_inner:
+                        # Outer batch loop — track which batch we're on
+                        _current_batch[0] = self.n
+                        return
+                    # Inner denoising loop — push throttled progress events
+                    now = time.time()
+                    if now - self._last_sse_time < self._sse_interval:
+                        return
+                    self._last_sse_time = now
+                    step = self.n
+                    total = self.total or 1
+                    pct = step / total
+                    # Compose overall progress: combine batch index + inner step
+                    batch_frac = (_current_batch[0]) / max(total_batches, 1)
+                    inner_frac = pct / max(total_batches, 1)
+                    overall = min(batch_frac + inner_frac, 1.0)
+                    elapsed = self.format_dict.get("elapsed", 0) or 0
+                    rate = self.format_dict.get("rate", None)
+                    if rate and rate > 0:
+                        remaining = (total - step) / rate
+                        eta_str = f"{remaining:.0f}s remaining"
+                    else:
+                        eta_str = "estimating…"
+                    batch_label = f"Batch {_current_batch[0]+1}/{total_batches}" if total_batches > 1 else "Diffusion"
+                    msg = f"{batch_label} step {step}/{total} ({pct*100:.0f}%) — {eta_str}"
+                    logger.info(f"[{job_id}] step progress: {msg}")
+                    progress_queue.put({
+                        "event": "progress",
+                        "progress": round(overall, 4),
+                        "message": msg,
+                    })
+
+            try:
+                # Patch tqdm in the modules MatterGen imports it from
+                _tqdm_module.tqdm = _StreamingTqdm
+                _tqdm_auto_module.tqdm = _StreamingTqdm
+                _pc_mod.tqdm = _StreamingTqdm
+                _gen_mod.tqdm = _StreamingTqdm
+
+                generator = _create_generator(
+                    req,
+                    model,
+                    checkpoint_info,
+                    progress_callback=_progress_callback,
+                )
+
+                _log("Starting diffusion generation...")
                 structures: list[Structure] = generator.generate(output_dir=output_path)
-        finally:
-            # ── Restore original tqdm so we don't leak the patch ──────
-            _tqdm_module.tqdm = _original_tqdm
-            _tqdm_auto_module.tqdm = _original_auto_tqdm
-            if _pc_mod_orig_tqdm is not None:
-                _pc_mod.tqdm = _pc_mod_orig_tqdm
-            if _gen_mod_orig_tqdm is not None:
-                _gen_mod.tqdm = _gen_mod_orig_tqdm
+            finally:
+                # ── Restore original tqdm so we don't leak the patch ──────
+                _tqdm_module.tqdm = _original_tqdm
+                _tqdm_auto_module.tqdm = _original_auto_tqdm
+                if _pc_mod_orig_tqdm is not None:
+                    _pc_mod.tqdm = _pc_mod_orig_tqdm
+                if _gen_mod_orig_tqdm is not None:
+                    _gen_mod.tqdm = _gen_mod_orig_tqdm
         t_gen = time.time() - t1
         _log(f"Generation complete: {len(structures)} structure(s) in {t_gen:.1f}s")
 
