@@ -3,6 +3,20 @@
    Dark theme, dot-grid canvas, Blender-inspired nodes
    ═══════════════════════════════════════════════════════════════════ */
 
+/* Data Viewer uses local uPlot canvas/axes, with node-local controls. */
+.ne-data-viewer { display: flex; flex-direction: column; gap: 8px; }
+.ne-data-viewer label { display: flex; flex-direction: column; gap: 4px; }
+.ne-data-viewer [hidden] { display: none; }
+.ne-data-viewer select { width: 100%; min-width: 0; }
+.ne-data-viewer button { padding: 5px 8px; cursor: pointer; }
+.ne-data-viewer button:disabled { cursor: default; opacity: .5; }
+.ne-data-status, .ne-data-hover, .ne-data-tsne p { font-size: 11px; overflow-wrap: anywhere; }
+.ne-data-status { color: #9de1e6; }
+.ne-data-tsne p { margin-top: 6px; color: #e7c77d; }
+.ne-data-plot { width: 100%; height: 240px; min-height: 180px; }
+.ne-data-hover { min-height: 30px; color: #c4cedb; }
+.ne-node[data-node-key="data_viewer"] .ne-node-body { max-height: none; }
+
 /* ── Reset & Base ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

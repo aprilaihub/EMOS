@@ -26,6 +26,7 @@
         predictor:   { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }],                           outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         cif_viewer:  { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }], outputs: [] },
         text_viewer: { inputs: [{ key: 'any_in',    label: 'Input',  type: PORT_TYPES.ANY    }], outputs: [] },
+        data_viewer: { inputs: [{ key: 'data_in', label: 'Data', type: PORT_TYPES.ANY }, { key: 'labels_in', label: 'X / Labels (optional)', type: PORT_TYPES.ANY, required: false }], outputs: [] },
         filter:      { inputs: [{ key: 'cif_in',    label: 'CIF (optional)', type: PORT_TYPES.CIF, required: false }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         splitter:    { inputs: [{ key: 'any_in', label: 'Input', type: PORT_TYPES.ANY }], outputs: [] },
@@ -439,6 +440,12 @@
             log.style.maxHeight = `${logHeight}px`;
         }
 
+        const dataPlot = node.el.querySelector('.ne-data-plot');
+        if (dataPlot) {
+            const controlsHeight = dataPlot.parentElement.offsetHeight - dataPlot.offsetHeight;
+            dataPlot.style.height = `${Math.max(180, bodyHeight - controlsHeight - (log?.offsetHeight || 0) - 24)}px`;
+        }
+
         const textContent = node.el.querySelector('.ne-text-viewer-content');
         if (textContent) textContent.style.maxHeight = `${Math.max(80, bodyHeight - 58)}px`;
 
@@ -541,6 +548,7 @@
             breakpointEnabled: false,
             featureDefinition,
             treeInput: null,
+            treeCif: false,
             treeEntries: [],
             treeSelections: new Set(),
             prettyFieldSelections: [],
@@ -553,6 +561,12 @@
         node.el = el;
         canvas.appendChild(el);
         positionNodeEl(node);
+        if (node.key === 'data_viewer') {
+            node.dataViewer = EMOSDataViewer.mount(el, {
+                materialName: getMaterialName,
+                onChange: notifyGraphChanged,
+            });
+        }
         if (!options.suppressSelection) selectNode(id);
         // Populate property fields async after element is in the DOM
         if (node.type === 'database' || node.type === 'generator') {
@@ -737,6 +751,7 @@
     function buildNodeBodyHTML(node) {
         if (node.key === 'cif_viewer')  return buildCIFViewerBody(node);
         if (node.key === 'text_viewer') return buildTextViewerBody(node);
+        if (node.key === 'data_viewer') return EMOSDataViewer.bodyHTML();
         if (node.key === 'filter')      return buildFilterBody(node);
         if (node.key === 'splitter')    return buildSplitterBody(node);
         if (node.key === 'tree_splitter') return buildTreeSplitterBody(node);
@@ -966,7 +981,7 @@
     }
 
     function buildTreeSplitterBody(node) {
-        return `<div class="ne-tree-splitter" id="tree-splitter-${node.id}"><p class="ne-splitter-status">Connect a result to choose fields from its dictionary tree.</p></div>`;
+        return `<div class="ne-tree-splitter" id="tree-splitter-${node.id}"><p class="ne-splitter-status">Connect JSON or CIF input to select fields. CIF values remain strings; missing values are null.</p></div>`;
     }
 
     function buildMergerBody(node) {
@@ -1132,6 +1147,7 @@ output_results = results`;
             }
             return true;
         });
+        node.dataViewer?.destroy();
         node.el.remove();
         delete nodes[id];
         if (selectedNodeId === id) selectedNodeId = null;
@@ -1840,12 +1856,32 @@ output_results = results`;
 
     function executeTreeSplitterNode(node) {
         const input = getUpstreamData(node.id).any_in;
-        node.treeInput = input;
-        node.treeEntries = buildTreeSplitterEntries(input);
+        try {
+            const cif = EMOSCifTree.adapt(input);
+            node.treeInput = input;
+            node.treeCif = Boolean(cif);
+            node.treeEntries = cif ? cif.entries : buildTreeSplitterEntries(input);
+        } catch (error) {
+            resetTreeSplitter(node, error.message);
+            updateNodeDownloadButton(node);
+            throw error;
+        }
         const validSelections = new Set(node.treeEntries.map(entry => entry.id));
         node.treeSelections = new Set([...node.treeSelections].filter(id => validSelections.has(id)));
         renderTreeSplitter(node);
         updateTreeSplitterOutputs(node);
+    }
+
+    function resetTreeSplitter(node, message = 'Execute the graph to reload JSON or CIF fields.') {
+        if (node.key !== 'tree_splitter') return;
+        node.treeInput = null;
+        node.treeEntries = [];
+        node.treeCif = false;
+        node.portData = null;
+        node.resultRecord = null;
+        // Keep configured selections/ports and wires, but never permit stale values to be selected.
+        const container = document.getElementById(`tree-splitter-${node.id}`);
+        if (container) container.textContent = message;
     }
 
     function buildTreeSplitterEntries(value) {
@@ -1915,9 +1951,15 @@ output_results = results`;
             checkbox.checked = node.treeSelections.has(entry.id);
             checkbox.dataset.treePath = entry.id;
             checkbox.addEventListener('change', () => {
+                if (!canEditGraph() || !node.treeEntries.includes(entry)) {
+                    syncTreeSplitterSelections(node);
+                    return;
+                }
                 if (checkbox.checked) node.treeSelections.add(entry.id);
                 else node.treeSelections.delete(entry.id);
                 updateTreeSplitterOutputs(node);
+                wires.filter(wire => wire.fromNode === node.id).forEach(wire => markNodeAndDependentsStale(wire.toNode));
+                if (node.hasCompleted) node.resultRecord = createNodeResultRecord(node);
                 notifyGraphChanged();
             });
             const text = document.createElement('span');
@@ -1934,11 +1976,12 @@ output_results = results`;
             .map(id => entriesById.get(id))
             .filter(Boolean)
             .map(entry => {
-                const value = getTreeSplitterValue(node.treeInput, entry.path);
+                const value = node.treeCif ? entry.value : getTreeSplitterValue(node.treeInput, entry.path);
                 return {
-                    key: treeSplitterPortKey(entry.path),
+                    // Preserve legacy JSON port keys; CIF tags need a collision-free encoding.
+                    key: node.treeCif ? `cif_tree_${encodeURIComponent(entry.id)}` : treeSplitterPortKey(entry.path),
                     label: entry.path.join(' > '),
-                    type: splitterPortType(null, value),
+                    type: node.treeCif ? PORT_TYPES.RESULT : splitterPortType(null, value),
                     value,
                 };
             });
@@ -2133,6 +2176,14 @@ output_results = results`;
 
     function isNodeReady(node) {
         if (!isConfiguredForExecution(node)) return false;
+        if (node.key === 'data_viewer') {
+            // Optional means it may be disconnected, not that a connected source
+            // can be read before completion (or while its labels are stale).
+            return wires.filter(wire => wire.toNode === node.id).every(wire => {
+                const source = nodes[wire.fromNode];
+                return source && source.hasCompleted && !source.isStale;
+            });
+        }
         if (node.key === 'merger') {
             return getMergerInputConnections(node).every(({ source }) => source.hasCompleted && !source.isStale);
         }
@@ -2203,11 +2254,13 @@ output_results = results`;
             visited.add(currentId);
 
             const node = nodes[currentId];
+            node?.dataViewer?.reset('Upstream input changed. Execute the graph to reload data.');
             if (node && (node.hasCompleted || node.data != null || node.portData != null)) {
                 node.isStale = true;
                 setNodeState(currentId, 'stale');
                 updateNodeDownloadButton(node);
             }
+            if (node) resetTreeSplitter(node, 'Upstream input changed. Execute the graph to reload fields.');
             for (const wire of wires) {
                 if (wire.fromNode === currentId) queue.push(wire.toNode);
             }
@@ -2268,7 +2321,7 @@ output_results = results`;
         if (!accepted) return;
 
         cancelWiring();
-        Object.values(nodes).forEach(node => node.el.remove());
+        Object.values(nodes).forEach(node => { node.dataViewer?.destroy(); node.el.remove(); });
         wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
         nodes = {};
         wires = [];
@@ -2298,6 +2351,8 @@ output_results = results`;
     }
 
     function resetViewerDisplay(node) {
+        resetTreeSplitter(node);
+        node.dataViewer?.reset();
         if (node.key === 'text_viewer') {
             const content = document.getElementById(`text-viewer-${node.id}`);
             if (content) content.textContent = 'No data yet.';
@@ -2440,6 +2495,7 @@ output_results = results`;
 
     function serializeGraphNode(node) {
         const configuration = { fields: serializeGraphFields(node) };
+        if (node.key === 'data_viewer') configuration.dataViewer = node.dataViewer.configuration();
 
         if (node.key === 'filter') configuration.filterRules = serializeFilterRules(node);
         if (node.key === 'tree_splitter') configuration.treeSelections = [...node.treeSelections];
@@ -2607,6 +2663,7 @@ output_results = results`;
         restoreGraphFields(node, configuration.fields);
         if (node.key === 'tree_splitter') node.treeSelections = new Set((configuration.treeSelections || []).filter(value => typeof value === 'string'));
         if (node.key === 'text_viewer') restoreTextViewerConfiguration(node, configuration.textViewer);
+        if (node.key === 'data_viewer') node.dataViewer.restore(configuration.dataViewer);
         updateBreakpointButton(node);
     }
 
@@ -2710,7 +2767,7 @@ output_results = results`;
 
     function clearGraphWithoutConfirmation() {
         cancelWiring();
-        Object.values(nodes).forEach(node => node.el.remove());
+        Object.values(nodes).forEach(node => { node.dataViewer?.destroy(); node.el.remove(); });
         wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
         nodes = {};
         wires = [];
@@ -3072,6 +3129,16 @@ output_results = results`;
     // ═══════════════════════════════════════════════════════════════
     function displayViewerData(node) {
         const upstreamData = getUpstreamData(node.id);
+        // Data Viewer consumes named ports; retain legacy first-value behavior below.
+        if (node.key === 'data_viewer') {
+            node.data = upstreamData.data_in;
+            if (!Object.hasOwn(upstreamData, 'labels_in') && wires.some(wire => wire.toNode === node.id && wire.toPort === 'labels_in')) {
+                upstreamData.labels_in = null; // Connected but missing labels must fail validation.
+            }
+            node.dataViewer.load(upstreamData.data_in, upstreamData.labels_in);
+            setNodeState(node.id, 'done');
+            return;
+        }
         // Get the first upstream value
         const dataKey = Object.keys(upstreamData)[0];
         const data = upstreamData[dataKey];
