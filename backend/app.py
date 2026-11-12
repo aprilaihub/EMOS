@@ -892,6 +892,8 @@ def _run_generator(key, inputs, run_entry=None):
                     props[prop_name] = float(v)
                 except (ValueError, TypeError):
                     props[prop_name] = v
+        if 'diffusion_guidance_factor' in props:
+            gen_inputs['diffusion_guidance_factor'] = props.pop('diffusion_guidance_factor')
         if props:
             gen_inputs['properties_to_condition_on'] = props
 
@@ -991,7 +993,7 @@ def _run_predictor(key, inputs, upstream, run_entry=None):
 
     # All predictors accept a list[str] of CIF strings in a single batch call
     pred_cls = predictor_factory[key]
-    pred = pred_cls(key, logger)
+    pred = pred_cls(key, logger=logger)
     result = pred.predict(cif_array)
 
     yield _sse_event('log', {'message': f'Prediction complete for {len(cif_array)} structure(s)', 'level': 'info'})
