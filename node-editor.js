@@ -18,6 +18,13 @@
     const GRAPH_FILE_FORMAT = 'emos-node-graph';
     const GRAPH_FILE_VERSION = 1;
     const DYNAMIC_OUTPUT_NODE_KEYS = new Set(['splitter', 'tree_splitter', 'merger']);
+    const MOSFET_REGIONS = ['channel'];
+    const MOSFET_CHANNEL_PINS = [
+        { key: 'channel_bandgap', label: 'Channel · Bandgap (eV)', field: 'channelEgEv', scale: 1, min: 0 },
+        { key: 'channel_mob_n', label: 'Channel · Electron mobility (cm²/V·s)', field: 'channelUn', scale: 1e-4, min: 0 },
+        { key: 'channel_mob_p', label: 'Channel · Hole mobility (cm²/V·s)', field: 'channelUp', scale: 1e-4, min: 0 },
+        { key: 'channel_dielectric', label: 'Channel · Relative permittivity', field: 'channelEpsRel', scale: 1, min: 0, positive: true },
+    ];
 
     // Node definitions — ports schema per category
     const NODE_SCHEMAS = {
@@ -558,6 +565,7 @@
 
         nodes[id] = node;
         const el = renderNode(node);
+        if (isMosfetFeature(featureDefinition)) el.classList.add('ne-mosfet-node');
         node.el = el;
         canvas.appendChild(el);
         positionNodeEl(node);
@@ -779,7 +787,18 @@
         return html;
     }
 
+    function isMosfetFeature(feature) {
+        return feature?.folder_path?.includes('/MosfetEvaluator') === true;
+    }
+
     function getFeatureNodeSchema(feature) {
+        if (isMosfetFeature(feature)) {
+            const inputs = MOSFET_REGIONS.flatMap(region => [
+                { key: `${region}_name`, label: `${region[0].toUpperCase() + region.slice(1)} · Name / CIF`, type: PORT_TYPES.ANY, region },
+                ...MOSFET_CHANNEL_PINS.map(pin => ({ ...pin, type: PORT_TYPES.RESULT, region })),
+            ]).map(input => ({ ...input, required: false }));
+            return { inputs, outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] };
+        }
         const acceptsCif = (feature.inputs || []).some(input => input.type === 'file' && /cif/i.test(input.name));
         return {
             inputs: acceptsCif ? [{ key: 'cif_in', label: 'CIF', type: PORT_TYPES.CIF }] : [],
@@ -792,8 +811,10 @@
         if (!feature) return '<p class="ne-feature-note">Feature metadata is unavailable.</p>';
 
         let html = '<div class="ne-feature-fields">';
-        if (feature.display_name === 'MOSFET evaluator') {
-            html += '<p class="ne-feature-note">This feature currently uses simulation parameters only.</p>';
+        if (isMosfetFeature(feature)) {
+            html += '<p class="ne-feature-note">All pins are optional. Connected channel properties override the manual fields below. Mobility pins use cm²/(V·s); manual fields use m²/(V·s).</p>';
+            html += '<p class="ne-feature-note">Names are labels only. Lists must have equal lengths and match by index; scalar values apply to every material. Gate, source, drain, oxide and contact settings remain manual.</p>';
+            html += '<p class="ne-feature-note">Suggested IUs: GBFS → bandgap, mob_n, mob_p, dielectric; GBFS-2D → bandgap. Connect a database or generator CIF output to Name / CIF. Use Splitter nodes to extract predictor properties.</p>';
         }
         for (const input of feature.inputs || []) {
             if (input.type === 'file' && /cif/i.test(input.name)) {
@@ -1600,10 +1621,78 @@ output_results = results`;
     }
 
     async function executeFeatureNode(backendUrl, node) {
+        const inputs = buildFeatureRequest(node);
+        if (!isMosfetFeature(node.featureDefinition)) return requestFeatureResult(backendUrl, node, inputs);
+
+        const plan = buildMosfetRunPlan(node);
+        if (!plan.connected) return requestFeatureResult(backendUrl, node, inputs);
+        const results = [];
+        addNodeLog(node.id, `Evaluating ${plan.count} material combination(s).`, 'info');
+        for (let run = 0; run < plan.count; run++) {
+            const request = { ...inputs };
+            if (plan.batched) request.nodeBatchOutput = true;
+            const materials = {};
+            let remaining = run;
+            for (const region of [...plan.regions].reverse()) {
+                const index = remaining % region.entries.length;
+                remaining = Math.floor(remaining / region.entries.length);
+                const entry = region.entries[index];
+                Object.assign(request, entry.inputs);
+                materials[region.name] = { name: entry.name, index };
+            }
+            addNodeLog(node.id, `Material combination ${run + 1}/${plan.count}`, 'info');
+            try {
+                const result = await requestFeatureResult(backendUrl, node, request);
+                results.push({ ...result, node_materials: materials });
+            } catch (error) {
+                throw new Error(`Material combination ${run + 1}/${plan.count}: ${error.message}`);
+            }
+            setNodeProgress(node.id, (run + 1) / plan.count * 100);
+        }
+        return plan.batched ? results : results[0];
+    }
+
+    function buildMosfetRunPlan(node) {
+        const upstream = getUpstreamData(node.id);
+        const connected = node.inputs.filter(input => wires.some(wire => wire.toNode === node.id && wire.toPort === input.key));
+        const regions = MOSFET_REGIONS.map(name => {
+            const pins = connected.filter(input => input.region === name);
+            const lists = pins.filter(input => Array.isArray(upstream[input.key]));
+            const size = lists.length ? upstream[lists[0].key].length : 1;
+            if (size === 0) throw new Error(`${name}: connected lists must not be empty.`);
+            if (lists.some(input => upstream[input.key].length !== size)) {
+                throw new Error(`${name}: all connected parameter lists, including names, must have the same length.`);
+            }
+            const entries = Array.from({ length: size }, (_, index) => {
+                const entry = { name: null, inputs: {} };
+                for (const pin of pins) {
+                    const value = Array.isArray(upstream[pin.key]) ? upstream[pin.key][index] : upstream[pin.key];
+                    if (!pin.field) {
+                        if (typeof value !== 'string' || !value.trim()) {
+                            throw new Error(`${pin.label}, item ${index + 1}: expected a non-empty name or CIF string.`);
+                        }
+                        entry.name = isCifString(value) ? getCifComposition(value, index) : value.trim();
+                    } else {
+                        if (typeof value !== 'number' || !Number.isFinite(value) || value < pin.min || (pin.positive && value === 0)) {
+                            throw new Error(`${pin.label}, item ${index + 1}: expected a finite ${pin.positive ? 'positive' : 'non-negative'} scalar number.`);
+                        }
+                        entry.inputs[pin.field] = value * pin.scale;
+                    }
+                }
+                return entry;
+            });
+            return { name, entries };
+        });
+        const count = regions.reduce((total, region) => total * region.entries.length, 1);
+        if (!Number.isSafeInteger(count)) throw new Error('Too many material combinations to enumerate safely.');
+        return { regions, count, connected: connected.length > 0, batched: connected.some(input => Array.isArray(upstream[input.key])) };
+    }
+
+    async function requestFeatureResult(backendUrl, node, inputs) {
         const response = await fetch(`${backendUrl}/api/process/${node.key}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(buildFeatureRequest(node)),
+            body: JSON.stringify(inputs),
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -1708,6 +1797,7 @@ output_results = results`;
     }
 
     function getFeatureSplitterOutputs(feature, value) {
+        if (isMosfetFeature(feature) && (Array.isArray(value) || value?.node_materials)) return getRuntimeSplitterOutputs(value);
         return (feature?.outputs || []).map(output => ({
             key: splitterPortKey(output.name),
             label: output.display_name || displaySplitterKey(output.name),
@@ -2176,9 +2266,9 @@ output_results = results`;
 
     function isNodeReady(node) {
         if (!isConfiguredForExecution(node)) return false;
-        if (node.key === 'data_viewer') {
+        if (node.key === 'data_viewer' || isMosfetFeature(node.featureDefinition)) {
             // Optional means it may be disconnected, not that a connected source
-            // can be read before completion (or while its labels are stale).
+            // can be read before completion (or while its output is stale).
             return wires.filter(wire => wire.toNode === node.id).every(wire => {
                 const source = nodes[wire.fromNode];
                 return source && source.hasCompleted && !source.isStale;

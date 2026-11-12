@@ -632,6 +632,16 @@ body {
     margin-left: 2px;
 }
 
+.ne-mosfet-node .ne-port-label-input {
+    position: absolute;
+    right: 18px;
+    max-width: 240px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: #1e1e38;
+    color: #bbb;
+}
+
 .ne-port-label-output {
     margin-right: 0;
     text-align: right;
