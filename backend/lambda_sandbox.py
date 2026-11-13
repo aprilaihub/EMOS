@@ -137,7 +137,7 @@ def validate_lambda_code(code: str) -> ast.Module:
     return tree
 
 
-def run_sandboxed_lambda(code: str, cif_list: list[str], results: dict[str, Any]) -> dict[str, Any]:
+def run_sandboxed_lambda(code: str, cif_list: list[str], results: dict[str, Any] | list[Any]) -> dict[str, Any]:
     """Execute a pipeline transform in an isolated child with no environment."""
     validate_lambda_code(code)
     payload = json.dumps({"code": code, "cif_list": cif_list, "results": results})
@@ -188,7 +188,7 @@ def _worker() -> int:
         namespace = {
             "__builtins__": SAFE_BUILTINS,
             "cif_list": list(payload.get("cif_list", [])),
-            "results": dict(payload.get("results", {})),
+            "results": payload.get("results", {}),
             "output_cifs": None,
             "output_results": None,
         }
@@ -205,8 +205,8 @@ def _worker() -> int:
             raise LambdaSandboxError("output_cifs must be a list")
         if not all(isinstance(item, str) for item in output_cifs):
             raise LambdaSandboxError("output_cifs must contain only strings")
-        if not isinstance(output_results, dict):
-            raise LambdaSandboxError("output_results must be a dictionary")
+        if not isinstance(output_results, (dict, list)):
+            raise LambdaSandboxError("output_results must be a dictionary or list")
 
         response = {
             "ok": True,

@@ -1122,11 +1122,11 @@
         const defaultCode =
 `# Available variables:
 #   cif_list  - list[str] of CIF strings
-#   results   - predictor result dict {source, results: [...]}
+#   results   - connected result dictionary or list
 #
 # Set output variables before the script ends:
 #   output_cifs    - list[str] of CIF strings to pass forward
-#   output_results - results dict to pass forward
+#   output_results - dictionary or list to pass forward
 
 output_cifs = cif_list
 output_results = results`;

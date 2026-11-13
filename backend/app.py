@@ -1013,7 +1013,7 @@ def _run_lambda(inputs, upstream):
         cif_list = []
 
     results = upstream.get('result_in', {})
-    if not isinstance(results, dict):
+    if not isinstance(results, (dict, list)):
         results = {}
 
     yield _sse_event('log', {'message': f'Lambda: executing on {len(cif_list)} CIF(s)…', 'level': 'info'})
