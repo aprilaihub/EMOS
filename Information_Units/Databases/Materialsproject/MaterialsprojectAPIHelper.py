@@ -248,12 +248,32 @@ class MaterialsprojectAPIHelper:
         # Try parsing as a chemical formula first
         try:
             composition = Composition(query)
-            elements = [el.symbol for el in composition.elements]
-            if elements:
-                if len(elements) == 1:
-                    return f'elements HAS "{elements[0]}"'
-                elements_filter = "(" + " AND ".join([f'elements HAS "{el}"' for el in elements]) + ")"
-                return f'{elements_filter} AND nelements = {len(elements)}'
+            if len(composition.elements) == 1:
+                return f'elements HAS "{composition.elements[0].symbol}"'
+
+            candidate_formulas = []
+            for attr_name in ('reduced_formula', 'alphabetical_formula'):
+                formula = getattr(composition, attr_name, None)
+                if not formula:
+                    continue
+                normalized = str(formula).replace(' ', '')
+                if normalized and normalized not in candidate_formulas:
+                    candidate_formulas.append(normalized)
+
+            if candidate_formulas:
+                formula_filters = [f'chemical_formula_reduced = "{formula}"' for formula in candidate_formulas]
+                if len(formula_filters) == 1:
+                    exact_formula_filter = formula_filters[0]
+                else:
+                    exact_formula_filter = '(' + ' OR '.join(formula_filters) + ')'
+
+                # Fallback for provider-specific formula ordering conventions.
+                # This keeps composition search robust when reduced-formula strings differ
+                # in token order (e.g., Ba3AsP vs AsBa3P).
+                element_symbols = [el.symbol for el in composition.elements]
+                elements_filter = '(' + ' AND '.join([f'elements HAS "{el}"' for el in element_symbols]) + ')'
+                nelements_filter = f'nelements = {len(element_symbols)}'
+                return f'({exact_formula_filter} OR ({elements_filter} AND {nelements_filter}))'
         except Exception:
             pass
 

@@ -139,6 +139,7 @@ def _model_service_availability():
         'mattergen': (generator_factory['mattergen_base_model'], 'mattergen_base_model'),
         'mattersim': (predictor_factory['mattersim'], 'mattersim'),
         'chgnet': (predictor_factory['chgnet'], 'chgnet'),
+        'grace': (predictor_factory['grace'], 'grace'),
         'gbfs': (predictor_factory['gbfs'], 'gbfs'),
         'gbfs_2d': (predictor_factory['gbfs_2d'], 'gbfs_2d'),
     }
@@ -183,6 +184,7 @@ def _availability_payload():
     predictors = {
         'mattersim': {'available': bool(services['mattersim'].get('available')), 'service': 'mattersim'},
         'chgnet': {'available': bool(services['chgnet'].get('available')), 'service': 'chgnet'},
+        'grace': {'available': bool(services['grace'].get('available')), 'service': 'grace'},
         'gbfs': {'available': bool(services['gbfs'].get('available')), 'service': 'gbfs'},
         'gbfs_2d': {'available': bool(services['gbfs_2d'].get('available')), 'service': 'gbfs_2d'},
         'synthnn': {'available': True, 'service': 'local'},
