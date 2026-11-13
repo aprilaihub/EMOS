@@ -40,6 +40,7 @@
     "predictors": {
       "MatterSim": "Universal neural network potential for materials simulation",
       "CHGNet": "Charge-informed graph neural network potential for energy, force, stress, and relaxation prediction",
+      "GRACE": "Foundation-model interatomic potential for crystal structure property prediction",
       "SynthNN": "Synthesis Neural Network for synthesizability prediction", 
       "GBFS": "Pretrained predictors from GBFS workflow, implemented in Python",
       "GBFS-2D": "Pretrained GBFS workflow predictors specialized for 2D layered materials",
@@ -82,7 +83,7 @@
       "inputs": [
         {"name": "cif_files", "display_name": "CIF Files", "type": "file", "required": true, "accept": ".cif", "multiple": true, "description": "One or more CIF structures to analyse"},
         {"name": "active_databases", "display_name": "Databases", "type": "iu_checkbox_group", "required": false, "options": [{"value": "materialsproject", "text": "Materials Project"}, {"value": "alexandria", "text": "Alexandria"}], "description": "Optional database sources used for stability evidence"},
-        {"name": "active_predictors", "display_name": "Predictors", "type": "iu_checkbox_group", "required": false, "options": [{"value": "mattersim", "text": "MatterSim"}, {"value": "chgnet", "text": "CHGNet"}], "description": "Optional predictors used for stability evidence"}
+        {"name": "active_predictors", "display_name": "Predictors", "type": "iu_checkbox_group", "required": false, "options": [{"value": "mattersim", "text": "MatterSim"}, {"value": "chgnet", "text": "CHGNet"}, {"value": "grace", "text": "GRACE"}], "description": "Optional predictors used for stability evidence"}
       ],
       "outputs": [
         {"name": "status", "display_name": "Status", "type": "text", "description": "Analysis status when cancelled or failed"},
