@@ -10,7 +10,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
 # ── Create conda environment with MatterSim ───────────────────────────────
-RUN conda create -n mattersim python=3.13 -y \
+# Python 3.11 (same as CHGNet): cu118 wheels for torch/torchvision/torchaudio
+# are not published for 3.13. Installing the full trio up front satisfies
+# MatterSim's torch>=/torchvision>=/torchaudio>= requirements, so pip does not
+# pull newer CUDA builds that this cluster's driver cannot run.
+RUN conda create -n mattersim python=3.11 -y \
+    && conda run -n mattersim pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cu118 \
+        "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1" \
     && conda run -n mattersim pip install --no-cache-dir \
         "mattersim==1.2.1" \
         "ase==3.27.0" \
@@ -26,6 +33,9 @@ COPY mattersim_api.py /app/mattersim_api.py
 
 # Expose the FastAPI port
 EXPOSE 8000
+
+ENV MATTERSIM_DEVICE=auto
+ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 # Health-check
 HEALTHCHECK --interval=300s --timeout=10s --retries=2 --start-period=60s \

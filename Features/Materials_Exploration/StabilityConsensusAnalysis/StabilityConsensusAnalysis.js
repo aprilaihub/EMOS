@@ -1,7 +1,7 @@
-// Stability Consensus Analysis Feature
+// Stability Analysis Feature
 class StabilityConsensusAnalysisFeature extends BaseFeature {
     constructor(featureId) {
-        super(featureId, 'Stability Consensus Analysis', 'Query materials databases and run predictors to evaluate multi-source stability');
+        super(featureId, 'Stability Analysis', 'Query materials databases and run predictors to evaluate multi-source stability');
         this.uploadedCifFiles = [];
         this.pendingFileReads = 0;
         this.selectedCifCount = 0;
@@ -46,6 +46,10 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
                                 <input type="checkbox" name="predictor" value="chgnet" style="width:18px; height:18px; margin:0; padding:0;">
                                 <span style="text-align:left;">CHGNet</span>
                             </label>
+                            <label style="display:grid; grid-template-columns:20px minmax(0, 1fr); align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #e3e7ee; border-radius:6px; background:#f8f9fa; cursor:pointer;">
+                                <input type="checkbox" name="predictor" value="grace" style="width:18px; height:18px; margin:0; padding:0;">
+                                <span style="text-align:left;">GRACE</span>
+                            </label>
                         </div>
                     </fieldset>
                 </div>
@@ -63,7 +67,6 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
                     </div>
 
                     <div class="output-item">
-                        <strong>Stability Heatmap:</strong>
                         <div id="stabilityHeatmap_${this.featureId}" style="width:100%; margin-top:0.75rem;"></div>
                     </div>
 
@@ -252,7 +255,8 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             materialsproject: 'Materials Project',
             alexandria: 'Alexandria',
             mattersim: 'MatterSim',
-            chgnet: 'CHGNet'
+            chgnet: 'CHGNet',
+            grace: 'GRACE'
         };
 
         const revokeDownloadUrl = () => {
@@ -276,51 +280,335 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             this._downloadJsonUrl = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = this._downloadJsonUrl;
-            link.download = 'stability-consensus-results.json';
+            link.download = 'stability-analysis-results.json';
             link.textContent = 'Download JSON';
             link.addEventListener('click', () => this.addLog('Results downloaded', 'success'));
             downloadEl.appendChild(link);
         };
 
-        const classifyResult = (sourceData) => {
-            const stability = String(sourceData?.stability || '');
-            if (stability.includes('✅')) {
-                return { label: 'Stable', color: '#cfe8d3' };
+        const positiveColor = '#cfe8d3';
+        const negativeColor = '#f2cccc';
+        const missingColor = '#e1e5e8';
+
+        const toFiniteNumber = (value) => {
+            if (value === null || value === undefined) {
+                return null;
             }
-            if (stability.includes('❌')) {
-                return { label: 'Unstable', color: '#f2cccc' };
+            if (typeof value === 'string' && value.trim() === '') {
+                return null;
             }
-            return { label: 'Not found / error', color: '#e1e5e8' };
+            const numeric = Number(value);
+            return Number.isFinite(numeric) ? numeric : null;
+        };
+
+        const extractFormationEnergyValue = (entry, sourceKey) => {
+            const sourceData = (entry.sources || {})[sourceKey] || {};
+            if (sourceKey === 'materialsproject' || sourceKey === 'alexandria') {
+                return toFiniteNumber(sourceData?.thermodynamic_metrics?.formation_energy_per_atom?.value);
+            }
+            return toFiniteNumber(sourceData.raw_value);
+        };
+
+        const extractHullValue = (entry, sourceKey) => {
+            const sourceData = (entry.sources || {})[sourceKey] || {};
+            if (sourceKey === 'materialsproject') {
+                return toFiniteNumber(sourceData?.thermodynamic_metrics?.energy_above_hull?.value ?? sourceData.raw_value);
+            }
+            if (sourceKey === 'alexandria') {
+                return toFiniteNumber(sourceData?.thermodynamic_metrics?.hull_distance?.value ?? sourceData.raw_value);
+            }
+            return null;
+        };
+
+        const classifyMetricCell = (value, threshold, positiveLabel, negativeLabel) => {
+            const numericValue = toFiniteNumber(value);
+            if (numericValue === null) {
+                return {
+                    text: 'NA',
+                    color: missingColor,
+                    label: 'Missing value'
+                };
+            }
+
+            const isPositive = numericValue < threshold || Math.abs(numericValue - threshold) < 1e-12;
+            return {
+                text: numericValue.toFixed(4),
+                color: isPositive ? positiveColor : negativeColor,
+                label: isPositive ? positiveLabel : negativeLabel
+            };
         };
 
         const renderHeatmap = (cifResults) => {
             if (!heatmapEl) return;
             heatmapEl.innerHTML = '';
 
-            const sourceKeys = [];
-            document.querySelectorAll(
-                `#dbCheckboxes_${this.featureId} input[type="checkbox"]:checked, `
-                + `#predCheckboxes_${this.featureId} input[type="checkbox"]:checked`
-            ).forEach((input) => {
-                if (!sourceKeys.includes(input.value)) sourceKeys.push(input.value);
-            });
-            cifResults.forEach((entry) => {
-                Object.keys(entry.sources || {}).forEach((source) => {
-                    if (!sourceKeys.includes(source)) sourceKeys.push(source);
-                });
-            });
+            const computeMeanStd = (values) => {
+                const finiteValues = values
+                    .map(value => toFiniteNumber(value))
+                    .filter(value => value !== null);
 
-            const preferredOrder = ['materialsproject', 'alexandria', 'mattersim', 'chgnet'];
-            sourceKeys.sort((a, b) => {
-                const aIndex = preferredOrder.includes(a) ? preferredOrder.indexOf(a) : preferredOrder.length;
-                const bIndex = preferredOrder.includes(b) ? preferredOrder.indexOf(b) : preferredOrder.length;
-                return aIndex - bIndex;
-            });
+                if (finiteValues.length === 0) {
+                    return { mean: null, stdDev: null, count: 0 };
+                }
 
-            if (sourceKeys.length === 0) {
-                heatmapEl.textContent = 'No source results available.';
-                return;
-            }
+                const mean = finiteValues.reduce((sum, value) => sum + value, 0) / finiteValues.length;
+                const variance = finiteValues.reduce((sum, value) => {
+                    const delta = value - mean;
+                    return sum + (delta * delta);
+                }, 0) / finiteValues.length;
+
+                return {
+                    mean,
+                    stdDev: Math.sqrt(variance),
+                    count: finiteValues.length,
+                };
+            };
+
+            const extractAggregateStats = (entry, metricKey, fallbackValues) => {
+                const aggregateBlock = entry?.thermodynamic_aggregates?.[metricKey];
+                const aggregateMean = toFiniteNumber(aggregateBlock?.mean);
+                const aggregateStd = toFiniteNumber(aggregateBlock?.std_dev);
+                if (aggregateMean !== null || aggregateStd !== null) {
+                    return {
+                        mean: aggregateMean,
+                        stdDev: aggregateStd,
+                        count: Number(aggregateBlock?.count) || 0,
+                    };
+                }
+                return computeMeanStd(fallbackValues);
+            };
+
+            const metricColumns = [
+                {
+                    key: 'mp_formation_energy',
+                    title: 'MP ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.materialsproject,
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => extractFormationEnergyValue(entry, 'materialsproject'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable',
+                        'Formation-unfavorable'
+                    ),
+                },
+                {
+                    key: 'alex_formation_energy',
+                    title: 'Alex ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.alexandria,
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => extractFormationEnergyValue(entry, 'alexandria'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable',
+                        'Formation-unfavorable'
+                    ),
+                },
+                {
+                    key: 'mattersim_formation_energy',
+                    title: 'MatterSim ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.mattersim,
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => extractFormationEnergyValue(entry, 'mattersim'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable',
+                        'Formation-unfavorable'
+                    ),
+                },
+                {
+                    key: 'chgnet_formation_energy',
+                    title: 'CHGNet ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.chgnet,
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => extractFormationEnergyValue(entry, 'chgnet'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable',
+                        'Formation-unfavorable'
+                    ),
+                },
+                {
+                    key: 'grace_formation_energy',
+                    title: 'GRACE ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.grace,
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => extractFormationEnergyValue(entry, 'grace'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable',
+                        'Formation-unfavorable'
+                    ),
+                },
+                {
+                    key: 'formation_energy_avg',
+                    title: 'Avg ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: 'All formation sources',
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => {
+                        const stats = extractAggregateStats(
+                            entry,
+                            'formation_energy_per_atom',
+                            [
+                                extractFormationEnergyValue(entry, 'materialsproject'),
+                                extractFormationEnergyValue(entry, 'alexandria'),
+                                extractFormationEnergyValue(entry, 'mattersim'),
+                                extractFormationEnergyValue(entry, 'chgnet'),
+                                extractFormationEnergyValue(entry, 'grace'),
+                            ],
+                        );
+                        return stats.mean;
+                    },
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.0,
+                        'Formation-favorable (average)',
+                        'Formation-unfavorable (average)'
+                    ),
+                },
+                {
+                    key: 'formation_energy_std',
+                    title: 'Std ΔHf',
+                    subtitle: 'eV/atom',
+                    sourceLabel: 'All formation sources',
+                    unit: 'eV/atom',
+                    groupLabel: 'Formation energy (ΔHf, eV/atom)',
+                    getValue: (entry) => {
+                        const stats = extractAggregateStats(
+                            entry,
+                            'formation_energy_per_atom',
+                            [
+                                extractFormationEnergyValue(entry, 'materialsproject'),
+                                extractFormationEnergyValue(entry, 'alexandria'),
+                                extractFormationEnergyValue(entry, 'mattersim'),
+                                extractFormationEnergyValue(entry, 'chgnet'),
+                                extractFormationEnergyValue(entry, 'grace'),
+                            ],
+                        );
+                        return stats.stdDev;
+                    },
+                    classify: (value) => {
+                        const numericValue = toFiniteNumber(value);
+                        if (numericValue === null) {
+                            return {
+                                text: 'NA',
+                                color: missingColor,
+                                label: 'Missing value'
+                            };
+                        }
+                        return {
+                            text: numericValue.toFixed(4),
+                            color: '#eef3fb',
+                            label: 'Spread across formation sources'
+                        };
+                    },
+                },
+                {
+                    key: 'mp_hull_energy',
+                    title: 'MP E_hull',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.materialsproject,
+                    unit: 'eV/atom',
+                    groupLabel: 'Energy above hull (E_hull, eV/atom)',
+                    getValue: (entry) => extractHullValue(entry, 'materialsproject'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.05,
+                        'Near/on hull',
+                        'Above hull'
+                    ),
+                },
+                {
+                    key: 'alex_hull_energy',
+                    title: 'Alex E_hull',
+                    subtitle: 'eV/atom',
+                    sourceLabel: sourceDisplayNames.alexandria,
+                    unit: 'eV/atom',
+                    groupLabel: 'Energy above hull (E_hull, eV/atom)',
+                    getValue: (entry) => extractHullValue(entry, 'alexandria'),
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.05,
+                        'Near/on hull',
+                        'Above hull'
+                    ),
+                },
+                {
+                    key: 'hull_energy_avg',
+                    title: 'Avg E_hull',
+                    subtitle: 'eV/atom',
+                    sourceLabel: 'All hull sources',
+                    unit: 'eV/atom',
+                    groupLabel: 'Energy above hull (E_hull, eV/atom)',
+                    getValue: (entry) => {
+                        const stats = extractAggregateStats(
+                            entry,
+                            'energy_above_hull',
+                            [
+                                extractHullValue(entry, 'materialsproject'),
+                                extractHullValue(entry, 'alexandria'),
+                            ],
+                        );
+                        return stats.mean;
+                    },
+                    classify: (value) => classifyMetricCell(
+                        value,
+                        0.05,
+                        'Near/on hull (average)',
+                        'Above hull (average)'
+                    ),
+                },
+                {
+                    key: 'hull_energy_std',
+                    title: 'Std E_hull',
+                    subtitle: 'eV/atom',
+                    sourceLabel: 'All hull sources',
+                    unit: 'eV/atom',
+                    groupLabel: 'Energy above hull (E_hull, eV/atom)',
+                    getValue: (entry) => {
+                        const stats = extractAggregateStats(
+                            entry,
+                            'energy_above_hull',
+                            [
+                                extractHullValue(entry, 'materialsproject'),
+                                extractHullValue(entry, 'alexandria'),
+                            ],
+                        );
+                        return stats.stdDev;
+                    },
+                    classify: (value) => {
+                        const numericValue = toFiniteNumber(value);
+                        if (numericValue === null) {
+                            return {
+                                text: 'NA',
+                                color: missingColor,
+                                label: 'Missing value'
+                            };
+                        }
+                        return {
+                            text: numericValue.toFixed(4),
+                            color: '#eef3fb',
+                            label: 'Spread across hull sources'
+                        };
+                    },
+                },
+            ];
 
             const table = document.createElement('table');
             Object.assign(table.style, {
@@ -332,50 +620,89 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             });
 
             const headerRow = document.createElement('tr');
-            const sourceHeader = document.createElement('th');
-            sourceHeader.textContent = 'Source';
-            Object.assign(sourceHeader.style, {
-                width: '150px',
+            const compositionHeader = document.createElement('th');
+            compositionHeader.textContent = 'Composition';
+            Object.assign(compositionHeader.style, {
+                width: '160px',
                 paddingRight: '12px',
                 textAlign: 'left'
             });
-            headerRow.appendChild(sourceHeader);
+            headerRow.appendChild(compositionHeader);
 
-            cifResults.forEach((_, index) => {
-                const indexHeader = document.createElement('th');
-                indexHeader.textContent = String(index);
-                Object.assign(indexHeader.style, {
-                    padding: '0',
+            const groupRow = document.createElement('tr');
+            const blankHeader = document.createElement('th');
+            blankHeader.textContent = '';
+            Object.assign(blankHeader.style, {
+                width: '160px',
+                paddingRight: '12px',
+                borderBottom: 'none'
+            });
+            groupRow.appendChild(blankHeader);
+
+            const groupSegments = [
+                { label: 'Formation energy (ΔHf, eV/atom)', span: 7 },
+                { label: 'Energy above hull (E_hull, eV/atom)', span: 4 },
+            ];
+            groupSegments.forEach((segment) => {
+                const groupHeader = document.createElement('th');
+                groupHeader.textContent = segment.label;
+                groupHeader.colSpan = segment.span;
+                Object.assign(groupHeader.style, {
+                    padding: '6px 8px',
+                    textAlign: 'center',
+                    fontWeight: '700',
+                    borderBottom: '1px solid #cfd8e3',
+                    background: '#f6f8fb'
+                });
+                groupRow.appendChild(groupHeader);
+            });
+            table.appendChild(groupRow);
+
+            metricColumns.forEach((column) => {
+                const metricHeader = document.createElement('th');
+                metricHeader.innerHTML = `${column.title}<br><span style="font-size:11px; font-weight:500; color:#667085;">${column.subtitle}</span>`;
+                metricHeader.title = `${column.sourceLabel} ${column.title} (${column.unit})`;
+                Object.assign(metricHeader.style, {
+                    padding: '6px 8px',
                     overflow: 'hidden',
                     textAlign: 'center',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    fontWeight: '600',
+                    minWidth: '96px'
                 });
-                headerRow.appendChild(indexHeader);
+                headerRow.appendChild(metricHeader);
             });
             table.appendChild(headerRow);
 
-            sourceKeys.forEach((source) => {
+            cifResults.forEach((entry, index) => {
                 const row = document.createElement('tr');
-                const sourceCell = document.createElement('th');
-                sourceCell.textContent = sourceDisplayNames[source] || source;
-                Object.assign(sourceCell.style, {
-                    width: '150px',
+                const compositionCell = document.createElement('th');
+                const composition = entry.composition || entry.cif_name || `Compound ${index + 1}`;
+                compositionCell.textContent = composition;
+                compositionCell.title = `${entry.cif_name || composition}`;
+                Object.assign(compositionCell.style, {
+                    width: '160px',
                     paddingRight: '12px',
                     textAlign: 'left',
                     whiteSpace: 'nowrap'
                 });
-                row.appendChild(sourceCell);
+                row.appendChild(compositionCell);
 
-                cifResults.forEach((entry, index) => {
-                    const classification = classifyResult((entry.sources || {})[source]);
+                metricColumns.forEach((column) => {
+                    const metricValue = column.getValue(entry);
+                    const classification = column.classify(metricValue);
                     const cell = document.createElement('td');
-                    cell.title = `${index}: ${entry.cif_name || 'Unknown CIF'} — ${classification.label}`;
+                    cell.textContent = classification.text;
+                    cell.title = `${composition} — ${column.sourceLabel} ${column.title}: ${classification.text || 'Missing'} ${column.unit} (${classification.label})`;
                     cell.setAttribute('aria-label', cell.title);
                     Object.assign(cell.style, {
                         height: '34px',
-                        padding: '0',
+                        padding: '0 8px',
                         borderRadius: '4px',
-                        backgroundColor: classification.color
+                        backgroundColor: classification.color,
+                        textAlign: 'center',
+                        fontVariantNumeric: 'tabular-nums',
+                        color: classification.label === 'Missing value' ? '#6c757d' : '#24303d'
                     });
                     row.appendChild(cell);
                 });
@@ -386,9 +713,9 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
 
             const legend = document.createElement('div');
             legend.innerHTML = `
-                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:#cfe8d3;"></span>Stable</span>
-                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:#f2cccc;"></span>Unstable</span>
-                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:#e1e5e8;"></span>Not found / error</span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:${positiveColor};"></span>Favorable / near hull</span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:${negativeColor};"></span>Unfavorable / above hull</span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px; height:14px; border-radius:3px; background:${missingColor};"></span>Missing</span>
             `;
             Object.assign(legend.style, {
                 display: 'flex',
@@ -401,7 +728,7 @@ class StabilityConsensusAnalysisFeature extends BaseFeature {
             heatmapEl.appendChild(legend);
 
             const note = document.createElement('div');
-            note.textContent = 'Heatmap columns use zero-based CIF indices. Their corresponding filenames are provided in the downloadable JSON under results_per_cif.';
+            note.textContent = 'Each row corresponds to one uploaded compound composition. All values are in eV/atom. Formation columns include per-source values plus average and standard deviation; hull columns include per-source values plus average and standard deviation. Grey cells indicate missing values.';
             Object.assign(note.style, {
                 marginTop: '8px',
                 fontSize: '12px',

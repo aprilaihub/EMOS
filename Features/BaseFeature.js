@@ -20,6 +20,7 @@ const _mappingSourcePaths = [
     './Information_Units/property_mappings/sources/predictors/pdd.json',
     './Information_Units/property_mappings/sources/predictors/gbfs.json',
     './Information_Units/property_mappings/sources/predictors/gbfs2d.json',
+    './Information_Units/property_mappings/sources/predictors/grace.json',
     './Information_Units/property_mappings/sources/predictors/mattersim.json',
     './Information_Units/property_mappings/sources/predictors/synthnn.json',
 ];
@@ -97,7 +98,7 @@ class BaseFeature {
         return `
             <div class="feature-header">
                 <div class="feature-title-section">
-                    <h3><span id="featureTitle">${this.featureName}</span> Processing</h3>
+                    <h3><span id="featureTitle">${this.featureName}</span></h3>
                     <p class="feature-subtitle" id="featureSubtitle">${this.featureDescription}</p>
                 </div>
                 <button class="close-feature" id="closeFeature">×</button>

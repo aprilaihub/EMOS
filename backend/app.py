@@ -139,6 +139,7 @@ def _model_service_availability():
         'mattergen': (generator_factory['mattergen_base_model'], 'mattergen_base_model'),
         'mattersim': (predictor_factory['mattersim'], 'mattersim'),
         'chgnet': (predictor_factory['chgnet'], 'chgnet'),
+        'grace': (predictor_factory['grace'], 'grace'),
         'gbfs': (predictor_factory['gbfs'], 'gbfs'),
         'gbfs_2d': (predictor_factory['gbfs_2d'], 'gbfs_2d'),
     }
@@ -183,6 +184,7 @@ def _availability_payload():
     predictors = {
         'mattersim': {'available': bool(services['mattersim'].get('available')), 'service': 'mattersim'},
         'chgnet': {'available': bool(services['chgnet'].get('available')), 'service': 'chgnet'},
+        'grace': {'available': bool(services['grace'].get('available')), 'service': 'grace'},
         'gbfs': {'available': bool(services['gbfs'].get('available')), 'service': 'gbfs'},
         'gbfs_2d': {'available': bool(services['gbfs_2d'].get('available')), 'service': 'gbfs_2d'},
         'synthnn': {'available': True, 'service': 'local'},
@@ -892,6 +894,8 @@ def _run_generator(key, inputs, run_entry=None):
                     props[prop_name] = float(v)
                 except (ValueError, TypeError):
                     props[prop_name] = v
+        if 'diffusion_guidance_factor' in props:
+            gen_inputs['diffusion_guidance_factor'] = props.pop('diffusion_guidance_factor')
         if props:
             gen_inputs['properties_to_condition_on'] = props
 
@@ -991,7 +995,7 @@ def _run_predictor(key, inputs, upstream, run_entry=None):
 
     # All predictors accept a list[str] of CIF strings in a single batch call
     pred_cls = predictor_factory[key]
-    pred = pred_cls(key, logger)
+    pred = pred_cls(key, logger=logger)
     result = pred.predict(cif_array)
 
     yield _sse_event('log', {'message': f'Prediction complete for {len(cif_array)} structure(s)', 'level': 'info'})
