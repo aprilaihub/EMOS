@@ -8,6 +8,10 @@
       "name": "chemical_formula_descriptive",
       "retrievable": true
     },
+    "chemical_formula_reduced": {
+      "name": "chemical_formula_reduced",
+      "retrievable": true
+    },
     "chemical_system": {
       "name": "_mp_chemical_system",
       "retrievable": true,

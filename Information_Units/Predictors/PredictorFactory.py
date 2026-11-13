@@ -4,6 +4,7 @@ from Information_Units.Predictors.Chgnet.ChgnetPredictor import ChgnetPredictor
 from Information_Units.Predictors.Pdd.PddPredictor import PddPredictor
 from Information_Units.Predictors.Gbfs.GbfsPredictor import GbfsPredictor
 from Information_Units.Predictors.Gbfs2d.Gbfs2dPredictor import Gbfs2dPredictor
+from Information_Units.Predictors.Grace.GracePredictor import GracePredictor
 
 predictor_factory = {
     "mattersim": MattersimPredictor,
@@ -12,6 +13,7 @@ predictor_factory = {
     "pdd": PddPredictor,
     "gbfs": GbfsPredictor,
     "gbfs_2d": Gbfs2dPredictor,
+    "grace": GracePredictor,
 }
 
 predictor_registry = {}

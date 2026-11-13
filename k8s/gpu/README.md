@@ -15,12 +15,13 @@ the cluster:
 atishdixit16/emos-mattergen:gpu
 atishdixit16/emos-chgnet:gpu
 atishdixit16/emos-mattersim:gpu
+atishdixit16/emos-grace:gpu
 atishdixit16/emos-gbfs:cpu
 atishdixit16/emos-gbfs2d:cpu
 ```
 
 The build contexts are the EMOS root for GBFS/GBFS2D and each model's
-`docker` directory for MatterGen, CHGNet, and MatterSim.
+`docker` directory for MatterGen, CHGNet, MatterSim, and GRACE.
 
 ## Deploy
 
@@ -45,6 +46,7 @@ When the backend is deployed in the same namespace, use these URLs:
 MATTERGEN_API_URL=http://emos-mattergen:8000
 CHGNET_API_URL=http://emos-chgnet:8000
 MATTERSIM_API_URL=http://emos-mattersim:8000
+GRACE_API_URL=http://emos-grace:8000
 GBFS_PRED_API_URL=http://emos-gbfs:8000
 GBFS2D_API_URL=http://emos-gbfs2d:8000
 ```

@@ -162,6 +162,15 @@
         "file_name": "ChgnetPredictor.py"
       },
       {
+        "id": "grace",
+        "name": "Grace",
+        "display_name": "GRACE",
+        "description": "Foundation-model interatomic potential for crystal structure property prediction",
+        "folder_path": "Information_Units/Predictors/Grace",
+        "class_name": "GracePredictor",
+        "file_name": "GracePredictor.py"
+      },
+      {
         "id": "synthnn",
         "name": "Synthnn",
         "display_name": "SynthNN",
@@ -377,6 +386,10 @@
               {
                 "value": "chgnet",
                 "text": "CHGNet"
+              },
+              {
+                "value": "grace",
+                "text": "GRACE"
               }
             ],
             "description": "Optional predictors used for stability evidence"

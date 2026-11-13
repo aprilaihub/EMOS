@@ -13,6 +13,7 @@ The services used by the webapp are:
 
 - `emos-mattergen` - GPU service
 - `emos-chgnet` - GPU service
+- `emos-grace` - GPU service
 - `emos-gbfs` - CPU service
 - `emos-gbfs2d` - CPU service
 - `emos-mattersim` - GPU service, when GPU quota is available
@@ -37,6 +38,10 @@ kubectl port-forward -n eidf204ns service/emos-gbfs2d 8201:8000
 kubectl port-forward -n eidf204ns service/emos-chgnet 8400:8000
 ```
 
+```bash
+kubectl port-forward -n eidf204ns service/emos-grace 8500:8000
+```
+
 If MatterSim is running, forward it too:
 
 ```bash
@@ -57,6 +62,7 @@ export MATTERGEN_API_URL=http://localhost:8100
 export GBFS_PRED_API_URL=http://localhost:8200
 export GBFS2D_API_URL=http://localhost:8201
 export CHGNET_API_URL=http://localhost:8400
+export GRACE_API_URL=http://localhost:8500
 export MATTERSIM_API_URL=http://localhost:8300
 
 python backend/app.py
@@ -68,8 +74,8 @@ The backend listens on port `5001` by default. Test it from another terminal:
 curl http://localhost:5001/api/health
 ```
 
-If MatterSim is not running, leave `MATTERSIM_API_URL` unset and do not use
-MatterSim nodes in the webapp until its GPU pod is available.
+If MatterSim or GRACE are not running, leave their `*_API_URL` variables unset
+and do not use their nodes in the webapp until their GPU pods are available.
 
 ## 4. Start the frontend
 
@@ -105,6 +111,7 @@ curl http://localhost:8200/ready
 curl http://localhost:8201/ready
 curl http://localhost:8400/health
 curl http://localhost:8100/health
+curl http://localhost:8500/health
 ```
 
 Expected model services should return an HTTP success response. Stop a

@@ -209,6 +209,76 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: emos-grace
+  namespace: eidf204ns
+  labels:
+    app: emos-grace
+    emos.ai/gpu-model: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emos-grace
+  template:
+    metadata:
+      labels:
+        app: emos-grace
+        emos.ai/gpu-model: "true"
+        kueue.x-k8s.io/queue-name: eidf204ns-user-queue
+    spec:
+      containers:
+        - name: grace
+          image: atishdixit16/emos-grace:gpu
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: GRACE_DEVICE
+              value: "auto"
+            - name: CUDA_DEVICE_ORDER
+              value: PCI_BUS_ID
+          resources:
+            requests:
+              nvidia.com/gpu: "1"
+              cpu: "2"
+              memory: 16Gi
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: 32Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 5
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emos-grace
+  namespace: eidf204ns
+spec:
+  selector:
+    app: emos-grace
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: emos-gbfs
   namespace: eidf204ns
 spec:
