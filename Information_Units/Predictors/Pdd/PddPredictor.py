@@ -1,12 +1,10 @@
 """PDD (Pointwise Distance Distribution) Predictor.
 
 Computes the Pointwise Distance Distribution descriptor for one or many crystal
-structures supplied as CIF text strings (``predict``), and screens whole folders of
-CIFs for duplicates with a two-stage AMD -> PDD pipeline (``screen``).
-
-PDD layout: ``(rows, k + 1)`` - column 0 holds the row weights (they sum to 1) and
-columns 1..k the sorted neighbour distances.  The AMD vector is the weighted mean of
-the distance columns.
+structures supplied as CIF text strings.  For a single structure the output is
+the PDD matrix (k rows × k columns); for multiple structures the full k×k PDD
+is returned per structure together with an inter-structure comparison matrix
+based on the Earth-Mover's Distance (EMD).
 
 Reference: https://github.com/dwiddo/average-minimum-distance
 """
@@ -33,8 +31,8 @@ class PddPredictor(BasePredictor):
     Output: ``dict`` with ``"source"`` and ``"results"`` keys.
 
     Each result item carries:
-    - ``pdd_vector``   – 1-D AMD vector (weighted mean of the PDD distance columns), shape ``(k,)``
-    - ``pdd_matrix``   – Full PDD matrix as a nested list, shape ``(rows, k + 1)``; column 0 = row weights
+    - ``pdd_vector``   – 1-D AMD vector (mean of PDD rows), shape ``(k,)``
+    - ``pdd_matrix``   – Full PDD matrix as a nested list, shape ``(n_atoms, k)``
 
     Parameters
     ----------
@@ -85,9 +83,7 @@ class PddPredictor(BasePredictor):
             f"Computes geometric crystal-structure descriptors using the "
             f"average-minimum-distance package.\n"
             f"Parameters: k={self.k}\n"
-            f"Output per structure: pdd_vector (AMD, weighted mean of PDD rows) and pdd_matrix "
-            f"(rows x (k+1), column 0 = row weights).\n"
-            f"screen(config): two-stage duplicate screening, AMD on all structures then PDD EMD on candidate pairs."
+            f"Output per structure: pdd_vector and pdd_matrix."
         )
 
     def predict(self, input_data: list[str]) -> dict[str, Any]:
@@ -126,8 +122,8 @@ class PddPredictor(BasePredictor):
 
             try:
                 ps = self._load_single_crystal(cif_text, idx)
-                pdd_mat = amd.PDD(ps, self.k)          # shape (rows, k + 1); column 0 = row weights
-                amd_vec = np.average(pdd_mat[:, 1:], weights=pdd_mat[:, 0], axis=0)  # AMD, shape (k,)
+                pdd_mat = amd.PDD(ps, self.k)          # shape (n_atoms, k)
+                amd_vec = np.mean(pdd_mat, axis=0)     # shape (k,)  — the AMD vector
 
                 item = {
                     "index": idx,
@@ -172,35 +168,6 @@ class PddPredictor(BasePredictor):
             )
 
         return {"source": self.SOURCE, "results": results}
-
-    def screen(self, config: Any) -> dict[str, Any]:
-        """Screen folders of CIFs for duplicates: AMD on every structure, PDD only on candidate pairs.
-
-        Parameters
-        ----------
-        config:
-            A ``SimilarityConfig`` or a plain ``dict`` of its fields (``input_dirs``, ``k_amd``,
-            ``k_pdd``, ``k_max``, ``tau``, ``metric``, ``linkage`` ...).  See
-            ``Information_Units/Predictors/Pdd/similarity/config.py``.
-
-        Returns
-        -------
-        JSON-safe summary: run directory, stage counts, bound check, representatives,
-        warnings and the list of written files.  All tables and figures are written to the
-        run directory.
-        """
-        from Information_Units.Predictors.Pdd.similarity import SimilarityConfig, run_similarity_pipeline
-
-        cfg = config if isinstance(config, SimilarityConfig) else SimilarityConfig.from_dict(dict(config))
-        result = run_similarity_pipeline(cfg)
-        if self.logger:
-            counts = result.screen.counts
-            self.logger.log(
-                f"PDD screen complete: {counts['n_groups']} groups from {counts['n_structures']} structures; "
-                f"{counts['n_pdd_pairs_saved']} PDD pairs saved.",
-                "info",
-            )
-        return result.summary()
 
     def cancel(self) -> dict:
         """Signal the predictor to stop after the current structure."""
