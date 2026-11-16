@@ -1,0 +1,30 @@
+# generated using pymatgen
+data_ZnO
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   3.27630300
+_cell_length_b   3.27697866
+_cell_length_c   5.29171085
+_cell_angle_alpha   89.92855189
+_cell_angle_beta   89.93899525
+_cell_angle_gamma   60.05605154
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   ZnO
+_chemical_formula_sum   'Zn2 O2'
+_cell_volume   49.22990908
+_cell_formula_units_Z   2
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Zn  Zn0  1  0.29935801  0.74413615  0.41999158  1
+  O  O1  1  0.63260502  0.07763261  0.30071941  1
+  Zn  Zn2  1  0.63279426  0.07729597  0.91966307  1
+  O  O3  1  0.29961726  0.74421108  0.80098373  1
