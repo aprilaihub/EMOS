@@ -102,4 +102,4 @@ With `complete` linkage every pair in a group is within `tau`; `single` gives ch
 
 `amd_descriptors.csv` (`AMD_1..AMD_k_amd`, all structures), `pdd_store.pkl` / `pdd_store.csv` (reduced subset), `cif_metadata.csv`, `candidate_pairs.csv`, `duplicate_groups.csv`, `group_members.csv`, `amd_distance_matrix_k###.csv` (dendrogram leaf order), `amd_dendrogram.png`, `amd_heatmap.png`, `tsne_coords.csv`, `tsne.png`, `parse_warnings.json`, `run_info.json` (parameters, package versions, input files, stage counts, bound check, warnings). Optional: `pdd_dendrogram.png` / `pdd_heatmap.png` (`plot_pdd_subset`), `sensitivity_sweep.csv`.
 
-Step-by-step walkthrough: [docs/tutorials/tutorial_pdd_similarity.ipynb](../../../docs/tutorials/tutorial_pdd_similarity.ipynb).
+Step-by-step walkthrough: [docs/tutorials/tutorial_pdd_similarity.md](../../../docs/tutorials/tutorial_pdd_similarity.md) (also as an executed notebook: [tutorial_pdd_similarity.ipynb](../../../docs/tutorials/tutorial_pdd_similarity.ipynb)).
