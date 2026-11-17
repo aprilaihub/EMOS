@@ -18,6 +18,13 @@
     const GRAPH_FILE_FORMAT = 'emos-node-graph';
     const GRAPH_FILE_VERSION = 1;
     const DYNAMIC_OUTPUT_NODE_KEYS = new Set(['splitter', 'tree_splitter', 'merger']);
+    const MOSFET_REGIONS = ['channel'];
+    const MOSFET_CHANNEL_PINS = [
+        { key: 'channel_bandgap', label: 'Channel · Bandgap (eV)', field: 'channelEgEv', scale: 1, min: 0 },
+        { key: 'channel_mob_n', label: 'Channel · Electron mobility (cm²/V·s)', field: 'channelUn', scale: 1e-4, min: 0 },
+        { key: 'channel_mob_p', label: 'Channel · Hole mobility (cm²/V·s)', field: 'channelUp', scale: 1e-4, min: 0 },
+        { key: 'channel_dielectric', label: 'Channel · Relative permittivity', field: 'channelEpsRel', scale: 1, min: 0, positive: true },
+    ];
 
     // Node definitions — ports schema per category
     const NODE_SCHEMAS = {
@@ -26,6 +33,7 @@
         predictor:   { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }],                           outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         cif_viewer:  { inputs: [{ key: 'cif_in',    label: 'CIF',    type: PORT_TYPES.CIF    }], outputs: [] },
         text_viewer: { inputs: [{ key: 'any_in',    label: 'Input',  type: PORT_TYPES.ANY    }], outputs: [] },
+        data_viewer: { inputs: [{ key: 'data_in', label: 'Data', type: PORT_TYPES.ANY }, { key: 'labels_in', label: 'X / Labels (optional)', type: PORT_TYPES.ANY, required: false }], outputs: [] },
         filter:      { inputs: [{ key: 'cif_in',    label: 'CIF (optional)', type: PORT_TYPES.CIF, required: false }, { key: 'result_in', label: 'Result', type: PORT_TYPES.RESULT }],
                        outputs:[{ key: 'cif_out',   label: 'CIF',    type: PORT_TYPES.CIF    }, { key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] },
         splitter:    { inputs: [{ key: 'any_in', label: 'Input', type: PORT_TYPES.ANY }], outputs: [] },
@@ -439,6 +447,12 @@
             log.style.maxHeight = `${logHeight}px`;
         }
 
+        const dataPlot = node.el.querySelector('.ne-data-plot');
+        if (dataPlot) {
+            const controlsHeight = dataPlot.parentElement.offsetHeight - dataPlot.offsetHeight;
+            dataPlot.style.height = `${Math.max(180, bodyHeight - controlsHeight - (log?.offsetHeight || 0) - 24)}px`;
+        }
+
         const textContent = node.el.querySelector('.ne-text-viewer-content');
         if (textContent) textContent.style.maxHeight = `${Math.max(80, bodyHeight - 58)}px`;
 
@@ -541,6 +555,7 @@
             breakpointEnabled: false,
             featureDefinition,
             treeInput: null,
+            treeCif: false,
             treeEntries: [],
             treeSelections: new Set(),
             prettyFieldSelections: [],
@@ -550,9 +565,16 @@
 
         nodes[id] = node;
         const el = renderNode(node);
+        if (isMosfetFeature(featureDefinition)) el.classList.add('ne-mosfet-node');
         node.el = el;
         canvas.appendChild(el);
         positionNodeEl(node);
+        if (node.key === 'data_viewer') {
+            node.dataViewer = EMOSDataViewer.mount(el, {
+                materialName: getMaterialName,
+                onChange: notifyGraphChanged,
+            });
+        }
         if (!options.suppressSelection) selectNode(id);
         // Populate property fields async after element is in the DOM
         if (node.type === 'database' || node.type === 'generator') {
@@ -737,6 +759,7 @@
     function buildNodeBodyHTML(node) {
         if (node.key === 'cif_viewer')  return buildCIFViewerBody(node);
         if (node.key === 'text_viewer') return buildTextViewerBody(node);
+        if (node.key === 'data_viewer') return EMOSDataViewer.bodyHTML();
         if (node.key === 'filter')      return buildFilterBody(node);
         if (node.key === 'splitter')    return buildSplitterBody(node);
         if (node.key === 'tree_splitter') return buildTreeSplitterBody(node);
@@ -764,7 +787,18 @@
         return html;
     }
 
+    function isMosfetFeature(feature) {
+        return feature?.folder_path?.includes('/MosfetEvaluator') === true;
+    }
+
     function getFeatureNodeSchema(feature) {
+        if (isMosfetFeature(feature)) {
+            const inputs = MOSFET_REGIONS.flatMap(region => [
+                { key: `${region}_name`, label: `${region[0].toUpperCase() + region.slice(1)} · Name / CIF`, type: PORT_TYPES.ANY, region },
+                ...MOSFET_CHANNEL_PINS.map(pin => ({ ...pin, type: PORT_TYPES.RESULT, region })),
+            ]).map(input => ({ ...input, required: false }));
+            return { inputs, outputs: [{ key: 'result_out', label: 'Result', type: PORT_TYPES.RESULT }] };
+        }
         const acceptsCif = (feature.inputs || []).some(input => input.type === 'file' && /cif/i.test(input.name));
         return {
             inputs: acceptsCif ? [{ key: 'cif_in', label: 'CIF', type: PORT_TYPES.CIF }] : [],
@@ -777,8 +811,10 @@
         if (!feature) return '<p class="ne-feature-note">Feature metadata is unavailable.</p>';
 
         let html = '<div class="ne-feature-fields">';
-        if (feature.display_name === 'MOSFET evaluator') {
-            html += '<p class="ne-feature-note">This feature currently uses simulation parameters only.</p>';
+        if (isMosfetFeature(feature)) {
+            html += '<p class="ne-feature-note">All pins are optional. Connected channel properties override the manual fields below. Mobility pins use cm²/(V·s); manual fields use m²/(V·s).</p>';
+            html += '<p class="ne-feature-note">Names are labels only. Lists must have equal lengths and match by index; scalar values apply to every material. Gate, source, drain, oxide and contact settings remain manual.</p>';
+            html += '<p class="ne-feature-note">Suggested IUs: GBFS → bandgap, mob_n, mob_p, dielectric; GBFS-2D → bandgap. Connect a database or generator CIF output to Name / CIF. Use Splitter nodes to extract predictor properties.</p>';
         }
         for (const input of feature.inputs || []) {
             if (input.type === 'file' && /cif/i.test(input.name)) {
@@ -966,7 +1002,7 @@
     }
 
     function buildTreeSplitterBody(node) {
-        return `<div class="ne-tree-splitter" id="tree-splitter-${node.id}"><p class="ne-splitter-status">Connect a result to choose fields from its dictionary tree.</p></div>`;
+        return `<div class="ne-tree-splitter" id="tree-splitter-${node.id}"><p class="ne-splitter-status">Connect JSON or CIF input to select fields. CIF values remain strings; missing values are null.</p></div>`;
     }
 
     function buildMergerBody(node) {
@@ -1086,11 +1122,11 @@
         const defaultCode =
 `# Available variables:
 #   cif_list  - list[str] of CIF strings
-#   results   - predictor result dict {source, results: [...]}
+#   results   - connected result dictionary or list
 #
 # Set output variables before the script ends:
 #   output_cifs    - list[str] of CIF strings to pass forward
-#   output_results - results dict to pass forward
+#   output_results - dictionary or list to pass forward
 
 output_cifs = cif_list
 output_results = results`;
@@ -1132,6 +1168,7 @@ output_results = results`;
             }
             return true;
         });
+        node.dataViewer?.destroy();
         node.el.remove();
         delete nodes[id];
         if (selectedNodeId === id) selectedNodeId = null;
@@ -1584,10 +1621,78 @@ output_results = results`;
     }
 
     async function executeFeatureNode(backendUrl, node) {
+        const inputs = buildFeatureRequest(node);
+        if (!isMosfetFeature(node.featureDefinition)) return requestFeatureResult(backendUrl, node, inputs);
+
+        const plan = buildMosfetRunPlan(node);
+        if (!plan.connected) return requestFeatureResult(backendUrl, node, inputs);
+        const results = [];
+        addNodeLog(node.id, `Evaluating ${plan.count} material combination(s).`, 'info');
+        for (let run = 0; run < plan.count; run++) {
+            const request = { ...inputs };
+            if (plan.batched) request.nodeBatchOutput = true;
+            const materials = {};
+            let remaining = run;
+            for (const region of [...plan.regions].reverse()) {
+                const index = remaining % region.entries.length;
+                remaining = Math.floor(remaining / region.entries.length);
+                const entry = region.entries[index];
+                Object.assign(request, entry.inputs);
+                materials[region.name] = { name: entry.name, index };
+            }
+            addNodeLog(node.id, `Material combination ${run + 1}/${plan.count}`, 'info');
+            try {
+                const result = await requestFeatureResult(backendUrl, node, request);
+                results.push({ ...result, node_materials: materials });
+            } catch (error) {
+                throw new Error(`Material combination ${run + 1}/${plan.count}: ${error.message}`);
+            }
+            setNodeProgress(node.id, (run + 1) / plan.count * 100);
+        }
+        return plan.batched ? results : results[0];
+    }
+
+    function buildMosfetRunPlan(node) {
+        const upstream = getUpstreamData(node.id);
+        const connected = node.inputs.filter(input => wires.some(wire => wire.toNode === node.id && wire.toPort === input.key));
+        const regions = MOSFET_REGIONS.map(name => {
+            const pins = connected.filter(input => input.region === name);
+            const lists = pins.filter(input => Array.isArray(upstream[input.key]));
+            const size = lists.length ? upstream[lists[0].key].length : 1;
+            if (size === 0) throw new Error(`${name}: connected lists must not be empty.`);
+            if (lists.some(input => upstream[input.key].length !== size)) {
+                throw new Error(`${name}: all connected parameter lists, including names, must have the same length.`);
+            }
+            const entries = Array.from({ length: size }, (_, index) => {
+                const entry = { name: null, inputs: {} };
+                for (const pin of pins) {
+                    const value = Array.isArray(upstream[pin.key]) ? upstream[pin.key][index] : upstream[pin.key];
+                    if (!pin.field) {
+                        if (typeof value !== 'string' || !value.trim()) {
+                            throw new Error(`${pin.label}, item ${index + 1}: expected a non-empty name or CIF string.`);
+                        }
+                        entry.name = isCifString(value) ? getCifComposition(value, index) : value.trim();
+                    } else {
+                        if (typeof value !== 'number' || !Number.isFinite(value) || value < pin.min || (pin.positive && value === 0)) {
+                            throw new Error(`${pin.label}, item ${index + 1}: expected a finite ${pin.positive ? 'positive' : 'non-negative'} scalar number.`);
+                        }
+                        entry.inputs[pin.field] = value * pin.scale;
+                    }
+                }
+                return entry;
+            });
+            return { name, entries };
+        });
+        const count = regions.reduce((total, region) => total * region.entries.length, 1);
+        if (!Number.isSafeInteger(count)) throw new Error('Too many material combinations to enumerate safely.');
+        return { regions, count, connected: connected.length > 0, batched: connected.some(input => Array.isArray(upstream[input.key])) };
+    }
+
+    async function requestFeatureResult(backendUrl, node, inputs) {
         const response = await fetch(`${backendUrl}/api/process/${node.key}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(buildFeatureRequest(node)),
+            body: JSON.stringify(inputs),
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -1692,6 +1797,7 @@ output_results = results`;
     }
 
     function getFeatureSplitterOutputs(feature, value) {
+        if (isMosfetFeature(feature) && (Array.isArray(value) || value?.node_materials)) return getRuntimeSplitterOutputs(value);
         return (feature?.outputs || []).map(output => ({
             key: splitterPortKey(output.name),
             label: output.display_name || displaySplitterKey(output.name),
@@ -1840,12 +1946,32 @@ output_results = results`;
 
     function executeTreeSplitterNode(node) {
         const input = getUpstreamData(node.id).any_in;
-        node.treeInput = input;
-        node.treeEntries = buildTreeSplitterEntries(input);
+        try {
+            const cif = EMOSCifTree.adapt(input);
+            node.treeInput = input;
+            node.treeCif = Boolean(cif);
+            node.treeEntries = cif ? cif.entries : buildTreeSplitterEntries(input);
+        } catch (error) {
+            resetTreeSplitter(node, error.message);
+            updateNodeDownloadButton(node);
+            throw error;
+        }
         const validSelections = new Set(node.treeEntries.map(entry => entry.id));
         node.treeSelections = new Set([...node.treeSelections].filter(id => validSelections.has(id)));
         renderTreeSplitter(node);
         updateTreeSplitterOutputs(node);
+    }
+
+    function resetTreeSplitter(node, message = 'Execute the graph to reload JSON or CIF fields.') {
+        if (node.key !== 'tree_splitter') return;
+        node.treeInput = null;
+        node.treeEntries = [];
+        node.treeCif = false;
+        node.portData = null;
+        node.resultRecord = null;
+        // Keep configured selections/ports and wires, but never permit stale values to be selected.
+        const container = document.getElementById(`tree-splitter-${node.id}`);
+        if (container) container.textContent = message;
     }
 
     function buildTreeSplitterEntries(value) {
@@ -1915,9 +2041,15 @@ output_results = results`;
             checkbox.checked = node.treeSelections.has(entry.id);
             checkbox.dataset.treePath = entry.id;
             checkbox.addEventListener('change', () => {
+                if (!canEditGraph() || !node.treeEntries.includes(entry)) {
+                    syncTreeSplitterSelections(node);
+                    return;
+                }
                 if (checkbox.checked) node.treeSelections.add(entry.id);
                 else node.treeSelections.delete(entry.id);
                 updateTreeSplitterOutputs(node);
+                wires.filter(wire => wire.fromNode === node.id).forEach(wire => markNodeAndDependentsStale(wire.toNode));
+                if (node.hasCompleted) node.resultRecord = createNodeResultRecord(node);
                 notifyGraphChanged();
             });
             const text = document.createElement('span');
@@ -1934,11 +2066,12 @@ output_results = results`;
             .map(id => entriesById.get(id))
             .filter(Boolean)
             .map(entry => {
-                const value = getTreeSplitterValue(node.treeInput, entry.path);
+                const value = node.treeCif ? entry.value : getTreeSplitterValue(node.treeInput, entry.path);
                 return {
-                    key: treeSplitterPortKey(entry.path),
+                    // Preserve legacy JSON port keys; CIF tags need a collision-free encoding.
+                    key: node.treeCif ? `cif_tree_${encodeURIComponent(entry.id)}` : treeSplitterPortKey(entry.path),
                     label: entry.path.join(' > '),
-                    type: splitterPortType(null, value),
+                    type: node.treeCif ? PORT_TYPES.RESULT : splitterPortType(null, value),
                     value,
                 };
             });
@@ -2133,6 +2266,14 @@ output_results = results`;
 
     function isNodeReady(node) {
         if (!isConfiguredForExecution(node)) return false;
+        if (node.key === 'data_viewer' || isMosfetFeature(node.featureDefinition)) {
+            // Optional means it may be disconnected, not that a connected source
+            // can be read before completion (or while its output is stale).
+            return wires.filter(wire => wire.toNode === node.id).every(wire => {
+                const source = nodes[wire.fromNode];
+                return source && source.hasCompleted && !source.isStale;
+            });
+        }
         if (node.key === 'merger') {
             return getMergerInputConnections(node).every(({ source }) => source.hasCompleted && !source.isStale);
         }
@@ -2203,11 +2344,13 @@ output_results = results`;
             visited.add(currentId);
 
             const node = nodes[currentId];
+            node?.dataViewer?.reset('Upstream input changed. Execute the graph to reload data.');
             if (node && (node.hasCompleted || node.data != null || node.portData != null)) {
                 node.isStale = true;
                 setNodeState(currentId, 'stale');
                 updateNodeDownloadButton(node);
             }
+            if (node) resetTreeSplitter(node, 'Upstream input changed. Execute the graph to reload fields.');
             for (const wire of wires) {
                 if (wire.fromNode === currentId) queue.push(wire.toNode);
             }
@@ -2268,7 +2411,7 @@ output_results = results`;
         if (!accepted) return;
 
         cancelWiring();
-        Object.values(nodes).forEach(node => node.el.remove());
+        Object.values(nodes).forEach(node => { node.dataViewer?.destroy(); node.el.remove(); });
         wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
         nodes = {};
         wires = [];
@@ -2298,6 +2441,8 @@ output_results = results`;
     }
 
     function resetViewerDisplay(node) {
+        resetTreeSplitter(node);
+        node.dataViewer?.reset();
         if (node.key === 'text_viewer') {
             const content = document.getElementById(`text-viewer-${node.id}`);
             if (content) content.textContent = 'No data yet.';
@@ -2440,6 +2585,7 @@ output_results = results`;
 
     function serializeGraphNode(node) {
         const configuration = { fields: serializeGraphFields(node) };
+        if (node.key === 'data_viewer') configuration.dataViewer = node.dataViewer.configuration();
 
         if (node.key === 'filter') configuration.filterRules = serializeFilterRules(node);
         if (node.key === 'tree_splitter') configuration.treeSelections = [...node.treeSelections];
@@ -2607,6 +2753,7 @@ output_results = results`;
         restoreGraphFields(node, configuration.fields);
         if (node.key === 'tree_splitter') node.treeSelections = new Set((configuration.treeSelections || []).filter(value => typeof value === 'string'));
         if (node.key === 'text_viewer') restoreTextViewerConfiguration(node, configuration.textViewer);
+        if (node.key === 'data_viewer') node.dataViewer.restore(configuration.dataViewer);
         updateBreakpointButton(node);
     }
 
@@ -2710,7 +2857,7 @@ output_results = results`;
 
     function clearGraphWithoutConfirmation() {
         cancelWiring();
-        Object.values(nodes).forEach(node => node.el.remove());
+        Object.values(nodes).forEach(node => { node.dataViewer?.destroy(); node.el.remove(); });
         wiresSvg.querySelectorAll('.ne-wire').forEach(wire => wire.remove());
         nodes = {};
         wires = [];
@@ -3072,6 +3219,16 @@ output_results = results`;
     // ═══════════════════════════════════════════════════════════════
     function displayViewerData(node) {
         const upstreamData = getUpstreamData(node.id);
+        // Data Viewer consumes named ports; retain legacy first-value behavior below.
+        if (node.key === 'data_viewer') {
+            node.data = upstreamData.data_in;
+            if (!Object.hasOwn(upstreamData, 'labels_in') && wires.some(wire => wire.toNode === node.id && wire.toPort === 'labels_in')) {
+                upstreamData.labels_in = null; // Connected but missing labels must fail validation.
+            }
+            node.dataViewer.load(upstreamData.data_in, upstreamData.labels_in);
+            setNodeState(node.id, 'done');
+            return;
+        }
         // Get the first upstream value
         const dataKey = Object.keys(upstreamData)[0];
         const data = upstreamData[dataKey];

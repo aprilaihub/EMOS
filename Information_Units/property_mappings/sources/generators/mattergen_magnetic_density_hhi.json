@@ -11,6 +11,10 @@
     "mag_density": {
       "name": "dft_mag_density",
       "range_support": false
+    },
+    "diffusion_guidance_factor": {
+      "name": "diffusion_guidance_factor",
+      "range_support": false
     }
   }
 }

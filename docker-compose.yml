@@ -118,6 +118,34 @@ services:
 
 
   # -----------------------------------------------------------------------
+  # GRACE — foundation-model interatomic potential predictor
+  # -----------------------------------------------------------------------
+  grace:
+    build:
+      context: ./Information_Units/Predictors/Grace/docker
+      dockerfile: Dockerfile
+    container_name: emos-grace
+    ports:
+      - "${GRACE_PORT:-8500}:8000"
+    environment:
+      - GRACE_LOG_LEVEL=${GRACE_LOG_LEVEL:-DEBUG}
+      - GRACE_MODEL=${GRACE_MODEL:-GRACE-3L-OMAT-large}
+
+  grace-gpu:
+    extends:
+      service: grace
+    container_name: emos-grace-gpu
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+
+  # -----------------------------------------------------------------------
   # GBFS — material-property predictor (LightGBM + matminer)
   # -----------------------------------------------------------------------
   # Exposes a FastAPI server for predicting material properties from CIF data.

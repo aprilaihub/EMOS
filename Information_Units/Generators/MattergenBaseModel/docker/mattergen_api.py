@@ -64,6 +64,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Models preloaded at container startup — see _preload_models() below.
+# Keep this configurable because each prepared model remains in process memory.
+# MATTERGEN_PRELOAD_MODELS is a comma-separated list; the legacy singular
+# MATTERGEN_PRELOAD_MODEL variable remains supported for deployments that use it.
+_DEFAULT_PRELOAD_MODELS = "mattergen_base"
+MATTERGEN_PRELOAD_MODELS = os.getenv("MATTERGEN_PRELOAD_MODELS", "").strip()
+if not MATTERGEN_PRELOAD_MODELS:
+    MATTERGEN_PRELOAD_MODELS = os.getenv("MATTERGEN_PRELOAD_MODEL", _DEFAULT_PRELOAD_MODELS)
+PRELOAD_MODELS = tuple(model.strip() for model in MATTERGEN_PRELOAD_MODELS.split(",") if model.strip())
+
 # Generation output goes to a temporary directory that is cleaned up after
 # each request — no persistent disk writes for CIF files.
 
@@ -136,6 +146,11 @@ _jobs: dict[str, dict] = {}
 # Per-job cancellation flags — checked by the generation thread
 _cancel_flags: dict[str, threading.Event] = {}
 
+_prepared_models: dict[str, tuple[object, MatterGenCheckpointInfo]] = {}
+_prepared_models_lock = threading.Lock()
+_generation_lock = threading.Lock()
+_preload_complete = threading.Event()
+
 
 class GenerationCancelledError(Exception):
     """Raised inside a generation thread when the user cancels."""
@@ -155,6 +170,99 @@ def _structure_to_cif(structure: Structure) -> str:
     """Convert a pymatgen Structure to a CIF-format string."""
     cifstr=structure.to(fmt='cif')
     return cifstr
+
+
+def _get_prepared_model(req: GenerateRequest, log) -> tuple[object, MatterGenCheckpointInfo]:
+    """Load each checkpoint and its GemNet model once per process."""
+    model_key = (
+        f"hf:{req.pretrained_name}"
+        if req.pretrained_name is not None
+        else f"path:{Path(req.model_path).resolve()}"
+    )
+    with _prepared_models_lock:
+        cached = _prepared_models.get(model_key)
+        if cached is not None:
+            log("Reusing cached MatterGen model")
+            return cached
+
+        config_overrides = [
+            "++lightning_module.diffusion_module.model."
+            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
+        ]
+        t0 = time.time()
+        if req.pretrained_name is not None:
+            log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
+            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
+                req.pretrained_name,
+                config_overrides=config_overrides,
+            )
+        else:
+            log(f"Loading local checkpoint: {req.model_path}")
+            checkpoint_info = MatterGenCheckpointInfo(
+                model_path=Path(req.model_path).resolve(),
+                load_epoch="last",
+                config_overrides=config_overrides,
+                strict_checkpoint_loading=True,
+            )
+
+        model_holder = CrystalGenerator(
+            checkpoint_info=checkpoint_info,
+            batch_size=1,
+            num_batches=1,
+            properties_to_condition_on={},
+            record_trajectories=False,
+        )
+        model = model_holder.model
+        _prepared_models[model_key] = (model, checkpoint_info)
+        log(f"MatterGen model prepared and cached in {time.time() - t0:.1f}s")
+        return model, checkpoint_info
+
+
+def _create_generator(
+    req: GenerateRequest,
+    model: object,
+    checkpoint_info: MatterGenCheckpointInfo,
+    progress_callback=None,
+) -> CrystalGenerator:
+    """Create request settings around an already-loaded model."""
+    return CrystalGenerator(
+        checkpoint_info=checkpoint_info,
+        properties_to_condition_on=req.properties_to_condition_on or {},
+        batch_size=req.batch_size,
+        num_batches=req.num_batches,
+        record_trajectories=req.record_trajectories,
+        diffusion_guidance_factor=(
+            req.diffusion_guidance_factor
+            if req.diffusion_guidance_factor is not None
+            else 0.0
+        ),
+        target_compositions_dict=req.target_compositions or [],
+        progress_callback=progress_callback,
+        _model=model,
+    )
+
+
+@app.on_event("startup")
+def _preload_models() -> None:
+    """Warm configured models in the background during server startup."""
+    if not PRELOAD_MODELS:
+        _preload_complete.set()
+        return
+
+    def _worker() -> None:
+        try:
+            for model_name in PRELOAD_MODELS:
+                preload_req = GenerateRequest(pretrained_name=model_name)
+                try:
+                    _get_prepared_model(preload_req, lambda msg, level="info": logger.log(
+                        getattr(logging, level.upper(), logging.INFO), f"[preload:{model_name}] {msg}"
+                    ))
+                except Exception:
+                    logger.exception("MatterGen preload failed for %s", model_name)
+        finally:
+            _preload_complete.set()
+
+    threading.Thread(target=_worker, name="mattergen-preload", daemon=True).start()
 
 
 def _run_generation(job_id: str, req: GenerateRequest) -> None:
@@ -185,52 +293,14 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
         else:
             _log("No conditioning properties (unconditional generation)")
 
-        config_overrides = [
-            "++lightning_module.diffusion_module.model."
-            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
-        ]
-
         t0 = time.time()
-
-        if req.pretrained_name is not None:
-            _log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
-            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
-                req.pretrained_name,
-                config_overrides=config_overrides,
-            )
-        else:
-            _log(f"Loading local checkpoint: {req.model_path}")
-            checkpoint_info = MatterGenCheckpointInfo(
-                model_path=Path(req.model_path).resolve(),
-                load_epoch="last",
-                config_overrides=config_overrides,
-                strict_checkpoint_loading=True,
-            )
-
-        t_load = time.time() - t0
-        _log(f"Checkpoint loaded in {t_load:.1f}s")
-
-        guidance = (
-            req.diffusion_guidance_factor
-            if req.diffusion_guidance_factor is not None
-            else 0.0
-        )
-        _log(f"Creating CrystalGenerator (guidance_factor={guidance}, "
-             f"record_trajectories={req.record_trajectories})")
-
-        generator = CrystalGenerator(
-            checkpoint_info=checkpoint_info,
-            properties_to_condition_on=properties,
-            batch_size=req.batch_size,
-            num_batches=req.num_batches,
-            record_trajectories=req.record_trajectories,
-            diffusion_guidance_factor=guidance,
-            target_compositions_dict=req.target_compositions or [],
-        )
+        model, checkpoint_info = _get_prepared_model(req, _log)
+        generator = _create_generator(req, model, checkpoint_info)
 
         _log("Starting diffusion generation...")
         t1 = time.time()
-        structures: list[Structure] = generator.generate(output_dir=output_path)
+        with _generation_lock:
+            structures: list[Structure] = generator.generate(output_dir=output_path)
         t_gen = time.time() - t1
         _log(f"Generation complete: {len(structures)} structure(s) in {t_gen:.1f}s")
 
@@ -284,6 +354,13 @@ def _run_generation(job_id: str, req: GenerateRequest) -> None:
 def health():
     logger.debug("Mattergen service health check requested")
     return {"status": "ok", "service": "mattergen", "message": "Mattergen OK"}
+
+
+@app.get("/ready")
+def ready():
+    if not _preload_complete.is_set():
+        raise HTTPException(status_code=503, detail="MatterGen models are still preloading")
+    return {"status": "ready", "service": "mattergen"}
 
 
 @app.get("/info")
@@ -420,38 +497,8 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         else:
             _log("No conditioning properties (unconditional generation)")
 
-        config_overrides = [
-            "++lightning_module.diffusion_module.model."
-            "element_mask_func={_target_:'mattergen.denoiser.mask_disallowed_elements',_partial_:True}"
-        ]
-
         t0 = time.time()
-
-        if req.pretrained_name is not None:
-            _log(f"Loading pretrained model from HuggingFace Hub: {req.pretrained_name}")
-            checkpoint_info = MatterGenCheckpointInfo.from_hf_hub(
-                req.pretrained_name,
-                config_overrides=config_overrides,
-            )
-        else:
-            _log(f"Loading local checkpoint: {req.model_path}")
-            checkpoint_info = MatterGenCheckpointInfo(
-                model_path=Path(req.model_path).resolve(),
-                load_epoch="last",
-                config_overrides=config_overrides,
-                strict_checkpoint_loading=True,
-            )
-
-        t_load = time.time() - t0
-        _log(f"Checkpoint loaded in {t_load:.1f}s")
-
-        guidance = (
-            req.diffusion_guidance_factor
-            if req.diffusion_guidance_factor is not None
-            else 0.0
-        )
-        _log(f"Creating CrystalGenerator (guidance_factor={guidance}, "
-             f"record_trajectories={req.record_trajectories})")
+        model, checkpoint_info = _get_prepared_model(req, _log)
 
         # ── tqdm monkeypatch ──────────────────────────────────────────
         # MatterGen uses two tqdm bars:
@@ -463,73 +510,11 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
         import tqdm as _tqdm_module
         import tqdm.auto as _tqdm_auto_module
 
-        _original_tqdm = _tqdm_module.tqdm
-        _original_auto_tqdm = _tqdm_auto_module.tqdm
-
         total_batches = req.num_batches
         _current_batch = [0]  # mutable counter for the outer batch loop
 
-        class _StreamingTqdm(_original_tqdm):
-            """Drop-in tqdm replacement that pushes progress events to the SSE queue."""
-
-            def __init__(self, *args, **kwargs):
-                # Throttle: only push an SSE event every N seconds
-                self._last_sse_time = 0.0
-                self._sse_interval = 2.0  # seconds between SSE pushes
-                self._is_inner = False
-                super().__init__(*args, **kwargs)
-                # Heuristic: the inner (denoising) loop has total >= 100
-                # while the outer (batch) loop has total == num_batches (small)
-                if self.total is not None and self.total >= 100:
-                    self._is_inner = True
-
-            def update(self, n=1):
-                super().update(n)
-                # Check for cancellation on every step
-                _check_cancelled()
-                if not self._is_inner:
-                    # Outer batch loop — track which batch we're on
-                    _current_batch[0] = self.n
-                    return
-                # Inner denoising loop — push throttled progress events
-                now = time.time()
-                if now - self._last_sse_time < self._sse_interval:
-                    return
-                self._last_sse_time = now
-                step = self.n
-                total = self.total or 1
-                pct = step / total
-                # Compose overall progress: combine batch index + inner step
-                batch_frac = (_current_batch[0]) / max(total_batches, 1)
-                inner_frac = pct / max(total_batches, 1)
-                overall = min(batch_frac + inner_frac, 1.0)
-                elapsed = self.format_dict.get("elapsed", 0) or 0
-                rate = self.format_dict.get("rate", None)
-                if rate and rate > 0:
-                    remaining = (total - step) / rate
-                    eta_str = f"{remaining:.0f}s remaining"
-                else:
-                    eta_str = "estimating…"
-                batch_label = f"Batch {_current_batch[0]+1}/{total_batches}" if total_batches > 1 else "Diffusion"
-                msg = f"{batch_label} step {step}/{total} ({pct*100:.0f}%) — {eta_str}"
-                logger.info(f"[{job_id}] step progress: {msg}")
-                progress_queue.put({
-                    "event": "progress",
-                    "progress": round(overall, 4),
-                    "message": msg,
-                })
-
-        # Patch tqdm in the modules MatterGen imports it from
-        _tqdm_module.tqdm = _StreamingTqdm
-        _tqdm_auto_module.tqdm = _StreamingTqdm
-
-        # Also patch into the specific MatterGen modules that already imported tqdm
         import mattergen.diffusion.sampling.pc_sampler as _pc_mod
         import mattergen.generator as _gen_mod
-        _pc_mod_orig_tqdm = getattr(_pc_mod, 'tqdm', None)
-        _gen_mod_orig_tqdm = getattr(_gen_mod, 'tqdm', None)
-        _pc_mod.tqdm = _StreamingTqdm
-        _gen_mod.tqdm = _StreamingTqdm
 
         # Progress callback — fires per-batch from draw_samples_from_sampler
         def _progress_callback(progress: float = 0.0, **kwargs):
@@ -546,29 +531,88 @@ def _run_generation_streaming(job_id: str, req: GenerateRequest, progress_queue:
                 "message": msg,
             })
 
-        generator = CrystalGenerator(
-            checkpoint_info=checkpoint_info,
-            properties_to_condition_on=properties,
-            batch_size=req.batch_size,
-            num_batches=req.num_batches,
-            record_trajectories=req.record_trajectories,
-            diffusion_guidance_factor=guidance,
-            target_compositions_dict=req.target_compositions or [],
-            progress_callback=_progress_callback,
-        )
-
-        _log("Starting diffusion generation...")
         t1 = time.time()
-        try:
-            structures: list[Structure] = generator.generate(output_dir=output_path)
-        finally:
-            # ── Restore original tqdm so we don't leak the patch ──────
-            _tqdm_module.tqdm = _original_tqdm
-            _tqdm_auto_module.tqdm = _original_auto_tqdm
-            if _pc_mod_orig_tqdm is not None:
-                _pc_mod.tqdm = _pc_mod_orig_tqdm
-            if _gen_mod_orig_tqdm is not None:
-                _gen_mod.tqdm = _gen_mod_orig_tqdm
+        # The tqdm patches are process-wide, so keep them inside the generation lock.
+        with _generation_lock:
+            _original_tqdm = _tqdm_module.tqdm
+            _original_auto_tqdm = _tqdm_auto_module.tqdm
+            _pc_mod_orig_tqdm = getattr(_pc_mod, 'tqdm', None)
+            _gen_mod_orig_tqdm = getattr(_gen_mod, 'tqdm', None)
+
+            class _StreamingTqdm(_original_tqdm):
+                """Drop-in tqdm replacement that pushes progress events to the SSE queue."""
+
+                def __init__(self, *args, **kwargs):
+                    # Throttle: only push an SSE event every N seconds
+                    self._last_sse_time = 0.0
+                    self._sse_interval = 2.0  # seconds between SSE pushes
+                    self._is_inner = False
+                    super().__init__(*args, **kwargs)
+                    # Heuristic: the inner (denoising) loop has total >= 100
+                    # while the outer (batch) loop has total == num_batches (small)
+                    if self.total is not None and self.total >= 100:
+                        self._is_inner = True
+
+                def update(self, n=1):
+                    super().update(n)
+                    # Check for cancellation on every step
+                    _check_cancelled()
+                    if not self._is_inner:
+                        # Outer batch loop — track which batch we're on
+                        _current_batch[0] = self.n
+                        return
+                    # Inner denoising loop — push throttled progress events
+                    now = time.time()
+                    if now - self._last_sse_time < self._sse_interval:
+                        return
+                    self._last_sse_time = now
+                    step = self.n
+                    total = self.total or 1
+                    pct = step / total
+                    # Compose overall progress: combine batch index + inner step
+                    batch_frac = (_current_batch[0]) / max(total_batches, 1)
+                    inner_frac = pct / max(total_batches, 1)
+                    overall = min(batch_frac + inner_frac, 1.0)
+                    elapsed = self.format_dict.get("elapsed", 0) or 0
+                    rate = self.format_dict.get("rate", None)
+                    if rate and rate > 0:
+                        remaining = (total - step) / rate
+                        eta_str = f"{remaining:.0f}s remaining"
+                    else:
+                        eta_str = "estimating…"
+                    batch_label = f"Batch {_current_batch[0]+1}/{total_batches}" if total_batches > 1 else "Diffusion"
+                    msg = f"{batch_label} step {step}/{total} ({pct*100:.0f}%) — {eta_str}"
+                    logger.info(f"[{job_id}] step progress: {msg}")
+                    progress_queue.put({
+                        "event": "progress",
+                        "progress": round(overall, 4),
+                        "message": msg,
+                    })
+
+            try:
+                # Patch tqdm in the modules MatterGen imports it from
+                _tqdm_module.tqdm = _StreamingTqdm
+                _tqdm_auto_module.tqdm = _StreamingTqdm
+                _pc_mod.tqdm = _StreamingTqdm
+                _gen_mod.tqdm = _StreamingTqdm
+
+                generator = _create_generator(
+                    req,
+                    model,
+                    checkpoint_info,
+                    progress_callback=_progress_callback,
+                )
+
+                _log("Starting diffusion generation...")
+                structures: list[Structure] = generator.generate(output_dir=output_path)
+            finally:
+                # ── Restore original tqdm so we don't leak the patch ──────
+                _tqdm_module.tqdm = _original_tqdm
+                _tqdm_auto_module.tqdm = _original_auto_tqdm
+                if _pc_mod_orig_tqdm is not None:
+                    _pc_mod.tqdm = _pc_mod_orig_tqdm
+                if _gen_mod_orig_tqdm is not None:
+                    _gen_mod.tqdm = _gen_mod_orig_tqdm
         t_gen = time.time() - t1
         _log(f"Generation complete: {len(structures)} structure(s) in {t_gen:.1f}s")
 

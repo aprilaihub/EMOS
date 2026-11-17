@@ -62,6 +62,21 @@ open index.html
 
 You can also open `index.html` directly from your file browser.
 
+If developers share a Remote SSH server, each backend needs a different remote
+port. For example, start yours with `PORT=5002 python backend/app.py`, serve
+the frontend on a free port with `python -m http.server 8001 --bind 127.0.0.1`,
+and forward both ports in VS Code's Ports panel. If the forwarded frontend and
+backend ports on your computer are 8001 and 5002, open:
+
+```text
+http://localhost:8001/index.html?backend=local&backend_port=5002
+```
+
+Use the **local forwarded backend port** in `backend_port` if VS Code assigns
+a different one. The browser remembers the port for the same frontend origin,
+including the node editor. Set `backend_port=5001` to return to the default.
+Different ports do not isolate shared files or model services.
+
 ### Standard Local Commands
 
 ```bash

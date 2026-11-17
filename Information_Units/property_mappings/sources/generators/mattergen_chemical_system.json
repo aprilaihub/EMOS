@@ -7,6 +7,10 @@
     "chemical_system": {
       "name": "chemical_system",
       "range_support": false
+    },
+    "diffusion_guidance_factor": {
+      "name": "diffusion_guidance_factor",
+      "range_support": false
     }
   }
 }

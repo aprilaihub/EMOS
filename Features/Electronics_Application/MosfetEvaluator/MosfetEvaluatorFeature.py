@@ -4,6 +4,7 @@ import json
 import numpy as np
 from datetime import datetime
 from pathlib import Path
+from uuid import uuid4
 
 
 class MosfetEvaluatorFeature(BaseFeature):
@@ -15,6 +16,8 @@ class MosfetEvaluatorFeature(BaseFeature):
     
     def extract_inputs(self, input_data):
         return {
+            # Node-editor batches opt in without changing standard UI output names.
+            'nodeBatchOutput': input_data.get('nodeBatchOutput') is True,
             'channelLengthNm': input_data.get('channelLengthNm', '14'),
             'sourceDrainLengthNm': input_data.get('sourceDrainLengthNm', '4'),
             'oxideThicknessNm': input_data.get('oxideThicknessNm', '1'),
@@ -137,6 +140,7 @@ class MosfetEvaluatorFeature(BaseFeature):
             'status': 'completed',
             'message': 'MOSFET evaluator feature executed successfully',
             'solver_results': solver_results,
+            'nodeBatchOutput': inputs.get('nodeBatchOutput') is True,
         }
     
     def format_outputs(self, results):
@@ -195,7 +199,8 @@ class MosfetEvaluatorFeature(BaseFeature):
         # Save to JSON file in temp directory
         output_dir = Path(tempfile.gettempdir()) / 'emos_mosfet_results'
         output_dir.mkdir(exist_ok=True)
-        json_filename = f"mosfet_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        suffix = f"_{uuid4().hex}" if results.get('nodeBatchOutput') is True else ""
+        json_filename = f"mosfet_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}{suffix}.json"
         json_path = output_dir / json_filename
         
         with open(json_path, 'w') as f:

@@ -102,6 +102,11 @@ const iuFeatureModules = {
             file: './Features/IU_Features/Predictors/ChgnetIUFeature.js',
             id: 2003,
         },
+        grace: {
+            className: 'GraceIUFeature',
+            file: './Features/IU_Features/Predictors/GraceIUFeature.js',
+            id: 2004,
+        },
         synthnn: {
             className: 'SynthnnIUFeature',
             file: './Features/IU_Features/Predictors/SynthnnIUFeature.js',

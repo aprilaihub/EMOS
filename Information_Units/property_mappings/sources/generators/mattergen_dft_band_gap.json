@@ -7,6 +7,10 @@
     "band_gap_direct": {
       "name": "dft_band_gap",
       "range_support": false
+    },
+    "diffusion_guidance_factor": {
+      "name": "diffusion_guidance_factor",
+      "range_support": false
     }
   }
 }
