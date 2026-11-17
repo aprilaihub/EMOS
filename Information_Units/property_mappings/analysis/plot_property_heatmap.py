@@ -78,6 +78,7 @@ IU_DISPLAY = {
     "mattersim":"MatterSim",
     "synthnn":  "SynthNN",
     "chgnet":   "CHGnet",
+    "grace":    "GRACE",
 }
 
 # Ordered row groups
@@ -87,7 +88,7 @@ ROW_ORDER = {
                    "mattergen_chemical_system", "mattergen_dft_band_gap", "mattergen_bulk_modulus",
                    "mattergen_magnetic_density", "mattergen_chemical_system_stability",
                    "mattergen_magnetic_density_hhi"],
-    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn", "chgnet"],
+    "predictors": ["gbfs", "gbfs2d", "mattersim", "synthnn", "chgnet", "grace"],
 }
 
 SECTION_COLORS = {
