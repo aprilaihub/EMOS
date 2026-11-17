@@ -7,3 +7,4 @@ These tutorials show how to add each type of EMOS component:
 - [Generator IU tutorial](tutorial_generator_iu.md)
 - [Predictor IU tutorial](tutorial_predictor_iu.md)
 - [Feature tutorial](tutorial_feature.md)
+- [PDD similarity tutorial](tutorial_pdd_similarity.md): AMD screen, PDD confirm, on the CIF test fixtures (also as an [executed notebook](tutorial_pdd_similarity.ipynb))
