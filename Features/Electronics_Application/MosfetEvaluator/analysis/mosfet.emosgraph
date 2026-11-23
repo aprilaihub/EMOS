@@ -1,0 +1,766 @@
+{
+  "format": "emos-node-graph",
+  "version": 1,
+  "savedAt": "2026-11-13T16:08:53.818Z",
+  "canvas": {
+    "panX": 315.3421094234453,
+    "panY": 142.6686401010286,
+    "zoom": 0.3021857518821416
+  },
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "feature",
+      "key": "1",
+      "name": "Database Extractor",
+      "x": 203.66425403194478,
+      "y": 77.26162727650292,
+      "width": 358.6722617881478,
+      "height": 378.7305869584951,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "feature_active_databases",
+            "value": "cod",
+            "checked": false
+          },
+          {
+            "name": "feature_active_databases",
+            "value": "materialsproject",
+            "checked": false
+          },
+          {
+            "name": "feature_active_databases",
+            "value": "alexandria",
+            "checked": true
+          },
+          {
+            "name": "feature_active_databases",
+            "value": "mathub3d",
+            "checked": false
+          },
+          {
+            "name": "feature_active_databases",
+            "value": "jarvisdft",
+            "checked": true
+          },
+          {
+            "name": "feature_active_databases",
+            "value": "aflow",
+            "checked": false
+          },
+          {
+            "name": "feature_batch_size",
+            "value": "100"
+          },
+          {
+            "name": "feature_retrieval_mode",
+            "value": "lenient"
+          },
+          {
+            "name": "feature_target_compositions",
+            "value": ""
+          },
+          {
+            "name": "feature_query_values",
+            "value": "{\"band_gap\":[0.9,4.0],\"hull_distance\":[0,0.25], \"nelements\":[2,3]}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "predictor",
+      "key": "gbfs",
+      "name": "GBFS",
+      "x": 1007.6091507333279,
+      "y": 233.57160771900328,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": []
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "utility",
+      "key": "filter",
+      "name": "Filter",
+      "x": 1380.597358607676,
+      "y": 313.8563915744292,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "filterRules": [
+          {
+            "prop": "bandgap",
+            "op": ">=",
+            "val": "0.9"
+          },
+          {
+            "prop": "bandgap",
+            "op": "<=",
+            "val": "4"
+          },
+          {
+            "prop": "dielectric",
+            "op": ">",
+            "val": "3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_10",
+      "type": "utility",
+      "key": "lambda",
+      "name": "Lambda",
+      "x": 1776.9199885907153,
+      "y": 274.27393363764776,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "code",
+            "value": "#deduplicate by composition\n\nrows = results.get(\"results\", [])\nassert len(cif_list) == len(rows), \"Connect matching CIFs and GBFS results.\"\n\nseen = {}\noutput_cifs = []\nkept = []\n\nfor cif, row in zip(cif_list, rows):\n    name = row.get(\"material_name\") or row.get(\"formula\") or row.get(\"composition\")\n\n    if not name:\n        block_name = \"\"\n        for line in cif.split(\"\\n\"):\n            parts = line.strip().split(None, 1)\n            if not parts:\n                continue\n            tag = parts[0].lower()\n            if tag.startswith(\"data_\"):\n                block_name = parts[0][5:]\n            if tag in (\"_chemical_formula_sum\", \"_chemical_formula_structural\") and len(parts) == 2:\n                name = \"\".join(parts[1].strip(\"\\\"'\").split())\n                if name not in (\"\", \".\", \"?\"):\n                    break\n                name = \"\"\n        if not name and not block_name.lower().startswith(\"generated\"):\n            name = block_name.replace(\"_\", \" \").replace(\"-\", \" \")\n\n    if name and name in seen:\n        continue\n    if name:\n        seen[name] = True\n\n    entry = row.copy()\n    entry[\"index\"] = len(output_cifs)\n    output_cifs.append(cif)\n    kept.append(entry)\n\noutput_results = results.copy()\noutput_results[\"results\"] = kept"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_12",
+      "type": "predictor",
+      "key": "mattersim",
+      "name": "MatterSim",
+      "x": 2182.8370206468653,
+      "y": 204.85936600372006,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": []
+      }
+    },
+    {
+      "id": "node_15",
+      "type": "utility",
+      "key": "lambda",
+      "name": "Lambda",
+      "x": 2179.6536896572384,
+      "y": 414.1355716833983,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "code",
+            "value": "#Force-based stability filtering\n\nthreshold = 0.10\nforce_key = \"relaxed_forces\"\n\nrows = results.get(\"results\", [])\nassert not cif_list or len(cif_list) == len(rows), \"CIFs and results must match.\"\noutput_cifs = []\nkept = []\n\nfor i, row in enumerate(rows):\n    if row.get(\"status\") == \"error\" or row.get(\"error\"):\n        continue\n\n    forces = (row.get(\"properties\") or {}).get(force_key)\n    if not forces or not all(len(vector) == 3 for vector in forces):\n        continue\n\n    magnitudes = [\n        sum(component * component for component in vector) ** 0.5\n        for vector in forces\n    ]\n    if not all(magnitude <= threshold for magnitude in magnitudes):\n        continue\n\n    cif = cif_list[i] if cif_list else row.get(\"cif_input\")\n    assert cif, \"A retained result has no matching CIF.\"\n\n    entry = row.copy()\n    entry[\"index\"] = len(kept)\n    output_cifs.append(cif)\n    kept.append(entry)\n\noutput_results = results.copy()\noutput_results[\"results\"] = kept"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_16",
+      "type": "predictor",
+      "key": "synthnn",
+      "name": "SynthNN",
+      "x": 190.47636155271567,
+      "y": 896.5981385485856,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": []
+      }
+    },
+    {
+      "id": "node_17",
+      "type": "utility",
+      "key": "filter",
+      "name": "Filter",
+      "x": 642.7507284336112,
+      "y": 885.8801127892497,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "filterRules": [
+          {
+            "prop": "synthesizability_score",
+            "op": ">",
+            "val": "0.7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_20",
+      "type": "generator",
+      "key": "mattergen_dft_band_gap",
+      "name": "MatterGen: DFT Band Gap",
+      "x": 231.52114651034483,
+      "y": 474.98230901325354,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "batch_size",
+            "value": "50"
+          },
+          {
+            "name": "prop_dft_band_gap",
+            "value": "0.2"
+          },
+          {
+            "name": "prop_diffusion_guidance_factor",
+            "value": "0.8"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_22",
+      "type": "predictor",
+      "key": "gbfs",
+      "name": "GBFS",
+      "x": 993.2689524859593,
+      "y": 1039.896330573895,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": []
+      }
+    },
+    {
+      "id": "node_23",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 1347.8708910716275,
+      "y": 1006.1268626778281,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"results\",\"properties\",\"bandgap\"]",
+          "[\"results\",\"properties\",\"mob_n\"]",
+          "[\"results\",\"properties\",\"mob_p\"]",
+          "[\"results\",\"properties\",\"dielectric\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "tree_results__properties__bandgap",
+            "label": "results > properties > bandgap",
+            "type": "result"
+          },
+          {
+            "key": "tree_results__properties__mob_n",
+            "label": "results > properties > mob_n",
+            "type": "result"
+          },
+          {
+            "key": "tree_results__properties__mob_p",
+            "label": "results > properties > mob_p",
+            "type": "result"
+          },
+          {
+            "key": "tree_results__properties__dielectric",
+            "label": "results > properties > dielectric",
+            "type": "result"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_24",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 610.0693940084459,
+      "y": 95.71854956889696,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"extraction\",\"databases\",\"alexandria\",\"payload\",\"cif_strings\"]",
+          "[\"extraction\",\"databases\",\"jarvisdft\",\"payload\",\"cif_strings\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "tree_extraction__databases__alexandria__payload__cif_strings",
+            "label": "extraction > databases > alexandria > payload > cif_strings",
+            "type": "cif"
+          },
+          {
+            "key": "tree_extraction__databases__jarvisdft__payload__cif_strings",
+            "label": "extraction > databases > jarvisdft > payload > cif_strings",
+            "type": "cif"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_25",
+      "type": "utility",
+      "key": "merger",
+      "name": "Merger",
+      "x": 605.9968630496847,
+      "y": 497.98192460813664,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "merge_mode",
+            "value": "append",
+            "checked": true
+          },
+          {
+            "name": "merge_mode",
+            "value": "merge",
+            "checked": false
+          }
+        ],
+        "inputs": [
+          {
+            "key": "input_one",
+            "defaultLabel": "Input 1",
+            "type": "any"
+          },
+          {
+            "key": "input_two",
+            "defaultLabel": "Input 2",
+            "type": "any"
+          },
+          {
+            "key": "input_3",
+            "defaultLabel": "Input 3",
+            "type": "any"
+          }
+        ],
+        "outputPorts": [
+          {
+            "key": "result_out",
+            "label": "CIF",
+            "type": "cif"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_28",
+      "type": "feature",
+      "key": "4",
+      "name": "MOSFET evaluator",
+      "x": 1869.4961762660894,
+      "y": 943.0187354022352,
+      "width": 360,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "feature_channelLengthNm",
+            "value": "14"
+          },
+          {
+            "name": "feature_sourceDrainLengthNm",
+            "value": "4"
+          },
+          {
+            "name": "feature_oxideThicknessNm",
+            "value": "1"
+          },
+          {
+            "name": "feature_channelThicknessNm",
+            "value": "4"
+          },
+          {
+            "name": "feature_dxM",
+            "value": "5e-10"
+          },
+          {
+            "name": "feature_dyM",
+            "value": "5e-10"
+          },
+          {
+            "name": "feature_temperatureK",
+            "value": "300"
+          },
+          {
+            "name": "feature_gateWorkFunctionEv",
+            "value": "3.65"
+          },
+          {
+            "name": "feature_sdWorkFunctionEv",
+            "value": "0"
+          },
+          {
+            "name": "feature_channelDopingCm3",
+            "value": "-1000000000000000"
+          },
+          {
+            "name": "feature_sourceDrainDopingCm3",
+            "value": "100000000000000000000"
+          },
+          {
+            "name": "feature_drainVoltageVd",
+            "value": "0.7"
+          },
+          {
+            "name": "feature_gateVoltageSweepStartV",
+            "value": "0"
+          },
+          {
+            "name": "feature_gateVoltageSweepStopV",
+            "value": "0.7"
+          },
+          {
+            "name": "feature_numberOfGatePoints",
+            "value": "14"
+          },
+          {
+            "name": "feature_drainVoltageSweepStartV",
+            "value": "0"
+          },
+          {
+            "name": "feature_drainVoltageSweepStopV",
+            "value": "0.7"
+          },
+          {
+            "name": "feature_numberOfDrainPoints",
+            "value": "13"
+          },
+          {
+            "name": "feature_channelNc",
+            "value": "2.8e+25"
+          },
+          {
+            "name": "feature_channelNv",
+            "value": "1.04e+25"
+          },
+          {
+            "name": "feature_channelEpsRel",
+            "value": "11.9"
+          },
+          {
+            "name": "feature_channelUn",
+            "value": "0.15"
+          },
+          {
+            "name": "feature_channelUp",
+            "value": "0.0475"
+          },
+          {
+            "name": "feature_channelXiEv",
+            "value": "4.05"
+          },
+          {
+            "name": "feature_channelEgEv",
+            "value": "1.12"
+          },
+          {
+            "name": "feature_channelVsatN",
+            "value": "200000"
+          },
+          {
+            "name": "feature_channelVsatP",
+            "value": "200000"
+          },
+          {
+            "name": "feature_channelPowN",
+            "value": "2"
+          },
+          {
+            "name": "feature_channelPowP",
+            "value": "1"
+          },
+          {
+            "name": "feature_insulatorNc",
+            "value": "1"
+          },
+          {
+            "name": "feature_insulatorNv",
+            "value": "1"
+          },
+          {
+            "name": "feature_insulatorEpsRel",
+            "value": "3.9"
+          },
+          {
+            "name": "feature_insulatorUn",
+            "value": "0.001"
+          },
+          {
+            "name": "feature_insulatorUp",
+            "value": "0.001"
+          },
+          {
+            "name": "feature_insulatorXiEv",
+            "value": "0.9"
+          },
+          {
+            "name": "feature_insulatorEgEv",
+            "value": "9"
+          },
+          {
+            "name": "feature_insulatorVsatN",
+            "value": "200000"
+          },
+          {
+            "name": "feature_insulatorVsatP",
+            "value": "200000"
+          },
+          {
+            "name": "feature_insulatorPowN",
+            "value": "2"
+          },
+          {
+            "name": "feature_insulatorPowP",
+            "value": "1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_30",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 2289.9773259302888,
+      "y": 1115.0567096660698,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"key_metrics\",\"Ion_Ioff_ratio\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "tree_key_metrics__Ion_Ioff_ratio",
+            "label": "key_metrics > Ion_Ioff_ratio",
+            "type": "result"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_31",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 2345.8089226779152,
+      "y": 895.7327237578976,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"blocks\",\"1\",\"name\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "cif_tree_%5B%22blocks%22%2C%221%22%2C%22name%22%5D",
+            "label": "blocks > 1 > name",
+            "type": "result"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_32",
+      "type": "viewer",
+      "key": "data_viewer",
+      "name": "Data Viewer",
+      "x": 233.78154938008356,
+      "y": 1527.001937450787,
+      "width": 2432.1565558566194,
+      "height": 369.9652098096401,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "dataViewer": {
+          "mode": "Auto",
+          "field": ""
+        }
+      }
+    }
+  ],
+  "connections": [
+    {
+      "fromNode": "node_2",
+      "fromPort": "result_out",
+      "toNode": "node_5",
+      "toPort": "result_in"
+    },
+    {
+      "fromNode": "node_5",
+      "fromPort": "cif_out",
+      "toNode": "node_10",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_5",
+      "fromPort": "result_out",
+      "toNode": "node_10",
+      "toPort": "result_in"
+    },
+    {
+      "fromNode": "node_10",
+      "fromPort": "cif_out",
+      "toNode": "node_12",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_10",
+      "fromPort": "cif_out",
+      "toNode": "node_15",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_12",
+      "fromPort": "result_out",
+      "toNode": "node_15",
+      "toPort": "result_in"
+    },
+    {
+      "fromNode": "node_15",
+      "fromPort": "cif_out",
+      "toNode": "node_16",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_16",
+      "fromPort": "result_out",
+      "toNode": "node_17",
+      "toPort": "result_in"
+    },
+    {
+      "fromNode": "node_15",
+      "fromPort": "cif_out",
+      "toNode": "node_17",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_17",
+      "fromPort": "cif_out",
+      "toNode": "node_22",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_22",
+      "fromPort": "result_out",
+      "toNode": "node_23",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_1",
+      "fromPort": "result_out",
+      "toNode": "node_24",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_24",
+      "fromPort": "tree_extraction__databases__alexandria__payload__cif_strings",
+      "toNode": "node_25",
+      "toPort": "input_one"
+    },
+    {
+      "fromNode": "node_24",
+      "fromPort": "tree_extraction__databases__jarvisdft__payload__cif_strings",
+      "toNode": "node_25",
+      "toPort": "input_two"
+    },
+    {
+      "fromNode": "node_20",
+      "fromPort": "cif_out",
+      "toNode": "node_25",
+      "toPort": "input_3"
+    },
+    {
+      "fromNode": "node_25",
+      "fromPort": "result_out",
+      "toNode": "node_2",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_25",
+      "fromPort": "result_out",
+      "toNode": "node_5",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_23",
+      "fromPort": "tree_results__properties__bandgap",
+      "toNode": "node_28",
+      "toPort": "channel_bandgap"
+    },
+    {
+      "fromNode": "node_23",
+      "fromPort": "tree_results__properties__mob_n",
+      "toNode": "node_28",
+      "toPort": "channel_mob_n"
+    },
+    {
+      "fromNode": "node_23",
+      "fromPort": "tree_results__properties__mob_p",
+      "toNode": "node_28",
+      "toPort": "channel_mob_p"
+    },
+    {
+      "fromNode": "node_23",
+      "fromPort": "tree_results__properties__dielectric",
+      "toNode": "node_28",
+      "toPort": "channel_dielectric"
+    },
+    {
+      "fromNode": "node_17",
+      "fromPort": "cif_out",
+      "toNode": "node_28",
+      "toPort": "channel_name"
+    },
+    {
+      "fromNode": "node_28",
+      "fromPort": "result_out",
+      "toNode": "node_30",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_17",
+      "fromPort": "cif_out",
+      "toNode": "node_31",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_30",
+      "fromPort": "tree_key_metrics__Ion_Ioff_ratio",
+      "toNode": "node_32",
+      "toPort": "data_in"
+    },
+    {
+      "fromNode": "node_31",
+      "fromPort": "cif_tree_%5B%22blocks%22%2C%221%22%2C%22name%22%5D",
+      "toNode": "node_32",
+      "toPort": "labels_in"
+    }
+  ]
+}

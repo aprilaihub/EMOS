@@ -1,0 +1,399 @@
+{
+  "format": "emos-node-graph",
+  "version": 1,
+  "savedAt": "2026-11-13T18:46:08.943Z",
+  "canvas": {
+    "panX": 30.16887519376644,
+    "panY": -75.78357618625057,
+    "zoom": 0.8179069375972322
+  },
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "database",
+      "key": "cod",
+      "name": "COD",
+      "x": 7.544494474098599,
+      "y": 268.02821117683874,
+      "width": 318.8016974120806,
+      "height": 190.12730590604448,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "target_compositions",
+            "value": "ZnO"
+          },
+          {
+            "name": "batch_size",
+            "value": "17"
+          },
+          {
+            "name": "filter_chemical_formula_descriptive",
+            "value": "ZnO"
+          },
+          {
+            "name": "filter_elements",
+            "value": ""
+          },
+          {
+            "name": "filter_id",
+            "value": ""
+          },
+          {
+            "name": "filter_last_modified",
+            "value": ""
+          },
+          {
+            "name": "filter_nelements",
+            "value": "2"
+          },
+          {
+            "name": "filter_nperiodic_dimensions",
+            "value": ""
+          },
+          {
+            "name": "filter_type",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "database",
+      "key": "materialsproject",
+      "name": "MaterialsProject",
+      "x": 3.3576245945647827,
+      "y": 473.8394337402355,
+      "width": 329.9745388187911,
+      "height": 190.20678964832237,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "target_compositions",
+            "value": "ZnO"
+          },
+          {
+            "name": "batch_size",
+            "value": "12"
+          },
+          {
+            "name": "filter_chemical_formula_descriptive",
+            "value": "ZnO"
+          },
+          {
+            "name": "filter__mp_chemical_system",
+            "value": ""
+          },
+          {
+            "name": "filter_elements",
+            "value": ""
+          },
+          {
+            "name": "filter__mp_stability.r2scan.energy_above_hull_min",
+            "value": ""
+          },
+          {
+            "name": "filter__mp_stability.r2scan.energy_above_hull_max",
+            "value": ""
+          },
+          {
+            "name": "filter__mp_stability.r2scan.is_stable",
+            "value": ""
+          },
+          {
+            "name": "filter__mp_stability.r2scan.formation_energy_per_atom_min",
+            "value": ""
+          },
+          {
+            "name": "filter__mp_stability.r2scan.formation_energy_per_atom_max",
+            "value": ""
+          },
+          {
+            "name": "filter_id",
+            "value": ""
+          },
+          {
+            "name": "filter_last_modified",
+            "value": ""
+          },
+          {
+            "name": "filter_nelements",
+            "value": "2"
+          },
+          {
+            "name": "filter_nperiodic_dimensions",
+            "value": ""
+          },
+          {
+            "name": "filter_type",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "utility",
+      "key": "merger",
+      "name": "Merger",
+      "x": 381.282840280471,
+      "y": 325.09988348164876,
+      "width": 333.39793197766875,
+      "height": 220,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "merge_mode",
+            "value": "append",
+            "checked": true
+          },
+          {
+            "name": "merge_mode",
+            "value": "merge",
+            "checked": false
+          }
+        ],
+        "inputs": [
+          {
+            "key": "input_one",
+            "defaultLabel": "Input 1",
+            "type": "any"
+          },
+          {
+            "key": "input_two",
+            "defaultLabel": "Input 2",
+            "type": "any"
+          },
+          {
+            "key": "input_3",
+            "defaultLabel": "Input 3",
+            "type": "any"
+          }
+        ],
+        "outputPorts": [
+          {
+            "key": "result_out",
+            "label": "CIF",
+            "type": "cif"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_7",
+      "type": "predictor",
+      "key": "pdd",
+      "name": "PDD",
+      "x": 789.1486152539816,
+      "y": 278.6750634848047,
+      "width": 320,
+      "height": null,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": []
+      }
+    },
+    {
+      "id": "node_8",
+      "type": "utility",
+      "key": "lambda",
+      "name": "Lambda",
+      "x": 403.24118317219353,
+      "y": 585.4643063913585,
+      "width": 310.7245086308447,
+      "height": 321.2039309532422,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "code",
+            "value": "# Calculate AMD\n\noutput_cifs = cif_list\n\nk = 15\nitems = results.get(\"results\", [])\nassert items, \"No PDD results received.\"\n\nvectors = []\nlabels = []\n\nfor i, item in enumerate(items):\n    assert item.get(\"status\") == \"ok\", \"A PDD computation failed.\"\n\n    pdd = item.get(\"properties\", {}).get(\"pdd_matrix\")\n    assert pdd, \"Missing PDD matrix.\"\n    assert all(len(row) >= k + 1 for row in pdd), \\\n        \"PDD needs at least 15 neighbours.\"\n    assert all(\n        all(0 <= value < float(\"inf\") for value in row[:k + 1])\n        for row in pdd\n    ), \"Invalid weight or distance.\"\n\n    weight = sum(row[0] for row in pdd)\n    assert 0 < weight < float(\"inf\"), \"Invalid total weight.\"\n\n    # Column 0 contains weights; columns 1–15 contain distances.\n    vector = [\n        sum((row[0] / weight) * row[j] for row in pdd)\n        for j in range(1, k + 1)\n    ]\n    vectors.append(vector)\n\n    label = (\n        item.get(\"label\")\n        or item.get(\"material_name\")\n        or item.get(\"formula\")\n        or \"CIF \" + str(i + 1)\n    )\n    labels.append(str(label))\n\nn = len(vectors)\nmatrix = [[0.0 for j in range(n)] for i in range(n)]\n\nfor i in range(n):\n    for j in range(i + 1, n):\n        distance = sum(\n            (vectors[i][d] - vectors[j][d]) ** 2\n            for d in range(k)\n        ) ** 0.5\n        assert distance < float(\"inf\"), \\\n            \"Distance overflow; check input scales.\"\n\n        matrix[i][j] = distance\n        matrix[j][i] = distance\n\noutput_results = {\"matrix\": matrix, \"labels\": labels}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_9",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 781.493892049374,
+      "y": 673.73702751598,
+      "width": 318.9589796443148,
+      "height": 341.60530790670265,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"blocks\",\"1\",\"name\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "cif_tree_%5B%22blocks%22%2C%221%22%2C%22name%22%5D",
+            "label": "blocks > 1 > name",
+            "type": "result"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_12",
+      "type": "utility",
+      "key": "tree_splitter",
+      "name": "Tree Splitter",
+      "x": 781.4345427191827,
+      "y": 543.8468803760928,
+      "width": 320.1003696858764,
+      "height": 120.99630314123594,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "treeSelections": [
+          "[\"matrix\"]"
+        ],
+        "outputPorts": [
+          {
+            "key": "tree_matrix",
+            "label": "matrix",
+            "type": "result"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_14",
+      "type": "viewer",
+      "key": "data_viewer",
+      "name": "Data Viewer",
+      "x": 1167.7124440085888,
+      "y": 228.18031528270768,
+      "width": 284.38469466472174,
+      "height": 499.8359185772591,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "dataViewer": {
+          "mode": "Plot",
+          "field": "[\"properties\",\"pdd_vector\"]"
+        }
+      }
+    },
+    {
+      "id": "node_15",
+      "type": "viewer",
+      "key": "data_viewer",
+      "name": "Data Viewer",
+      "x": 1167.7631316469858,
+      "y": 658.3924837562737,
+      "width": 297.79926062824717,
+      "height": 375.69149722484264,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [],
+        "dataViewer": {
+          "mode": "Heatmap",
+          "field": ""
+        }
+      }
+    },
+    {
+      "id": "node_16",
+      "type": "generator",
+      "key": "mattergen_chemical_system",
+      "name": "MatterGen: Chemical System",
+      "x": 4.561796256667634,
+      "y": 674.7510637426803,
+      "width": 315.5985212564944,
+      "height": 294.286321622573,
+      "breakpointEnabled": false,
+      "configuration": {
+        "fields": [
+          {
+            "name": "batch_size",
+            "value": "50"
+          },
+          {
+            "name": "prop_chemical_system",
+            "value": "Zn-O"
+          },
+          {
+            "name": "prop_diffusion_guidance_factor",
+            "value": "2.0"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "fromNode": "node_1",
+      "fromPort": "cif_out",
+      "toNode": "node_6",
+      "toPort": "input_one"
+    },
+    {
+      "fromNode": "node_5",
+      "fromPort": "cif_out",
+      "toNode": "node_6",
+      "toPort": "input_two"
+    },
+    {
+      "fromNode": "node_6",
+      "fromPort": "result_out",
+      "toNode": "node_7",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_7",
+      "fromPort": "result_out",
+      "toNode": "node_8",
+      "toPort": "result_in"
+    },
+    {
+      "fromNode": "node_6",
+      "fromPort": "result_out",
+      "toNode": "node_8",
+      "toPort": "cif_in"
+    },
+    {
+      "fromNode": "node_8",
+      "fromPort": "cif_out",
+      "toNode": "node_9",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_8",
+      "fromPort": "result_out",
+      "toNode": "node_12",
+      "toPort": "any_in"
+    },
+    {
+      "fromNode": "node_7",
+      "fromPort": "result_out",
+      "toNode": "node_14",
+      "toPort": "data_in"
+    },
+    {
+      "fromNode": "node_9",
+      "fromPort": "cif_tree_%5B%22blocks%22%2C%221%22%2C%22name%22%5D",
+      "toNode": "node_15",
+      "toPort": "labels_in"
+    },
+    {
+      "fromNode": "node_12",
+      "fromPort": "tree_matrix",
+      "toNode": "node_15",
+      "toPort": "data_in"
+    },
+    {
+      "fromNode": "node_16",
+      "fromPort": "cif_out",
+      "toNode": "node_6",
+      "toPort": "input_3"
+    }
+  ]
+}
