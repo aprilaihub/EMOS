@@ -12,6 +12,10 @@
 
 EMOS is an open-source platform for electronics materials science research. Access integrated databases, AI-powered analysis, and computational tools for materials exploration and electronic device design.
 
+## DEMO VIDEO
+
+[![Watch the EMOS demo video](https://drive.google.com/thumbnail?id=1d1WNaRhZOQVDaAnvalEjtsPAQifAzFx7&sz=w1200)](https://drive.google.com/file/d/1d1WNaRhZOQVDaAnvalEjtsPAQifAzFx7/view)
+
 ## QUICK START
 
 ### Prerequisites
